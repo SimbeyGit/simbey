@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Library\Util\RString.h"
-#include "Library\Util\StreamCopy.h"
+#include "..\..\..\Shared\Library\Util\RString.h"
+#include "..\..\..\Shared\Library\Util\StreamCopy.h"
 
 interface __declspec(uuid("03CAACF8-4C42-464c-901E-C5C0AA8F94F3")) IRStringArray : IUnknown
 {

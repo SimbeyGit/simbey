@@ -1,0 +1,22 @@
+function main ()
+{
+	var oSource = Host.OpenFolder();
+	var oRelease = oSource.CreateFolder("..\\target\\release");
+	var oDebug = oSource.CreateFolder("..\\target\\debug");
+
+	var oEnum = oSource.Find("*");
+	do
+	{
+		if(0 != strcmpi(oEnum.Ext, "quadoo"))
+		{
+			var strName = oEnum.Name;
+
+			try oRelease.DeleteFile(strName); catch;
+			try oDebug.DeleteFile(strName); catch;
+
+			println("Copying " + strName);
+			oSource.CopyHardLink(strName, oRelease.GetPathOf(strName));
+			oSource.CopyHardLink(strName, oDebug.GetPathOf(strName));
+		}
+	} while(oEnum.Next());
+}

@@ -1,0 +1,16 @@
+function main ()
+{
+	var oShell = Host.CreateObject("WScript.Shell");
+	try
+	{
+		oShell.RegWrite("HKCR\\QuadooScript\\shell\\open\\command\\", Host.NativeModule + " \"%1\" -args %*", "REG_SZ");
+		oShell.RegWrite("HKCR\\QuadooScript\\shell\\edit\\command\\", "%SystemRoot%\\system32\\NOTEPAD.EXE \"%1\"", "REG_EXPAND_SZ");
+		oShell.RegWrite("HKCR\\.quadoo\\", "QuadooScript", "REG_SZ");
+		oShell.RegWrite("HKCR\\.quadoo\\Content Type", "text/plain", "REG_SZ");
+		Host.WriteLn("QuadooScript has successfully been registered with the shell!");
+	}
+	catch
+	{
+		Host.WriteLn("This script must be run with administrative privileges.");
+	}
+}

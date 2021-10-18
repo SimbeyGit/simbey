@@ -2,7 +2,7 @@
 
 SET _ProjectDir=%CD%
 SET _ThisDir=%~dp0
-SET _AssembleSIF=%_ThisDir%\..\..\target\release\AssembleSIF.exe
+SET _AssembleSIF=%_ThisDir%\..\..\bin\AssembleSIF.exe
 
 IF NOT EXIST "%_AssembleSIF%" GOTO Missing_AssembleSIF
 

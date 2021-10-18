@@ -1,0 +1,42 @@
+function main ()
+{
+	Host.EnableCOM();
+
+	try
+	{
+		var strHost = Host.NativeModule, strUpperHost;
+		var idxLastSlash = strrchr(strHost, '\\');
+		strHost = left(strHost, idxLastSlash);
+		strUpperHost = ucase(strHost);
+
+		println("Checking registration of: " + strHost);
+
+		var aPaths = split(Host.GetEnv("Path"), ";");
+		for(int i = 0; i < len(aPaths); i++)
+		{
+			if(ucase(aPaths[i]) == strUpperHost)
+			{
+				println("Path is already registered!");
+				return;
+			}
+		}
+
+		println("Attempting to register path...");
+
+		var oShell = Host.CreateObject("WScript.Shell");
+		var strPath = oShell.RegRead("HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\Path");
+
+		if(instri(strPath, strHost) == -1)
+		{
+			oShell.RegWrite("HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\\Path", strPath + ";" + strHost, "REG_EXPAND_SZ");
+			println("Registered path: " + strHost);
+		}
+		else
+			println("Already configured in registry!");
+	}
+	catch(e)
+	{
+		println("ERROR: This script must be run with administrative privileges!");
+		println(e.ToString());
+	}
+}
