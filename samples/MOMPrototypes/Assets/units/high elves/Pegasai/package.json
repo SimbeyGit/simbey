@@ -1,0 +1,71 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Pegasai",
+			race: "High Elves",
+			figures: 4,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 3
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 5
+				},
+				range:
+				{
+					stat: "normal arrow",
+					name: "Arrow",
+					value: 3
+				},
+				defense: 4,
+				resist: 8,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Ranged Attack", type: "range", value: 8 },
+				{ name: "Scouting", type: "ability", value: 2 }
+			]
+		}
+	}
+]

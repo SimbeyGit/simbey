@@ -1,0 +1,64 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Minotaurs",
+			race: "Beastmen",
+			figures: 2,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "HeavyWalking.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 12
+				},
+				defense: 4,
+				resist: 7,
+				hits: 12
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 2 },
+				{ name: "Large Shield", type: "ability" }
+			]
+		}
+	}
+]

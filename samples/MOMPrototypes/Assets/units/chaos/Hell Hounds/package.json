@@ -1,0 +1,60 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Hell Hounds",
+			realm: "chaos",
+			figures: 4,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Creature A",
+					value: 3
+				},
+				defense: 2,
+				resist: 6,
+				hits: 4
+			},
+			abilities:
+			[
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 3 },
+				{ name: "To Hit", type: "tohit", value: 1 }
+			]
+		}
+	}
+]

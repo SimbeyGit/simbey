@@ -1,0 +1,63 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Stag Beetle",
+			race: "Klackons",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 15
+				},
+				defense: 7,
+				resist: 6,
+				hits: 20
+			},
+			abilities:
+			[
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 5 }
+			]
+		}
+	}
+]

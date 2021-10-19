@@ -1,0 +1,83 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "Marcus",
+			tag_line: "The Ranger",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 200,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 10
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 6
+				},
+				range:
+				{
+					stat: "normal arrow",
+					name: "Arrow",
+					value: 5
+				},
+				defense: 5,
+				resist: 6,
+				hits: 8
+			},
+			slots: ["bow", "shield", "item"],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 5 },
+				{ name: "Ranged Attack", type: "range", value: 8 },
+				{ name: "Might", type: "ability" },
+				{ name: "Scouting", type: "ability" },
+				{ name: "Pathfinding", type: "ability" }
+			],
+			spells:
+			[
+				"Resist Elements",
+				"Stone Skin"
+			]
+		}
+	}
+]

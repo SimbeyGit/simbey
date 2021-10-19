@@ -1,0 +1,82 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "Yramrag",
+			tag_line: "The Warlock",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 300,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 6
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 20
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 1
+				},
+				range:
+				{
+					stat: "chaos",
+					name: "Lightning Bolt",
+					value: 8
+				},
+				defense: 5,
+				resist: 10,
+				hits: 5
+			},
+			slots: ["staff", "item", "item"],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 15 },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Random", random: "mage" }
+			],
+			spells:
+			[
+				"Lightning Bolt",
+				"Doom Bolt",
+				"Warp Lightning"
+			]
+		}
+	}
+]

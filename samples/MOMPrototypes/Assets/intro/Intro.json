@@ -1,0 +1,133 @@
+[
+	{
+		type: "fader",
+		frame: 0,
+		change: -1.6f,
+		stop: 0.0f
+	},
+	{
+		type: "fader",
+		frame: 2,
+		change: 1.6f,
+		stop: 255.0f
+	},
+	{
+		type: "fader",
+		frame: 3,
+		change: -1.6f,
+		stop: 0.0f
+	},
+	{
+		type: "fader",
+		frame: 5,
+		change: 1.6f,
+		stop: 255.0f
+	},
+	{
+		type: "fader",
+		frame: 6,
+		change: -1.6f,
+		stop: 0.0f
+	},
+	{
+		type: "fader",
+		frame: 31,
+		change: 4.5f,
+		stop: 255.0f
+	},
+	{
+		type: "fader",
+		frame: 32,
+		change: -255.0f,
+		stop: 0.0f
+	},
+	{
+		type: "sound",
+		frame: 50,
+		sound: "SOUNDFX_115_000_-_Old_Man.wav"
+	},
+	{
+		type: "sound",
+		frame: 80,
+		sound: "SOUNDFX_004_000_-_Too_late.wav"
+	},
+	{
+		type: "sound",
+		frame: 107,
+		sound: "SOUNDFX_116_000_-_Met.wav"
+	},
+	{
+		type: "sound",
+		frame: 134,
+		sound: "SOUNDFX_001_000_-_Truth.wav"
+	},
+	{
+		type: "sound",
+		frame: 167,
+		sound: "INTROSFX_000_000.wav"	// Lightning
+	},
+	{
+		type: "sound",
+		frame: 171,
+		sound: "INTROSFX_000_000.wav"	// Lightning
+	},
+	{
+		type: "sound",
+		frame: 190,
+		sound: "SOUNDFX_118_000_-_Mastery.wav"
+	},
+	{
+		type: "sound",
+		frame: 192,
+		sound: "INTROSFX_004_000.wav"	// Casting
+	},
+	{
+		type: "sound",
+		frame: 205,
+		sound: "INTROSFX_005_000.wav"	// Charging
+	},
+	{
+		type: "sound",
+		frame: 234,
+		sound: "INTROSFX_000_000.wav"	// Lightning
+	},
+	{
+		type: "sound",
+		frame: 260,
+		sound: "SOUNDFX_003_000_-_Noooo.wav"
+	},
+	{
+		type: "sound",
+		frame: 273,
+		sound: "INTROSFX_001_000.wav"	// Fireball
+	},
+	{
+		type: "sound",
+		frame: 281,
+		sound: "INTROSFX_003_000.wav"	// Whoosh
+	},
+	{
+		type: "sound",
+		frame: 283,
+		sound: "INTROSFX_001_000.wav"	// Fireball
+	},
+	{
+		type: "sound",
+		frame: 289,
+		sound: "INTROSFX_003_000.wav"	// Whoosh
+	},
+	{
+		type: "sound",
+		frame: 291,
+		sound: "INTROSFX_001_000.wav"	// Fireball
+	},
+	{
+		type: "sound",
+		frame: 303,
+		sound: "INTROSFX_002_000.wav"	// Explosion
+	},
+	{
+		type: "exit",
+		frame: 320
+	}
+]

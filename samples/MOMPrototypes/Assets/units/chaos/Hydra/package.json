@@ -1,0 +1,62 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Hydra",
+			realm: "chaos",
+			figures: 1,
+			heads: 9,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 14
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Creature B",
+					value: 6
+				},
+				defense: 4,
+				resist: 11,
+				hits: 10
+			},
+			abilities:
+			[
+				{ type: "To Hit", type: "tohit", value: 1 }
+				{ type: "Regeneration", type: "ability" },
+				{ type: "Fire Breath", type: "breath", breath: "fire", value: 5 }
+			]
+		}
+	}
+]

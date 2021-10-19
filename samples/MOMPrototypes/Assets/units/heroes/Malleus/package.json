@@ -1,0 +1,84 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "Malleus",
+			tag_line: "The Magician",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 150,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 3
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 5
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 1
+				},
+				range:
+				{
+					stat: "chaos",
+					name: "Fire Bolt",
+					value: 8
+				},
+				defense: 5,
+				resist: 10,
+				hits: 5
+			},
+			slots: ["staff", "item", "item"],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 10 },
+				{ name: "Arcane Power", type: "ability" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Random", random: "mage" }
+			],
+			spells:
+			[
+				"Fire Bolt",
+				"Fireball",
+				"Flame Strike",
+				"Fire Elemental"
+			]
+		}
+	}
+]

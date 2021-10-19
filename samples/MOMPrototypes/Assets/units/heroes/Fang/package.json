@@ -1,0 +1,64 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "Fang",
+			tag_line: "The Draconian",
+			figures: 1,
+			animation: "flying_unit",
+			hire_cost: 200,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 3
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 7
+				},
+				defense: 5,
+				resist: 6,
+				hits: 8
+			},
+			slots: ["sword", "shield", "item"],
+			abilities:
+			[
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 5 },
+				{ name: "Might", type: "ability" },
+				{ name: "Random", random: "fighter" },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]

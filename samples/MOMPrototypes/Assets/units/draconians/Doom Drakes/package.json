@@ -1,0 +1,64 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Doom Drakes",
+			race: "Draconians",
+			figures: 2,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 4
+				},
+				{
+					type: "food",
+					amount: 1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 3
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 8
+				},
+				defense: 3,
+				resist: 9,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 6 },
+				{ name: "Scouting", type: "ability", value: 2 }
+			]
+		}
+	}
+]

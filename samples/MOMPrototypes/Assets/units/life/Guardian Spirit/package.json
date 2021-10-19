@@ -1,0 +1,66 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Guardian Spirit",
+			realm: "life",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 1
+					},
+					{
+						stat: "water",
+						sound: "Scuttle.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "melee",
+					name: "Creature A",
+					value: 10
+				},
+				defense: 4,
+				resist: 10,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "Meld", type: "ability" },
+				{ name: "Non-Corporeal", type: "ability" },
+				{ name: "Resistance to All", type: "ability", value: 1 }
+			]
+		}
+	}
+]

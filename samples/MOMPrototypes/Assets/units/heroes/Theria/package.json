@@ -1,0 +1,62 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "Theria",
+			tag_line: "The Thief",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 100,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 5
+				},
+				defense: 5,
+				resist: 6,
+				hits: 7
+			},
+			slots: ["sword", "shield", "item"],
+			abilities:
+			[
+				{ name: "Agility", type: "ability" },
+				{ name: "Charmed", type: "ability" }
+			]
+		}
+	}
+]

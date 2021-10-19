@@ -1,0 +1,20 @@
+[
+	{
+		package: "buildsif",
+		name: "terrain.sif",
+		files: ["*.png"],
+		canvas: 32
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "terrain",
+			format: "combat",
+			world: "Arcanus",
+			style: "default",
+			category: "standard"
+		}
+	}
+]

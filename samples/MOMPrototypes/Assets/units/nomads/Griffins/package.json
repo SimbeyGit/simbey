@@ -1,0 +1,64 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Griffins",
+			race: "Nomads",
+			figures: 2,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 9
+				},
+				defense: 5,
+				resist: 7,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "Negate First Strike", type: "ability" },
+				{ name: "Armor Piercing", type: "ability" }
+			]
+		}
+	}
+]

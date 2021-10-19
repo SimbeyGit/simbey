@@ -1,0 +1,47 @@
+[
+	{
+		package: "buildsif",
+		name: "buttons.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "animations.json",
+		data:
+		{
+			type: "animation",
+			animation: "buttons",
+			images:
+			[
+				{ layer: 0 },	// button74x21Disabled
+				{ layer: 1 },	// button74x21Normal
+				{ layer: 2 },	// button74x21Pressed
+			],
+			animations:
+			[
+				// button74x21Disabled (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// button74x21Normal (animation 1)
+				{
+					frames:
+					[
+						{ image: 1, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// button74x21Pressed (animation 2)
+				{
+					frames:
+					[
+						{ image: 2, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				}
+			]
+		}
+	}
+]

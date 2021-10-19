@@ -1,0 +1,64 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Steam Cannon",
+			race: "Dwarves",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						type: "land",
+						sound: "Scuttle.mp3",
+						value: 1
+					}
+				],
+				range:
+				{
+					stat: "normal rock",
+					name: "Rock",
+					value: 12
+				}
+				defense: 2,
+				resist: 9,
+				hits: 12
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 10 },
+				{ name: "Mountaineer", type: "ability" }
+			]
+		}
+	}
+]

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns='http://schemas.microsoft.com/windows/2009/Ribbon'>
+  <Application.Commands />
+  <Application.Views>
+    <Ribbon>
+      <Ribbon.QuickAccessToolbar>
+        <QuickAccessToolbar CommandName="ID_QAT" />
+      </Ribbon.QuickAccessToolbar>
+      <Ribbon.ApplicationMenu>
+        <ApplicationMenu CommandName="ID_APP_MENU">
+          <MenuGroup>
+            <Button CommandName="ID_NEW" LabelTitle="New" LargeBitmap="auto" />
+            <Button CommandName="ID_OPEN" LabelTitle="Open" LargeBitmap="auto" />
+            <Button CommandName="ID_SAVE" LabelTitle="Save" LargeBitmap="auto" />
+            <Button CommandName="ID_EXIT" LabelTitle="Exit" LargeBitmap="auto" />
+          </MenuGroup>
+        </ApplicationMenu>
+      </Ribbon.ApplicationMenu>
+      <Ribbon.Tabs>
+        <Tab CommandName="ID_TAB_MAIN" LabelTitle="Main">
+          <Group CommandName="ID_GROUP_WORLD" LabelTitle="World" SizeDefinition="TwoButtons">
+            <ToggleButton CommandName="ID_ARCANUS" LabelTitle="Arcanus" LargeBitmap="auto" />
+            <ToggleButton CommandName="ID_MYRROR" LabelTitle="Myrror" LargeBitmap="auto" />
+          </Group>
+          <Group CommandName="ID_GROUP_TERRAIN" LabelTitle="Terrain" SizeDefinition="OneInRibbonGallery">
+            <InRibbonGallery CommandName="ID_TERRAIN" ItemWidth="20" ItemHeight="18" Type="Items" MaxRows="4" MinColumnsLarge="4" MinColumnsMedium="3" TextPosition="Bottom">
+              <InRibbonGallery.MenuGroups>
+                <MenuGroup>
+                </MenuGroup>
+              </InRibbonGallery.MenuGroups>
+            </InRibbonGallery>
+          </Group>
+          <Group CommandName="ID_GROUP_FEATURES" LabelTitle="Features" SizeDefinition="OneInRibbonGallery">
+            <InRibbonGallery CommandName="ID_FEATURES" ItemWidth="20" ItemHeight="18" Type="Items" MaxRows="10" MinColumnsLarge="2" MinColumnsMedium="1" TextPosition="Bottom">
+              <InRibbonGallery.MenuGroups>
+                <MenuGroup>
+                  <Button CommandName="ID_PLACE_CITY" LabelTitle="Place/Modify City" LargeBitmap="auto" />
+                  <Button CommandName="ID_SELECT_CLEAR" LabelTitle="Select Clear Feature" LargeBitmap="auto" />
+                </MenuGroup>
+              </InRibbonGallery.MenuGroups>
+            </InRibbonGallery>
+          </Group>
+        </Tab>
+      </Ribbon.Tabs>
+    </Ribbon>
+  </Application.Views>
+</Application>

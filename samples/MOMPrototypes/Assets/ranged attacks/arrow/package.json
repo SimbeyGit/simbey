@@ -1,0 +1,26 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			type: "missile",
+			name: "Arrow",
+			sound: "Arrow.mp3",
+			velocity: 4.5,
+			stats:
+			{
+				normal: "Normal Arrow",
+				alchemy: "Alchemy Arrow",
+				mithril: "Mithril Arrow",
+				adamantium: "Adamantium Arrow"
+			}
+		}
+	}
+]

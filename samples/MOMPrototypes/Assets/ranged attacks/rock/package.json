@@ -1,0 +1,26 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			type: "missile",
+			name: "Rock",
+			sound: "Rock.mp3",
+			velocity: 3.5,
+			stats:
+			{
+				normal: "Normal Rock",
+				alchemy: "Alchemy Rock",
+				mithril: "Mithril Rock",
+				adamantium: "Adamantium Rock"
+			}
+		}
+	}
+]

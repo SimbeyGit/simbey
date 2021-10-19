@@ -1,0 +1,66 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Paladins",
+			race: "High Men",
+			figures: 4,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 6
+				},
+				defense: 5,
+				resist: 8,
+				hits: 4
+			},
+			abilities:
+			[
+				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
+				{ name: "Holy Bonus", type: "ability", value: 1 },
+				{ name: "Armor Piercing", type: "ability" },
+				{ name: "First Strike", type: "ability" }
+			]
+		}
+	}
+]

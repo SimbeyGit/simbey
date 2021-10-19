@@ -1,0 +1,63 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Wyvern Riders",
+			race: "Orcs",
+			figures: 2,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 3
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 5
+				},
+				defense: 5,
+				resist: 7,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "Poison Touch", type: "touch", touch: "poison", value: 6 }
+			]
+		}
+	}
+]

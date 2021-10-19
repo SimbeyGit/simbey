@@ -1,0 +1,372 @@
+[
+	{
+		package: "buildsif",
+		name: "new_game_ui.sif",
+		files: ["WizardSelection.png", "Flag.png"]
+	},
+	{
+		package: "buildsif",
+		name: "unit_details.sif",
+		files: ["UnitDetails.png"]
+	},
+	{
+		package: "sif",
+		name: "Buildings.sif"
+	},
+	{
+		package: "sif",
+		name: "CombatBarFont.sif"
+	},
+	{
+		package: "sif",
+		name: "CombatUI.sif"
+	},
+	{
+		package: "sif",
+		name: "DreamOrphanage6A.sif"
+	},
+	{
+		package: "sif",
+		name: "DreamOrphanage6B.sif"
+	},
+	{
+		package: "sif",
+		name: "MoveTo.sif"
+	},
+	{
+		package: "sif",
+		name: "MoveType.sif"
+	},
+	{
+		package: "sif",
+		name: "Nodes.sif"
+	},
+	{
+		package: "sif",
+		name: "Selected.sif"
+	},
+	{
+		package: "sif",
+		name: "SmallYellowFont.sif"
+	},
+	{
+		package: "sif",
+		name: "YellowFont.sif"
+	},
+	{
+		package: "json",
+		name: "Buildings.json",
+		data:
+		{
+			images:
+			[
+				{ layer: 0 },	// house
+				{ layer: 1 },	// house
+				{ layer: 2 },	// house
+				{ layer: 3 },	// house
+				{ layer: 4 },	// house
+				{ layer: 5 },	// wizard tower
+				{ layer: 6 },	// keep
+				{ layer: 7 },	// tower of wizardry
+				{ layer: 8 },	// fallen temple
+				{ layer: 9 }	// ruins
+			],
+			animations:
+			[
+				{	// house
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				{	// house
+					frames:
+					[
+						{ image: 1, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				{	// house
+					frames:
+					[
+						{ image: 2, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				{	// house
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				{	// house
+					frames:
+					[
+						{ image: 4, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				{	// wizard tower
+					frames:
+					[
+						{ image: 5, ticks: 1, xoffset: 0, yoffset: -46 }
+					]
+				},
+				{	// keep
+					frames:
+					[
+						{ image: 6, ticks: 1, xoffset: 0, yoffset: -46 }
+					]
+				},
+				{	// tower of wizardry
+					frames:
+					[
+						{ image: 7, ticks: 1, xoffset: 0, yoffset: -46 }
+					]
+				},
+				{	// fallen temple
+					frames:
+					[
+						{ image: 8, ticks: 1, xoffset: 0, yoffset: -46 }
+					]
+				},
+				{	// ruins
+					frames:
+					[
+						{ image: 9, ticks: 1, xoffset: 0, yoffset: -46 }
+					]
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "CombatUI.json",
+		data:
+		{
+			images:
+			[
+				{ layer: 0 },	// Combat bar
+				{ layer: 1 },	// Spell Normal
+				{ layer: 2 },	// Spell Pressed
+				{ layer: 3 },	// Wait Normal
+				{ layer: 4 },	// Wait Pressed
+				{ layer: 5 },	// Info Normal
+				{ layer: 6 },	// Info Pressed
+				{ layer: 7 },	// Auto Normal
+				{ layer: 8 },	// Auto Pressed
+				{ layer: 9 },	// Flee Normal
+				{ layer: 10 },	// Flee Pressed
+				{ layer: 11 },	// Done Normal
+				{ layer: 12 }	// Done Pressed
+			],
+			animations:
+			[
+				{
+					frames:
+					[
+						// Combat bar
+						{ image: 0, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Spell Normal
+						{ image: 1, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Spell Pressed
+						{ image: 2, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Wait Normal
+						{ image: 3, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Wait Pressed
+						{ image: 4, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Info Normal
+						{ image: 5, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Info Pressed
+						{ image: 6, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Auto Normal
+						{ image: 7, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Auto Pressed
+						{ image: 8, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Flee Normal
+						{ image: 9, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Flee Pressed
+						{ image: 10, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Done Normal
+						{ image: 11, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						// Done Pressed
+						{ image: 12, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "MoveTo.json",
+		data:
+		{
+			images:
+			[
+				{ layer: 0 },
+				{ layer: 1 },
+				{ layer: 2 },
+				{ layer: 3 },
+				{ layer: 4 },
+				{ layer: 5 },
+				{ layer: 6 },
+				{ layer: 7 }
+			],
+			animations:
+			[
+				{
+					frames:
+					[
+						{ image: 0, ticks: 10, xoffset: 0, yoffset: 0 },
+						{ image: 1, ticks: 10, xoffset: 0, yoffset: 0 },
+						{ image: 2, ticks: 10, xoffset: 0, yoffset: 0 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: 0 },
+						{ image: 4, ticks: 10, xoffset: 0, yoffset: 0 },
+						{ image: 5, ticks: 10, xoffset: 0, yoffset: 0 },
+						{ image: 6, ticks: 10, xoffset: 0, yoffset: 0 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: 0 }
+					]
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "MoveType.json",
+		data:
+		{
+			images:
+			[
+				{ layer: 0 },	// can't move
+				{ layer: 1 },	// melee
+				{ layer: 2 },	// ranged
+				{ layer: 3 },	// move/spell
+			],
+			animations:
+			[
+				{	// can't move
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: -8, yoffset: -4 }
+					]
+				},
+				{	// melee
+					frames:
+					[
+						{ image: 1, ticks: 1, xoffset: -8, yoffset: -4 }
+					]
+				},
+				{	// ranged
+					frames:
+					[
+						{ image: 2, ticks: 1, xoffset: -8, yoffset: -4 }
+					]
+				},
+				{	// move/spell
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: -8, yoffset: -4 }
+					]
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "Tiles.json",
+		data:
+		{
+			images:
+			[
+				{ layer: 0 },
+				{ layer: 1 },
+				{ layer: 2 },
+				{ layer: 3 }
+			],
+			animations:
+			[
+				{
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						{ image: 1, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						{ image: 2, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				{
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				}
+			]
+		}
+	}
+]

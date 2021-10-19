@@ -1,0 +1,79 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "champion",
+			name: "Roland",
+			tag_line: "The Paladin",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 500,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 10
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 40
+				},
+				{
+					type: "book",
+					book: "life"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 9
+				},
+				defense: 5,
+				resist: 6,
+				hits: 8
+			},
+			slots: ["sword", "shield", "item"],
+			abilities:
+			[
+				{ name: "Legendary", type: "ability" },
+				{ name: "Super Might", type: "ability" },
+				{ name: "Prayermaster", type: "ability" },
+				{ name: "Healer", type: "ability" },
+				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
+				{ name: "Armor Piercing", type: "ability" },
+				{ name: "First Strike", type: "ability" },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]

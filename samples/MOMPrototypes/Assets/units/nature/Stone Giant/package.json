@@ -1,0 +1,70 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Stone Giant",
+			realm: "nature",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 9
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						type: "land",
+						sound: "HeavyWalking.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Colossus",
+					value: 15
+				},
+				range:
+				{
+					stat: "normal rock",
+					name: "Rock",
+					value: 15
+				}
+				defense: 8,
+				resist: 9,
+				hits: 20
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 2 },
+				{ name: "To Hit", type: "tohit", value: 2 },
+				{ name: "Mountaineer", type: "ability" },
+				{ name: "Wall Crusher", type: "ability" },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" }
+			]
+		}
+	}
+]

@@ -1,0 +1,70 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Dark Elf Nightmares",
+			race: "Dark Elves",
+			figures: 4,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 3
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 8
+				},
+				range:
+				{
+					stat: "chaos",
+					name: "Drow Sparkle",
+					value: 5
+				},
+				defense: 4,
+				resist: 8,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 4 },
+				{ name: "Scouting", type: "ability" }
+			]
+		}
+	}
+]

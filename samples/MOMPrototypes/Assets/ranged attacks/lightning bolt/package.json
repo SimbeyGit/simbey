@@ -1,0 +1,25 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			type: "magic",
+			name: "Lightning Bolt",
+			realm: "chaos",
+			cost: 3,
+			sound: "LightningBolt.mp3",
+			velocity: 6.0,
+			stats:
+			{
+				normal: "Magic"
+			}
+		}
+	}
+]

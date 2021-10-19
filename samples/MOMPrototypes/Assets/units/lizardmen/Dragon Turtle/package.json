@@ -1,0 +1,68 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Dragon Turtle",
+			race: "Lizardmen",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 2
+					},
+					{
+						stat: "water",
+						sound: "Scuttle.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 10
+				},
+				defense: 8,
+				resist: 8,
+				hits: 15
+			},
+			abilities:
+			[
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 5 }
+			]
+		}
+	}
+]

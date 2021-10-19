@@ -1,0 +1,59 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Troll Spearmen",
+			race: "Trolls",
+			figures: 8,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Armor.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 3
+				},
+				defense: 2,
+				resist: 7,
+				hits: 4
+			},
+			abilities:
+			[
+				{ name: "Regeneration", type: "ability" }
+			]
+		}
+	}
+]

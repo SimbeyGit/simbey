@@ -1,0 +1,336 @@
+[
+	{
+		package: "buildsif",
+		name: "wizards.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "animations.json",
+		data:
+		{
+			type: "animation",
+			animation: "wizards",
+			images:
+			[
+				{ layer: 0 },	// WZ01
+				{ layer: 1 },	// WZ02
+				{ layer: 2 },	// WZ03
+				{ layer: 3 },	// WZ04
+				{ layer: 4 },	// WZ05
+				{ layer: 5 },	// WZ06
+				{ layer: 6 },	// WZ07
+				{ layer: 7 },	// WZ08
+				{ layer: 8 },	// WZ09
+				{ layer: 9 },	// WZ10
+				{ layer: 10 },	// WZ11
+				{ layer: 11 },	// WZ12
+				{ layer: 12 },	// WZ13
+				{ layer: 13 }	// WZ14
+			],
+			animations:
+			[
+				// WZ01 (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ02 (animation 1)
+				{
+					frames:
+					[
+						{ image: 1, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ03 (animation 2)
+				{
+					frames:
+					[
+						{ image: 2, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ04 (animation 3)
+				{
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ05 (animation 4)
+				{
+					frames:
+					[
+						{ image: 4, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ06 (animation 5)
+				{
+					frames:
+					[
+						{ image: 5, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ07 (animation 6)
+				{
+					frames:
+					[
+						{ image: 6, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ08 (animation 7)
+				{
+					frames:
+					[
+						{ image: 7, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ09 (animation 8)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ10 (animation 9)
+				{
+					frames:
+					[
+						{ image: 9, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ11 (animation 10)
+				{
+					frames:
+					[
+						{ image: 10, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ12 (animation 11)
+				{
+					frames:
+					[
+						{ image: 11, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ13 (animation 12)
+				{
+					frames:
+					[
+						{ image: 12, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// WZ14 (animation 13)
+				{
+					frames:
+					[
+						{ image: 13, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "wizards.json",
+		data:
+		{
+			type: "data",
+			wizards:
+			[
+				{
+					name: "Merlin",
+					portrait: 0,
+					books:
+					{
+						life: 5,
+						nature: 5
+					},
+					retorts:
+					[
+						"Sage Master"
+					],
+					music: [ "MOM72.MID", "MOM73.MID" ]
+				},
+				{
+					name: "Raven",
+					portrait: 1,
+					books:
+					{
+						sorcery: 6,
+						nature: 5
+					},
+					retorts:
+					[
+					],
+					music: [ "MOM74.MID", "MOM75.MID" ]
+				},
+				{
+					name: "Sharee",
+					portrait: 2,
+					books:
+					{
+						death: 5,
+						chaos: 5
+					},
+					retorts:
+					[
+						"Conjurer"
+					],
+					music: [ "MOM76.MID", "MOM77.MID" ]
+				},
+				{
+					name: "Lo Pan",
+					portrait: 3,
+					books:
+					{
+						sorcery: 5,
+						chaos: 5
+					},
+					retorts:
+					[
+						"Channeler"
+					],
+					music: [ "MOM78.MID" ]
+				},
+				{
+					name: "Jafar",
+					portrait: 4,
+					books:
+					{
+						sorcery: 10
+					},
+					retorts:
+					[
+						"Alchemy"
+					],
+					music: [ "MOM80.MID", "MOM81.MID" ]
+				},
+				{
+					name: "Oberic",
+					portrait: 5,
+					books:
+					{
+						nature: 5,
+						chaos: 5
+					},
+					retorts:
+					[
+						"Mana Focusing"
+					],
+					music: [ "MOM82.MID", "MOM83.MID" ]
+				},
+				{
+					name: "Rjak",
+					portrait: 6,
+					books:
+					{
+						death: 9
+					},
+					retorts:
+					[
+						"Sage Master"
+					],
+					music: [ "MOM84.MID", "MOM85.MID" ]
+				},
+				{
+					name: "Sss'ra",
+					portrait: 7,
+					books:
+					{
+						life: 4,
+						chaos: 4
+					},
+					retorts:
+					[
+						"Myrran"
+					],
+					music: [ "MOM86.MID", "MOM87.MID" ]
+				},
+				{
+					name: "Tauron",
+					portrait: 8,
+					books:
+					{
+						chaos: 10
+					},
+					retorts:
+					[
+						"Chaos Mastery"
+					],
+					music: [ "MOM88.MID", "MOM89.MID" ]
+				},
+				{
+					name: "Freya",
+					portrait: 9,
+					books:
+					{
+						nature: 10
+					},
+					retorts:
+					[
+						"Nature Mastery"
+					],
+					music: [ "MOM90.MID", "MOM91.MID" ]
+				},
+				{
+					name: "Horus",
+					portrait: 10,
+					books:
+					{
+						life: 5,
+						sorcery: 5
+					},
+					retorts:
+					[
+						"Archmage"
+					],
+					music: [ "MOM92.MID", "MOM93.MID" ]
+				},
+				{
+					name: "Ariel",
+					portrait: 11,
+					books:
+					{
+						life: 10
+					},
+					retorts:
+					[
+						"Charismatic"
+					],
+					music: [ "MOM94.MID", "MOM95.MID" ]
+				},
+				{
+					name: "Tlaloc",
+					portrait: 12,
+					books:
+					{
+						life: 5,
+						nature: 5
+					},
+					retorts:
+					[
+						"Warlord"
+					],
+					music: [ "MOM96.MID", "MOM97.MID" ]
+				},
+				{
+					name: "Kali",
+					portrait: 13,
+					books:
+					{
+						sorcery: 5,
+						death: 5
+					},
+					retorts:
+					[
+						"Artificer"
+					],
+					music: [ "MOM98.MID", "MOM99.MID" ]
+				}
+			]
+		}
+	}
+]

@@ -1,0 +1,67 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Sky Drake",
+			realm: "sorcery",
+			figures: 1,
+			animation: "air_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 25
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "DrakeFly.mp3",
+						value: 4
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Drake",
+					value: 20
+				},
+				defense: 10,
+				resist: 14,
+				hits: 25
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 3 },
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
+				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
+				{ name: "Lightning Breath", type: "breath", breath: "lightning", value: 20,
+					abilities:
+					[
+						{ name: "Armor Piercing", type: "ability" }
+					]
+				}
+			]
+		}
+	}
+]

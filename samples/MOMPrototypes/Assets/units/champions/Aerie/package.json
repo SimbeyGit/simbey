@@ -1,0 +1,84 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "champion",
+			name: "Aerie",
+			tag_line: "The Illusionist",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 500,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 10
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 40
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 1
+				},
+				range:
+				{
+					stat: "sorcery",
+					name: "Illusion Ball",
+					value: 5
+				},
+				defense: 4,
+				resist: 6,
+				hits: 5
+			},
+			slots: ["staff", "item", "item"],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 10 },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Illusion", type: "ability" },
+				{ name: "Random", random: "mage" },
+				{ name: "Random", random: "mage" }
+			],
+			spells:
+			[
+				"Psionic Blast",
+				"Vertigo",
+				"Mind Storm"
+			]
+		}
+	}
+]

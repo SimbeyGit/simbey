@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MOMCombatDemo", "MOMCombatDemo\MOMCombatDemo.vcproj", "{371BC3D3-189D-46B6-AD64-00787E1283BD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MOMWorldEditor", "MOMWorldEditor\MOMWorldEditor.vcproj", "{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{371BC3D3-189D-46B6-AD64-00787E1283BD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{371BC3D3-189D-46B6-AD64-00787E1283BD}.Debug|Win32.Build.0 = Debug|Win32
+		{371BC3D3-189D-46B6-AD64-00787E1283BD}.Release|Win32.ActiveCfg = Release|Win32
+		{371BC3D3-189D-46B6-AD64-00787E1283BD}.Release|Win32.Build.0 = Release|Win32
+		{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}.Debug|Win32.Build.0 = Debug|Win32
+		{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}.Release|Win32.ActiveCfg = Release|Win32
+		{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

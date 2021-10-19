@@ -1,0 +1,74 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Demon Lord",
+			realm: "death",
+			figures: 1,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 15
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 20
+				},
+				range:
+				{
+					stat: "chaos",
+					name: "Fire bolt",
+					value: 10
+				},
+				defense: 10,
+				resist: 12,
+				hits: 20
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 8 },
+				{ name: "To Hit", type: "tohit", value: 3 },
+				{ name: "Summon Demons", type: "ability", value: 3 },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Weapon Immunity", type: "immunity", immunity: "weapon" },
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
+				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" },
+				{ name: "Cause Fear", type: "ability" },
+				{ name: "Life Steal", type: "touch", touch: "life steal", value: 5, resist: true }
+			]
+		}
+	}
+]

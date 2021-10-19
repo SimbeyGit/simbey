@@ -1,0 +1,60 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Cockatrices",
+			realm: "nature",
+			figures: 4,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 8
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Creature A",
+					value: 4
+				},
+				defense: 3,
+				resist: 7,
+				hits: 3
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Stoning Touch", type: "touch", touch: "stoning", value: 3 }
+			]
+		}
+	}
+]

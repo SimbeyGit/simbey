@@ -1,0 +1,67 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "Valana",
+			tag_line: "The Bard",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 100,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 4
+				},
+				defense: 5,
+				resist: 6,
+				hits: 6
+			},
+			slots: ["sword", "shield", "item"],
+			abilities:
+			[
+				{ name: "Leadership", type: "ability" },
+				{ name: "Caster", type: "caster", value: 5 }
+			],
+			spells:
+			[
+				"Confusion",
+				"Vertigo"
+			]
+		}
+	}
+]

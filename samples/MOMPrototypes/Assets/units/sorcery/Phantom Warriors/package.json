@@ -1,0 +1,61 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Phantom Warriors",
+			realm: "sorcery",
+			figures: 6,
+			animation: "ground_unit",
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 1
+					},
+					{
+						stat: "water",
+						sound: "Scuttle.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 3
+				},
+				defense: 0,
+				resist: 6,
+				hits: 1
+			},
+			abilities:
+			[
+				{ name: "Non-Corporeal", type: "ability" },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" },
+				{ name: "Illusion", type: "ability" }
+			]
+		}
+	}
+]

@@ -1,0 +1,54 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Fire Elemental",
+			realm: "chaos",
+			figures: 1,
+			animation: "ground_unit",
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Creature A",
+					value: 12
+				},
+				defense: 4,
+				resist: 6,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Fire Immunity", type: "immunity", immunity: "fire" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" }
+			]
+		}
+	}
+]

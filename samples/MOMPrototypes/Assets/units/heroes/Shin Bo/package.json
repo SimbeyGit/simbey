@@ -1,0 +1,71 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "Shin Bo",
+			tag_line: "The Ninja",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 300,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 6
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 20
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 6
+				},
+				defense: 5,
+				resist: 6,
+				hits: 7
+			},
+			slots: ["sword", "shield", "item"],
+			abilities:
+			[
+				{ name: "Blademaster", type: "ability" },
+				{ name: "Invisibility", type: "ability" },
+				{ name: "Random", random: "fighter" },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]

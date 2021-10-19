@@ -1,0 +1,60 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Great Drake",
+			realm: "chaos",
+			figures: 1,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 30
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "DrakeFly.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Drake",
+					value: 30
+				},
+				defense: 10,
+				resist: 12,
+				hits: 30
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 3 },
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 30 }
+			]
+		}
+	}
+]

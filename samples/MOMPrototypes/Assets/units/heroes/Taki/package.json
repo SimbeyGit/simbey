@@ -1,0 +1,69 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "Taki",
+			tag_line: "The War Monk",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 150,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 3
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 5
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 6
+				},
+				defense: 5,
+				resist: 6,
+				hits: 6
+			},
+			slots: ["sword", "shield", "item"],
+			abilities:
+			[
+				{ name: "Super Agility", type: "ability" },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]

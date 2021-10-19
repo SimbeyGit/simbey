@@ -1,0 +1,574 @@
+function ExpandStats (oUnit, nLevel)
+{
+	var oBase = oUnit.base;
+	var oStats = JSONClone(oBase.stats, true /* deep clone */);
+	var strType = oBase.type;
+	var nBaseToHit = 3, nBaseToBlock = 3;
+	var nAttackBonus = 0;
+
+	if(strType != "fantastic")	// Fantastic creatures don't have level adjustments.
+	{
+		if(strType == "hero" || strType == "champion")
+		{
+			if(nLevel > 1)
+				nBaseToHit += ((nLevel - 2) / 3) + 1;
+
+			if(nLevel > 0)
+				oStats.defense = oStats.defense + (nLevel - 1) / 2 + 1;
+
+			oStats.hits = oStats.hits + nLevel;
+			nAttackBonus = nLevel;
+		}
+		else
+		{
+			if(nLevel > 2)
+			{
+				nBaseToHit += nLevel - 2;
+
+				oStats.hits = oStats.hits + (nLevel - 3) / 2 + 1;
+			}
+
+			if(nLevel > 1)
+				oStats.defense = oStats.defense + (nLevel - 2) / 2 + 1;
+
+			// Don't calculate an attack bonus if the unit has no melee.
+			if(nLevel > 0 && 0 < oStats.melee.value)
+				nAttackBonus = (nLevel - 1) / 2 + 1;
+		}
+
+		oStats.melee.value = oStats.melee.value + nAttackBonus;
+		if(oStats.Has("range"))
+			oStats.range.value = oStats.range.value + nAttackBonus;
+		oStats.resist = oStats.resist + nLevel;
+	}
+
+	// If the unit has a "Thrown" ability, then
+	// build an expanded "thrown" stat for it.
+	try
+	{
+		var oThrown = JSONGetObject(oBase, "abilities[name:\"Thrown\"]", false);
+		var oThrownStat = JSONCreateObject();
+		oThrownStat.type = "thrown";
+		oThrownStat.value = oThrown.value + nAttackBonus;
+		oStats.thrown = oThrownStat;
+	}
+	catch;
+
+	oStats.attack_bonus = nAttackBonus;
+	oStats.to_hit = nBaseToHit;
+	oStats.to_block = nBaseToBlock;
+	if(oBase.Has("heads"))
+		oStats.actors = oBase.heads;
+	else
+		oStats.actors = oBase.figures;
+
+	return oStats;
+}
+
+class CombatUnit
+{
+	var m_oUnit;
+	var m_oStats;
+	var m_aHeads;
+	var m_nDamage;	// Accumulated damage, before applying to m_oUnit
+
+	CombatUnit (oUnit, oExpStats) :
+		m_oUnit(oUnit),
+		m_oStats(oExpStats),
+		m_aHeads(JSONCreateArray()),
+		m_nDamage(0)
+	{
+		var cHits = m_oStats.hits;
+		var cMaxHeads = m_oStats.actors;
+		var nMaxHits = cMaxHeads * cHits;
+		var nHealth = nMaxHits - oUnit.damage;
+
+		while(0 < nHealth)
+		{
+			var oHead = JSONCreateObject();
+			oHead.hits = cHits > nHealth ? nHealth : cHits;
+			oHead.damage = 0;
+			oHead.frozen = false;
+			m_aHeads.Append(oHead);
+			nHealth -= cHits;
+		}
+	}
+
+	property Unit
+	{
+		get
+		{
+			return m_oUnit;
+		}
+	}
+
+	property Abilities
+	{
+		get
+		{
+			return m_oUnit.base.abilities;
+		}
+	}
+
+	property Stats
+	{
+		get
+		{
+			return m_oStats;
+		}
+	}
+
+	property Heads
+	{
+		get
+		{
+			return m_aHeads;
+		}
+	}
+
+	property LiveHeads
+	{
+		get
+		{
+			var c = 0, cHeads = len(m_aHeads);
+			for(var i = 0; i < cHeads; i++)
+			{
+				var oHead = m_aHeads[i];
+				if(oHead.damage < oHead.hits)
+					c++;
+			}
+			return c;
+		}
+	}
+
+	function FindAbility (strName)
+	{
+		try
+			return JSONGetObject(m_oUnit, "base:abilities[name:\"" + strName + "\"]", false);
+		catch
+			return null;
+	}
+
+	function FindImmunity (strType)
+	{
+		var oAbilities = m_oUnit.base.abilities;
+		var cAbilities = len(oAbilities);
+		for(var i = 0; i < cAbilities; i++)
+		{
+			var oAbility = oAbilities[i];
+			if(oAbility.type == "immunity")
+			{
+				var vImmunity = oAbility.immunity;
+				if(QVType.JSONArray == typeof(vImmunity))
+				{
+					if(vImmunity.Find(strType) >= 0)
+						return oAbility;
+				}
+				else if(vImmunity == strType)
+					return oAbility;
+			}
+		}
+		return null;
+	}
+
+	function AddDamage (nHead, nDamage)
+	{
+		var oHead = m_aHeads[nHead];
+		var cRemaining = oHead.hits;
+		var cPending = oHead.damage;
+		var nAppliedDamage = nDamage;
+
+		if(nDamage > cRemaining - cPending)
+			nAppliedDamage = cRemaining - cPending;
+
+		oHead.damage = cPending + nAppliedDamage;
+		m_nDamage += nAppliedDamage;
+
+		return nDamage - nAppliedDamage;
+	}
+
+	function CommitDamage ()
+	{
+		var nInflicted = m_nDamage;
+		m_nDamage = 0;
+
+		for(int i = len(m_aHeads) - 1; i >= 0; i--)
+		{
+			var oHead = m_aHeads[i];
+			oHead.hits = oHead.hits - oHead.damage;
+
+			if(oHead.hits == 0)
+				m_aHeads.Remove(i);
+			oHead.damage = 0;
+		}
+		m_oUnit.damage = m_oUnit.damage + nInflicted;
+
+		return nInflicted;
+	}
+};
+
+class DamageCalculator
+{
+	var m_strSourceOwner, m_oSource, m_nSourceLevel;
+	var m_strTargetOwner, m_oTarget, m_nTargetLevel;
+
+	var m_oSourceCombatUnit, m_oTargetCombatUnit;
+
+	DamageCalculator (strSourceOwner, oSource, nSourceLevel, strTargetOwner, oTarget, nTargetLevel) :
+		m_strSourceOwner(strSourceOwner),
+		m_oSource(oSource),
+		m_nSourceLevel(nSourceLevel),
+		m_strTargetOwner(strTargetOwner),
+		m_oTarget(oTarget),
+		m_nTargetLevel(nTargetLevel)
+	{
+	}
+
+	function RangeAttack (mapRange)
+	{
+		var oResult = JSONCreateObject();
+
+		var oExpSource = ExpandStats(m_oSource, m_nSourceLevel);
+		var oExpTarget = ExpandStats(m_oTarget, m_nTargetLevel);
+
+		m_oSourceCombatUnit = new CombatUnit(m_oSource, oExpSource);
+		m_oTargetCombatUnit = new CombatUnit(m_oTarget, oExpTarget);
+
+		var oWeapon = CreateRangeWeapon(mapRange, m_oSourceCombatUnit);
+		SingleAttack(m_oSourceCombatUnit, oWeapon, m_oTargetCombatUnit);
+
+		var nDamageToTarget = m_oTargetCombatUnit.CommitDamage();
+		var nMaxHealth = oExpTarget.actors * oExpTarget.hits;
+
+		oResult.target_figures = m_oTargetCombatUnit.LiveHeads;
+		oResult.target_impact = (double)nDamageToTarget / (double)nMaxHealth;
+
+		return oResult;
+	}
+
+	function MeleeAttack ()
+	{
+		var oResult = JSONCreateObject();
+
+		var oExpSource = ExpandStats(m_oSource, m_nSourceLevel);
+		var oExpTarget = ExpandStats(m_oTarget, m_nTargetLevel);
+
+		m_oSourceCombatUnit = new CombatUnit(m_oSource, oExpSource);
+		m_oTargetCombatUnit = new CombatUnit(m_oTarget, oExpTarget);
+
+		var nDamageToSource = 0, nDamageToTarget = 0;
+
+		Stage1Attack(ref nDamageToSource, ref nDamageToTarget);
+		Stage2Attack(ref nDamageToSource, ref nDamageToTarget);
+		Stage3Attack(ref nDamageToSource, ref nDamageToTarget);
+
+		var nSourceMaxHealth = oExpSource.actors * oExpSource.hits;
+		var nTargetMaxHealth = oExpTarget.actors * oExpTarget.hits;
+
+		oResult.source_figures = m_oSourceCombatUnit.LiveHeads;
+		oResult.source_impact = (double)nDamageToSource / (double)nSourceMaxHealth;
+		oResult.target_figures = m_oTargetCombatUnit.LiveHeads;
+		oResult.target_impact = (double)nDamageToTarget / (double)nTargetMaxHealth;
+
+		return oResult;
+	}
+
+	// Private Methods
+
+	function HasWeaponAbility (oWeapon, strAbility)
+	{
+		try
+			return JSONGetObject(oWeapon, "abilities[name:\"" + strAbility + "\"]", false);
+		catch
+			return null;
+	}
+
+	function CreateRangeWeapon (mapRange, oCombatSource)
+	{
+		var oWeapon = JSONCreateObject();
+		var oStats = oCombatSource.Stats;
+		var oRange = oStats.range;
+		var oRangeDef = mapRange[oRange.name];
+
+		oWeapon.type = oRangeDef.type;
+		oWeapon.value = oRange.value;
+		if(oRangeDef.Has("realm"))
+			oWeapon.realm = oRangeDef.realm;
+		if(oWeapon.type == "magic")
+			oWeapon.immunity = "magic";
+		else
+			oWeapon.immunity = "missile";
+		oWeapon.to_hit = oStats.to_hit;
+		oWeapon.abilities = oCombatSource.Abilities;
+
+		return oWeapon;
+	}
+
+	function CreateThrownWeapon (oCombatSource)
+	{
+		var oWeapon = JSONCreateObject();
+		var oStats = oCombatSource.Stats;
+		var oThrown = oStats.thrown;
+
+		if(oCombatSource.FindAbility("Illusion"))
+			oWeapon.type = "illusion";
+		else
+			oWeapon.type = oThrown.type;
+		oWeapon.value = oThrown.value;
+		oWeapon.immunity = "weapon";
+		oWeapon.to_hit = oStats.to_hit;
+		oWeapon.abilities = oCombatSource.Abilities;
+
+		return oWeapon;
+	}
+
+	function CreateSpecialWeapon (oCombatSource, oAbility)
+	{
+		var oWeapon = JSONCreateObject();
+		var oStats = oCombatSource.Stats;
+		var oAbilities = oCombatSource.Abilities;
+
+		oWeapon.name = oAbility.name;
+		oWeapon.type = oAbility[oAbility.type];
+		oWeapon.value = oAbility.value;
+		oWeapon.immunity = oWeapon.type;
+		oWeapon.to_hit = oStats.to_hit;
+
+		if(oAbility.Has("resist"))
+			oWeapon.resist = oAbility.resist;
+
+		// The "Lightning Breath" ability also has the "Armor Piercing" ability.
+		if(oAbility.Has("abilities"))
+		{
+			oWeapon.abilities = JSONClone(oAbility.abilities, false);
+
+			var cAbilities = len(oAbilities);
+			for(int x = 0; x < cAbilities; x++)
+				oWeapon.abilities.Append(oAbilities[x]);
+		}
+		else
+			oWeapon.abilities = oAbilities;
+
+		return oWeapon;
+	}
+
+	function CreateMeleeWeapon (oCombatSource)
+	{
+		var oWeapon = JSONCreateObject();
+		var oStats = oCombatSource.Stats;
+		var oMelee = oStats.melee;
+
+		if(oCombatSource.FindAbility("Illusion"))
+			oWeapon.type = "illusion";
+		else
+			oWeapon.type = "melee";
+		oWeapon.value = oMelee.value;
+		oWeapon.immunity = "weapon";
+		oWeapon.to_hit = oStats.to_hit;
+		oWeapon.abilities = oCombatSource.Abilities;
+
+		return oWeapon;
+	}
+
+	function SingleAttack (oCombatAttacker, oWeapon, oCombatTarget)
+	{
+		var aAttackers = oCombatAttacker.Heads;
+		var aTargets = oCombatTarget.Heads;
+		var oTargetStats = oCombatTarget.Stats;
+
+		var nToHit = oWeapon.to_hit;
+		var nToBlock = oTargetStats.to_block;
+		var nDefense = oTargetStats.defense;
+
+		// Adjust the weapon's "To Hit" value for a "To Hit" bonus.
+		var oToHitBonus = HasWeaponAbility(oWeapon, "To Hit");
+		if(oToHitBonus)
+			nToHit += oToHitBonus.value;
+
+		// Adjust the weapon's "To Hit" value as well as the
+		// target's "To Block" value based on the "Lucky" ability.
+		if(oCombatAttacker.FindAbility("Lucky"))
+			nToHit++;
+		if(oCombatTarget.FindAbility("Lucky"))
+		{
+			nToBlock++;
+			nToHit--;
+		}
+
+		// If the target has immunity to the weapon, then increase
+		// the target's defense to 50 for this attack.
+		if(oWeapon.Has("immunity"))
+		{
+			var oImmunity = oCombatTarget.FindImmunity(oWeapon.immunity);
+			if(oImmunity && nDefense < 50)
+				nDefense = 50;
+		}
+
+		// If the attacker has "Armor Piercing" then the target's
+		// defense value is cut in half.
+		if(HasWeaponAbility(oWeapon, "Armor Piercing"))
+			nDefense = nDefense >> 1;
+
+		bool fResist;
+		if(oWeapon.Has("resist"))
+			fResist = oWeapon.resist;
+
+		var nStrength = oWeapon.value;
+		for(int a = 0; a < len(aAttackers); a++)
+		{
+			int cDamage;
+
+			// Skip any attacker that is frozen (e.g. wracked by fear)
+			if(aAttackers[a].frozen)
+				continue;
+
+			if(fResist)
+			{
+				var nResist = oTargetStats.resist - nStrength;
+				var nRolled = dice(10);
+				if(nRolled > nResist)
+					cDamage = nRolled - nResist;
+			}
+			else
+			{
+				for(int s = 0; s < nStrength; s++)
+				{
+					if(dice(10) <= nToHit)
+						cDamage++;
+				}
+			}
+
+			if(0 < cDamage)
+			{
+				for(int u = len(aTargets) - 1; u >= 0; u--)
+				{
+					if(!fResist)
+					{
+						for(int d = 0; d < nDefense; d++)
+						{
+							if(dice(10) <= nToBlock)
+							{
+								cDamage--;
+								if(0 == cDamage)
+									break;
+							}
+						}
+					}
+
+					cDamage = oCombatTarget.AddDamage(u, cDamage);
+					if(0 == cDamage)
+						break;
+				}
+			}
+		}
+	}
+
+	function SpecialAttack (oCombatAttacker, strType, oCombatTarget)
+	{
+		var oAbilities = oCombatAttacker.Abilities;
+		var cAbilities = len(oAbilities);
+		for(int i = 0; i < cAbilities; i++)
+		{
+			var oAbility = oAbilities[i];
+			if(oAbility.type == strType)
+			{
+				var oWeapon = CreateSpecialWeapon(oCombatAttacker, oAbility);
+				SingleAttack(oCombatAttacker, oWeapon, oCombatTarget);
+			}
+		}
+	}
+
+	function PerformFearRoll (oCombatAttacker, oCombatTarget)
+	{
+		if(oCombatAttacker.FindAbility("Cause Fear") && !oCombatTarget.FindImmunity("fear"))
+		{
+			var aTargets = oCombatTarget.Heads;
+			var nResist = oCombatTarget.Stats.resist;
+
+			for(int i = 0; i < len(aTargets); i++)
+			{
+				if(dice(10) > nResist)
+					aTargets[i].frozen = true;
+			}
+		}
+	}
+
+	function Stage1Attack (nDamageToSource, nDamageToTarget)
+	{
+		if(m_oSourceCombatUnit.FindAbility("Thrown"))
+			nDamageToTarget += SingleAttack(m_oSourceCombatUnit, CreateThrownWeapon(m_oSourceCombatUnit), m_oTargetCombatUnit);
+
+		SpecialAttack(m_oSourceCombatUnit, "breath", m_oTargetCombatUnit);
+		SpecialAttack(m_oSourceCombatUnit, "gaze", m_oTargetCombatUnit);
+
+		nDamageToTarget += m_oTargetCombatUnit.CommitDamage();
+	}
+
+	function Stage2Attack (nDamageToSource, nDamageToTarget)
+	{
+		// For stage 2, the target and attacker are flipped.
+		// That is, the target gets to use gaze attacks against the attacker.
+		SpecialAttack(m_oTargetCombatUnit, "gaze", m_oSourceCombatUnit);
+
+		nDamageToSource += m_oSourceCombatUnit.CommitDamage();
+	}
+
+	function Stage3Attack (nDamageToSource, nDamageToTarget)
+	{
+		PerformFearRoll(m_oSourceCombatUnit, m_oTargetCombatUnit);
+		PerformFearRoll(m_oTargetCombatUnit, m_oSourceCombatUnit);
+
+		// Apply melee damage from the attacker to the target.
+		SingleAttack(m_oSourceCombatUnit, CreateMeleeWeapon(m_oSourceCombatUnit), m_oTargetCombatUnit);
+		SpecialAttack(m_oSourceCombatUnit, "touch", m_oTargetCombatUnit);
+
+		// If the attacker has "First Strike" then the target commits its damage immediately,
+		// unless the target also has the "Negate First Strike" ability.
+		if(m_oSourceCombatUnit.FindAbility("First Strike") && !m_oTargetCombatUnit.FindAbility("Negate First Strike"))
+			nDamageToTarget += m_oTargetCombatUnit.CommitDamage();
+
+		// If the target still has live figures, now it gets a chance to counterattack.
+		SingleAttack(m_oTargetCombatUnit, CreateMeleeWeapon(m_oTargetCombatUnit), m_oSourceCombatUnit);
+		SpecialAttack(m_oTargetCombatUnit, "touch", m_oSourceCombatUnit);
+
+		nDamageToSource += m_oSourceCombatUnit.CommitDamage();
+		nDamageToTarget += m_oTargetCombatUnit.CommitDamage();
+	}
+};
+
+class Combat
+{
+	var m_strPlayer1, m_oPlayer1;
+	var m_strPlayer2, m_oPlayer2;
+	var m_mapRange = new map<string>;
+
+	Combat (strPlayer1, oPlayer1, strPlayer2, oPlayer2) :
+		m_strPlayer1(strPlayer1),
+		m_oPlayer1(oPlayer1),
+		m_strPlayer2(strPlayer2),
+		m_oPlayer2(oPlayer2)
+	{
+	}
+
+	function AddRangeAttack (strName, oData)
+	{
+		m_mapRange.Add(strName, oData);
+	}
+
+	function RangeAttack (strSource, oSource, nSourceLevel, strTarget, oTarget, nTargetLevel)
+	{
+		var oDamageCalculator = new DamageCalculator(strSource, oSource, nSourceLevel, strTarget, oTarget, nTargetLevel);
+		return oDamageCalculator.RangeAttack(m_mapRange);
+	}
+
+	function MeleeAttack (strSource, oSource, nSourceLevel, strTarget, oTarget, nTargetLevel)
+	{
+		var oDamageCalculator = new DamageCalculator(strSource, oSource, nSourceLevel, strTarget, oTarget, nTargetLevel);
+		return oDamageCalculator.MeleeAttack();
+	}
+};
+
+function CreateCombatObject (strPlayer1, oPlayer1, strPlayer2, oPlayer2)
+{
+	return new Combat(strPlayer1, oPlayer1, strPlayer2, oPlayer2);
+}

@@ -1,0 +1,90 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "champion",
+			name: "Ravashack",
+			tag_line: "The Necromancer",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 500,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 10
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 40
+				},
+				{
+					type: "book",
+					book: "death"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 1
+				},
+				range:
+				{
+					stat: "chaos",
+					name: "Death Bolt",
+					value: 7
+				},
+				defense: 5,
+				resist: 6,
+				hits: 5
+			},
+			slots: ["staff", "item", "item"],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 12.5 },
+				{ name: "Arcane Power", type: "ability" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Life Steal", type: "touch", touch: "life steal", value: 0, resist: true },
+				{ name: "Random", random: "mage" },
+				{ name: "Random", random: "mage" }
+			],
+			spells:
+			[
+				"Weakness",
+				"Black Sleep",
+				"Animate Dead",
+				"Wrack"
+			]
+		}
+	}
+]

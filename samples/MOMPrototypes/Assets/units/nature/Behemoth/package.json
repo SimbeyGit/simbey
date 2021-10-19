@@ -1,0 +1,59 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Behemoth",
+			realm: "nature",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 15
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "HeavyWalking.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Behemoth",
+					value: 25
+				},
+				defense: 9,
+				resist: 10,
+				hits: 45
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 2 }
+			]
+		}
+	}
+]

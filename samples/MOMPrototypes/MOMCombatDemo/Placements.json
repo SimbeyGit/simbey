@@ -1,0 +1,126 @@
+{
+	player: "defense",
+	defense:
+	{
+		objects:
+		[
+			{
+				// Add the wizard's tower
+				type: "building",
+				x: 8,
+				y: 16,
+				object: 5
+			},
+			{
+				type: "unit",
+				name: "Warrax",
+				level: 4
+			},
+			{
+				type: "unit",
+				name: "Torin",
+				level: 2
+			},
+			{
+				type: "unit",
+				name: "Mystic X",
+				level: 5
+			},
+			{
+				type: "unit",
+				name: "Zaldron",
+				level: 3
+			},
+			{
+				type: "unit",
+				name: "Ravashack",
+				level: 4
+			},
+			{
+				type: "unit",
+				name: "War Mammoths",
+				level: 1
+			},
+			{
+				type: "unit",
+				name: "Dragon Turtle",
+				level: 2,
+				enchanted: true
+			},
+			{
+				type: "unit",
+				name: "Doom Drakes",
+				level: 2
+			},
+			{
+				type: "unit",
+				name: "Paladins",
+				level: 3
+			},
+			{
+				type: "unit",
+				name: "Fang",
+				level: 4,
+				enchanted: true
+			}
+		]
+	},
+	offense:
+	{
+		name: "Monsters",
+		objects:
+		[
+			{
+				// Add the tower of wizardry
+				type: "building",
+				x: 20,
+				y: 16,
+				object: 7
+			},
+			{
+				type: "unit",
+				name: "Great Drake",
+				level: 0
+			},
+			{
+				type: "unit",
+				name: "Behemoth",
+				level: 1
+			},
+			{
+				type: "unit",
+				name: "Earth Elemental",
+				level: 0
+			},
+			{
+				type: "unit",
+				name: "Basilisk",
+				level: 2
+			},
+			{
+				type: "unit",
+				name: "Giant Spiders",
+				level: 3
+			},
+			{
+				type: "unit",
+				name: "Shadow Demons",
+				level: 1
+			},
+			{
+				type: "unit",
+				name: "Sprites",
+				level: 0
+			},
+			{
+				type: "unit",
+				name: "Chaos Spawn",
+				level: 0
+			}
+		],
+		def:
+		{
+			// Anything here is passed to the combat script
+		}
+	}
+}

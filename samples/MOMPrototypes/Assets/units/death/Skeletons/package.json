@@ -1,0 +1,64 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Skeletons",
+			realm: "death",
+			figures: 6,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 3
+				},
+				defense: 4,
+				resist: 5,
+				hits: 1
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
+				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" }
+			]
+		}
+	}
+]

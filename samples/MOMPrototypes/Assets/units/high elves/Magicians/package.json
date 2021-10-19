@@ -1,0 +1,73 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "High Elf Magicians",
+			race: "High Elves",
+			figures: 4,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 4
+				},
+				{
+					type: "food",
+					amount: 1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Armor.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 1
+				},
+				range:
+				{
+					stat: "chaos",
+					name: "Fire Bolt",
+					value: 5
+				},
+				defense: 3,
+				resist: 10,
+				hits: 1
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 4 },
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Forester", type: "ability" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Fireball", type: "spell", value: 5 }
+			]
+		}
+	}
+]

@@ -1,0 +1,46 @@
+[
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			import: "units\\shared\\Settlers",
+			type: "normal",
+			name: "High Elf Settlers",
+			race: "High Elves",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 1
+					}
+				],
+				defense: 1,
+				resist: 6,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "Create Outpost", type: "ability" },
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Forester", type: "ability" }
+			]
+		}
+	}
+]

@@ -1,0 +1,54 @@
+[
+	{
+		package: "sound",
+		name: "INTROSFX_000_000.wav"
+	},
+	{
+		package: "sound",
+		name: "INTROSFX_001_000.wav"
+	},
+	{
+		package: "sound",
+		name: "INTROSFX_002_000.wav"
+	},
+	{
+		package: "sound",
+		name: "INTROSFX_003_000.wav"
+	},
+	{
+		package: "sound",
+		name: "INTROSFX_004_000.wav"
+	},
+	{
+		package: "sound",
+		name: "INTROSFX_005_000.wav"
+	},
+	{
+		package: "sound",
+		name: "SOUNDFX_001_000_-_Truth.wav"
+	},
+	{
+		package: "sound",
+		name: "SOUNDFX_003_000_-_Noooo.wav"
+	},
+	{
+		package: "sound",
+		name: "SOUNDFX_004_000_-_Too_late.wav"
+	},
+	{
+		package: "sound",
+		name: "SOUNDFX_115_000_-_Old_man.wav"
+	},
+	{
+		package: "sound",
+		name: "SOUNDFX_116_000_-_Met.wav"
+	},
+	{
+		package: "sound",
+		name: "SOUNDFX_117_000_-_Unused.wav"
+	},
+	{
+		package: "sound",
+		name: "SOUNDFX_118_000_-_Mastery.wav"
+	}
+]

@@ -1,0 +1,62 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Phantom Beast",
+			realm: "sorcery",
+			figures: 1,
+			animation: "ground_unit",
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 2
+					},
+					{
+						stat: "water",
+						sound: "Scuttle.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 18
+				},
+				defense: 0,
+				resist: 8,
+				hits: 20
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Non-Corporeal", type: "ability" },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" },
+				{ name: "Illusion", type: "ability" }
+			]
+		}
+	}
+]

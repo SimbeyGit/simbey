@@ -1,0 +1,69 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Centaurs",
+			race: "Beastmen",
+			figures: 4,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 3
+				},
+				range:
+				{
+					stat: "normal arrow",
+					name: "Arrow",
+					value: 2
+				},
+				defense: 3,
+				resist: 5,
+				hits: 3
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 6 }
+			]
+		}
+	}
+]

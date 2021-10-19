@@ -1,0 +1,69 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Fire Giant",
+			realm: "chaos",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 3
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "HeavyWalking.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Colossus",
+					value: 10
+				},
+				range:
+				{
+					stat: "normal rock",
+					name: "Rock",
+					value: 10
+				}
+				defense: 5,
+				resist: 7,
+				hits: 15
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 2 },
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Mountaineer", type: "ability" },
+				{ name: "Wall Crusher", type: "ability" },
+				{ name: "Fire Immunity", type: "immunity", immunity: "fire" }
+			]
+		}
+	}
+]

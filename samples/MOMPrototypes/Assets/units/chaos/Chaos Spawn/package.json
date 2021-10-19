@@ -1,0 +1,63 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Chaos Spawn",
+			realm: "chaos",
+			figures: 1,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 12
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Creature A",
+					value: 1
+				},
+				defense: 6,
+				resist: 10,
+				hits: 15
+			},
+			abilities:
+			[
+				{ name: "Cause Fear", type: "ability" },
+				{ name: "Poison Touch", type: "touch", touch: "poison", value: 4 },
+				{ name: "Doom Gaze", type: "gaze", gaze: "doom", value: 4 },
+				{ name: "Death Gaze", type: "gaze", gaze: "death", value: 4 },
+				{ name: "Stoning Gaze", type: "gaze", gaze: "stoning", value: 4 }
+			]
+		}
+	}
+]

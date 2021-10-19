@@ -1,0 +1,54 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Floating Island",
+			realm: "sorcery",
+			figures: 1,
+			animation: "land_unit",
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "water",
+						sound: "Scuttle.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 0
+				},
+				defense: 0,
+				resist: 10,
+				hits: 45
+			},
+			abilities:
+			[
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" }
+			]
+		}
+	}
+]

@@ -1,0 +1,61 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "hero",
+			name: "B'Shan",
+			tag_line: "The Dervish",
+			figures: 1,
+			animation: "ground_unit",
+			hire_cost: 100,
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 4
+				},
+				range:
+				{
+					state: "normal arrow",
+					name: "Arrow",
+					value: 4
+				},
+				defense: 4,
+				resist: 6,
+				hits: 6
+			},
+			slots: ["bow", "shield", "item"],
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 8 },
+				{ name: "Noble", type: "ability" }
+			]
+		}
+	}
+]

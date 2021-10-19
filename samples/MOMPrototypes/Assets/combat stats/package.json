@@ -1,0 +1,1990 @@
+[
+	{
+		package: "buildsif",
+		name: "combat_stats.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "combat_melee.json",
+		data:
+		{
+			type: "melee",
+			melee:
+			[
+				{
+					name: "Behemoth",
+					sound: "BehemothAttack.mp3"
+				},
+				{
+					name: "Colossus",
+					sound: "Colossus.mp3"
+				},
+				{
+					name: "Creature A",
+					sound: "CreatureA.mp3"
+				},
+				{
+					name: "Creature B",
+					sound: "CreatureB.mp3"
+				},
+				{
+					name: "Drake",
+					sound: "DrakeAttack.mp3"
+				},
+				{
+					name: "Sprites",
+					sound: "SpritesAttack.mp3"
+				},
+				{
+					name: "Sword",
+					sound: "SwordAttack.mp3"
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "combat_stats.json",
+		data:
+		{
+			type: "stats",
+			stats:
+			[
+				{
+					stat: "normal melee",
+					type: "melee",
+					image: "MeleeNormal.png"
+				},
+				{
+					stat: "alchemy melee",
+					type: "melee",
+					image: "MeleeAlchemy.png"
+				},
+				{
+					stat: "mithril melee",
+					type: "melee",
+					image: "MeleeMithril.png"
+				},
+				{
+					stat: "adamantium melee",
+					type: "melee",
+					image: "MeleeAdamantium.png"
+				},
+				{
+					stat: "normal arrow",
+					type: "missile",
+					image: "ArrowNormal.png"
+				},
+				{
+					stat: "alchemy arrow",
+					type: "missile",
+					image: "ArrowAlchemy.png"
+				},
+				{
+					stat: "mithril arrow",
+					type: "missile",
+					image: "ArrowMithril.png"
+				},
+				{
+					stat: "adamantium arrow",
+					type: "missile",
+					image: "ArrowAdamantium.png"
+				},
+				{
+					stat: "normal rock",
+					type: "missile",
+					image: "RockNormal.png"
+				},
+				{
+					stat: "alchemy rock",
+					type: "missile",
+					image: "RockAlchemy.png"
+				},
+				{
+					stat: "mithril rock",
+					type: "missile",
+					image: "RockMithril.png"
+				},
+				{
+					stat: "adamantium rock",
+					type: "missile",
+					image: "RockAdamantium.png"
+				},
+				{
+					stat: "normal defense",
+					type: "defense",
+					image: "DefenseNormal.png"
+				},
+				{
+					stat: "alchemy defense",
+					type: "defense",
+					image: "DefenseAlchemy.png"
+				},
+				{
+					stat: "mithril defense",
+					type: "defense",
+					image: "DefenseMithril.png"
+				},
+				{
+					stat: "adamantium defense",
+					type: "defense",
+					image: "DefenseAdamantium.png"
+				},
+				{
+					stat: "chaos",
+					type: "magic",
+					image: "Chaos.png"
+				},
+				{
+					stat: "nature",
+					type: "magic",
+					image: "Nature.png"
+				},
+				{
+					stat: "sorcery",
+					type: "magic",
+					image: "Sorcery.png"
+				},
+				{
+					stat: "defense",
+					type: "defense",
+					image: "Defense.png"
+				},
+				{
+					stat: "resist",
+					type: "resist",
+					image: "Resist.png"
+				},
+				{
+					stat: "hits",
+					type: "hits",
+					image: "HitPoints.png"
+				},
+				{
+					stat: "land",
+					type: "move",
+					name: "Move Land",
+					image: "MoveLand.png",
+					animation: "ground_unit"
+				},
+				{
+					stat: "water",
+					type: "move",
+					name: "Move Water",
+					image: "MoveWater.png",
+					animation: "ground_unit"
+				},
+				{
+					stat: "air",
+					type: "move",
+					name: "Move Air",
+					image: "MoveAir.png",
+					animation: "flying_unit"
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "LandUnit.json",
+		data:
+		{
+			type: "animation",
+			animation: "ground_unit",
+			images:
+			[
+				{ layer: 0 },	// d1-attack
+				{ layer: 1 },	// d1-move
+				{ layer: 2 },	// d1-move
+				{ layer: 3 },	// d1-stand
+				{ layer: 4 },	// d2-attack
+				{ layer: 5 },	// d2-move
+				{ layer: 6 },	// d2-move
+				{ layer: 7 },	// d2-stand
+				{ layer: 8 },	// d3-attack
+				{ layer: 9 },	// d3-move
+				{ layer: 10 },	// d3-move
+				{ layer: 11 },	// d3-stand
+				{ layer: 12 },	// d4-attack
+				{ layer: 13 },	// d4-move
+				{ layer: 14 },	// d4-move
+				{ layer: 15 },	// d4-stand
+				{ layer: 16 },	// d5-attack
+				{ layer: 17 },	// d5-move
+				{ layer: 18 },	// d5-move
+				{ layer: 19 },	// d5-stand
+				{ layer: 20 },	// d6-attack
+				{ layer: 21 },	// d6-move
+				{ layer: 22 },	// d6-move
+				{ layer: 23 },	// d6-stand
+				{ layer: 24 },	// d7-attack
+				{ layer: 25 },	// d7-move
+				{ layer: 26 },	// d7-move
+				{ layer: 27 },	// d7-stand
+				{ layer: 28 },	// d8-attack
+				{ layer: 29 },	// d8-move
+				{ layer: 30 },	// d8-move
+				{ layer: 31 }	// d8-stand
+			],
+			animations:
+			[
+				// d1-attack (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 0, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 0, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 2
+				},
+				// d1-move (animation 1)
+				{
+					frames:
+					[
+						{ image: 1, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 2, ticks: 15, xoffset: 0, yoffset: -15 },
+					]
+				},
+				// d1-stand (animation 2)
+				{
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d1-range (animation 3)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 2
+				},
+				// d2-attack (animation 4)
+				{
+					frames:
+					[
+						{ image: 4, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 4, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 4, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 6
+				},
+				// d2-move (animation 5)
+				{
+					frames:
+					[
+						{ image: 5, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 6, ticks: 15, xoffset: 0, yoffset: -15 },
+					]
+				},
+				// d2-stand (animation 6)
+				{
+					frames:
+					[
+						{ image: 7, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d2-range (animation 7)
+				{
+					frames:
+					[
+						{ image: 4, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 6
+				},
+				// d3-attack (animation 8)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 8, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 8, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 10
+				},
+				// d3-move (animation 9)
+				{
+					frames:
+					[
+						{ image: 9, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 10, ticks: 15, xoffset: 0, yoffset: -15 },
+					]
+				},
+				// d3-stand (animation 10)
+				{
+					frames:
+					[
+						{ image: 11, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d3-range (animation 11)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 10
+				},
+				// d4-attack (animation 12)
+				{
+					frames:
+					[
+						{ image: 12, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 12, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 12, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 14
+				},
+				// d4-move (animation 13)
+				{
+					frames:
+					[
+						{ image: 13, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 14, ticks: 15, xoffset: 0, yoffset: -15 },
+					]
+				},
+				// d4-stand (animation 14)
+				{
+					frames:
+					[
+						{ image: 15, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d4-range (animation 15)
+				{
+					frames:
+					[
+						{ image: 12, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 13, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 14
+				},
+				// d5-attack (animation 16)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 16, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 16, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 18
+				},
+				// d5-move (animation 17)
+				{
+					frames:
+					[
+						{ image: 17, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 18, ticks: 15, xoffset: 0, yoffset: -15 },
+					]
+				},
+				// d5-stand (animation 18)
+				{
+					frames:
+					[
+						{ image: 19, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d5-range (animation 19)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 18
+				},
+				// d6-attack (animation 20)
+				{
+					frames:
+					[
+						{ image: 20, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 20, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 20, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 22
+				},
+				// d6-move (animation 21)
+				{
+					frames:
+					[
+						{ image: 21, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 22, ticks: 15, xoffset: 0, yoffset: -15 },
+					]
+				},
+				// d6-stand (animation 22)
+				{
+					frames:
+					[
+						{ image: 23, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d6-range (animation 23)
+				{
+					frames:
+					[
+						{ image: 20, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 22
+				},
+				// d7-attack (animation 24)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 24, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 24, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 26
+				},
+				// d7-move (animation 25)
+				{
+					frames:
+					[
+						{ image: 25, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 26, ticks: 15, xoffset: 0, yoffset: -15 },
+					]
+				},
+				// d7-stand (animation 26)
+				{
+					frames:
+					[
+						{ image: 27, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d7-range (animation 27)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 26
+				},
+				// d8-attack (animation 28)
+				{
+					frames:
+					[
+						{ image: 28, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 28, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 28, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 30
+				},
+				// d8-move (animation 29)
+				{
+					frames:
+					[
+						{ image: 29, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 30, ticks: 15, xoffset: 0, yoffset: -15 },
+					]
+				},
+				// d8-stand (animation 30)
+				{
+					frames:
+					[
+						{ image: 31, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d8-range (animation 31)
+				{
+					frames:
+					[
+						{ image: 28, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 30
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "EnchantedLandUnit.json",
+		data:
+		{
+			type: "animation",
+			animation: "enchanted_ground_unit",
+			images:
+			[
+				{ layer: 0 },	// d1-attack-a
+				{ layer: 1 },	// d1-attack-b
+				{ layer: 2 },	// d1-move-a
+				{ layer: 3 },	// d1-move-b
+				{ layer: 4 },	// d1-move-a
+				{ layer: 5 },	// d1-move-b
+				{ layer: 6 },	// d1-stand-a
+				{ layer: 7 },	// d1-stand-b
+				{ layer: 8 },	// d2-attack-a
+				{ layer: 9 },	// d2-attack-b
+				{ layer: 10 },	// d2-move-a
+				{ layer: 11 },	// d2-move-b
+				{ layer: 12 },	// d2-move-a
+				{ layer: 13 },	// d2-move-b
+				{ layer: 14 },	// d2-stand-a
+				{ layer: 15 },	// d2-stand-b
+				{ layer: 16 },	// d3-attack-a
+				{ layer: 17 },	// d3-attack-b
+				{ layer: 18 },	// d3-move-a
+				{ layer: 19 },	// d3-move-b
+				{ layer: 20 },	// d3-move-a
+				{ layer: 21 },	// d3-move-b
+				{ layer: 22 },	// d3-stand-a
+				{ layer: 23 },	// d3-stand-b
+				{ layer: 24 },	// d4-attack-a
+				{ layer: 25 },	// d4-attack-b
+				{ layer: 26 },	// d4-move-a
+				{ layer: 27 },	// d4-move-b
+				{ layer: 28 },	// d4-move-a
+				{ layer: 29 },	// d4-move-b
+				{ layer: 30 },	// d4-stand-a
+				{ layer: 31 },	// d4-stand-b
+				{ layer: 32 },	// d5-attack-a
+				{ layer: 33 },	// d5-attack-b
+				{ layer: 34 },	// d5-move-a
+				{ layer: 35 },	// d5-move-b
+				{ layer: 36 },	// d5-move-a
+				{ layer: 37 },	// d5-move-b
+				{ layer: 38 },	// d5-stand-a
+				{ layer: 39 },	// d5-stand-b
+				{ layer: 40 },	// d6-attack-a
+				{ layer: 41 },	// d6-attack-b
+				{ layer: 42 },	// d6-move-a
+				{ layer: 43 },	// d6-move-b
+				{ layer: 44 },	// d6-move-a
+				{ layer: 45 },	// d6-move-b
+				{ layer: 46 },	// d6-stand-a
+				{ layer: 47 },	// d6-stand-b
+				{ layer: 48 },	// d7-attack-a
+				{ layer: 49 },	// d7-attack-b
+				{ layer: 50 },	// d7-move-a
+				{ layer: 51 },	// d7-move-b
+				{ layer: 52 },	// d7-move-a
+				{ layer: 53 },	// d7-move-b
+				{ layer: 54 },	// d7-stand-a
+				{ layer: 55 },	// d7-stand-b
+				{ layer: 56 },	// d8-attack-a
+				{ layer: 57 },	// d8-attack-b
+				{ layer: 58 },	// d8-move-a
+				{ layer: 59 },	// d8-move-b
+				{ layer: 60 },	// d8-move-a
+				{ layer: 61 },	// d8-move-b
+				{ layer: 62 },	// d8-stand-a
+				{ layer: 63 }	// d8-stand-b
+			],
+			animations:
+			[
+				// d1-attack (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 1, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 7, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 0, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 1, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 7, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 0, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 1, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 7, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 2
+				},
+				// d1-move (animation 1)
+				{
+					frames:
+					[
+						{ image: 2, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 3, ticks: 7, xoffset: -1, yoffset: -16 },
+						{ image: 4, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 5, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d1-stand (animation 2)
+				{
+					frames:
+					[
+						{ image: 6, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 7, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d1-range (animation 3)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 1, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 7, ticks: 5, xoffset: -1, yoffset: -16 }
+					],
+					next: 2
+				},
+				// d2-attack (animation 4)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 9, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 15, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 8, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 9, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 15, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 8, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 9, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 15, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 6
+				},
+				// d2-move (animation 5)
+				{
+					frames:
+					[
+						{ image: 10, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 11, ticks: 7, xoffset: -1, yoffset: -16 },
+						{ image: 12, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 13, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d2-stand (animation 6)
+				{
+					frames:
+					[
+						{ image: 14, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 15, ticks: 8, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d2-range (animation 7)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 9, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 15, ticks: 5, xoffset: -1, yoffset: -16 }
+					],
+					next: 6
+				},
+				// d3-attack (animation 8)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 17, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 23, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 16, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 17, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 23, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 16, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 17, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 23, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 10
+				},
+				// d3-move (animation 9)
+				{
+					frames:
+					[
+						{ image: 18, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 19, ticks: 7, xoffset: -1, yoffset: -16 },
+						{ image: 20, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 21, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d3-stand (animation 10)
+				{
+					frames:
+					[
+						{ image: 22, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 23, ticks: 8, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d3-range (animation 11)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 17, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 23, ticks: 5, xoffset: -1, yoffset: -16 }
+					],
+					next: 10
+				},
+				// d4-attack (animation 12)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 25, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 31, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 24, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 25, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 31, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 24, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 25, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 31, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 14
+				},
+				// d4-move (animation 13)
+				{
+					frames:
+					[
+						{ image: 26, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 27, ticks: 7, xoffset: -1, yoffset: -16 },
+						{ image: 28, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 29, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d4-stand (animation 14)
+				{
+					frames:
+					[
+						{ image: 30, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 31, ticks: 8, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d4-range (animation 15)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 25, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 26, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 27, ticks: 5, xoffset: -1, yoffset: -16 }
+					],
+					next: 14
+				},
+				// d5-attack (animation 16)
+				{
+					frames:
+					[
+						{ image: 32, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 33, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 39, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 32, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 33, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 39, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 32, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 33, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 39, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 18
+				},
+				// d5-move (animation 17)
+				{
+					frames:
+					[
+						{ image: 34, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 35, ticks: 7, xoffset: -1, yoffset: -16 },
+						{ image: 36, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 37, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d5-stand (animation 18)
+				{
+					frames:
+					[
+						{ image: 38, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 39, ticks: 8, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d5-range (animation 19)
+				{
+					frames:
+					[
+						{ image: 32, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 33, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: -1, yoffset: -16 }
+						{ image: 39, ticks: 5, xoffset: -1, yoffset: -16 }
+					],
+					next: 18
+				},
+				// d6-attack (animation 20)
+				{
+					frames:
+					[
+						{ image: 40, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 41, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 47, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 40, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 41, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 47, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 40, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 41, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 47, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 22
+				},
+				// d6-move (animation 21)
+				{
+					frames:
+					[
+						{ image: 42, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 43, ticks: 7, xoffset: -1, yoffset: -16 },
+						{ image: 44, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 45, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d6-stand (animation 22)
+				{
+					frames:
+					[
+						{ image: 46, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 47, ticks: 8, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d6-range (animation 23)
+				{
+					frames:
+					[
+						{ image: 40, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 41, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 47, ticks: 5, xoffset: -1, yoffset: -16 }
+					],
+					next: 22
+				},
+				// d7-attack (animation 24)
+				{
+					frames:
+					[
+						{ image: 48, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 49, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 55, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 48, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 49, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 55, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 48, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 49, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 55, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 26
+				},
+				// d7-move (animation 25)
+				{
+					frames:
+					[
+						{ image: 50, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 51, ticks: 7, xoffset: -1, yoffset: -16 },
+						{ image: 52, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 53, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d7-stand (animation 26)
+				{
+					frames:
+					[
+						{ image: 54, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 55, ticks: 8, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d7-range (animation 27)
+				{
+					frames:
+					[
+						{ image: 48, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 49, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 55, ticks: 5, xoffset: -1, yoffset: -16 }
+					],
+					next: 26
+				},
+				// d8-attack (animation 28)
+				{
+					frames:
+					[
+						{ image: 56, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 57, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 63, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 56, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 57, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 63, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 56, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 57, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 63, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 30
+				},
+				// d8-move (animation 29)
+				{
+					frames:
+					[
+						{ image: 58, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 59, ticks: 7, xoffset: -1, yoffset: -16 },
+						{ image: 60, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 61, ticks: 7, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d8-stand (animation 30)
+				{
+					frames:
+					[
+						{ image: 62, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 63, ticks: 8, xoffset: -1, yoffset: -16 }
+					]
+				},
+				// d8-range (animation 31)
+				{
+					frames:
+					[
+						{ image: 56, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 57, ticks: 10, xoffset: -1, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 63, ticks: 5, xoffset: -1, yoffset: -16 }
+					],
+					next: 30
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "FlyingUnit.json",
+		data:
+		{
+			type: "animation",
+			animation: "flying_unit",
+			images:
+			[
+				{ layer: 0 },	// d1-attack
+				{ layer: 1 },	// d1-move
+				{ layer: 2 },	// d1-move
+				{ layer: 3 },	// d1-stand
+				{ layer: 4 },	// d2-attack
+				{ layer: 5 },	// d2-move
+				{ layer: 6 },	// d2-move
+				{ layer: 7 },	// d2-stand
+				{ layer: 8 },	// d3-attack
+				{ layer: 9 },	// d3-move
+				{ layer: 10 },	// d3-move
+				{ layer: 11 },	// d3-stand
+				{ layer: 12 },	// d4-attack
+				{ layer: 13 },	// d4-move
+				{ layer: 14 },	// d4-move
+				{ layer: 15 },	// d4-stand
+				{ layer: 16 },	// d5-attack
+				{ layer: 17 },	// d5-move
+				{ layer: 18 },	// d5-move
+				{ layer: 19 },	// d5-stand
+				{ layer: 20 },	// d6-attack
+				{ layer: 21 },	// d6-move
+				{ layer: 22 },	// d6-move
+				{ layer: 23 },	// d6-stand
+				{ layer: 24 },	// d7-attack
+				{ layer: 25 },	// d7-move
+				{ layer: 26 },	// d7-move
+				{ layer: 27 },	// d7-stand
+				{ layer: 28 },	// d8-attack
+				{ layer: 29 },	// d8-move
+				{ layer: 30 },	// d8-move
+				{ layer: 31 }	// d8-stand
+			],
+			animations:
+			[
+				// d1-attack (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 0, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 0, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 1
+				},
+				// d1-move (animation 1)
+				{
+					frames:
+					[
+						{ image: 1, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 2, ticks: 12, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d1-stand (animation 2)
+				{
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d1-range (animation 3)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 3, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 1
+				},
+				// d2-attack (animation 4)
+				{
+					frames:
+					[
+						{ image: 4, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 4, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 4, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 5
+				},
+				// d2-move (animation 5)
+				{
+					frames:
+					[
+						{ image: 5, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 6, ticks: 12, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d2-stand (animation 6)
+				{
+					frames:
+					[
+						{ image: 7, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d2-range (animation 7)
+				{
+					frames:
+					[
+						{ image: 4, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 5
+				},
+				// d3-attack (animation 8)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 8, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 8, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 9
+				},
+				// d3-move (animation 9)
+				{
+					frames:
+					[
+						{ image: 9, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 10, ticks: 12, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d3-stand (animation 10)
+				{
+					frames:
+					[
+						{ image: 11, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d3-range (animation 11)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 9
+				},
+				// d4-attack (animation 12)
+				{
+					frames:
+					[
+						{ image: 12, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 12, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 12, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 13
+				},
+				// d4-move (animation 13)
+				{
+					frames:
+					[
+						{ image: 13, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 14, ticks: 12, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d4-stand (animation 14)
+				{
+					frames:
+					[
+						{ image: 15, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d4-range (animation 15)
+				{
+					frames:
+					[
+						{ image: 12, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 15, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 13
+				},
+				// d5-attack (animation 16)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 16, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 16, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 17
+				},
+				// d5-move (animation 17)
+				{
+					frames:
+					[
+						{ image: 17, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 18, ticks: 12, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d5-stand (animation 18)
+				{
+					frames:
+					[
+						{ image: 19, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d5-range (animation 19)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 17
+				},
+				// d6-attack (animation 20)
+				{
+					frames:
+					[
+						{ image: 20, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 20, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 20, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 21
+				},
+				// d6-move (animation 21)
+				{
+					frames:
+					[
+						{ image: 21, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 22, ticks: 12, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d6-stand (animation 22)
+				{
+					frames:
+					[
+						{ image: 23, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d6-range (animation 23)
+				{
+					frames:
+					[
+						{ image: 20, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 21
+				},
+				// d7-attack (animation 24)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 24, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 24, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 25
+				},
+				// d7-move (animation 25)
+				{
+					frames:
+					[
+						{ image: 25, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 26, ticks: 12, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d7-stand (animation 26)
+				{
+					frames:
+					[
+						{ image: 27, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d7-range (animation 27)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 25
+				},
+				// d8-attack (animation 28)
+				{
+					frames:
+					[
+						{ image: 28, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 28, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 28, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 29
+				},
+				// d8-move (animation 29)
+				{
+					frames:
+					[
+						{ image: 29, ticks: 15, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 },
+						{ image: 30, ticks: 12, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d8-stand (animation 30)
+				{
+					frames:
+					[
+						{ image: 31, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// d8-range (animation 31)
+				{
+					frames:
+					[
+						{ image: 28, ticks: 20, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 10, xoffset: 0, yoffset: -15 }
+					],
+					next: 29
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "EnchantedFlyingUnit.json",
+		data:
+		{
+			type: "animation",
+			animation: "enchanted_flying_unit",
+			images:
+			[
+				{ layer: 0 },	// d1-attack-a
+				{ layer: 1 },	// d1-attack-b
+				{ layer: 2 },	// d1-move-a
+				{ layer: 3 },	// d1-move-b
+				{ layer: 4 },	// d1-move-a
+				{ layer: 5 },	// d1-move-b
+				{ layer: 6 },	// d1-stand-a
+				{ layer: 7 },	// d1-stand-b
+				{ layer: 8 },	// d2-attack-a
+				{ layer: 9 },	// d2-attack-b
+				{ layer: 10 },	// d2-move-a
+				{ layer: 11 },	// d2-move-b
+				{ layer: 12 },	// d2-move-a
+				{ layer: 13 },	// d2-move-b
+				{ layer: 14 },	// d2-stand-a
+				{ layer: 15 },	// d2-stand-b
+				{ layer: 16 },	// d3-attack-a
+				{ layer: 17 },	// d3-attack-b
+				{ layer: 18 },	// d3-move-a
+				{ layer: 19 },	// d3-move-b
+				{ layer: 20 },	// d3-move-a
+				{ layer: 21 },	// d3-move-b
+				{ layer: 22 },	// d3-stand-a
+				{ layer: 23 },	// d3-stand-b
+				{ layer: 24 },	// d4-attack-a
+				{ layer: 25 },	// d4-attack-b
+				{ layer: 26 },	// d4-move-a
+				{ layer: 27 },	// d4-move-b
+				{ layer: 28 },	// d4-move-a
+				{ layer: 29 },	// d4-move-b
+				{ layer: 30 },	// d4-stand-a
+				{ layer: 31 },	// d4-stand-b
+				{ layer: 32 },	// d5-attack-a
+				{ layer: 33 },	// d5-attack-b
+				{ layer: 34 },	// d5-move-a
+				{ layer: 35 },	// d5-move-b
+				{ layer: 36 },	// d5-move-a
+				{ layer: 37 },	// d5-move-b
+				{ layer: 38 },	// d5-stand-a
+				{ layer: 39 },	// d5-stand-b
+				{ layer: 40 },	// d6-attack-a
+				{ layer: 41 },	// d6-attack-b
+				{ layer: 42 },	// d6-move-a
+				{ layer: 43 },	// d6-move-b
+				{ layer: 44 },	// d6-move-a
+				{ layer: 45 },	// d6-move-b
+				{ layer: 46 },	// d6-stand-a
+				{ layer: 47 },	// d6-stand-b
+				{ layer: 48 },	// d7-attack-a
+				{ layer: 49 },	// d7-attack-b
+				{ layer: 50 },	// d7-move-a
+				{ layer: 51 },	// d7-move-b
+				{ layer: 52 },	// d7-move-a
+				{ layer: 53 },	// d7-move-b
+				{ layer: 54 },	// d7-stand-a
+				{ layer: 55 },	// d7-stand-b
+				{ layer: 56 },	// d8-attack-a
+				{ layer: 57 },	// d8-attack-b
+				{ layer: 58 },	// d8-move-a
+				{ layer: 59 },	// d8-move-b
+				{ layer: 60 },	// d8-move-a
+				{ layer: 61 },	// d8-move-b
+				{ layer: 62 },	// d8-stand-a
+				{ layer: 63 }	// d8-stand-b
+			],
+			animations:
+			[
+				// d1-attack (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 1, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 7, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 0, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 1, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 7, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 0, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 1, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 7, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 1
+				},
+				// d1-move (animation 1)
+				{
+					frames:
+					[
+						{ image: 2, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 3, ticks: 7, xoffset: 0, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 7, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 4, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 5, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 7, ticks: 5, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d1-stand (animation 2)
+				{
+					frames:
+					[
+						{ image: 6, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 7, ticks: 8, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d1-range (animation 3)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 1, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 6, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 7, ticks: 5, xoffset: 0, yoffset: -16 }
+					],
+					next: 1
+				},
+				// d2-attack (animation 4)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 9, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 15, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 8, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 9, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 15, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 8, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 9, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 15, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 5
+				},
+				// d2-move (animation 5)
+				{
+					frames:
+					[
+						{ image: 10, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 11, ticks: 7, xoffset: 0, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 15, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 12, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 13, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 15, ticks: 5, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d2-stand (animation 6)
+				{
+					frames:
+					[
+						{ image: 14, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 15, ticks: 8, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d2-range (animation 7)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 9, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 14, ticks: 5, xoffset: 0, yoffset: -16 }
+						{ image: 15, ticks: 5, xoffset: 0, yoffset: -16 }
+					],
+					next: 5
+				},
+				// d3-attack (animation 8)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 17, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 23, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 16, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 17, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 23, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 16, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 17, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 23, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 9
+				},
+				// d3-move (animation 9)
+				{
+					frames:
+					[
+						{ image: 18, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 19, ticks: 7, xoffset: 0, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 23, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 20, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 21, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 23, ticks: 5, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d3-stand (animation 10)
+				{
+					frames:
+					[
+						{ image: 22, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 23, ticks: 8, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d3-range (animation 11)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 17, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 22, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 23, ticks: 5, xoffset: 0, yoffset: -16 }
+					],
+					next: 9
+				},
+				// d4-attack (animation 12)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 25, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 31, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 24, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 25, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 31, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 24, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 25, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 31, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 13
+				},
+				// d4-move (animation 13)
+				{
+					frames:
+					[
+						{ image: 26, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 27, ticks: 7, xoffset: 0, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 31, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 28, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 29, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: 0, yoffset: -16 }
+						{ image: 31, ticks: 5, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d4-stand (animation 14)
+				{
+					frames:
+					[
+						{ image: 30, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 31, ticks: 8, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d4-range (animation 15)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 25, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 30, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 31, ticks: 5, xoffset: 0, yoffset: -16 }
+					],
+					next: 13
+				},
+				// d5-attack (animation 16)
+				{
+					frames:
+					[
+						{ image: 32, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 33, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 39, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 32, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 33, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 39, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 32, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 33, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 39, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 17
+				},
+				// d5-move (animation 17)
+				{
+					frames:
+					[
+						{ image: 34, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 35, ticks: 7, xoffset: 0, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 39, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 36, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 37, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 39, ticks: 5, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d5-stand (animation 18)
+				{
+					frames:
+					[
+						{ image: 38, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 39, ticks: 8, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d5-range (animation 19)
+				{
+					frames:
+					[
+						{ image: 32, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 33, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 38, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 39, ticks: 5, xoffset: 0, yoffset: -16 }
+					],
+					next: 17
+				},
+				// d6-attack (animation 20)
+				{
+					frames:
+					[
+						{ image: 40, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 41, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 47, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 40, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 41, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 47, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 40, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 41, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 47, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 21
+				},
+				// d6-move (animation 21)
+				{
+					frames:
+					[
+						{ image: 42, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 43, ticks: 7, xoffset: 0, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 47, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 44, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 45, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 47, ticks: 5, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d6-stand (animation 22)
+				{
+					frames:
+					[
+						{ image: 46, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 47, ticks: 8, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d6-range (animation 23)
+				{
+					frames:
+					[
+						{ image: 40, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 41, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 46, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 47, ticks: 5, xoffset: 0, yoffset: -16 }
+					],
+					next: 21
+				},
+				// d7-attack (animation 24)
+				{
+					frames:
+					[
+						{ image: 48, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 49, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 55, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 48, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 49, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 55, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 48, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 49, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 55, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 25
+				},
+				// d7-move (animation 25)
+				{
+					frames:
+					[
+						{ image: 50, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 51, ticks: 7, xoffset: 0, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 55, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 52, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 53, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 55, ticks: 5, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d7-stand (animation 26)
+				{
+					frames:
+					[
+						{ image: 54, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 55, ticks: 8, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d7-range (animation 27)
+				{
+					frames:
+					[
+						{ image: 48, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 49, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 54, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 55, ticks: 5, xoffset: 0, yoffset: -16 }
+					],
+					next: 25
+				},
+				// d8-attack (animation 28)
+				{
+					frames:
+					[
+						{ image: 56, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 57, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 63, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 56, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 57, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 63, ticks: 4, xoffset: -1, yoffset: -16 },
+						{ image: 56, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 57, ticks: 8, xoffset: -1, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: -1, yoffset: -16 },
+						{ image: 63, ticks: 4, xoffset: -1, yoffset: -16 }
+					],
+					next: 29
+				},
+				// d8-move (animation 29)
+				{
+					frames:
+					[
+						{ image: 58, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 59, ticks: 7, xoffset: 0, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 63, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 60, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 61, ticks: 6, xoffset: 0, yoffset: -16 },
+						{ image: 62, ticks: 5, xoffset: 0, yoffset: -16 },
+						{ image: 63, ticks: 5, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d8-stand (animation 30)
+				{
+					frames:
+					[
+						{ image: 62, ticks: 8, xoffset: 0, yoffset: -16 },
+						{ image: 63, ticks: 8, xoffset: 0, yoffset: -16 }
+					]
+				},
+				// d8-range (animation 31)
+				{
+					frames:
+					[
+						{ image: 56, ticks: 20, xoffset: 0, yoffset: -16 },
+						{ image: 57, ticks: 20, xoffset: 0, yoffset: -16 },
+						{ image: 62, ticks: 10, xoffset: 0, yoffset: -16 },
+						{ image: 63, ticks: 10, xoffset: 0, yoffset: -16 }
+					],
+					next: 29
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "Projectile.json",
+		data:
+		{
+			type: "animation",
+			animation: "projectile",
+			images:
+			[
+				{ layer: 0 },	// fly-d1-frame1
+				{ layer: 1 },	// fly-d1-frame2
+				{ layer: 2 },	// fly-d1-frame3
+				{ layer: 3 },	// fly-d2-frame1
+				{ layer: 4 },	// fly-d2-frame2
+				{ layer: 5 },	// fly-d2-frame3
+				{ layer: 6 },	// fly-d3-frame1
+				{ layer: 7 },	// fly-d3-frame2
+				{ layer: 8 },	// fly-d3-frame3
+				{ layer: 9 },	// fly-d4-frame1
+				{ layer: 10 },	// fly-d4-frame2
+				{ layer: 11 },	// fly-d4-frame3
+				{ layer: 12 },	// fly-d5-frame1
+				{ layer: 13 },	// fly-d5-frame2
+				{ layer: 14 },	// fly-d5-frame3
+				{ layer: 15 },	// fly-d6-frame1
+				{ layer: 16 },	// fly-d6-frame2
+				{ layer: 17 },	// fly-d6-frame3
+				{ layer: 18 },	// fly-d7-frame1
+				{ layer: 19 },	// fly-d7-frame2
+				{ layer: 20 },	// fly-d7-frame3
+				{ layer: 21 },	// fly-d8-frame1
+				{ layer: 22 },	// fly-d8-frame2
+				{ layer: 23 },	// fly-d8-frame3
+				{ layer: 24 },	// strike-d1
+				{ layer: 25 },	// strike-d2
+				{ layer: 26 },	// strike-d3
+				{ layer: 27 },	// strike-d4
+				{ layer: 28 },	// strike-d5
+				{ layer: 29 },	// strike-d6
+				{ layer: 30 },	// strike-d7
+				{ layer: 31 },	// strike-d8
+			],
+			animations:
+			[
+				// fly-d1-frame (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 1, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 2, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// fly-d2-frame (animation 1)
+				{
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 4, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 5, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// fly-d3-frame (animation 2)
+				{
+					frames:
+					[
+						{ image: 6, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 7, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 8, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// fly-d4-frame (animation 3)
+				{
+					frames:
+					[
+						{ image: 9, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 10, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 11, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// fly-d4-frame (animation 4)
+				{
+					frames:
+					[
+						{ image: 12, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 13, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 14, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// fly-d5-frame (animation 5)
+				{
+					frames:
+					[
+						{ image: 15, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 16, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 17, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// fly-d6-frame (animation 6)
+				{
+					frames:
+					[
+						{ image: 18, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 19, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 20, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// fly-d7-frame (animation 7)
+				{
+					frames:
+					[
+						{ image: 21, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 22, ticks: 1, xoffset: 0, yoffset: -15 },
+						{ image: 23, ticks: 1, xoffset: 0, yoffset: -15 }
+					]
+				},
+				// strike (animation 8)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 2, xoffset: 0, yoffset: -15 },
+						{ image: 25, ticks: 2, xoffset: 0, yoffset: -15 },
+						{ image: 26, ticks: 2, xoffset: 0, yoffset: -15 },
+						{ image: 27, ticks: 2, xoffset: 0, yoffset: -15 },
+						{ image: 28, ticks: 2, xoffset: 0, yoffset: -15 },
+						{ image: 29, ticks: 2, xoffset: 0, yoffset: -15 },
+						{ image: 30, ticks: 2, xoffset: 0, yoffset: -15 },
+						{ image: 31, ticks: 2, xoffset: 0, yoffset: -15 }
+					],
+					next: 9
+				},
+				// null (animation 9)
+				{
+					frames:
+					[
+						{ image: 31, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				}
+			]
+		}
+	}
+]

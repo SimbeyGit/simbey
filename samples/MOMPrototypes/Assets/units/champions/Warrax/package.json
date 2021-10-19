@@ -1,0 +1,79 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","portrait.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "champion",
+			name: "Warrax",
+			tag_line: "The Chaos Warrior",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 10
+				}
+			],
+			prereq:
+			[
+				{
+					type: "fame",
+					value: 40
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Cavalry.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 8
+				},
+				range:
+				{
+					stat: "chaos",
+					name: "Lightning Bolt",
+					value: 8
+				},
+				defense: 5,
+				resist: 9,
+				hits: 8
+			},
+			slots: ["sword/staff", "shield", "item"],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 10 },
+				{ name: "Constitution", type: "ability" },
+				{ name: "Arcane Power", type: "ability" },
+				{ name: "Armor Piercing", type: "ability" },
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" }
+			]
+		}
+	}
+]

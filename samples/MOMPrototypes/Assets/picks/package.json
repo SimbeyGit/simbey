@@ -1,0 +1,143 @@
+[
+	{
+		package: "buildsif",
+		name: "picks.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "animations.json",
+		data:
+		{
+			type: "animation",
+			animation: "picks",
+			images:
+			[
+				{ layer: 0 },	// chaos-1
+				{ layer: 1 },	// chaos-2
+				{ layer: 2 },	// chaos-3
+				{ layer: 3 },	// death-1
+				{ layer: 4 },	// death-2
+				{ layer: 5 },	// death-3
+				{ layer: 6 },	// life-1
+				{ layer: 7 },	// life-2
+				{ layer: 8 },	// life-3
+				{ layer: 9 },	// nature-1
+				{ layer: 10 },	// nature-2
+				{ layer: 11 },	// nature-3
+				{ layer: 12 },	// sorcery-1
+				{ layer: 13 },	// sorcery-2
+				{ layer: 14 }	// sorcery-3
+			],
+			animations:
+			[
+				// chaos-1 (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// chaos-2 (animation 1)
+				{
+					frames:
+					[
+						{ image: 1, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// chaos-3 (animation 2)
+				{
+					frames:
+					[
+						{ image: 2, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// death-1 (animation 3)
+				{
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// death-2 (animation 4)
+				{
+					frames:
+					[
+						{ image: 4, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// death-3 (animation 5)
+				{
+					frames:
+					[
+						{ image: 5, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// life-1 (animation 6)
+				{
+					frames:
+					[
+						{ image: 6, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// life-2 (animation 7)
+				{
+					frames:
+					[
+						{ image: 7, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// life-3 (animation 8)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// nature-1 (animation 9)
+				{
+					frames:
+					[
+						{ image: 9, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// nature-2 (animation 10)
+				{
+					frames:
+					[
+						{ image: 10, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// nature-3 (animation 11)
+				{
+					frames:
+					[
+						{ image: 11, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// sorcery-1 (animation 12)
+				{
+					frames:
+					[
+						{ image: 12, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// sorcery-2 (animation 13)
+				{
+					frames:
+					[
+						{ image: 13, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				},
+				// sorcery-3 (animation 14)
+				{
+					frames:
+					[
+						{ image: 14, ticks: 1, xoffset: 0, yoffset: 0 }
+					]
+				}
+			]
+		}
+	}
+]

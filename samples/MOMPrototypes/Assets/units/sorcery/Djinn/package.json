@@ -1,0 +1,68 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Djinn",
+			realm: "sorcery",
+			figures: 1,
+			animation: "air_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 17
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 3
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 15
+				},
+				range:
+				{
+					stat: "nature",
+					name: "Ice Bolt",
+					value: 8
+				},
+				defense: 8,
+				resist: 10,
+				hits: 20
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 3 },
+				{ name: "Teleporting", type: "ability" },
+				{ name: "Wind Walking", type: "ability" },
+				{ name: "Caster", type: "caster", value: 20.0 }
+			]
+		}
+	}
+]

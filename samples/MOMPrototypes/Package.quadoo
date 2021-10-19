@@ -1,0 +1,140 @@
+function FormatSifPackage (strPackage, strFiles, fTrim, nCanvas, strDataName, oData)
+{
+	var aPackage = JSONCreateArray();
+
+	var oBuilder = JSONCreateObject();
+	oBuilder.package = "buildsif";
+	oBuilder.name = strPackage;
+	oBuilder.files = JSONParse("[\"" + strFiles + "\"]");
+	oBuilder.trim = fTrim;
+	oBuilder.canvas = nCanvas;
+	aPackage.Append(oBuilder);
+
+	var oFrame = JSONCreateObject();
+	oFrame.package = "json";
+	oFrame.name = strDataName;
+	oFrame.data = oData;
+	aPackage.Append(oFrame);
+
+	return aPackage;
+}
+
+function BuildTileSet (strWorld, strTileSet, oTileSet)
+{
+	var oData = JSONCreateObject();
+	oData.world = strWorld;
+	oData.tileSet = strTileSet;
+
+	var aKeys = JSONCreateArray();
+	oData.keys = aKeys;
+
+	println("Tile Set: " + strTileSet);
+
+	// Build an alphabetized list of tile images using a string map.
+	var mapTiles = new map<string>;
+	var oTiles = oTileSet.Find("*.png");
+	do
+	{
+		if(oTiles.IsFile)
+			mapTiles.Add(oTiles.Name, null);
+	} while(oTiles.Next());
+
+	// Iterate over the alphabetized map to build the key sets.
+	while(0 < len(mapTiles))
+	{
+		var strTile = mapTiles.GetKey(0);
+		var strKey = left(strTile, 8);
+
+		var oKey = aKeys.FindObject("key", strKey);
+		if(null == oKey)
+		{
+			oKey = JSONCreateObject();
+			oKey.key = strKey;
+			oKey.variants = JSONCreateArray();
+			aKeys.Append(oKey);
+		}
+		var aVariants = oKey.variants;
+		int idxVariant;
+
+		if(strTile[8] != '-' && strTile[8] != '.')
+			idxVariant = lcase(strTile[8]) - 'a';
+		if(idxVariant > len(aVariants))
+			throw "Invalid variant index: " + idxVariant;
+
+		var aFrames;
+		if(idxVariant == len(aVariants))
+		{
+			aFrames = JSONCreateArray();
+			aVariants.Append(aFrames);
+		}
+		else
+			aFrames = aVariants[idxVariant];
+
+		aFrames.Append(strTile);
+
+		mapTiles.Remove(strTile);
+	}
+
+	Host.WriteTextFile((string)FormatSifPackage("tiles.sif", "*.png", false, 32, "tiles.json", oData), oTileSet.GetPathOf("package.json"));
+}
+
+function BuildTerrainAnimators (oTerrain)
+{
+	var oEnum = oTerrain.Find("*");
+	do
+	{
+		if(oEnum.IsFolder)
+		{
+			var strWorld = oEnum.Name;
+			var oFolder = oEnum.OpenFolder();
+			var oTileSet = oFolder.Find("*");
+			do
+			{
+				if(oTileSet.IsFolder)
+					BuildTileSet(strWorld, oTileSet.Name, oTileSet.OpenFolder());
+			} while(oTileSet.Next());
+		}
+	} while(oEnum.Next());
+}
+
+function main ()
+{
+	var oScript;
+
+	println("Compiling combat.quadoo...");
+	if(Host.Compile(null, Host.ReadTextFile("Assets\\scripts\\combat.quadoo"), false, ref oScript))
+	{
+		Host.WriteBinaryFile(oScript, "Assets\\scripts\\combat.qbc");
+
+		println("Building terrain animators...");
+		BuildTerrainAnimators(Host.OpenFolder("Assets\\overland\\terrain"));
+
+		var oPackager = Host.CreateProcess("..\\..\\bin\\SIFPackage.exe", "Assets Assets.pkg");
+		oPackager.Wait();
+
+		var nResult = oPackager.GetExitCode();
+		if(0 == nResult)
+		{
+			var oCombatDemo = Host.OpenFolder("MOMCombatDemo");
+			var oWorldEditor = Host.OpenFolder("MOMWorldEditor");
+
+			println("Removing previous Assets.pkg files...");
+			try oCombatDemo.DeleteFile("Assets.pkg"); catch;
+			try oWorldEditor.DeleteFile("Assets.pkg"); catch;
+
+			println("Hard linking Assets.pkg...");
+			oCombatDemo.CopyHardLink("..\\Assets.pkg", oCombatDemo.GetPathOf("Assets.pkg"));
+			oWorldEditor.CopyHardLink("..\\Assets.pkg", oWorldEditor.GetPathOf("Assets.pkg"));
+		}
+		else
+		{
+			println("Error building the package!");
+			println("Error code: 0x" + hex(nResult));
+		}
+	}
+	else
+	{
+		println("Error compiling combat.quadoo!");
+		println(JSONFormat((string)oScript));
+	}
+}

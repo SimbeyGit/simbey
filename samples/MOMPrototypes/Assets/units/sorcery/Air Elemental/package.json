@@ -1,0 +1,56 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Air Elemental",
+			realm: "sorcery",
+			figures: 1,
+			animation: "air_unit",
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 5
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 15
+				},
+				defense: 8,
+				resist: 9,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Invisibility", type: "ability" },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" },
+				{ name: "Weapon Immunity", type: "immunity", immunity: "weapon" }
+			]
+		}
+	}
+]

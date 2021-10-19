@@ -1,0 +1,25 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			type: "magic",
+			name: "Shimmer",
+			realm: "nature",
+			cost: 3,
+			sound: "MagicMissile.mp3",
+			velocity: 4.0,
+			stats:
+			{
+				normal: "Magic"
+			}
+		}
+	}
+]

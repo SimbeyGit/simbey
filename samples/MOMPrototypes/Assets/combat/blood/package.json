@@ -1,0 +1,51 @@
+[
+	{
+		package: "buildsif",
+		name: "combat_blood.sif",
+		files: ["*.png"],
+		trim: true
+	},
+	{
+		package: "json",
+		name: "Blood.json",
+		data:
+		{
+			type: "animation",
+			animation: "blood",
+			images:
+			[
+				{ layer: 0 },
+				{ layer: 1 },
+				{ layer: 2 },
+				{ layer: 3 }
+			],
+			animations:
+			[
+				{
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 9, yoffset: -6 }
+					]
+				},
+				{
+					frames:
+					[
+						{ image: 1, ticks: 1, xoffset: 9, yoffset: -6 }
+					]
+				},
+				{
+					frames:
+					[
+						{ image: 2, ticks: 1, xoffset: 9, yoffset: -6 }
+					]
+				},
+				{
+					frames:
+					[
+						{ image: 3, ticks: 1, xoffset: 9, yoffset: -6 }
+					]
+				}
+			]
+		}
+	}
+]

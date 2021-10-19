@@ -1,0 +1,44 @@
+[
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			import: "units\\shared\\Settlers",
+			type: "normal",
+			name: "High Men Settlers",
+			race: "High Men",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "food",
+					amount: 1
+				},
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Scuttle.mp3",
+						value: 1
+					}
+				],
+				defense: 1,
+				resist: 4,
+				hits: 10
+			},
+			abilities:
+			[
+				{ name: "Create Outpost", type: "ability" }
+			]
+		}
+	}
+]

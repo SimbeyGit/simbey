@@ -1,0 +1,69 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "normal",
+			name: "Nomad Bowmen",
+			race: "Nomads",
+			figures: 6,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 1
+				},
+				{
+					type: "food",
+					amount: 1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "Armor.mp3",
+						value: 1
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 1
+				},
+				range:
+				{
+					stat: "normal arrow",
+					name: "Arrow",
+					value: 1
+				},
+				defense: 1,
+				resist: 4,
+				hits: 1
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 8 }
+			]
+		}
+	}
+]

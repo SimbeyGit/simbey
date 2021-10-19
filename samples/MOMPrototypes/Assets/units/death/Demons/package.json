@@ -1,0 +1,58 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Demons",
+			realm: "death",
+			figures: 1,
+			animation: "flying_unit",
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Sword",
+					value: 14
+				},
+				defense: 5,
+				resist: 7,
+				hits: 12
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Weapon Immunity", type: "immunity", immunity: "weapon" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
+				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" }
+			]
+		}
+	}
+]

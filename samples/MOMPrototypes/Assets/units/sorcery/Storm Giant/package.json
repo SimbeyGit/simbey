@@ -1,0 +1,68 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Storm Giant",
+			realm: "sorcery",
+			figures: 1,
+			animation: "ground_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 10
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "land",
+						sound: "HeavyWalking.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Colossus",
+					value: 12
+				},
+				range:
+				{
+					stat: "chaos",
+					name: "Lightning Bolt",
+					value: 10
+				}
+				defense: 7,
+				resist: 9,
+				hits: 20
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 4 },
+				{ name: "To Hit", type: "tohit", value: 2 },
+				{ name: "Wall Crusher", type: "ability" },
+				{ name: "Armor Piercing", type: "ability" }
+			]
+		}
+	}
+]

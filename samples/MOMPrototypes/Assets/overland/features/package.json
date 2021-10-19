@@ -1,0 +1,9 @@
+﻿[
+	{
+		"package": "buildsif",
+		"name": "features.sif",
+		"files": ["*.png"],
+		"trim": false,
+		"canvas": 32
+	}
+]
