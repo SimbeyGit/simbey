@@ -1,1 +1,0 @@
-﻿[{"package":"buildsif","name":"tiles.sif","files":["*.png"],"trim":false,"canvas":32},{"package":"json","name":"tiles.json","data":{"world":"myrror","tileSet":"sorceryNode","keys":[{"key":"00000000","variants":[["00000000-frame1.png","00000000-frame2.png","00000000-frame3.png","00000000-frame4.png"]]}]}}]

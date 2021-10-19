@@ -1,1 +1,0 @@
-﻿[{"package":"buildsif","name":"tiles.sif","files":["*.png"],"trim":false,"canvas":32},{"package":"json","name":"tiles.json","data":{"world":"arcanus","tileSet":"ocean","keys":[{"key":"00000000","variants":[["00000000a.png"],["00000000b.png"],["00000000c.png"],["00000000d.png"],["00000000e.png"]]}]}}]
