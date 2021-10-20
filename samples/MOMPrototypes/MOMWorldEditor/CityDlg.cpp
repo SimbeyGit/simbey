@@ -82,11 +82,12 @@ HRESULT CCityDlg::SaveData (VOID)
 	CheckIf(0 >= nPopulation, E_FAIL);
 	Check(JSONCreateInteger(nPopulation, &srv));
 	Check(m_pCity->AddValueW(L"population", srv));
+	srv.Release();
 
 	cch = GetWindowText(GetDlgItem(IDC_FLAG), wzValue, ARRAYSIZE(wzValue));
 	CheckIf(0 == cch, E_FAIL);
 	nFlag = Formatting::TAscToInt32(wzValue);
-	CheckIf(0 > nFlag || nFlag > 15, E_FAIL);
+	CheckIf(0 > nFlag || nFlag > 16, E_FAIL);
 	Check(JSONCreateInteger(nFlag, &srv));
 	Check(m_pCity->AddValueW(L"flag", srv));
 

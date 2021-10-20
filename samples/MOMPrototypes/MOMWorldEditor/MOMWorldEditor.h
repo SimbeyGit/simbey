@@ -140,8 +140,82 @@ struct MAPTILE
 
 struct CITYTILE
 {
-	ISimbeyInterchangeSprite* pNormal[16];
-	ISimbeyInterchangeSprite* pWalled[16];
+	ISimbeyInterchangeSprite* pNormal[17];
+	ISimbeyInterchangeSprite* pWalled[17];
+};
+
+class CBaseGalleryCommand
+{
+public:
+	CTerrainGallery* m_pGallery;
+	MAPTILE* m_pWorld;
+	INT m_xWorld, m_yWorld;
+
+public:
+	CBaseGalleryCommand (CTerrainGallery* pGallery, MAPTILE* pWorld, INT xWorld, INT yWorld) :
+		m_pGallery(pGallery),
+		m_pWorld(pWorld),
+		m_xWorld(xWorld), m_yWorld(yWorld)
+	{
+		m_pGallery->AddRef();
+	}
+
+	virtual ~CBaseGalleryCommand ()
+	{
+		m_pGallery->Release();
+	}
+
+	virtual HRESULT Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile) = 0;
+	virtual BOOL ContinuePainting (VOID) { return TRUE; }
+};
+
+class CTerrainCommand : public CBaseGalleryCommand
+{
+public:
+	TRStrMap<CTileSet*>* m_pmapTileSets;
+
+public:
+	CTerrainCommand (CTerrainGallery* pGallery, MAPTILE* pWorld, INT xWorld, INT yWorld, TRStrMap<CTileSet*>* pmapTileSets) :
+		CBaseGalleryCommand(pGallery, pWorld, xWorld, yWorld),
+		m_pmapTileSets(pmapTileSets)
+	{
+	}
+
+	virtual HRESULT Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile);
+};
+
+class CFeaturesCommand : public CBaseGalleryCommand
+{
+public:
+	CFeaturesCommand (CTerrainGallery* pGallery, MAPTILE* pWorld, INT xWorld, INT yWorld) :
+		CBaseGalleryCommand(pGallery, pWorld, xWorld, yWorld)
+	{
+	}
+
+	virtual HRESULT Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile);
+};
+
+class CClearFeatureCommand : public CBaseGalleryCommand
+{
+public:
+	CClearFeatureCommand (CTerrainGallery* pGallery, MAPTILE* pWorld, INT xWorld, INT yWorld) :
+		CBaseGalleryCommand(pGallery, pWorld, xWorld, yWorld)
+	{
+	}
+
+	virtual HRESULT Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile);
+};
+
+class CPlaceCityCommand : public CBaseGalleryCommand
+{
+public:
+	CPlaceCityCommand (CTerrainGallery* pGallery, MAPTILE* pWorld, INT xWorld, INT yWorld) :
+		CBaseGalleryCommand(pGallery, pWorld, xWorld, yWorld)
+	{
+	}
+
+	virtual HRESULT Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile);
+	virtual BOOL ContinuePainting (VOID) { return FALSE; }
 };
 
 class CMOMWorldEditor :
@@ -189,9 +263,7 @@ protected:
 	BOOL m_fDragging;
 	BOOL m_fPainting;
 
-	bool m_fPaintTerrain;
-	bool m_fClearFeature;
-	bool m_fPlaceCity;
+	CBaseGalleryCommand* m_pCommand;
 
 public:
 	IMP_BASE_UNKNOWN
@@ -289,15 +361,19 @@ protected:
 	HRESULT LoadWorldFromJSON (TRStrMap<CTileSet*>& mapTileSet, IJSONObject* pMap, PCWSTR pcwzWorld, INT xWorld, INT yWorld, MAPTILE** ppWorld);
 	HRESULT SaveWorldToJSON (IJSONObject* pMap, PCWSTR pcwzWorld, INT xWorld, INT yWorld, MAPTILE* pWorld);
 
+	HRESULT ReplaceCommand (CBaseGalleryCommand* pCommand);
+
 	HRESULT BuildPlaceGrid (MAPTILE* pWorld, INT xTile, INT yTile, __out_ecount(9) CPlaceItem** ppPlaceItems);
 	VOID GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, __in_ecount_opt(cPlaceItems) CPlaceItem** ppPlaceItems, INT cPlaceItems, PWSTR pwzKey);
 
+public:
 	HRESULT ClearTile (INT x, INT y, BOOL fActiveWorld);
 	HRESULT PlaceSelectedTile (INT x, INT y);
 	HRESULT PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStrMap<CTileSet*>* pmapTileSets, RSTRING rstrTile, BOOL fActiveWorld);
 
 	HRESULT PlaceOrModifyCity (MAPTILE* pWorld, INT xTile, INT yTile);
 
+protected:
 	HRESULT LoadFeatures (ISimbeyInterchangeFile* pFeatures);
 	HRESULT LoadCityTiles (ISimbeyInterchangeFile* pCityTiles);
 

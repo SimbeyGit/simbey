@@ -443,6 +443,55 @@ HRESULT STDMETHODCALLTYPE CTerrainGallery::Clear (VOID)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Gallery Commands
+///////////////////////////////////////////////////////////////////////////////
+
+HRESULT CTerrainCommand::Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile)
+{
+	HRESULT hr;
+	RSTRING rstrTile = NULL;
+	INT nResult;
+
+	Check(m_pGallery->GetSelectedTile(&rstrTile));
+	Check(RStrCompareRStr(m_pWorld[yTile * m_xWorld + xTile].pTile->GetTileSet(), rstrTile, &nResult));
+	CheckIfIgnore(0 == nResult, S_FALSE);
+
+	Check(pEditor->PlaceTile(m_pWorld, xTile, yTile, m_pmapTileSets, rstrTile, TRUE));
+
+Cleanup:
+	RStrRelease(rstrTile);
+	return hr;
+}
+
+HRESULT CFeaturesCommand::Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile)
+{
+	HRESULT hr;
+	RSTRING rstrTile = NULL;
+
+	Check(m_pGallery->GetSelectedTile(&rstrTile));
+
+	RStrReplace(&m_pWorld[yTile * m_xWorld + xTile].rstrFeature, rstrTile);
+	pEditor->ClearTile(xTile, yTile, TRUE);
+
+Cleanup:
+	RStrRelease(rstrTile);
+	return hr;
+}
+
+HRESULT CClearFeatureCommand::Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile)
+{
+	SafeRelease(m_pWorld[yTile * m_xWorld + xTile].pData);
+	RStrReplace(&m_pWorld[yTile * m_xWorld + xTile].rstrFeature, NULL);
+	pEditor->ClearTile(xTile, yTile, TRUE);
+	return S_OK;
+}
+
+HRESULT CPlaceCityCommand::Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile)
+{
+	return pEditor->PlaceOrModifyCity(m_pWorld, xTile, yTile);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // CMOMWorldEditor
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -464,9 +513,7 @@ CMOMWorldEditor::CMOMWorldEditor (HINSTANCE hInstance) :
 	m_pMouse(NULL),
 	m_fDragging(FALSE),
 	m_fPainting(FALSE),
-	m_fPaintTerrain(true),
-	m_fClearFeature(false),
-	m_fPlaceCity(false)
+	m_pCommand(NULL)
 {
 	ZeroMemory(m_fKeys, sizeof(m_fKeys));
 }
@@ -483,7 +530,7 @@ CMOMWorldEditor::~CMOMWorldEditor ()
 
 	for(sysint i = 0; i < m_aCityTiles.Length(); i++)
 	{
-		for(INT n = 0; n < 16; n++)
+		for(INT n = 0; n < 17; n++)
 		{
 			SafeRelease(m_aCityTiles[i].pNormal[n]);
 			SafeRelease(m_aCityTiles[i].pWalled[n]);
@@ -751,28 +798,25 @@ HRESULT STDMETHODCALLTYPE CMOMWorldEditor::Execute (UINT32 commandId, UI_EXECUTI
 			break;
 		case ID_TERRAIN:
 			if(World::Arcanus == m_eType)
+			{
 				m_pArcanusTerrain->SetSelection(currentValue->uintVal);
+				Check(ReplaceCommand(__new CTerrainCommand(m_pArcanusTerrain, m_pArcanusWorld, m_xWorld, m_yWorld, &m_mapArcanus)));
+			}
 			else if(World::Myrror == m_eType)
+			{
 				m_pMyrrorTerrain->SetSelection(currentValue->uintVal);
-			m_fPaintTerrain = true;
-			m_fClearFeature = false;
-			m_fPlaceCity = false;
+				Check(ReplaceCommand(__new CTerrainCommand(m_pMyrrorTerrain, m_pMyrrorWorld, m_xWorld, m_yWorld, &m_mapMyrror)));
+			}
 			break;
 		case ID_FEATURES:
 			m_pFeatures->SetSelection(currentValue->uintVal);
-			m_fPaintTerrain = false;
-			m_fClearFeature = false;
-			m_fPlaceCity = false;
+			Check(ReplaceCommand(__new CFeaturesCommand(m_pFeatures, World::Arcanus == m_eType ? m_pArcanusWorld : m_pMyrrorWorld, m_xWorld, m_yWorld)));
 			break;
 		case ID_SELECT_CLEAR:
-			m_fPaintTerrain = false;
-			m_fClearFeature = true;
-			m_fPlaceCity = false;
+			Check(ReplaceCommand(__new CClearFeatureCommand(m_pFeatures, World::Arcanus == m_eType ? m_pArcanusWorld : m_pMyrrorWorld, m_xWorld, m_yWorld)));
 			break;
 		case ID_PLACE_CITY:
-			m_fPaintTerrain = false;
-			m_fClearFeature = false;
-			m_fPlaceCity = true;
+			Check(ReplaceCommand(__new CPlaceCityCommand(m_pFeatures, World::Arcanus == m_eType ? m_pArcanusWorld : m_pMyrrorWorld, m_xWorld, m_yWorld)));
 			break;
 		}
 	}
@@ -994,6 +1038,7 @@ BOOL CMOMWorldEditor::OnSetCursor (UINT uMsg, WPARAM wParam, LPARAM lParam, LRES
 
 BOOL CMOMWorldEditor::OnDestroy (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
+	SafeDelete(m_pCommand);
 	SaveWindowPosition(m_hwnd, c_wzAppWindowPos);
 	return FALSE;
 }
@@ -1557,6 +1602,20 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CMOMWorldEditor::ReplaceCommand (CBaseGalleryCommand* pCommand)
+{
+	HRESULT hr;
+
+	CheckAlloc(pCommand);
+
+	SafeDelete(m_pCommand);
+	m_pCommand = pCommand;
+	hr = S_OK;
+
+Cleanup:
+	return hr;
+}
+
 HRESULT CMOMWorldEditor::BuildPlaceGrid (MAPTILE* pWorld, INT xTile, INT yTile, __out_ecount(9) CPlaceItem** ppPlaceItems)
 {
 	HRESULT hr = S_OK;
@@ -1656,68 +1715,19 @@ Cleanup:
 HRESULT CMOMWorldEditor::PlaceSelectedTile (INT x, INT y)
 {
 	HRESULT hr;
-	RSTRING rstrTile = NULL;
-	MAPTILE* pWorld = NULL;
 	INT xTile = x / TILE_WIDTH;
 	INT yTile = y / TILE_HEIGHT;
-	INT nResult;
 
-	if(m_fPaintTerrain)
-	{
-		CTerrainGallery* pGallery = NULL;
-		TRStrMap<CTileSet*>* pmapTileSets = NULL;
+	CheckIf(NULL == m_pCommand, E_FAIL);
+	Check(m_pCommand->Execute(this, xTile, yTile));
 
-		if(World::Arcanus == m_eType)
-		{
-			pGallery = m_pArcanusTerrain;
-			pmapTileSets = &m_mapArcanus;
-			pWorld = m_pArcanusWorld;
-		}
-		else if(World::Myrror == m_eType)
-		{
-			pGallery = m_pMyrrorTerrain;
-			pmapTileSets = &m_mapMyrror;
-			pWorld = m_pMyrrorWorld;
-		}
-
-		CheckIf(NULL == pGallery, E_UNEXPECTED);
-		CheckIf(NULL == pmapTileSets, E_UNEXPECTED);
-		CheckIf(NULL == pWorld, E_UNEXPECTED);
-
-		Check(pGallery->GetSelectedTile(&rstrTile));
-		Check(RStrCompareRStr(pWorld[yTile * m_xWorld + xTile].pTile->GetTileSet(), rstrTile, &nResult));
-		CheckIfIgnore(0 == nResult, S_FALSE);
-
-		Check(PlaceTile(pWorld, xTile, yTile, pmapTileSets, rstrTile, TRUE));
-	}
-	else
-	{
-		if(World::Arcanus == m_eType)
-			pWorld = m_pArcanusWorld;
-		else if(World::Myrror == m_eType)
-			pWorld = m_pMyrrorWorld;
-
-		if(m_fPlaceCity)
-		{
-			m_fPainting = FALSE;
-			Check(PlaceOrModifyCity(pWorld, xTile, yTile));
-		}
-		else
-		{
-			if(m_fClearFeature)
-				SafeRelease(pWorld[yTile * m_xWorld + xTile].pData);
-			else
-				Check(m_pFeatures->GetSelectedTile(&rstrTile));
-
-			RStrReplace(&pWorld[yTile * m_xWorld + xTile].rstrFeature, rstrTile);
-			ClearTile(xTile, yTile, TRUE);
-		}
-	}
+	m_fPainting = m_pCommand->ContinuePainting();
+	if(!m_fPainting)
+		SafeDelete(m_pCommand);
 
 	Check(UpdateVisibleTiles());
 
 Cleanup:
-	RStrRelease(rstrTile);
 	return hr;
 }
 

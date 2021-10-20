@@ -4,7 +4,7 @@
 #include "..\..\..\Shared\Library\Core\BaseUnknown.h"
 #include "..\..\..\Platform\SIF\Published\SIF.h"
 
-interface __declspec(uuid("F47EE11A-E8DC-4e92-82C9-53E7E7E008BE")) IRibbonHost : public IUIApplication
+interface __declspec(uuid("F47EE11A-E8DC-4e92-82C9-53E7E7E008BE")) IRibbonHost : IUIApplication
 {
 	virtual HRESULT WINAPI GetRibbonSettingsKey (__out_ecount(cchMaxKey) PSTR pszKeyName, INT cchMaxKey) = 0;
 	virtual HRESULT WINAPI GetRibbonSettingsValue (__out_ecount(cchMaxValue) PSTR pszValueName, INT cchMaxValue) = 0;
