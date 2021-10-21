@@ -61,6 +61,10 @@
 	},
 	{
 		package: "sound",
+		name: "Merge.mp3"
+	},
+	{
+		package: "sound",
 		name: "Pebble.mp3"
 	},
 	{

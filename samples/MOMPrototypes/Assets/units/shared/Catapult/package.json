@@ -19,8 +19,7 @@
 		data:
 		{
 			type: "normal",
-			name: "Steam Cannon",
-			race: "Dwarves",
+			name: "Catapult",
 			figures: 1,
 			animation: "ground_unit",
 			upkeep:
@@ -31,7 +30,7 @@
 				},
 				{
 					type: "gold",
-					amount: 4
+					amount: 2
 				}
 			],
 			stats:
@@ -48,16 +47,17 @@
 				{
 					stat: "normal rock",
 					name: "Rock",
-					value: 12
+					value: 10
 				}
 				defense: 2,
-				resist: 9,
-				hits: 12
+				resist: 4,
+				hits: 10
 			},
 			abilities:
 			[
 				{ name: "Ranged Attack", type: "range", value: 10 },
-				{ name: "Mountaineer", type: "ability" }
+				{ name: "Wall Crusher", type: "ability" },
+				{ name: "Long Range", type: "ability" }
 			]
 		}
 	}

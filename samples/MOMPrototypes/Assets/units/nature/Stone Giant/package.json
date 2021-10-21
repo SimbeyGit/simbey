@@ -35,7 +35,7 @@
 				move:
 				[
 					{
-						type: "land",
+						stat: "land",
 						sound: "HeavyWalking.mp3",
 						value: 2
 					}

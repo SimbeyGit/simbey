@@ -59,7 +59,7 @@
 			},
 			{
 				type: "unit",
-				name: "Fang",
+				name: "Steam Cannon",
 				level: 4,
 				enchanted: true
 			}
@@ -99,7 +99,7 @@
 			},
 			{
 				type: "unit",
-				name: "Giant Spiders",
+				name: "Great Wyrm",
 				level: 3
 			},
 			{
