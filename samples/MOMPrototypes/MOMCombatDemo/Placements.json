@@ -100,7 +100,8 @@
 			{
 				type: "unit",
 				name: "Great Wyrm",
-				level: 3
+				level: 3,
+				enchanted: true
 			},
 			{
 				type: "unit",

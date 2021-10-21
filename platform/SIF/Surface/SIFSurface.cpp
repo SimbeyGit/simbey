@@ -668,6 +668,20 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CSIFCanvas::ReplaceSprite (sysint nLayer, ISimbeyInterchangeSprite* pReplace, ISimbeyInterchangeSprite* pSprite)
+{
+	HRESULT hr;
+	sysint nSprite;
+	TArray<ISimbeyInterchangeSprite*>* paSprites;
+
+	Check(FindSprite(nLayer, pReplace, &nSprite));
+	paSprites = &m_aLayers[nLayer]->aSprites;
+	ReplaceInterface((*paSprites)[nSprite], pSprite);
+
+Cleanup:
+	return hr;
+}
+
 HRESULT CSIFCanvas::SortLayer (sysint nLayer, INT (WINAPI* pfnCallback)(ISimbeyInterchangeSprite** ppSpriteA, ISimbeyInterchangeSprite** ppSpriteB, PVOID pParam), PVOID pvParam)
 {
 	HRESULT hr;

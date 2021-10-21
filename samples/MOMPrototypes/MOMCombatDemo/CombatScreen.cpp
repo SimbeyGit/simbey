@@ -342,6 +342,18 @@ HRESULT CObject::GetLastVisibleSprite (__deref_out ISimbeyInterchangeSprite** pp
 	return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
 }
 
+VOID CObject::ShiftObject (INT xShift, INT yShift)
+{
+	for(sysint i = 0; i < m_aSprites.Length(); i++)
+	{
+		INT x, y;
+		ISimbeyInterchangeSprite* pSprite = m_aSprites[i].pSprite;
+
+		pSprite->GetPosition(x, y);
+		pSprite->SetPosition(x + xShift, y + yShift);
+	}
+}
+
 CMovingObject::CMovingObject (IJSONObject* pDef,
 	RSTRING rstrOwner,
 	INT xTile, INT yTile,
@@ -384,16 +396,7 @@ VOID CMovingObject::UpdateDirection (INT nDirection)
 
 VOID CMovingObject::UpdateMovement (INT nMoveFrame)
 {
-	for(sysint i = 0; i < m_aSprites.Length(); i++)
-	{
-		INT x, y;
-		ISimbeyInterchangeSprite* pSprite = m_aSprites[i].pSprite;
-
-		pSprite->GetPosition(x, y);
-		x += c_ptMoveOffset[m_nDirection][nMoveFrame].x;
-		y += c_ptMoveOffset[m_nDirection][nMoveFrame].y;
-		pSprite->SetPosition(x, y);
-	}
+	ShiftObject(c_ptMoveOffset[m_nDirection][nMoveFrame].x, c_ptMoveOffset[m_nDirection][nMoveFrame].y);
 }
 
 VOID CMovingObject::SelectBaseAnimation (VOID)
@@ -566,8 +569,33 @@ bool CMovingObject::CanMeleeAttack (CMovingObject* pOther)
 		SUCCEEDED(JSONGetValueFromObject(m_pDef, SLP(L"base:stats:melee"), &srv));
 }
 
+HRESULT CMovingObject::ReplaceAnimator (ISimbeyInterchangeAnimator* pAnimator, CSIFCanvas* pMain, sysint nUnitLayer)
+{
+	HRESULT hr = S_FALSE;
+
+	for(sysint i = 0; i < m_aSprites.Length(); i++)
+	{
+		SPRITE_VIS& sprite = m_aSprites[i];
+		INT x, y;
+		INT nAnimation, nFrame, cTicks;
+		TStackRef<ISimbeyInterchangeSprite> srSprite;
+
+		sprite.pSprite->GetPosition(x, y);
+		sprite.pSprite->GetCurrentAnimation(&nAnimation, &nFrame, &cTicks);
+		Check(pAnimator->CreateSprite(&srSprite));
+		srSprite->SetPosition(x, y);
+		Check(srSprite->SelectAnimation(nAnimation, nFrame, cTicks));
+		pMain->ReplaceSprite(nUnitLayer, sprite.pSprite, srSprite);
+		sprite.pSprite->Release();
+		sprite.pSprite = srSprite.Detach();
+	}
+
+Cleanup:
+	return hr;
+}
+
 CMoveUnitAction::CMoveUnitAction (CCombatScreen* pWindow, CSIFCanvas* pMain, CIsometricTranslator* pIsometric, CObject* pSelected) :
-	m_pScreen(pWindow),
+	CAction(pWindow),
 	m_pMain(pMain),
 	m_pIsometric(pIsometric),
 	m_pSelected(pSelected),
@@ -659,8 +687,113 @@ VOID CMoveUnitAction::SelectNextMovement (VOID)
 	}
 }
 
+CMergeUnitAction::CMergeUnitAction (CCombatScreen* pWindow, CSIFCanvas* pMain, CIsometricTranslator* pIsometric, CObject* pSelected, sysint nUnitLayer, INT xTarget, INT yTarget) :
+	CAction(pWindow),
+	m_pMain(pMain),
+	m_pIsometric(pIsometric),
+	m_pSelected(pSelected),
+	m_nUnitLayer(nUnitLayer),
+	m_pOriginalAnimator(NULL),
+	m_xTarget(xTarget),
+	m_yTarget(yTarget),
+	m_cTicks(0),
+	m_cMergeShift(0),
+	m_eState(Idle)
+{
+}
+
+CMergeUnitAction::~CMergeUnitAction ()
+{
+	SafeRelease(m_pOriginalAnimator);
+}
+
+VOID CMergeUnitAction::Update (VOID)
+{
+	switch(m_eState)
+	{
+	case Idle:
+		{
+			TStackRef<ISimbeyInterchangeSprite> srSprite;
+			INT xView, yView;
+			INT xTarget, yTarget;
+
+			m_pSelected->GetLastVisibleSprite(&srSprite);
+			srSprite->GetAnimator(&m_pOriginalAnimator);
+
+			m_pIsometric->TileToView(m_pSelected->m_xTile, m_pSelected->m_yTile, &xView, &yView);
+			m_pIsometric->TileToView(m_xTarget, m_yTarget, &xTarget, &yTarget);
+			m_xOffset = xTarget - xView;
+			m_yOffset = yTarget - yView;
+
+			m_pScreen->PlaySound(m_pSelected->GetMovingSound());
+			m_pSelected->SelectMoveAnimation();
+
+			m_eState = Down;
+			m_cTicks = 1;
+		}
+		__fallthrough;
+	case Down:
+		if(0 == --m_cTicks)
+		{
+			m_pSelected->ShiftObject(0, 1);
+			m_cTicks = 3;
+
+			if(16 == ++m_cMergeShift)
+			{
+				m_pSelected->m_xTile = m_xTarget;
+				m_pSelected->m_yTile = m_yTarget;
+				m_pSelected->ShiftObject(m_xOffset, m_yOffset);
+				m_eState = Up;
+			}
+
+			UpdateSpriteSize();
+		}
+		break;
+	case Up:
+		if(0 == --m_cTicks)
+		{
+			m_pSelected->ShiftObject(0, -1);
+			m_cTicks = 2;
+
+			if(0 == --m_cMergeShift)
+			{
+				m_pSelected->SelectBaseAnimation();
+				static_cast<CMovingObject*>(m_pSelected)->ReplaceAnimator(m_pOriginalAnimator, m_pMain, m_nUnitLayer);
+				m_pScreen->ClearAction(this);
+			}
+			else
+				UpdateSpriteSize();
+		}
+		break;
+	}
+}
+
+HRESULT CMergeUnitAction::UpdateSpriteSize (VOID)
+{
+	HRESULT hr;
+	TStackRef<ISimbeyInterchangeAnimator> srDup;
+	INT cImages;
+
+	Check(m_pOriginalAnimator->Duplicate(&srDup));
+	cImages = srDup->GetImageCount();
+	for(INT i = 0; i < cImages; i++)
+	{
+		PBYTE pBits;
+		INT nWidth, nHeight, xOffset, yOffset;
+
+		Check(srDup->GetImage(i, &pBits, &nWidth, &nHeight));
+		Check(srDup->GetImageOffset(i, &xOffset, &yOffset));
+		Check(srDup->SetImage(i, FALSE, pBits, nWidth, max(nHeight - m_cMergeShift, 0), xOffset, yOffset));
+	}
+
+	static_cast<CMovingObject*>(m_pSelected)->ReplaceAnimator(srDup, m_pMain, m_nUnitLayer);
+
+Cleanup:
+	return hr;
+}
+
 CProjectileAction::CProjectileAction (CCombatScreen* pWindow, CMovingObject* pSource, CMovingObject* pTarget) :
-	m_pScreen(pWindow),
+	CAction(pWindow),
 	m_pSource(pSource),
 	m_pTarget(pTarget),
 	m_fImpacted(FALSE),
@@ -757,7 +890,7 @@ VOID CProjectileAction::Update (VOID)
 }
 
 CEffect::CEffect (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, ISimbeyInterchangeSprite* pSprite, INT cTicksRemaining) :
-	m_pScreen(pScreen),
+	CAction(pScreen),
 	m_pCanvas(pCanvas),
 	m_nLayer(nLayer),
 	m_pSprite(pSprite),
@@ -783,7 +916,7 @@ VOID CEffect::Update (VOID)
 }
 
 CUnitUpdater::CUnitUpdater (CCombatScreen* pScreen, CMovingObject* pUnit, CSIFCanvas* pCanvas, sysint nLayer, INT cVisible, INT cTicksRemaining) :
-	m_pScreen(pScreen),
+	CAction(pScreen),
 	m_pUnit(pUnit),
 	m_pCanvas(pCanvas),
 	m_nLayer(nLayer),
@@ -1450,24 +1583,12 @@ BOOL CCombatScreen::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, L
 			}
 			else
 			{
-				CAStar2D aStar;
-				if(SUCCEEDED(aStar.PreInit()))
-				{
-					if(SUCCEEDED(aStar.FindPath(m_pSelected->m_xTile, m_pSelected->m_yTile, xTile, yTile, 64, this)))
-					{
-						CMoveUnitAction* pAction = __new CMoveUnitAction(this, m_pMain, &m_Isometric, m_pSelected);
-						if(pAction)
-						{
-							aStar.GetPath(xTile, yTile, &pAction->m_aPath);
-							pAction->SelectNextMovement();
-							m_aActions.Append(pAction);
-							pAction->Release();
+				TStackRef<IJSONObject> srAbility;
 
-							if(m_pSelectedTile)
-								m_pMain->RemoveSprite(m_nTileEffectsLayer, m_pSelectedTile);
-						}
-					}
-				}
+				if(m_pSelected->CanBeMoved() && SUCCEEDED(FindUnitAbility(static_cast<CMovingObject*>(m_pSelected)->m_pDef, RSTRING_CAST(L"Merging"), &srAbility)))
+					StartMergingAction(xTile, yTile);
+				else
+					StartMovingAction(xTile, yTile);
 			}
 		}
 	}
@@ -1527,6 +1648,44 @@ CObject* CCombatScreen::FindObject (INT xTile, INT yTile)
 			return pObject;
 	}
 	return NULL;
+}
+
+HRESULT CCombatScreen::StartMergingAction (INT xTile, INT yTile)
+{
+	HRESULT hr;
+	CMergeUnitAction* pAction = __new CMergeUnitAction(this, m_pMain, &m_Isometric, m_pSelected, m_nUnitLayer, xTile, yTile);
+
+	CheckAlloc(pAction);
+	m_aActions.Append(pAction);
+	hr = S_OK;
+
+Cleanup:
+	SafeRelease(pAction);
+	return hr;
+}
+
+HRESULT CCombatScreen::StartMovingAction (INT xTile, INT yTile)
+{
+	HRESULT hr;
+	CAStar2D aStar;
+	CMoveUnitAction* pAction = NULL;
+
+	Check(aStar.PreInit());
+	Check(aStar.FindPath(m_pSelected->m_xTile, m_pSelected->m_yTile, xTile, yTile, 64, this));
+
+	pAction = __new CMoveUnitAction(this, m_pMain, &m_Isometric, m_pSelected);
+	CheckAlloc(pAction);
+
+	aStar.GetPath(xTile, yTile, &pAction->m_aPath);
+	pAction->SelectNextMovement();
+	m_aActions.Append(pAction);
+
+	if(m_pSelectedTile)
+		m_pMain->RemoveSprite(m_nTileEffectsLayer, m_pSelectedTile);
+
+Cleanup:
+	SafeRelease(pAction);
+	return hr;
 }
 
 HRESULT CCombatScreen::UpdateStatsPanel (INT xTile, INT yTile)

@@ -55,6 +55,7 @@ public:
 	virtual VOID GetFrameOffset (__out INT& x, __out INT& y);
 	virtual HRESULT GetFrameImage (__out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight) { return E_NOTIMPL; }
 	virtual HRESULT SetAnimationCompletedCallback (__in_opt ISpriteAnimationCompleted* pCallback) { return E_NOTIMPL; }
+	virtual HRESULT GetAnimator (__deref_out ISimbeyInterchangeAnimator** ppAnimator) { return E_NOTIMPL; }
 };
 
 class CDrawSolid :
@@ -97,6 +98,7 @@ public:
 	virtual VOID GetFrameOffset (__out INT& x, __out INT& y);
 	virtual HRESULT GetFrameImage (__out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight) { return E_NOTIMPL; }
 	virtual HRESULT SetAnimationCompletedCallback (__in_opt ISpriteAnimationCompleted* pCallback) { return E_NOTIMPL; }
+	virtual HRESULT GetAnimator (__deref_out ISimbeyInterchangeAnimator** ppAnimator) { return E_NOTIMPL; }
 
 	COLORREF GetSolidColor (VOID);
 	VOID SetSolidColor (COLORREF cr);
@@ -147,6 +149,7 @@ public:
 	virtual VOID GetFrameOffset (__out INT& x, __out INT& y);
 	virtual HRESULT GetFrameImage (__out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight) { return E_NOTIMPL; }
 	virtual HRESULT SetAnimationCompletedCallback (__in_opt ISpriteAnimationCompleted* pCallback) { return E_NOTIMPL; }
+	virtual HRESULT GetAnimator (__deref_out ISimbeyInterchangeAnimator** ppAnimator) { return E_NOTIMPL; }
 
 private:
 	VOID CalculateView (SIF_SURFACE* psifSurface24, __out PBYTE* ppbView, INT& xOffset, INT& yOffset, INT& xView, INT& yView, INT& xTile, INT& yTile);
@@ -184,6 +187,7 @@ public:
 	HRESULT FindSpriteAt (sysint nLayer, INT x, INT y, __deref_out ISimbeyInterchangeSprite** ppSprite);
 	HRESULT BringSpriteToTop (sysint nLayer, ISimbeyInterchangeSprite* pSprite);
 	HRESULT RemoveHiddenSprites (sysint nLayer);
+	HRESULT ReplaceSprite (sysint nLayer, ISimbeyInterchangeSprite* pReplace, ISimbeyInterchangeSprite* pSprite);
 
 	HRESULT SortLayer (sysint nLayer, INT (WINAPI* pfnCallback)(ISimbeyInterchangeSprite** ppSpriteA, ISimbeyInterchangeSprite** ppSpriteB, PVOID pParam), PVOID pvParam);
 

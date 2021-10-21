@@ -75,6 +75,8 @@ public:
 	virtual VOID SelectMoveAnimation (VOID) {}
 	virtual VOID SelectAttackAnimation (VOID) {}
 	virtual VOID SelectRangeAnimation (VOID) {}
+
+	VOID ShiftObject (INT xShift, INT yShift);
 };
 
 class CMovingObject : public CObject
@@ -114,6 +116,8 @@ public:
 	bool CanRangeAttack (CMovingObject* pOther);
 	bool CanMeleeAttack (CMovingObject* pOther);
 
+	HRESULT ReplaceAnimator (ISimbeyInterchangeAnimator* pAnimator, CSIFCanvas* pMain, sysint nUnitLayer);
+
 	static INT StandingAnimation (INT nDirection) { return nDirection * 4 + 2; }
 	static INT MovingAnimation (INT nDirection) { return nDirection * 4 + 1; }
 	static INT AttackingAnimation (INT nDirection) { return nDirection * 4 + 0; }
@@ -123,17 +127,20 @@ public:
 class CAction : public CBaseUnknown
 {
 public:
+	CCombatScreen* m_pScreen;
+
+public:
 	IMP_BASE_UNKNOWN
 
 	EMPTY_UNK_MAP
 
+	CAction (CCombatScreen* pScreen) : m_pScreen(pScreen) {}
 	virtual VOID Update (VOID) = 0;
 };
 
 class CMoveUnitAction : public CAction
 {
 public:
-	CCombatScreen* m_pScreen;
 	CSIFCanvas* m_pMain;
 
 	CIsometricTranslator* m_pIsometric;
@@ -154,10 +161,43 @@ public:
 	VOID SelectNextMovement (VOID);
 };
 
+class CMergeUnitAction : public CAction
+{
+	enum State
+	{
+		Idle,
+		Down,
+		Up
+	};
+
+public:
+	CSIFCanvas* m_pMain;
+	CIsometricTranslator* m_pIsometric;
+	CObject* m_pSelected;
+	sysint m_nUnitLayer;
+
+	ISimbeyInterchangeAnimator* m_pOriginalAnimator;
+
+	INT m_xTarget, m_yTarget;
+	INT m_xOffset, m_yOffset;
+	INT m_cTicks;
+	INT m_cMergeShift;
+
+	State m_eState;
+
+public:
+	CMergeUnitAction (CCombatScreen* pWindow, CSIFCanvas* pMain, CIsometricTranslator* pIsometric, CObject* pSelected, sysint nUnitLayer, INT xTarget, INT yTarget);
+	~CMergeUnitAction ();
+
+	virtual VOID Update (VOID);
+
+private:
+	HRESULT UpdateSpriteSize (VOID);
+};
+
 class CProjectileAction : public CAction
 {
 public:
-	CCombatScreen* m_pScreen;
 	CMovingObject* m_pSource;
 	CMovingObject* m_pTarget;
 	BOOL m_fImpacted;
@@ -184,7 +224,6 @@ public:
 class CEffect : public CAction
 {
 public:
-	CCombatScreen* m_pScreen;
 	CSIFCanvas* m_pCanvas;
 	sysint m_nLayer;
 	ISimbeyInterchangeSprite* m_pSprite;
@@ -200,7 +239,6 @@ public:
 class CUnitUpdater : public CAction
 {
 public:
-	CCombatScreen* m_pScreen;
 	CMovingObject* m_pUnit;
 	CSIFCanvas* m_pCanvas;
 	sysint m_nLayer;
@@ -355,7 +393,9 @@ protected:
 
 	CObject* FindObject (INT xTile, INT yTile);
 
-	VOID SelectNextMovement (VOID);
+	HRESULT StartMergingAction (INT xTile, INT yTile);
+	HRESULT StartMovingAction (INT xTile, INT yTile);
+
 	HRESULT UpdateStatsPanel (INT xTile, INT yTile);
 	HRESULT UpdateUnitStats (sysint nLayer, IJSONObject* pUnit, INT nLevel);
 	HRESULT PlaceStat (sysint nLayer, INT x, INT y, IJSONObject* pSource, PCWSTR pcwzField, bool fStatSprite = true);

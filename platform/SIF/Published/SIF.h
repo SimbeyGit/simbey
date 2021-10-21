@@ -36,6 +36,9 @@ interface ISeekableStream;
 // Forward declaration for ISpriteAnimationCompleted::OnSpriteAnimationCompleted()
 interface ISimbeyInterchangeSprite;
 
+// Forward declaration for
+interface ISimbeyInterchangeAnimator;
+
 #define	SIF_NO_TRANSPARENCY		0xFF000000
 
 #define	SIF_MAX_LAYER_NAME		256			// 255 characters + 1 terminator
@@ -214,6 +217,7 @@ interface __declspec(uuid("F9ED0968-51C0-402c-A999-45CB164B0402")) ISimbeyInterc
 	virtual VOID GetFrameOffset (__out INT& x, __out INT& y) = 0;
 	virtual HRESULT GetFrameImage (__out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight) = 0;
 	virtual HRESULT SetAnimationCompletedCallback (__in_opt ISpriteAnimationCompleted* pCallback) = 0;
+	virtual HRESULT GetAnimator (__deref_out ISimbeyInterchangeAnimator** ppAnimator) = 0;
 };
 
 interface __declspec(uuid("D9578F6E-0FE6-417f-9F35-7D5827940E94")) ISimbeyInterchangeAnimator : IUnknown
@@ -229,6 +233,7 @@ interface __declspec(uuid("D9578F6E-0FE6-417f-9F35-7D5827940E94")) ISimbeyInterc
 
 	virtual INT GetImageCount (VOID) = 0;
 	virtual HRESULT GetImage (INT nImage, PBYTE* ppBits32P, INT* pnWidth, INT* pnHeight) = 0;
+	virtual HRESULT GetImageOffset (INT nImage, __out INT* pxOffset, __out INT* pyOffset) = 0;
 
 	virtual HRESULT Duplicate (__deref_out ISimbeyInterchangeAnimator** ppAnimator) = 0;
 };
