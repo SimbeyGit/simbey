@@ -1,0 +1,12 @@
+Assets.pkg
+*.qbc
+Debug/
+Release/
+*.user
+*.ncb
+*.suo
+Ribbon.bml
+Ribbon.h
+Ribbon.rc
+RibbonMappings.h
+Ribbon*.sif
