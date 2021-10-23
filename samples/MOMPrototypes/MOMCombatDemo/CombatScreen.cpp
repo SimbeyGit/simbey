@@ -1015,7 +1015,15 @@ VOID CSummonSpell::Update (VOID)
 			{
 				m_eState = Up;
 				m_cFrame = 16;
+
+				// Show the units, then sort while the units are in the final position.
 				m_pObject->ShowOrHide(m_pCanvas, m_nLayer, TRUE);
+				m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer);
+
+				// After sorting, shift the units to the "spawning" location.
+				m_pObject->ShiftObject(0, 16);
+
+				// Update the units' heights.
 				UpdateSpriteSize();
 			}
 		}
@@ -1025,7 +1033,6 @@ VOID CSummonSpell::Update (VOID)
 		{
 			m_cTicks = 5;
 			m_pObject->ShiftObject(0, -1);
-			m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer);
 
 			if(0 == --m_cFrame)
 			{
@@ -1075,7 +1082,6 @@ HRESULT CSummonSpell::Start (VOID)
 
 	Check(m_pScreen->PlaceUnit(m_rstrName, m_rstrCaster, m_xTile, m_yTile, m_nLayer, 0, 0, 0, false, &m_pObject));
 	Check(m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer));
-	m_pObject->ShiftObject(0, 16);
 
 	Check(m_pObject->GetFirstVisibleSprite(&srFirstUnit));
 	Check(srFirstUnit->GetAnimator(&m_pOriginalAnimator));
