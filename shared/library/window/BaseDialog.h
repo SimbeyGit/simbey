@@ -5,6 +5,9 @@
 
 class CDialogHost;
 
+#pragma warning(push)
+#pragma warning(disable:4512)
+
 class CBaseDialog : public IOleWindow
 {
 private:
@@ -47,3 +50,5 @@ private:
 	static DLGRESULT CALLBACK DlgProcedure (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 	static DLGRESULT CALLBACK DlgCreatePage (HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 };
+
+#pragma warning(pop)

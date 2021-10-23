@@ -29,12 +29,12 @@
 				[
 					{
 						stat: "land",
-						sound: "Scuttle.mp3",
+						sound: "Armor.mp3",
 						value: 1
 					},
 					{
 						stat: "water",
-						sound: "Scuttle.mp3",
+						sound: "Armor.mp3",
 						value: 1
 					}
 				],

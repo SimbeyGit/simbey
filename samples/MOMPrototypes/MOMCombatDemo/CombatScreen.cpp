@@ -329,6 +329,19 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CObject::GetFirstVisibleSprite (__deref_out ISimbeyInterchangeSprite** ppSprite)
+{
+	for(sysint i = 0; i < m_aSprites.Length(); i++)
+	{
+		if(m_aSprites[i].fVisible)
+		{
+			SetInterface(*ppSprite, m_aSprites[i].pSprite);
+			return S_OK;
+		}
+	}
+	return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+}
+
 HRESULT CObject::GetLastVisibleSprite (__deref_out ISimbeyInterchangeSprite** ppSprite)
 {
 	for(sysint i = m_aSprites.Length() - 1; i >= 0; i--)
@@ -340,6 +353,22 @@ HRESULT CObject::GetLastVisibleSprite (__deref_out ISimbeyInterchangeSprite** pp
 		}
 	}
 	return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+}
+
+VOID CObject::ShowOrHide (CSIFCanvas* pCanvas, sysint nLayer, BOOL fShow)
+{
+	for(sysint i = 0; i < m_aSprites.Length(); i++)
+	{
+		if(static_cast<BOOL>(m_aSprites[i].fVisible) != fShow)
+		{
+			SPRITE_VIS& sprite = m_aSprites[i];
+			if(fShow)
+				pCanvas->AddSprite(nLayer, sprite.pSprite, NULL);
+			else
+				pCanvas->RemoveSprite(nLayer, sprite.pSprite);
+			sprite.fVisible = !sprite.fVisible;
+		}
+	}
 }
 
 VOID CObject::ShiftObject (INT xShift, INT yShift)
@@ -943,6 +972,192 @@ VOID CUnitUpdater::Update (VOID)
 	}
 }
 
+CSummonSpell::CSummonSpell (RSTRING rstrCaster, RSTRING rstrName, CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile) :
+	CAction(pScreen),
+	m_pCanvas(pCanvas),
+	m_nLayer(nLayer),
+	m_pIsometric(pIsometric),
+	m_xTile(xTile),
+	m_yTile(yTile),
+	m_eState(Idle),
+	m_pObject(NULL),
+	m_pOriginalAnimator(NULL)
+{
+	RStrSet(m_rstrCaster, rstrCaster);
+	RStrSet(m_rstrName, rstrName);
+}
+
+CSummonSpell::~CSummonSpell ()
+{
+	SafeRelease(m_pOriginalAnimator);
+
+	RStrRelease(m_rstrName);
+	RStrRelease(m_rstrCaster);
+}
+
+VOID CSummonSpell::Update (VOID)
+{
+	switch(m_eState)
+	{
+	case Idle:
+		m_cTicks = 4;
+		m_cFrame = 24;
+		m_eState = Spawn;
+		m_cLocks = 2;
+		Start();
+		break;
+	case Spawn:
+		if(0 == --m_cTicks)
+		{
+			m_cTicks = 4;
+
+			if(0 == --m_cFrame)
+			{
+				m_eState = Up;
+				m_cFrame = 16;
+				m_pObject->ShowOrHide(m_pCanvas, m_nLayer, TRUE);
+				UpdateSpriteSize();
+			}
+		}
+		break;
+	case Up:
+		if(0 == --m_cTicks)
+		{
+			m_cTicks = 5;
+			m_pObject->ShiftObject(0, -1);
+			m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer);
+
+			if(0 == --m_cFrame)
+			{
+				m_eState = Done;
+				m_pObject->ReplaceAnimator(m_pOriginalAnimator, m_pCanvas, m_nLayer);
+
+				if(0 == --m_cLocks)
+					m_pScreen->ClearAction(this);
+			}
+			else
+				UpdateSpriteSize();
+		}
+		break;
+	}
+}
+
+// ISpriteAnimationCompleted
+
+VOID CSummonSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
+{
+	m_pCanvas->RemoveSpriteLater(m_nLayer, pSprite);
+	if(0 == --m_cLocks)
+		m_pScreen->ClearAction(this);
+}
+
+HRESULT CSummonSpell::Start (VOID)
+{
+	HRESULT hr;
+	FMOD::Sound* pSummoning;
+	TStackRef<ISimbeyInterchangeFile> srSIF;
+	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
+	TStackRef<ISimbeyInterchangeSprite> srSprite, srFirstUnit;
+	INT xIso, yIso, xView, yView;
+
+	Check(m_pScreen->FindSound(RSTRING_CAST(L"Summoning.mp3"), &pSummoning));
+	m_pScreen->PlaySound(pSummoning);
+
+	Check(m_pScreen->GetPackage()->OpenSIF(L"spells\\Summoning\\cast.sif", &srSIF));
+	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 12, FALSE, &srAnimator, NULL));
+	Check(srAnimator->CreateSprite(&srSprite));
+	Check(srSprite->SelectAnimation(0));
+	Check(srSprite->SetAnimationCompletedCallback(this));
+
+	m_pIsometric->TileToView(m_xTile, m_yTile, &xIso, &yIso);
+	m_pIsometric->IsometricToView(m_pCanvas, xIso, yIso, &xView, &yView);
+	srSprite->SetPosition(xView, yView - 17);
+
+	Check(m_pScreen->PlaceUnit(m_rstrName, m_rstrCaster, m_xTile, m_yTile, m_nLayer, 0, 0, 0, false, &m_pObject));
+	Check(m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer));
+	m_pObject->ShiftObject(0, 16);
+
+	Check(m_pObject->GetFirstVisibleSprite(&srFirstUnit));
+	Check(srFirstUnit->GetAnimator(&m_pOriginalAnimator));
+	Check(m_pCanvas->AddSpriteBefore(m_nLayer, srSprite, srFirstUnit, NULL));
+
+	// Hide the units until the summoning portal is fully formed.
+	m_pObject->ShowOrHide(m_pCanvas, m_nLayer, FALSE);
+
+Cleanup:
+	if(srSIF)
+		srSIF->Close();
+	return hr;
+}
+
+HRESULT CSummonSpell::UpdateSpriteSize (VOID)
+{
+	HRESULT hr;
+	TStackRef<ISimbeyInterchangeAnimator> srDup;
+	INT cImages, cMergeShift = m_cFrame;
+
+	Check(m_pOriginalAnimator->Duplicate(&srDup));
+	cImages = srDup->GetImageCount();
+	for(INT i = 0; i < cImages; i++)
+	{
+		PBYTE pBits;
+		INT nWidth, nHeight, xOffset, yOffset;
+
+		Check(srDup->GetImage(i, &pBits, &nWidth, &nHeight));
+		Check(srDup->GetImageOffset(i, &xOffset, &yOffset));
+		Check(srDup->SetImage(i, FALSE, pBits, nWidth, max(nHeight - cMergeShift, 0), xOffset, yOffset));
+	}
+
+	m_pObject->ReplaceAnimator(srDup, m_pCanvas, m_nLayer);
+
+Cleanup:
+	return hr;
+}
+
+CCastSpell::CCastSpell (RSTRING rstrCaster)
+{
+	RStrSet(m_rstrCaster, rstrCaster);
+}
+
+CCastSpell::~CCastSpell ()
+{
+	RStrRelease(m_rstrCaster);
+}
+
+HRESULT CCastSpell::Query (INT xTile, INT yTile, __in_opt CMovingObject* pUnit)
+{
+	return NULL == pUnit ? S_OK : S_FALSE;
+}
+
+HRESULT CCastSpell::Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, __in_opt CMovingObject* pUnit, __deref_out CAction** ppAction)
+{
+	HRESULT hr;
+	RSTRING rstrName = NULL;
+
+	switch(rand() % 4)
+	{
+	case 0:
+		Check(RStrCreateW(LSP(L"Phantom Warriors"), &rstrName));
+		break;
+	case 1:
+		Check(RStrCreateW(LSP(L"Hell Hounds"), &rstrName));
+		break;
+	case 2:
+		Check(RStrCreateW(LSP(L"Earth Elemental"), &rstrName));
+		break;
+	case 3:
+		Check(RStrCreateW(LSP(L"Skeletons"), &rstrName));
+		break;
+	}
+
+	*ppAction = __new CSummonSpell(m_rstrCaster, rstrName, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile);
+	CheckAlloc(*ppAction);
+
+Cleanup:
+	RStrRelease(rstrName);
+	return hr;
+}
+
 CCombatBar::CCombatBar () :
 	m_pSurface(NULL),
 	m_pBar(NULL),
@@ -1132,7 +1347,9 @@ BOOL CCombatBar::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPAR
 
 			if(GetButtonFromPoint(xView, yView) == m_idxPressed)
 			{
-				if(2 == m_idxPressed)
+				if(0 == m_idxPressed)
+					m_pScreen->CastSpell(__new CCastSpell(GetLeftName()));
+				else if(2 == m_idxPressed)
 					m_pScreen->ShowSelectedUnitInfo();
 				else
 				{
@@ -1181,6 +1398,7 @@ CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface,
 	m_pCombatStats(NULL),
 	m_pCombatMelee(NULL),
 	m_pSelected(NULL),
+	m_pCastSpell(NULL),
 	m_pCombatBarFont(NULL),
 	m_pMoveType(NULL),
 	m_xHoverTile(-1),
@@ -1201,6 +1419,8 @@ CCombatScreen::~CCombatScreen ()
 
 	Assert(0 == m_aActions.Length());
 	Assert(0 == m_aObjects.Length());
+
+	SafeDelete(m_pCastSpell);
 
 	SafeRelease(m_pCombatBarFont);
 	SafeRelease(m_pSmallYellowFont);
@@ -1495,7 +1715,25 @@ BOOL CCombatScreen::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, L
 		m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xView, &yView);
 		m_pMoveTo->SetPosition(xView, yView);
 
-		if(m_pSelected && 0 == m_aActions.Length())
+		if(m_pCastSpell)
+		{
+			HRESULT hrSpell;
+			CObject* pObject = FindObject(xTile, yTile);
+			if(pObject)
+			{
+				if(pObject->CanBeMoved())
+					hrSpell = m_pCastSpell->Query(xTile, yTile, static_cast<CMovingObject*>(pObject));
+				else
+					hrSpell = S_FALSE;
+			}
+			else
+				hrSpell = m_pCastSpell->Query(xTile, yTile, NULL);
+			if(S_OK == hrSpell)
+				m_pMoveType->SelectAnimation(3);
+			else
+				m_pMoveType->SelectAnimation(0);
+		}
+		else if(m_pSelected && 0 == m_aActions.Length())
 		{
 			if(xTile == m_pSelected->m_xTile && yTile == m_pSelected->m_yTile)
 				m_pMoveType->SelectAnimation(0);
@@ -1543,52 +1781,78 @@ BOOL CCombatScreen::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, L
 		m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xView, &yView);
 		m_pMoveTo->SetPosition(xView, yView);
 
-		if(m_pSelected && 0 == m_aActions.Length())
+		if(0 == m_aActions.Length())
 		{
-			CObject* pObject = FindObject(xTile, yTile);
-			if(pObject)
+			if(m_pCastSpell)
 			{
-				if(pObject->CanBeMoved())
+				HRESULT hrSpell;
+				CObject* pObject = FindObject(xTile, yTile);
+				CAction* pSpellAction = NULL;
+				if(pObject)
 				{
-					CMovingObject* pOther = static_cast<CMovingObject*>(pObject);
-					CMovingObject* pSelected = static_cast<CMovingObject*>(m_pSelected);
-
-					if(!pSelected->HasSameOwner(pOther))
+					if(pObject->CanBeMoved())
+						hrSpell = m_pCastSpell->Cast(this, m_pMain, m_nUnitLayer, &m_Isometric, xTile, yTile, static_cast<CMovingObject*>(pObject), &pSpellAction);
+					else
+						hrSpell = S_FALSE;
+				}
+				else
+					hrSpell = m_pCastSpell->Cast(this, m_pMain, m_nUnitLayer, &m_Isometric, xTile, yTile, NULL, &pSpellAction);
+				if(pSpellAction)
+				{
+					m_aActions.Append(pSpellAction);
+					pSpellAction->Release();
+					SafeDelete(m_pCastSpell);
+				}
+			}
+			else if(m_pSelected)
+			{
+				CObject* pObject = FindObject(xTile, yTile);
+				if(pObject)
+				{
+					if(pObject->CanBeMoved())
 					{
-						pSelected->FaceObject(pOther);
+						CMovingObject* pOther = static_cast<CMovingObject*>(pObject);
+						CMovingObject* pSelected = static_cast<CMovingObject*>(m_pSelected);
 
-						if(pSelected->CanRangeAttack(pOther))
+						if(!pSelected->HasSameOwner(pOther))
 						{
-							CProjectileAction* pAction = __new CProjectileAction(this, pSelected, pOther);
-							if(pAction)
+							pSelected->FaceObject(pOther);
+
+							if(pSelected->CanRangeAttack(pOther))
 							{
-								pSelected->SelectRangeAnimation();
-								pSelected->CreateProjectiles(&m_Isometric, m_pMain, m_nUnitLayer, &m_mapProjectiles, pAction);
-								m_pHost->PlaySound(FMOD_CHANNEL_FREE, m_pSelected->GetRangeSound(), false, NULL);
+								CProjectileAction* pAction = __new CProjectileAction(this, pSelected, pOther);
+								if(pAction)
+								{
+									pSelected->SelectRangeAnimation();
+									pSelected->CreateProjectiles(&m_Isometric, m_pMain, m_nUnitLayer, &m_mapProjectiles, pAction);
+									m_pHost->PlaySound(FMOD_CHANNEL_FREE, m_pSelected->GetRangeSound(), false, NULL);
 
-								m_aActions.Append(pAction);
-								pAction->Release();
+									m_aActions.Append(pAction);
+									pAction->Release();
+								}
 							}
-						}
-						else if(pSelected->CanMeleeAttack(pOther))
-						{
-							pSelected->SelectAttackAnimation();
-							pOther->FaceObject(pSelected);
-							pOther->SelectAttackAnimation();
-							PerformAttack(pSelected, pOther, FALSE);
-							m_pHost->PlaySound(FMOD_CHANNEL_FREE, m_pSelected->GetMeleeSound(), false, NULL);
+							else if(pSelected->CanMeleeAttack(pOther))
+							{
+								pSelected->SelectAttackAnimation();
+								pOther->FaceObject(pSelected);
+								pOther->SelectAttackAnimation();
+								PerformAttack(pSelected, pOther, FALSE);
+								m_pHost->PlaySound(FMOD_CHANNEL_FREE, m_pSelected->GetMeleeSound(), false, NULL);
+							}
 						}
 					}
 				}
-			}
-			else
-			{
-				TStackRef<IJSONObject> srAbility;
-
-				if(m_pSelected->CanBeMoved() && SUCCEEDED(FindUnitAbility(static_cast<CMovingObject*>(m_pSelected)->m_pDef, RSTRING_CAST(L"Merging"), &srAbility)))
-					StartMergingAction(xTile, yTile);
 				else
-					StartMovingAction(xTile, yTile);
+				{
+					TStackRef<IJSONObject> srAbility;
+
+					Assert(m_pSelected->CanBeMoved());
+
+					if(SUCCEEDED(FindUnitAbility(static_cast<CMovingObject*>(m_pSelected)->m_pDef, RSTRING_CAST(L"Merging"), &srAbility)))
+						StartMergingAction(xTile, yTile);
+					else
+						StartMovingAction(xTile, yTile);
+				}
 			}
 		}
 	}
@@ -2059,6 +2323,18 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CCombatScreen::CastSpell (CCastSpell* pSpell)
+{
+	HRESULT hr;
+
+	CheckIf(NULL != m_pCastSpell, E_UNEXPECTED);
+	Check(m_pMoveType->SelectAnimation(3));
+	m_pCastSpell = pSpell;
+
+Cleanup:
+	return hr;
+}
+
 VOID CCombatScreen::UpdateMouse (LPARAM lParam)
 {
 	INT xView, yView;
@@ -2473,7 +2749,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CCombatScreen::AddMovingObject (IJSONObject* pDef, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange)
+HRESULT CCombatScreen::AddMovingObject (IJSONObject* pDef, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange, __deref_opt_out CMovingObject** ppObject)
 {
 	HRESULT hr;
 	TStackRef<IJSONObject> srStats, srUnit, srMove;
@@ -2548,6 +2824,8 @@ HRESULT CCombatScreen::AddMovingObject (IJSONObject* pDef, RSTRING rstrOwner, IN
 	}
 
 	Check(m_aObjects.Append(pObject));
+	if(ppObject)
+		*ppObject = pObject;
 	pObject = NULL;
 
 Cleanup:
@@ -2720,7 +2998,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CCombatScreen::PlaceUnit (RSTRING rstrName, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, INT nDirection, INT nLevel, COLORREF crColorize, bool fEnchanted)
+HRESULT CCombatScreen::PlaceUnit (RSTRING rstrName, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, INT nDirection, INT nLevel, COLORREF crColorize, bool fEnchanted, __deref_opt_out CMovingObject** ppObject)
 {
 	HRESULT hr;
 	TStackRef<IJSONValue> srvUnits, srv, srvData;
@@ -2822,7 +3100,7 @@ HRESULT CCombatScreen::PlaceUnit (RSTRING rstrName, RSTRING rstrOwner, INT xTile
 		if(srNew)
 			srAnimator = srNew;
 	}
-	Check(AddMovingObject(srUnit, rstrOwner, xTile, yTile, nLayer, srAnimator, nDirection, nLevel, pfnBaseAnimation, pMoveSound, pMeleeSound, pRangeSound));
+	Check(AddMovingObject(srUnit, rstrOwner, xTile, yTile, nLayer, srAnimator, nDirection, nLevel, pfnBaseAnimation, pMoveSound, pMeleeSound, pRangeSound, ppObject));
 
 Cleanup:
 	RStrRelease(rstrMelee);

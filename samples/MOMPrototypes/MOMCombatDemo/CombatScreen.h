@@ -63,7 +63,9 @@ public:
 	HRESULT AddSprite (ISimbeyInterchangeSprite* pSprite, bool fVisible);
 	HRESULT CloneSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
 	HRESULT UpdateVisList (CSIFCanvas* pCanvas, sysint nLayer, INT cVisible);
+	HRESULT GetFirstVisibleSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
 	HRESULT GetLastVisibleSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
+	VOID ShowOrHide (CSIFCanvas* pCanvas, sysint nLayer, BOOL fShow);
 
 	virtual bool CanBeMoved (VOID) { return false; }
 	virtual FMOD::Sound* GetMovingSound (VOID) { return NULL; }
@@ -252,6 +254,66 @@ public:
 	virtual VOID Update (VOID);
 };
 
+class CSummonSpell :
+	public CAction,
+	public ISpriteAnimationCompleted
+{
+	enum State
+	{
+		Idle,
+		Spawn,
+		Up,
+		Done
+	};
+
+private:
+	RSTRING m_rstrCaster;
+	RSTRING m_rstrName;
+
+	CSIFCanvas* m_pCanvas;
+	sysint m_nLayer;
+	CIsometricTranslator* m_pIsometric;
+	INT m_xTile;
+	INT m_yTile;
+
+	State m_eState;
+
+	INT m_cFrame;
+	INT m_cTicks;
+	CMovingObject* m_pObject;
+	ISimbeyInterchangeAnimator* m_pOriginalAnimator;
+
+	INT m_cLocks;
+
+public:
+	IMP_UNKNOWN(CAction)
+
+	CSummonSpell (RSTRING rstrCaster, RSTRING rstrName, CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile);
+	~CSummonSpell ();
+
+	virtual VOID Update (VOID);
+
+	// ISpriteAnimationCompleted
+	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
+
+private:
+	HRESULT Start (VOID);
+	HRESULT UpdateSpriteSize (VOID);
+};
+
+class CCastSpell
+{
+private:
+	RSTRING m_rstrCaster;
+
+public:
+	CCastSpell (RSTRING rstrCaster);
+	~CCastSpell ();
+
+	HRESULT Query (INT xTile, INT yTile, __in_opt CMovingObject* pUnit);
+	HRESULT Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, __in_opt CMovingObject* pUnit, __deref_out CAction** ppAction);
+};
+
 class CCombatBar :
 	public CBaseUnknown,
 	public ILayerInputHandler
@@ -283,6 +345,8 @@ public:
 
 	HRESULT Initialize (CCombatScreen* pWindow, CSIFSurface* pSurface, const RECT* pcrc);
 	VOID SetNames (RSTRING rstrLeft, RSTRING rstrRight);
+	RSTRING GetLeftName (VOID) { return m_rstrLeft; }
+	RSTRING GetRightName (VOID) { return m_rstrRight; }
 	HRESULT Load (ISimbeyInterchangeAnimator* pAnimator, ISimbeyInterchangeAnimator* pUnitStats, ISimbeyInterchangeFileFont* pYellowFont, ISimbeyInterchangeFileFont* pSmallYellowFont);
 	HRESULT Update (CMovingObject* pSelected);
 	VOID Clear (VOID);
@@ -332,6 +396,7 @@ protected:
 	CObject* m_pSelected;
 
 	TRefArray<CAction> m_aActions;
+	CCastSpell* m_pCastSpell;
 
 	ISimbeyInterchangeFileFont* m_pYellowFont;
 	ISimbeyInterchangeFileFont* m_pSmallYellowFont;
@@ -359,6 +424,10 @@ public:
 	HRESULT Initialize (VOID);
 
 	VOID PlaySound (FMOD::Sound* pSound);
+	HRESULT FindSound (RSTRING rstrName, FMOD::Sound** ppSound) { return m_pHost->FindSound(rstrName, ppSound); }
+
+	CSIFPackage* GetPackage (VOID) { return m_pPackage; }
+
 	VOID ClearAction (CAction* pAction);
 	VOID RemoveUnitSprite (ISimbeyInterchangeSprite* pSprite);
 	VOID SortUnitLayer (VOID);
@@ -375,6 +444,7 @@ public:
 	HRESULT GetHealthPct (IJSONObject* pUnit, IJSONObject* pStats, __out DOUBLE* pdblHealth);
 	HRESULT UpdateStatsPanel (VOID);
 	HRESULT ShowSelectedUnitInfo (VOID);
+	HRESULT CastSpell (CCastSpell* pSpell);
 	VOID UpdateMouse (LPARAM lParam);
 
 	// IScreen
@@ -409,12 +479,16 @@ protected:
 
 	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
 	HRESULT AddStaticObject (INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation);
-	HRESULT AddMovingObject (IJSONObject* pDef, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange);
+	HRESULT AddMovingObject (IJSONObject* pDef, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange, __deref_opt_out CMovingObject** ppObject = NULL);
 	HRESULT UpdatePositionInJSON (CMovingObject* pObject);
 
 	HRESULT CreateRandomAbility (IJSONArray* pAbilities, RSTRING rstrRandom, __deref_out IJSONValue** ppvAbility);
 	HRESULT AssignRandomStats (CUnitData* pUnitData, __deref_out IJSONObject** ppUnit);
-	HRESULT PlaceUnit (RSTRING rstrName, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, INT nDirection, INT nLevel, COLORREF crColorize, bool fEnchanted);
+
+public:
+	HRESULT PlaceUnit (RSTRING rstrName, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, INT nDirection, INT nLevel, COLORREF crColorize, bool fEnchanted, __deref_opt_out CMovingObject** ppObject = NULL);
+
+protected:
 	HRESULT PlaceObjects (sysint nLayer, PCWSTR pcwzGroup, RSTRING rstrOwner, const POINT* prgptPlace, INT nDirection, COLORREF crColorize);
 	HRESULT PlaceUnitsAndBuildings (sysint nLayer);
 

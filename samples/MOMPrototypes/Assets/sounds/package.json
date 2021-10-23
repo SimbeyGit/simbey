@@ -81,6 +81,10 @@
 	},
 	{
 		package: "sound",
+		name: "Summoning.mp3"
+	},
+	{
+		package: "sound",
 		name: "SpritesAttack.mp3"
 	},
 	{

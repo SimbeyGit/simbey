@@ -31,4 +31,7 @@ protected:
 	static HRESULT CreateAnimator (ISimbeyInterchangeFile* pSIF, IJSONObject* pDef, __deref_out ISimbeyInterchangeAnimator** ppAnimator, BOOL fUsePositionAsOffset);
 
 	static HRESULT AddFramesToAnimation (ISimbeyInterchangeAnimator* pAnimator, INT nAnimation, IJSONArray* pFrames);
+
+public:
+	static HRESULT CreateDefaultAnimator (ISimbeyInterchangeFile* pSIF, BOOL fUsePositionAsOffset, INT nTickDelay, BOOL fRepeat, __deref_out ISimbeyInterchangeAnimator** ppAnimator, __out_opt INT* pcFrames);
 };

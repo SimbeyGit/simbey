@@ -155,3 +155,33 @@ HRESULT CBaseScreen::AddFramesToAnimation (ISimbeyInterchangeAnimator* pAnimator
 Cleanup:
 	return hr;
 }
+
+HRESULT CBaseScreen::CreateDefaultAnimator (ISimbeyInterchangeFile* pSIF, BOOL fUsePositionAsOffset, INT nTickDelay, BOOL fRepeat, __deref_out ISimbeyInterchangeAnimator** ppAnimator, __out_opt INT* pcFrames)
+{
+	HRESULT hr;
+	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
+	DWORD cLayers = pSIF->GetLayerCount();
+
+	Check(sifCreateAnimator(cLayers, 1, &srAnimator));
+
+	for(DWORD i = 0; i < cLayers; i++)
+	{
+		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+
+		Check(pSIF->GetLayerByIndex(i, &srLayer));
+		Check(srAnimator->SetImage(i, FALSE, srLayer, fUsePositionAsOffset));
+		Check(srAnimator->AddFrame(0, nTickDelay, i, 0, 0));
+	}
+
+	if(!fRepeat)
+		Check(srAnimator->ConfigureAnimation(0, NULL, 0));
+
+	Check(srAnimator->CompactFrames(0));
+
+	*ppAnimator = srAnimator.Detach();
+	if(pcFrames)
+		*pcFrames = cLayers;
+
+Cleanup:
+	return hr;
+}

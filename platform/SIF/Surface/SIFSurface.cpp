@@ -457,6 +457,17 @@ VOID CSIFCanvas::Tick (VOID)
 			}
 		}
 	}
+
+	if(0 < m_aRemove.Length())
+	{
+		for(sysint i = 0; i < m_aRemove.Length(); i++)
+		{
+			REMOVE_LATER& remove = m_aRemove[i];
+			RemoveSprite(remove.nLayer, remove.pSprite);
+			SafeRelease(remove.pSprite);
+		}
+		m_aRemove.Clear();
+	}
 }
 
 HRESULT CSIFCanvas::AddLayer (BOOL fPerformTicks, BOOL fColorized, COLORREF crFill, __out_opt sysint* pnLayer)
@@ -508,7 +519,27 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CSIFCanvas::AddSpriteAfter (sysint nLayer, ISimbeyInterchangeSprite* pSprite, ISimbeyInterchangeSprite* pInsertAfter, __out_opt sysint* pnSprite)
+HRESULT CSIFCanvas::AddSpriteBefore (sysint nLayer, ISimbeyInterchangeSprite* pSprite, ISimbeyInterchangeSprite* pInsertBefore, __out_opt sysint* pnSprite)
+{
+	HRESULT hr;
+	LAYER* pLayer;
+	sysint nInsert;
+
+	Check(FindSprite(nLayer, pInsertBefore, &nInsert));
+	CheckIf(S_OK != hr, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
+	pLayer = m_aLayers[nLayer];
+
+	if(pnSprite)
+		*pnSprite = nInsert;
+
+	Check(pLayer->aSprites.InsertAt(pSprite, nInsert));
+	pSprite->AddRef();
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CSIFCanvas::AddSpriteAfter (sysint nLayer, ISimbeyInterchangeSprite* pSprite, __in_opt ISimbeyInterchangeSprite* pInsertAfter, __out_opt sysint* pnSprite)
 {
 	HRESULT hr;
 	LAYER* pLayer;
@@ -545,6 +576,19 @@ HRESULT CSIFCanvas::RemoveSprite (sysint nLayer, ISimbeyInterchangeSprite* pSpri
 		m_aLayers[nLayer]->aSprites.Remove(nSprite, &pSprite);
 		pSprite->Release();
 	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CSIFCanvas::RemoveSpriteLater (sysint nLayer, ISimbeyInterchangeSprite* pSprite)
+{
+	HRESULT hr;
+	REMOVE_LATER* pRemove;
+
+	Check(m_aRemove.AppendSlot(&pRemove));
+	SetInterface(pRemove->pSprite, pSprite);
+	pRemove->nLayer = nLayer;
 
 Cleanup:
 	return hr;
@@ -675,6 +719,7 @@ HRESULT CSIFCanvas::ReplaceSprite (sysint nLayer, ISimbeyInterchangeSprite* pRep
 	TArray<ISimbeyInterchangeSprite*>* paSprites;
 
 	Check(FindSprite(nLayer, pReplace, &nSprite));
+	CheckIf(S_FALSE == hr, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
 	paSprites = &m_aLayers[nLayer]->aSprites;
 	ReplaceInterface((*paSprites)[nSprite], pSprite);
 

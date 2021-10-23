@@ -1,0 +1,9 @@
+[
+	{
+		package: "buildsif",
+		name: "cast.sif",
+		files: ["cast-frame*.png"],
+		trim: true,
+		canvas: 32
+	}
+]

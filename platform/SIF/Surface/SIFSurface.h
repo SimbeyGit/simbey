@@ -13,6 +13,12 @@ struct LAYER
 	TArray<ISimbeyInterchangeSprite*> aSprites;
 };
 
+struct REMOVE_LATER
+{
+	ISimbeyInterchangeSprite* pSprite;
+	sysint nLayer;
+};
+
 class CDrawText :
 	public CBaseUnknown,
 	public ISimbeyInterchangeSprite
@@ -163,6 +169,7 @@ protected:
 	INT m_xScroll, m_yScroll;
 
 	TArray<LAYER*> m_aLayers;
+	TArray<REMOVE_LATER> m_aRemove;
 
 public:
 	CSIFCanvas ();
@@ -181,8 +188,10 @@ public:
 	HRESULT AddLayer (BOOL fPerformTicks, BOOL fColorized, COLORREF crFill, __out_opt sysint* pnLayer);
 	VOID ClearLayer (sysint nLayer);
 	HRESULT AddSprite (sysint nLayer, ISimbeyInterchangeSprite* pSprite, __out_opt sysint* pnSprite);
-	HRESULT AddSpriteAfter (sysint nLayer, ISimbeyInterchangeSprite* pSprite, ISimbeyInterchangeSprite* pInsertAfter, __out_opt sysint* pnSprite);
+	HRESULT AddSpriteBefore (sysint nLayer, ISimbeyInterchangeSprite* pSprite, ISimbeyInterchangeSprite* pInsertBefore, __out_opt sysint* pnSprite);
+	HRESULT AddSpriteAfter (sysint nLayer, ISimbeyInterchangeSprite* pSprite, __in_opt ISimbeyInterchangeSprite* pInsertAfter, __out_opt sysint* pnSprite);
 	HRESULT RemoveSprite (sysint nLayer, ISimbeyInterchangeSprite* pSprite);
+	HRESULT RemoveSpriteLater (sysint nLayer, ISimbeyInterchangeSprite* pSprite);
 	HRESULT FindSprite (sysint nLayer, ISimbeyInterchangeSprite* pSprite, __out_opt sysint* pnSprite);
 	HRESULT FindSpriteAt (sysint nLayer, INT x, INT y, __deref_out ISimbeyInterchangeSprite** ppSprite);
 	HRESULT BringSpriteToTop (sysint nLayer, ISimbeyInterchangeSprite* pSprite);
