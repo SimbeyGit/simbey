@@ -5,6 +5,7 @@ Release/
 *.user
 *.ncb
 *.suo
+*.aps
 Ribbon.bml
 Ribbon.h
 Ribbon.rc

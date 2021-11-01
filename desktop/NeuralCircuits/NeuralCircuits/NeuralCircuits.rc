@@ -1,0 +1,345 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New",                        IDM_NEW
+        MENUITEM "&Open",                       IDM_OPEN
+        MENUITEM "&Reopen",                     IDM_REOPEN
+        MENUITEM "&Close",                      IDM_CLOSE
+        MENUITEM SEPARATOR
+        MENUITEM "&Save",                       IDM_SAVE
+        MENUITEM "Save &As...",                 IDM_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       IDM_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Fire",                       ID_EDIT_FIRE
+        MENUITEM SEPARATOR
+        MENUITEM "Rotate &Axon",                ID_EDIT_ROTATE_AXON
+        MENUITEM "&Properties",                 ID_EDIT_PROPERTIES
+        MENUITEM "Edit &Links",                 ID_EDIT_LINKS
+        MENUITEM SEPARATOR
+        MENUITEM "&Delete\tDel",                ID_EDIT_DELETE
+    END
+    POPUP "&Insert"
+    BEGIN
+        MENUITEM "&Neurone",                    ID_INSERT_NEURONE
+        MENUITEM "&Bias neurone",               ID_INSERT_BIAS
+        MENUITEM "Sigmoi&d neurone",            ID_INSERT_SIGMOID
+        MENUITEM "&Input neurone",              ID_INSERT_INPUT
+        MENUITEM "&Output neurone",             ID_INSERT_OUTPUT
+        MENUITEM "&Splitter",                   ID_INSERT_SPLITTER
+        POPUP "&Logic gates"
+        BEGIN
+            MENUITEM "&And gate",                   ID_INSERT_AND_GATE
+            MENUITEM "&Or gate",                    ID_INSERT_OR_GATE
+            MENUITEM "&Not gate",                   ID_INSERT_NOT_GATE
+            MENUITEM "&Xor gate",                   ID_INSERT_XOR_GATE
+            MENUITEM "&Parity Generator",           ID_INSERT_PARITY_GENERATOR
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Neural &chip",                ID_INSERT_CHIP
+        MENUITEM "&Recent chips",               ID_RECENT_CHIPS
+        MENUITEM SEPARATOR
+        MENUITEM "Input &pad",                  ID_INSERT_INPUTPAD
+        MENUITEM "&Group",                      ID_INSERT_GROUP
+        MENUITEM "&More",                       ID_INSERT_MORE
+    END
+    POPUP "&Net"
+    BEGIN
+        MENUITEM "&Run\tF5",                    ID_NET_RUN
+        MENUITEM "&Step\tF8",                   ID_NET_STEP
+        MENUITEM SEPARATOR
+        MENUITEM "&Watch values",               ID_NET_WATCHVALUES
+        MENUITEM SEPARATOR
+        MENUITEM "&Back\tBackspace",            ID_NET_BACK
+        MENUITEM "&Open\tEnter",                ID_NET_OPEN
+    END
+END
+
+IDR_NEURONE MENU 
+BEGIN
+    POPUP "&Neurone"
+    BEGIN
+        MENUITEM "&Fire",                       ID_NEURONE_FIRE
+        MENUITEM SEPARATOR
+        MENUITEM "Rotate &Axon",                ID_NEURONE_ROTATE_AXON
+        MENUITEM "&Properties",                 ID_NEURONE_PROPERTIES
+    END
+END
+
+IDR_GROUP MENU 
+BEGIN
+    POPUP "&Group"
+    BEGIN
+        MENUITEM "Simple &Frame",               ID_INSERT_SIMPLEFRAME
+    END
+END
+
+IDR_FRAME MENU 
+BEGIN
+    POPUP "&Frame"
+    BEGIN
+        MENUITEM "&Rename",                     ID_FRAME_RENAME
+        MENUITEM "&Color",                      ID_FRAME_COLOR
+        MENUITEM "Randomi&ze weights",          ID_RANDOMIZE_WEIGHTS
+    END
+END
+
+IDR_INPUT_PAD MENU 
+BEGIN
+    POPUP "&Input pad"
+    BEGIN
+        MENUITEM "&Set size",                   ID_INPUTPAD_SETSIZE
+        MENUITEM "&Add splitters",              ID_INPUTPAD_ADDSPLITTERS
+        MENUITEM "&Properties",                 ID_INPUTPAD_PROPERTIES
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAIN                ICON                    "main.ico"
+IDI_SNN_FILE            ICON                    "snn.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONN_LIST DIALOGEX 0, 0, 298, 182
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Connection editor"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,6,6,284,150
+    EDITTEXT        IDC_WEIGHT,5,160,50,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Set Weight",IDC_SETWEIGHT,60,160,50,14
+    PUSHBUTTON      "Remove",IDC_REMOVE,185,160,50,14
+    DEFPUSHBUTTON   "Close",IDOK,240,160,50,14
+END
+
+IDD_PROPERTIES DIALOGEX 0, 0, 155, 122
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_THRESHOLD,6,12,40,14,ES_AUTOHSCROLL
+    LTEXT           "Threshold",IDC_STATIC,48,12,32,8
+    EDITTEXT        IDC_PIN,6,30,40,14,ES_AUTOHSCROLL
+    LTEXT           "Pin",IDC_STATIC,48,30,32,8
+    EDITTEXT        IDC_BIAS,6,48,40,14,ES_AUTOHSCROLL
+    LTEXT           "Bias",IDC_STATIC,48,48,32,8
+    LTEXT           "Link Source",IDC_STATIC,6,72,78,8
+    PUSHBUTTON      "Edit Links",IDC_EDIT_LINKS,90,66,56,14
+    COMBOBOX        IDC_LINK,6,84,138,48,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,22,102,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,82,102,50,14
+END
+
+IDD_GETTEXT DIALOGEX 0, 0, 184, 54
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Text"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_TEXT,6,6,168,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,6,30,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,30,50,14
+END
+
+IDD_COLOR_PICKER DIALOGEX 0, 0, 162, 91
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Color Picker"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Pick a solid color:",IDC_STATIC,6,6,55,8
+    COMBOBOX        IDC_COLOR_LIST,6,18,96,66,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_COLOR_SWATCH,"Static",SS_OWNERDRAW,108,6,42,24
+    LTEXT           "Enter an alpha channel:",IDC_STATIC,6,42,96,12
+    EDITTEXT        IDC_ALPHA,108,42,42,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,6,66,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,66,50,14
+END
+
+IDD_INPUTPADSIZE DIALOGEX 0, 0, 172, 66
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Input Pad Size"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Enter the side length of the input pad",IDC_STATIC,6,6,121,8
+    EDITTEXT        IDC_PAD_SIZE,6,18,40,12,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,34,42,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,88,42,50,14
+END
+
+IDD_INPUTPADPROPS DIALOGEX 0, 0, 186, 102
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Input Pad Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Define the value to send for set cells:",IDC_STATIC,6,6,121,8
+    EDITTEXT        IDC_SET_VALUE,6,18,40,14,ES_AUTOHSCROLL
+    LTEXT           "Define the value to send for clear cells:",IDC_STATIC,6,42,126,8
+    EDITTEXT        IDC_CLEAR_VALUE,6,54,40,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,37,78,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,97,78,50,14
+END
+
+IDD_EDIT_LINKS DIALOGEX 0, 0, 283, 167
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Links"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Links",IDC_STATIC,6,6,17,8
+    LISTBOX         IDC_LINKS,6,18,132,96,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Edit",IDC_EDIT_LINK,6,120,50,14
+    PUSHBUTTON      "Delete",IDC_DELETE_LINK,60,120,50,14
+    LTEXT           "Sources",IDC_STATIC,144,6,27,8
+    LISTBOX         IDC_SOURCES,144,18,132,84,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Name for new link:",IDC_STATIC,144,108,63,8
+    EDITTEXT        IDC_NAME,144,120,78,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Create",IDC_CREATE_LINK,228,120,50,14
+    DEFPUSHBUTTON   "Done",IDOK,116,144,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_CONN_LIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 138
+    END
+
+    IDD_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 148
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_GETTEXT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 177
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 47
+    END
+
+    IDD_COLOR_PICKER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 155
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 84
+    END
+
+    IDD_INPUTPADSIZE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 165
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 59
+    END
+
+    IDD_INPUTPADPROPS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 95
+    END
+
+    IDD_EDIT_LINKS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 276
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 160
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
