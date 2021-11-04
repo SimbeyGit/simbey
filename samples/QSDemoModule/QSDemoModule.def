@@ -1,0 +1,9 @@
+LIBRARY		QSDemoModule.dll
+
+DESCRIPTION	'QuadooScript Demonstration Module'
+
+EXPORTS
+			DllGetClassObject			PRIVATE
+			DllCanUnloadNow				PRIVATE
+			DllRegisterServer			PRIVATE
+			DllUnregisterServer			PRIVATE
