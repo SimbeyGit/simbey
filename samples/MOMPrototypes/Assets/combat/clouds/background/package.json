@@ -1,0 +1,8 @@
+[
+	{
+		package: "buildsif",
+		name: "clouds.sif",
+		files: ["*.png"],
+		canvas: 512
+	}
+]

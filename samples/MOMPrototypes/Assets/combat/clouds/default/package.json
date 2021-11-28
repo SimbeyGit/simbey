@@ -1,0 +1,8 @@
+[
+	{
+		package: "buildsif",
+		name: "walls.sif",
+		files: ["*.png"],
+		canvas: 32
+	}
+]

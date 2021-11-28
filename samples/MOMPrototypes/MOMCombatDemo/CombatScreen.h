@@ -415,6 +415,10 @@ protected:
 	ULONG m_idxExpandStats;
 	ULONG m_idxCreateCombatObject;
 
+	CSIFCanvas* m_pBackground;
+	DOUBLE m_dblBackground;
+	ISimbeyInterchangeSprite* m_pCornerA, *m_pCornerB, *m_pCornerC, *m_pCornerD;
+
 public:
 	IMP_BASE_UNKNOWN
 
@@ -487,6 +491,7 @@ protected:
 
 public:
 	HRESULT PlaceUnit (RSTRING rstrName, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, INT nDirection, INT nLevel, COLORREF crColorize, bool fEnchanted, __deref_opt_out CMovingObject** ppObject = NULL);
+	HRESULT ConfigureBackground (ISimbeyInterchangeFile* pLayers, INT idxLayer, INT x, INT y, __deref_out ISimbeyInterchangeSprite** ppSprite);
 
 protected:
 	HRESULT PlaceObjects (sysint nLayer, PCWSTR pcwzGroup, RSTRING rstrOwner, const POINT* prgptPlace, INT nDirection, COLORREF crColorize);

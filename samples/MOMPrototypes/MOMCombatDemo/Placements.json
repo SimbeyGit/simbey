@@ -1,5 +1,6 @@
 {
 	player: "defense",
+	floating: true,
 	defense:
 	{
 		objects:

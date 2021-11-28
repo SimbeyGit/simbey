@@ -1410,7 +1410,13 @@ CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface,
 	m_xHoverTile(-1),
 	m_yHoverTile(-1),
 	m_pUnitStats(NULL),
-	m_pBlood(NULL)
+	m_pBlood(NULL),
+	m_pBackground(NULL),
+	m_dblBackground(0.0),
+	m_pCornerA(NULL),
+	m_pCornerB(NULL),
+	m_pCornerC(NULL),
+	m_pCornerD(NULL)
 {
 	SetInterface(m_pWizard, pWizard);
 	SetInterface(m_pPlacements, pPlacements);
@@ -1426,6 +1432,11 @@ CCombatScreen::~CCombatScreen ()
 	Assert(0 == m_aActions.Length());
 	Assert(0 == m_aObjects.Length());
 
+	SafeRelease(m_pCornerA);
+	SafeRelease(m_pCornerB);
+	SafeRelease(m_pCornerC);
+	SafeRelease(m_pCornerD);
+
 	SafeDelete(m_pCastSpell);
 
 	SafeRelease(m_pCombatBarFont);
@@ -1439,6 +1450,7 @@ CCombatScreen::~CCombatScreen ()
 HRESULT CCombatScreen::Initialize (VOID)
 {
 	HRESULT hr;
+	TStackRef<IJSONValue> srv;
 	ISimbeyInterchangeFile* pSIF = NULL;
 	DWORD cParams;
 
@@ -1451,6 +1463,20 @@ HRESULT CCombatScreen::Initialize (VOID)
 	rc.top = 0;
 	rc.right = xSize;
 	rc.bottom = ySize - 58;
+
+	if(SUCCEEDED(m_pPlacements->FindNonNullValueW(L"floating", &srv)))
+	{
+		bool fFloating;
+
+		Check(srv->GetBoolean(&fFloating));
+
+		if(fFloating)
+		{
+			sysint nLayer;
+			Check(m_pSurface->AddCanvas(&rc, FALSE, &m_pBackground));
+			Check(m_pBackground->AddLayer(FALSE, FALSE, 0, &nLayer));
+		}
+	}
 
 	m_Isometric.TileToView(MAP_WIDTH / 2, MAP_HEIGHT / 2, &xScroll, &yScroll);
 	Check(m_pSurface->AddCanvas(&rc, TRUE, &m_pMain));
@@ -1693,6 +1719,16 @@ VOID CCombatScreen::OnUpdateFrame (VOID)
 
 	for(sysint i = m_aActions.Length() - 1; i >= 0; i--)
 		m_aActions[i]->Update();
+
+	if(m_pBackground)
+	{
+		INT xScroll = (INT)(64.0 + sin(m_dblBackground * 3.1415 / 180.0) * 64.0);
+		m_pBackground->SetScroll(xScroll, 0);
+
+		m_dblBackground += 0.25;
+		if(m_dblBackground >= 360.0)
+			m_dblBackground -= 360.0;
+	}
 }
 
 VOID CCombatScreen::OnNotifyFinished (BOOL fCompleted)
@@ -2560,34 +2596,85 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
 	sysint nLayer;
 	INT xTileStart, yTileStart, xTileEnd, yTileEnd;
-	INT yMid, nAdjust = 0;
 	CInteractiveLayer* pLayer = NULL;
 
 	Check(m_pMain->AddLayer(FALSE, FALSE, 0, &nLayer));
-
 	Check(LoadAnimator(SLP(L"graphics\\Tiles.json"), L"combat\\terrain\\arcanus\\default\\standard\\terrain.sif", &srAnimator, FALSE));
 
-	m_Isometric.GetTileRange(m_pMain, &xTileStart, &yTileStart, &xTileEnd, &yTileEnd);
-	yMid = (yTileStart + yTileEnd) / 2;
-
-	for(INT y = yTileStart; y < yTileEnd; y++)
+	if(m_pBackground)
 	{
-		if(0 <= y && y < MAP_HEIGHT)
+		TStackRef<ISimbeyInterchangeFile> srClouds, srWalls;
+
+		Check(m_pPackage->OpenSIF(L"combat\\clouds\\background\\clouds.sif", &srClouds));
+		Check(m_pPackage->OpenSIF(L"combat\\clouds\\default\\walls.sif", &srWalls));
+
+		Check(ConfigureBackground(srClouds, 0,   0,   0, &m_pCornerA));
+		Check(m_pBackground->AddSprite(0, m_pCornerA, NULL));
+
+		Check(ConfigureBackground(srClouds, 1, 320,   0, &m_pCornerB));
+		Check(m_pBackground->AddSprite(0, m_pCornerB, NULL));
+
+		Check(ConfigureBackground(srClouds, 2,   0, 181, &m_pCornerC));
+		Check(m_pBackground->AddSprite(0, m_pCornerC, NULL));
+
+		Check(ConfigureBackground(srClouds, 3, 320, 181, &m_pCornerD));
+		Check(m_pBackground->AddSprite(0, m_pCornerD, NULL));
+
+		for(INT y = 13; y <= 19; y++)
 		{
-			INT xStart = xTileStart - nAdjust;
-			INT xEnd = xTileEnd + nAdjust;
-			if(0 > xStart)
-				xStart = 0;
-			if(MAP_WIDTH < xEnd)
-				xEnd = MAP_WIDTH;
-			for(INT x = xStart; x < xEnd; x++)
-				PlaceTile(m_pMain, x, y, nLayer, srAnimator, rand() % 4, NULL);
+			for(INT x = 6; x <= 12; x++)
+			{
+				TStackRef<ISimbeyInterchangeSprite> srTile;
+				INT xTile, yTile;
+
+				PlaceTile(m_pMain, x, y, nLayer, srAnimator, rand() % 4, &srTile);
+				srTile->GetPosition(xTile, yTile);
+
+				if(y == 19)
+				{
+					TStackRef<ISimbeyInterchangeSprite> srWall;
+					Check(ConfigureBackground(srWalls, 0, xTile, yTile + 8, &srWall));
+					Check(m_pMain->AddSprite(nLayer, srWall, NULL));
+				}
+
+				if(x == 12)
+				{
+					TStackRef<ISimbeyInterchangeSprite> srWall;
+					Check(ConfigureBackground(srWalls, 1, xTile + 15, yTile + 8, &srWall));
+					Check(m_pMain->AddSprite(nLayer, srWall, NULL));
+				}
+			}
 		}
 
-		if(y < yMid)
-			nAdjust++;
-		else
-			nAdjust--;
+		srWalls->Close();
+		srClouds->Close();
+	}
+	else
+	{
+		INT yMid, nAdjust = 0;
+
+		m_Isometric.GetTileRange(m_pMain, &xTileStart, &yTileStart, &xTileEnd, &yTileEnd);
+		yMid = (yTileStart + yTileEnd) / 2;
+
+		for(INT y = yTileStart; y < yTileEnd; y++)
+		{
+			if(0 <= y && y < MAP_HEIGHT)
+			{
+				INT xStart = xTileStart - nAdjust;
+				INT xEnd = xTileEnd + nAdjust;
+				if(0 > xStart)
+					xStart = 0;
+				if(MAP_WIDTH < xEnd)
+					xEnd = MAP_WIDTH;
+				for(INT x = xStart; x < xEnd; x++)
+					PlaceTile(m_pMain, x, y, nLayer, srAnimator, rand() % 4, NULL);
+			}
+
+			if(y < yMid)
+				nAdjust++;
+			else
+				nAdjust--;
+		}
 	}
 
 	srAnimator.Release();
@@ -3112,6 +3199,19 @@ Cleanup:
 	RStrRelease(rstrMelee);
 	RStrRelease(rstrProjectile);
 	RStrRelease(rstrValue);
+	return hr;
+}
+
+HRESULT CCombatScreen::ConfigureBackground (ISimbeyInterchangeFile* pLayers, INT idxLayer, INT x, INT y, __deref_out ISimbeyInterchangeSprite** ppSprite)
+{
+	HRESULT hr;
+	TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+
+	Check(pLayers->GetLayerByIndex(idxLayer, &srLayer));
+	Check(sifCreateStaticSprite(srLayer, 0, 0, ppSprite));
+	(*ppSprite)->SetPosition(x, y);
+
+Cleanup:
 	return hr;
 }
 
