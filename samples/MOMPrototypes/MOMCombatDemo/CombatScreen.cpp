@@ -185,30 +185,36 @@ const POINT* c_ptFigureOffsets[8] =
 
 const POINT c_rgDefense[] =
 {
-	{ 10, 16 },
-	{ 10, 17 },
-	{ 10, 15 },
-	{ 10, 18 },
-	{ 9, 16 },
-	{ 9, 17 },
-	{ 9, 15 },
-	{ 9, 18 },
-	{ 10, 14 },
-	{ 9, 14 }
+	{ 12, 18 },
+	{ 12, 19 },
+	{ 12, 17 },
+	{ 12, 20 },
+	{ 11, 18 },
+	{ 11, 19 },
+	{ 11, 17 },
+	{ 11, 20 },
+	{ 12, 16 },
+	{ 11, 16 }
 };
 
 const POINT c_rgOffense[] =
 {
-	{ 18, 16 },
-	{ 18, 17 },
-	{ 18, 15 },
-	{ 18, 18 },
-	{ 19, 16 },
-	{ 19, 17 },
-	{ 19, 15 },
-	{ 19, 18 },
-	{ 18, 14 },
-	{ 19, 14 }
+	{ 20, 18 },
+	{ 20, 19 },
+	{ 20, 17 },
+	{ 20, 20 },
+	{ 21, 18 },
+	{ 21, 19 },
+	{ 21, 17 },
+	{ 21, 20 },
+	{ 20, 16 },
+	{ 21, 16 }
+};
+
+const RECT c_rcFloatingTiles =
+{
+	8, 15,
+	14, 21
 };
 
 const struct
@@ -2620,9 +2626,9 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 		Check(ConfigureBackground(srClouds, 3, 320, 181, &m_pCornerD));
 		Check(m_pBackground->AddSprite(0, m_pCornerD, NULL));
 
-		for(INT y = 13; y <= 19; y++)
+		for(INT y = c_rcFloatingTiles.top; y <= c_rcFloatingTiles.bottom; y++)
 		{
-			for(INT x = 6; x <= 12; x++)
+			for(INT x = c_rcFloatingTiles.left; x <= c_rcFloatingTiles.right; x++)
 			{
 				TStackRef<ISimbeyInterchangeSprite> srTile;
 				INT xTile, yTile;
@@ -2630,14 +2636,14 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 				PlaceTile(m_pMain, x, y, nLayer, srAnimator, rand() % 4, &srTile);
 				srTile->GetPosition(xTile, yTile);
 
-				if(y == 19)
+				if(y == c_rcFloatingTiles.bottom)
 				{
 					TStackRef<ISimbeyInterchangeSprite> srWall;
 					Check(ConfigureBackground(srWalls, 0, xTile, yTile + 8, &srWall));
 					Check(m_pMain->AddSprite(nLayer, srWall, NULL));
 				}
 
-				if(x == 12)
+				if(x == c_rcFloatingTiles.right)
 				{
 					TStackRef<ISimbeyInterchangeSprite> srWall;
 					Check(ConfigureBackground(srWalls, 1, xTile + 15, yTile + 8, &srWall));

@@ -10,7 +10,7 @@ public:
 
 public:
 	CDLLServer ();
-	~CDLLServer ();
+	virtual ~CDLLServer ();
 
 	virtual HRESULT RegisterServer (VOID);
 	virtual HRESULT UnregisterServer (VOID);
