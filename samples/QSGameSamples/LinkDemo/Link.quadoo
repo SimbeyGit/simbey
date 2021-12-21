@@ -1,0 +1,423 @@
+#define IDI_MAIN		103
+
+#define RGB(r,g,b)		(r | (g << 8) | (b << 16))
+
+#define VK_LEFT           	0x25
+#define VK_UP             	0x26
+#define VK_RIGHT          	0x27
+#define VK_DOWN           	0x28
+
+#define	EVENT_LBUTTONDOWN	1
+
+interface IGameClient
+{
+	virtual function ConfigureSurface (oGame, xSize, ySize) = 0;
+	virtual function OnStart (oGame) = 0;
+	virtual function OnClose (oGame) = 0;
+	virtual function OnUpdateFrame (oGame) = 0;
+	virtual function OnMusicStopped (oGame, fFinished) = 0;
+};
+
+class CController
+{
+	var m_x, m_y;
+	var m_oDevice;
+
+	CController (x, y, oDevice) :
+		m_x(x),
+		m_y(y),
+		m_oDevice(oDevice)
+	{
+	}
+
+	function Clicked (x, y)
+	{
+		return x >= m_x && x < m_x + 150 && y >= m_y && y < m_y + 50;
+	}
+
+	property Device
+	{
+		get
+		{
+			return m_oDevice;
+		}
+	}
+};
+
+class CPickScreen : IGameClient
+{
+	var m_oMainCanvas;
+	var m_oPackage;
+	var m_oDungeon;
+	var m_oLayer;
+	var m_oFont;
+	var m_oSurface;
+	var m_oMusic;
+
+	int m_cTimer = 0;
+
+	int m_nNextDevice = 0;
+
+	var m_aButtons = new array;
+
+	virtual function ConfigureSurface (oGame, xSize, ySize)
+	{
+		xSize = 320;
+		ySize = 320;
+	}
+
+	virtual function OnStart (oGame)
+	{
+		m_oSurface = oGame.Surface;
+
+		m_oSurface.EnableClear(RGB(0, 0, 0));
+		m_oMainCanvas = m_oSurface.AddCanvas(null, true);
+
+		m_oPackage = oGame.LoadPackage("LinkDemo.pkg");
+
+		m_oLayer = m_oMainCanvas.AddLayer(true /* ticks */);
+
+		m_oDungeon = m_oPackage.OpenSIF("dungeon\\Dungeon.sif");
+
+		m_oFont = m_oPackage.OpenSIF("fonts\\Zelda.sif").CreateFont();
+		var oText = m_oFont.CreateText("PICK A CONTROLLER", true);
+		oText.x = 160;
+		oText.y = 5;
+		m_oLayer.Add(oText);
+
+		DisplayDevice(oGame.Input.Keyboard);
+		var aDevices = oGame.Input.Registered;
+		var cDevices = len(aDevices);
+
+		m_oMusic = oGame.LoadMIDI(m_oPackage, "music\\Fairy-1.mid");
+		m_oMusic.Play();
+
+		for(int i = 2; i < cDevices; i++)
+			DisplayDevice(aDevices[i]);
+
+		oGame.Input.Mouse.SetEventCallback(EVENT_LBUTTONDOWN, new function OnClick (msg, x, y)
+		{
+			m_oSurface.PointToView(x, y, ref x, ref y);
+			for(int i = 0; i < len(m_aButtons); i++)
+			{
+				var oButton = m_aButtons[i];
+				if(oButton.Clicked(x, y))
+				{
+					try m_oMusic.Stop(); catch;
+					oGame.Input.Mouse.SetEventCallback(EVENT_LBUTTONDOWN, null);
+					m_oSurface.RemoveCanvas(m_oMainCanvas);
+					m_oSurface.DisableClear();
+
+					oGame.SetClient(new CTestGame(m_oPackage, oButton.Device, 0 == i));
+					break;
+				}
+			}
+		});
+	}
+
+	virtual function OnClose (oGame)
+	{
+		oGame.Quit(0);
+	}
+
+	virtual function OnUpdateFrame (oGame)
+	{
+		if(++m_cTimer == 50)
+		{
+			var cNew = oGame.Input.Refresh();
+			m_cTimer = 0;
+
+			if(0 < cNew)
+			{
+				var aDevices = oGame.Input.Registered;
+				var cDevices = len(aDevices);
+
+				for(int i = cDevices - cNew; i < cDevices; i++)
+					DisplayDevice(aDevices[i]);
+			}
+		}
+	}
+
+	virtual function OnMusicStopped (oGame, fFinished)
+	{
+		if(fFinished)
+			m_oMusic.Play();
+	}
+
+	function DisplayDevice (oDevice)
+	{
+		var x, y;
+
+		if(m_nNextDevice & 1)
+			x = 170;
+		else
+			x = 10;
+
+		y = (m_nNextDevice / 2) * 55 + 25;
+
+		var oTile = m_oDungeon.CreatePattern(m_oDungeon.Find("tile3.png"), 150, 50, true);
+		oTile.x = x;
+		oTile.y = y;
+		m_oLayer.Add(oTile);
+
+		var oText = m_oFont.CreateText(oDevice.Name, true);
+		oText.x = x + 75;
+		oText.y = y + 15;
+		m_oLayer.Add(oText);
+
+		m_aButtons.Append(new CController(x, y, oDevice));
+		m_nNextDevice++;
+	}
+};
+
+class CTestGame : IGameClient
+{
+	var m_oMainCanvas;
+	var m_oLayer;
+	var m_oPackage;
+	var m_oLink;
+	var m_oDungeon;
+	var m_oAnimator;
+	var m_oPlayer;
+	var m_oMusic;
+
+	var m_oController;
+	var m_fKeyboard;
+
+	CTestGame (oPackage, oController, fKeyboard) :
+		m_oPackage(oPackage),
+		m_oController(oController),
+		m_fKeyboard(fKeyboard)
+	{
+		oController.Enable();
+	}
+
+	virtual function ConfigureSurface (oGame, xSize, ySize)
+	{
+		xSize = 320;
+		ySize = 288;
+	}
+
+	virtual function OnStart (oGame)
+	{
+		var oSurface = oGame.Surface;
+
+		oGame.SetBackground(m_oPackage, "pattern\\Bricks.dib");
+
+		var oRect = JSONCreateObject(), xSize, ySize;
+		oSurface.GetViewSize(ref xSize, ref ySize);
+		oRect.left = 0;
+		oRect.top = 0;
+		oRect.right = xSize;
+		oRect.bottom = ySize;
+		m_oMainCanvas = oSurface.AddCanvas(oRect, true);
+
+		m_oLayer = m_oMainCanvas.AddLayer(true /* ticks */);
+
+		m_oLink = m_oPackage.OpenSIF("link\\Link.sif");
+
+		m_oDungeon = m_oPackage.OpenSIF("dungeon\\Dungeon.sif");
+
+		AddMapTiles(oGame);
+
+		var oDef = m_oPackage.GetJSONData("MovingUnit.json");
+
+		m_oAnimator = oGame.CreateAnimator(m_oLink, oDef, false);
+		m_oPlayer = m_oAnimator.CreateSprite();
+
+		m_oPlayer.x = 64;
+		m_oPlayer.y = 64;
+		m_oPlayer.SelectAnimation(4);
+		m_oLayer.Add(m_oPlayer);
+
+		CenterView(m_oPlayer);
+
+		m_oMusic = oGame.LoadMIDI(m_oPackage, "music\\Hyrule-Castle-1.mid");
+		m_oMusic.Play();
+	}
+
+	virtual function OnClose (oGame)
+	{
+		oGame.Quit(0);
+	}
+
+	virtual function OnUpdateFrame (oGame)
+	{
+		var x, y, nChangeDir = -1;
+		var nCurrent;
+
+		m_oPlayer.GetCurrentAnimation(ref nCurrent);
+
+		if(m_fKeyboard)
+		{
+			var oButtons = m_oController.Buttons;
+			if(oButtons[VK_LEFT] & 128)
+				nChangeDir = 1;	// Left
+			else if(oButtons[VK_RIGHT] & 128)
+				nChangeDir = 2;	// Right
+			else if(oButtons[VK_UP] & 128)
+				nChangeDir = 3;	// Up
+			else if(oButtons[VK_DOWN] & 128)
+				nChangeDir = 0;	// Down
+		}
+		else
+		{
+			m_oController.GetAxis(ref x, ref y);
+			if(x == 0)
+				nChangeDir = 1;	// Left
+			else if(x == 0xFFFF)
+				nChangeDir = 2;	// Right
+			else if(y == 0)
+				nChangeDir = 3;	// Up
+			else if(y == 0xFFFF)
+				nChangeDir = 0;	// Down
+		}
+
+		if(-1 != nChangeDir)
+		{
+			var x = m_oPlayer.x;
+			var y = m_oPlayer.y;
+
+			if(nCurrent != nChangeDir)
+				m_oPlayer.SelectAnimation(nChangeDir);
+
+			if(nChangeDir == 1)
+				x -= 2;
+			else if(nChangeDir == 2)
+				x += 2;
+			else if(nChangeDir == 3)
+				y -= 2;
+			else if(nChangeDir == 0)
+				y += 2;
+
+			if(x < 32)
+				x = 32;
+			else if(x > 316)
+				x = 316;
+
+			if(y < 20)
+				y = 20;
+			else if(y > 316)
+				y = 316;
+
+			m_oPlayer.x = x;
+			m_oPlayer.y = y;
+
+			CenterView(m_oPlayer);
+		}
+		else if(nCurrent == 1)
+			m_oPlayer.SelectAnimation(5);
+		else if(nCurrent == 2)
+			m_oPlayer.SelectAnimation(6);
+		else if(nCurrent == 3)
+			m_oPlayer.SelectAnimation(7);
+		else if(nCurrent == 0)
+			m_oPlayer.SelectAnimation(4);
+	}
+
+	virtual function OnMusicStopped (oGame, fFinished)
+	{
+		if(fFinished)
+			m_oMusic.Play();
+	}
+
+	function CenterView (oSprite)
+	{
+		var xView, yView;
+		m_oMainCanvas.GetViewSize(ref xView, ref yView);
+
+		var xScroll = oSprite.x - xView / 2;
+		var yScroll = oSprite.y - yView / 2;
+
+		if(xScroll < 0)
+			xScroll = 0;
+		else if(xScroll > 352 - xView)
+			xScroll = 352 - xView;
+
+		if(yScroll < 0)
+			yScroll = 0;
+		else if(yScroll > 352 - yView)
+			yScroll = 352 - yView;
+		m_oMainCanvas.SetScroll(xScroll, yScroll);
+	}
+
+	function AddMapTiles (oGame)
+	{
+		var idxCorner1 = m_oDungeon.Find("blue_corner_1.png");
+		var idxCorner2 = m_oDungeon.Find("blue_corner_2.png");
+		var idxCorner3 = m_oDungeon.Find("blue_corner_3.png");
+		var idxCorner4 = m_oDungeon.Find("blue_corner_4.png");
+
+		var idxWall1 = m_oDungeon.Find("blue_wall_1.png");
+		var idxWall2 = m_oDungeon.Find("blue_wall_2.png");
+		var idxWall3 = m_oDungeon.Find("blue_wall_3.png");
+		var idxWall4 = m_oDungeon.Find("blue_wall_4.png");
+
+		var idxTile = m_oDungeon.Find("tile1.png");
+		var idxLockedDoor = m_oDungeon.Find("blue_locked_door.png");
+
+		AddDungeonTile(oGame, idxCorner4, 0, 0);
+		AddDungeonTile(oGame, idxCorner1, 320, 0);
+		AddDungeonTile(oGame, idxCorner2, 320, 320);
+		AddDungeonTile(oGame, idxCorner3, 0, 320);
+
+		for(int x = 32; x < 320; x += 16)
+		{
+			AddDungeonTile(oGame, idxWall1, x, 0);
+
+			if(x == 64 || x == 80)
+			{
+				if(x == 64)
+					AddDungeonTile(oGame, idxLockedDoor, x, 320);
+			}
+			else
+				AddDungeonTile(oGame, idxWall3, x, 320);
+		}
+		for(int y = 32; y < 320; y += 16)
+		{
+			AddDungeonTile(oGame, idxWall4, 0, y);
+			AddDungeonTile(oGame, idxWall2, 320, y);
+		}
+
+		for(int y = 32; y < 320; y += 16)
+		{
+			for(int x = 32; x < 320; x += 16)
+				AddDungeonTile(oGame, idxTile, x, y);
+		}
+	}
+
+	function AddDungeonTileByName (oGame, strName, x, y)
+	{
+		AddDungeonTile(oGame, m_oDungeon.Find(strName + ".png"), x, y);
+	}
+
+	function AddDungeonTile (oGame, idx, x, y)
+	{
+		var oTile = m_oDungeon.CreateStaticSprite(idx);
+		oTile.x = x;
+		oTile.y = y;
+		m_oLayer.Add(oTile);
+	}
+};
+
+function main ()
+{
+	var oGame = Host.LoadQuadoo("QSGame.dll");
+	var oFrame = JSONCreateObject();
+
+	oFrame.Title = "Link Demo";
+	oFrame.Width = 700;
+	oFrame.Height = 650;
+	oFrame.Icon = IDI_MAIN;
+	oFrame.Show = 1;
+
+	try
+	{
+		oGame.SetDPIAware();
+		oGame.Run(new CPickScreen, oFrame);
+	}
+	catch(e)
+	{
+		Host.MessageBox(null, "Exception: " + e.ToString(), "Program Error", 0x00000030);
+	}
+}

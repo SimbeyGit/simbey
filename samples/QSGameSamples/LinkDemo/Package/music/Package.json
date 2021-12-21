@@ -1,0 +1,10 @@
+[
+	{
+		package: "midi",
+		name: "Hyrule-Castle-1.mid"
+	},
+	{
+		package: "midi",
+		name: "Fairy-1.mid"
+	}
+]

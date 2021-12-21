@@ -1,0 +1,9 @@
+[
+	{
+		package: "buildsif",
+		name: "Link.sif",
+		files: ["*.png"],
+		trim: true,
+		canvas: 32
+	}
+]

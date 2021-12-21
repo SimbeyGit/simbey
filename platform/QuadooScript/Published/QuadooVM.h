@@ -240,6 +240,8 @@ namespace QuadooVM
 		INT_SUM_FIRST,		// sum(array, first) - Adds together all the items from the array, starting with the provided value first
 		INT_SPLITLINES,		// splitlines(text) - Splits text delimited by CR or CRLF pairs into an array of strings
 		INT_SPLITLINES_TO,	// splitlines(text, array) - Splits text by line into the provided array
+		INT_MINVALUE,		// min(value, value) - Returns the smaller value
+		INT_MAXVALUE,		// max(value, value) - Returns the larger value
 		INT_TYPEOF = 0xFF	// typeof(value) - Return the type of the value using the Type enumeration below
 	};
 
@@ -629,6 +631,8 @@ HRESULT WINAPI QVMRound (__inout QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMCeil (__inout QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMFloor (__inout QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMSum (__inout QuadooVM::QVARIANT* pqv, __in_opt QuadooVM::QVARIANT* pqvFirst);
+HRESULT WINAPI QVMMin (QuadooVM::QVARIANT* pqvA, QuadooVM::QVARIANT* pqvB, __out QuadooVM::QVARIANT* pqv);
+HRESULT WINAPI QVMMax (QuadooVM::QVARIANT* pqvA, QuadooVM::QVARIANT* pqvB, __out QuadooVM::QVARIANT* pqv);
 
 HRESULT WINAPI QVMVariantToDouble (const QuadooVM::QVARIANT* pqv, __out DOUBLE* pdbl);
 HRESULT WINAPI QVMVariantToString (const QuadooVM::QVARIANT* pqv, __out RSTRING* prstr);

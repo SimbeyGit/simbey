@@ -1,0 +1,136 @@
+[
+	{
+		package: "json",
+		name: "MovingUnit.json",
+		data:
+		{
+			type: "animation",
+			images:
+			[
+				{ layer: 0 },	// RunDownA
+				{ layer: 1 },	// RunDownB
+				{ layer: 2 },	// RunDownC
+				{ layer: 3 },	// RunDownD
+				{ layer: 4 },	// RunDownE
+				{ layer: 5 },	// RunDownF
+				{ layer: 6 },	// RunDownG
+				{ layer: 7 },	// RunDownH
+				{ layer: 8 },	// RunLeftA
+				{ layer: 9 },	// RunLeftB
+				{ layer: 10 },	// RunLeftC
+				{ layer: 11 },	// RunLeftD
+				{ layer: 12 },	// RunLeftE
+				{ layer: 13 },	// RunLeftF
+				{ layer: 14 },	// RunLeftG
+				{ layer: 15 },	// RunLeftH
+				{ layer: 16 },	// RunRightA
+				{ layer: 17 },	// RunRightB
+				{ layer: 18 },	// RunRightC
+				{ layer: 19 },	// RunRightD
+				{ layer: 20 },	// RunRightE
+				{ layer: 21 },	// RunRightF
+				{ layer: 22 },	// RunRightG
+				{ layer: 23 },	// RunRightH
+				{ layer: 24 },	// RunUpA
+				{ layer: 25 },	// RunUpB
+				{ layer: 26 },	// RunUpC
+				{ layer: 27 },	// RunUpD
+				{ layer: 28 },	// RunUpE
+				{ layer: 29 },	// RunUpF
+				{ layer: 30 },	// RunUpG
+				{ layer: 31 },	// RunUpH
+				{ layer: 32 },	// StandDownA
+				{ layer: 33 },	// StandLeftA
+				{ layer: 34 },	// StandUpA
+				{ layer: 35 }	// StandRightA
+			],
+			animations:
+			[
+				// Run Down (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 1, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 2, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 3, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 4, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 5, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 6, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 7, ticks: 5, xoffset: -8, yoffset: -11 }
+					]
+				},
+				// Run Left (animation 1)
+				{
+					frames:
+					[
+						{ image: 8, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 9, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 10, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 11, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 12, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 13, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 14, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 15, ticks: 5, xoffset: -8, yoffset: -11 }
+					]
+				},
+				// Run Right (animation 2)
+				{
+					frames:
+					[
+						{ image: 16, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 17, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 18, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 19, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 20, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 21, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 22, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 23, ticks: 5, xoffset: -8, yoffset: -11 }
+					]
+				},
+				// Run Up (animation 3)
+				{
+					frames:
+					[
+						{ image: 24, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 25, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 26, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 27, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 28, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 29, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 30, ticks: 5, xoffset: -8, yoffset: -11 },
+						{ image: 31, ticks: 5, xoffset: -8, yoffset: -11 }
+					]
+				},
+				// Stand Down (animation 4)
+				{
+					frames:
+					[
+						{ image: 32, ticks: 5, xoffset: -8, yoffset: -11 }
+					]
+				},
+				// Stand Left (animation 5)
+				{
+					frames:
+					[
+						{ image: 33, ticks: 5, xoffset: -8, yoffset: -11 }
+					]
+				},
+				// Stand Down (animation 6)
+				{
+					frames:
+					[
+						{ image: 34, ticks: 5, xoffset: -8, yoffset: -11 }
+					]
+				},
+				// Stand Left (animation 7)
+				{
+					frames:
+					[
+						{ image: 35, ticks: 5, xoffset: -8, yoffset: -11 }
+					]
+				}
+			]
+		}
+	}
+]

@@ -1,0 +1,9 @@
+[
+	{
+		package: "buildsif",
+		name: "Dungeon.sif",
+		files: ["*.png"],
+		trim: true,
+		canvas: 32
+	}
+]
