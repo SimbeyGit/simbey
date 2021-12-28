@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RibbonWindow", "RibbonWindow\RibbonWindow.vcproj", "{3624374E-440D-4741-B31B-1420B28D4CE9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0A72BD48-F436-4171-A620-1CC0F616312E} = {0A72BD48-F436-4171-A620-1CC0F616312E}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platform", "Platform", "{A185DB3D-388A-47AA-B384-CF500EB5D251}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SIF", "..\..\platform\SIF\SIF\SIF.vcproj", "{0A72BD48-F436-4171-A620-1CC0F616312E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{86A47905-2A09-4086-997D-6C4C2BA18DF1} = {86A47905-2A09-4086-997D-6C4C2BA18DF1}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{2743BEF2-48AF-4B00-A3B0-4DE0D672245A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\shared\zlib\zlib.vcproj", "{86A47905-2A09-4086-997D-6C4C2BA18DF1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3624374E-440D-4741-B31B-1420B28D4CE9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3624374E-440D-4741-B31B-1420B28D4CE9}.Debug|Win32.Build.0 = Debug|Win32
+		{3624374E-440D-4741-B31B-1420B28D4CE9}.Release|Win32.ActiveCfg = Release|Win32
+		{3624374E-440D-4741-B31B-1420B28D4CE9}.Release|Win32.Build.0 = Release|Win32
+		{0A72BD48-F436-4171-A620-1CC0F616312E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0A72BD48-F436-4171-A620-1CC0F616312E}.Debug|Win32.Build.0 = Debug|Win32
+		{0A72BD48-F436-4171-A620-1CC0F616312E}.Release|Win32.ActiveCfg = Release|Win32
+		{0A72BD48-F436-4171-A620-1CC0F616312E}.Release|Win32.Build.0 = Release|Win32
+		{86A47905-2A09-4086-997D-6C4C2BA18DF1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{86A47905-2A09-4086-997D-6C4C2BA18DF1}.Debug|Win32.Build.0 = Debug|Win32
+		{86A47905-2A09-4086-997D-6C4C2BA18DF1}.Release|Win32.ActiveCfg = Release|Win32
+		{86A47905-2A09-4086-997D-6C4C2BA18DF1}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0A72BD48-F436-4171-A620-1CC0F616312E} = {A185DB3D-388A-47AA-B384-CF500EB5D251}
+		{86A47905-2A09-4086-997D-6C4C2BA18DF1} = {2743BEF2-48AF-4B00-A3B0-4DE0D672245A}
+	EndGlobalSection
+EndGlobal

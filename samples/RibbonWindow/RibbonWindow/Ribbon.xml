@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns='http://schemas.microsoft.com/windows/2009/Ribbon'>
+  <Application.Commands />
+  <Application.Views>
+    <Ribbon>
+      <Ribbon.QuickAccessToolbar>
+        <QuickAccessToolbar CommandName="ID_QAT" />
+      </Ribbon.QuickAccessToolbar>
+      <Ribbon.ApplicationMenu>
+        <ApplicationMenu CommandName="ID_APP_MENU">
+          <MenuGroup>
+            <Button CommandName="ID_EXIT" LabelTitle="Exit" LargeBitmap="auto" />
+          </MenuGroup>
+        </ApplicationMenu>
+      </Ribbon.ApplicationMenu>
+      <Ribbon.Tabs>
+        <Tab CommandName="ID_TAB_MAIN" LabelTitle="Main">
+          <Group CommandName="ID_GROUP_MAIN" LabelTitle="Button" SizeDefinition="OneButton">
+            <Button CommandName="ID_GENERIC" LabelTitle="Generic" LargeBitmap="auto" />
+          </Group>
+          <Group CommandName="ID_GALLERY_MAIN" LabelTitle="Gallery" SizeDefinition="OneInRibbonGallery">
+            <InRibbonGallery CommandName="ID_GALLERY" ItemWidth="24" ItemHeight="24" Type="Items" MaxRows="4" MinColumnsLarge="4" MinColumnsMedium="3" TextPosition="Bottom">
+              <InRibbonGallery.MenuGroups>
+                <MenuGroup>
+                </MenuGroup>
+              </InRibbonGallery.MenuGroups>
+            </InRibbonGallery>
+          </Group>
+          <Group CommandName="ID_GROUP_DROPDOWN" LabelTitle="List" SizeDefinition="OneButton">
+            <DropDownGallery CommandName="ID_DROPDOWN" LabelTitle="List" HasLargeItems="false" ItemWidth="24" ItemHeight="24" Type="Items" LargeBitmap="auto" />
+          </Group>
+        </Tab>
+      </Ribbon.Tabs>
+    </Ribbon>
+  </Application.Views>
+</Application>
