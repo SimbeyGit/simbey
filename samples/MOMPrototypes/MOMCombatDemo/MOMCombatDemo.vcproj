@@ -187,10 +187,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\InteractiveSurface.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\IntroScreen.cpp"
 				>
 			</File>
@@ -218,10 +214,6 @@
 			</File>
 			<File
 				RelativePath=".\CombatScreen.h"
-				>
-			</File>
-			<File
-				RelativePath=".\InteractiveSurface.h"
 				>
 			</File>
 			<File
@@ -448,6 +440,18 @@
 			</File>
 			<File
 				RelativePath="..\..\..\platform\SIF\Package\SIFPackage.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Shared"
+			>
+			<File
+				RelativePath="..\Shared\InteractiveSurface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\InteractiveSurface.h"
 				>
 			</File>
 		</Filter>

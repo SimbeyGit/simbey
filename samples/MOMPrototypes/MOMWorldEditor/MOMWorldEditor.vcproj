@@ -183,10 +183,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\InteractiveSurface.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MOMWorldEditor.cpp"
 				>
 			</File>
@@ -206,10 +202,6 @@
 			>
 			<File
 				RelativePath=".\CityDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\InteractiveSurface.h"
 				>
 			</File>
 			<File
@@ -530,6 +522,18 @@
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="Shared"
+			>
+			<File
+				RelativePath="..\Shared\InteractiveSurface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\InteractiveSurface.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

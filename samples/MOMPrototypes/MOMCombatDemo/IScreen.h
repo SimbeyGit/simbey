@@ -4,7 +4,7 @@
 #include "fmod.hpp"
 #include "fmod_errors.h"
 #include "Package\SIFPackage.h"
-#include "InteractiveSurface.h"
+#include "..\Shared\InteractiveSurface.h"
 
 interface IQuadooVM;
 

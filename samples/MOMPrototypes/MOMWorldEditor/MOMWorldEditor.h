@@ -7,7 +7,7 @@
 #include "Library\Window\BaseWindow.h"
 #include "Library\MIDIPlayer.h"
 #include "Package\SIFPackage.h"
-#include "InteractiveSurface.h"
+#include "..\Shared\InteractiveSurface.h"
 #include "Dir.h"
 
 interface IJSONValue;
