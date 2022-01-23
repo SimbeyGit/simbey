@@ -457,7 +457,7 @@ HRESULT CBaseWindow::UnregisterClass (LPCTSTR lpcszClass, HINSTANCE hInstance)
 
 BOOL CBaseWindow::InnerWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	BOOL fHandled = InvokeMessageHandler((BaseWindowMessage::Flag)static_cast<int>(BaseWindowMessage::SubclassedHandlers | BaseWindowMessage::BaseWindowHandler), message, wParam, lParam, lResult);
+	BOOL fHandled = InvokeMessageHandler(static_cast<BaseWindowMessage::Flag>(BaseWindowMessage::SubclassedHandlers | BaseWindowMessage::BaseWindowHandler), message, wParam, lParam, lResult);
 
 	// Final destruction may only be invoked by a real window message.
 	if(FINAL_WM_MESSAGE == message)

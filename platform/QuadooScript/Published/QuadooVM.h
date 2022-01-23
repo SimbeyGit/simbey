@@ -242,6 +242,10 @@ namespace QuadooVM
 		INT_SPLITLINES_TO,	// splitlines(text, array) - Splits text by line into the provided array
 		INT_MINVALUE,		// min(value, value) - Returns the smaller value
 		INT_MAXVALUE,		// max(value, value) - Returns the larger value
+		INT_WRITER,			// writer() - Creates a new binary writer object
+		INT_WRITER_ALLOC,	// writer(alloc) - Creates a new binary writer object and reserves the specified amount of memory
+		INT_READER,			// reader(binary) - Creates a new binary reader object on the provided binary object
+		INT_ATOU,			// atou(string, base) - Ascii To Unsigned
 		INT_TYPEOF = 0xFF	// typeof(value) - Return the type of the value using the Type enumeration below
 	};
 
@@ -565,6 +569,8 @@ HRESULT WINAPI QVMCreateEventFromHandle (HANDLE hEvent, __deref_out IQuadooObjec
 HRESULT WINAPI QVMCreateStringList (__in_opt QuadooVM::QVARIANT* pqvCopy, __out QuadooVM::QVARIANT* pqvStringList);
 HRESULT WINAPI QVMWrapStringArray (IRStringArray* pStringArray, __out QuadooVM::QVARIANT* pqvStringList);
 HRESULT WINAPI QVMLockBuffer (ILockableStream* pData, __out QuadooVM::QVARIANT* pqvResult);
+HRESULT WINAPI QVMCreateWriter (DWORD cbReserve, __out QuadooVM::QVARIANT* pqvWriter);
+HRESULT WINAPI QVMCreateReader (ILockableStream* pStream, DWORD nStart, DWORD cbData, __out QuadooVM::QVARIANT* pqvReader);
 
 HRESULT WINAPI QVMAdd (QuadooVM::QVARIANT* pLeft, QuadooVM::QVARIANT* pRight, QuadooVM::QVARIANT* pResult);
 HRESULT WINAPI QVMSubtract (QuadooVM::QVARIANT* pLeft, QuadooVM::QVARIANT* pRight, QuadooVM::QVARIANT* pResult);
@@ -633,6 +639,7 @@ HRESULT WINAPI QVMFloor (__inout QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMSum (__inout QuadooVM::QVARIANT* pqv, __in_opt QuadooVM::QVARIANT* pqvFirst);
 HRESULT WINAPI QVMMin (QuadooVM::QVARIANT* pqvA, QuadooVM::QVARIANT* pqvB, __out QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMMax (QuadooVM::QVARIANT* pqvA, QuadooVM::QVARIANT* pqvB, __out QuadooVM::QVARIANT* pqv);
+HRESULT WINAPI QVMAToU (QuadooVM::QVARIANT* pqvString, QuadooVM::QVARIANT* pqvBase, __out QuadooVM::QVARIANT* pqv);
 
 HRESULT WINAPI QVMVariantToDouble (const QuadooVM::QVARIANT* pqv, __out DOUBLE* pdbl);
 HRESULT WINAPI QVMVariantToString (const QuadooVM::QVARIANT* pqv, __out RSTRING* prstr);

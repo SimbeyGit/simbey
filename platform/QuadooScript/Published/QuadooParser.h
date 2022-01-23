@@ -16,3 +16,4 @@ interface IQuadooCompilerStatus
 HRESULT WINAPI QuadooParseToStream (PCWSTR pcwzFile, DWORD dwFlags, __out ISequentialStream* pstmBinaryScript, __out_opt ISequentialStream* pstmDebug, IQuadooCompilerStatus* pStatus);
 HRESULT WINAPI QuadooParseTextToStream (PCWSTR pcwzFileTag, INT cchFileTag, PCWSTR pcwzText, INT cchText, DWORD dwFlags, __out ISequentialStream* pstmBinaryScript, __out_opt ISequentialStream* pstmDebug, IQuadooCompilerStatus* pStatus);
 HRESULT WINAPI QuadooAllocStream (__deref_out ISequentialStream** ppStream);
+DWORD WINAPI QuadooStreamDataSize (ISequentialStream* pStream);
