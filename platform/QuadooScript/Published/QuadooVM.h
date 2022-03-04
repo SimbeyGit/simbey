@@ -130,6 +130,7 @@ namespace QuadooVM
 		SET_PROPERTY_DYNAMIC,
 		INTERFACE_CALL,
 		SHIFT_STACK,
+		DELETE_PROPERTY,
 		SYSCALL_STATIC = 0xF8,
 		SYSCALL_DYNAMIC = 0xF9,
 		JSON = 0xFA,
@@ -246,6 +247,7 @@ namespace QuadooVM
 		INT_WRITER_ALLOC,	// writer(alloc) - Creates a new binary writer object and reserves the specified amount of memory
 		INT_READER,			// reader(binary) - Creates a new binary reader object on the provided binary object
 		INT_ATOU,			// atou(string, base) - Ascii To Unsigned
+		INT_INPUT,			// input(cb) - Reads text from the input source (IQuadooInputSource)
 		INT_TYPEOF = 0xFF	// typeof(value) - Return the type of the value using the Type enumeration below
 	};
 
@@ -418,6 +420,11 @@ interface __declspec(uuid("487A453D-60C7-4e8f-A762-D0C1F5B1466F")) IQuadooPrintT
 	virtual HRESULT STDMETHODCALLTYPE PrintLn (RSTRING rstrText) = 0;
 };
 
+interface __declspec(uuid("A3C9B280-1AA0-4ced-A0B0-28E322409A25")) IQuadooInputSource : IUnknown
+{
+	virtual HRESULT STDMETHODCALLTYPE Read (__inout QuadooVM::QVARIANT* pqvRead) = 0;
+};
+
 interface __declspec(uuid("243449C6-8B58-47d4-B488-A6F9C0CF0F23")) IQuadooWaitForEvents : IUnknown
 {
 	virtual DWORD STDMETHODCALLTYPE WaitForEvents (DWORD cEvents, __in_ecount(cEvents) const HANDLE* prghEvents, DWORD msTimeout) = 0;
@@ -452,6 +459,7 @@ interface __declspec(uuid("35FE6D03-4D05-4b49-A7A3-CD9DC2C944C1")) IQuadooVM : I
 	virtual HRESULT STDMETHODCALLTYPE End (VOID) = 0;
 	virtual HRESULT STDMETHODCALLTYPE ThrowAndResume (QuadooVM::QVARIANT* pqvValue, __in_opt QuadooVM::QVARIANT* pqvCode, __out_opt QuadooVM::QVARIANT* pqvResult) = 0;
 	virtual VOID STDMETHODCALLTYPE EnableCodeStepping (bool fStepping) = 0;
+	virtual HRESULT STDMETHODCALLTYPE SetInputSource (__in_opt IQuadooInputSource* pSource) = 0;
 };
 
 interface __declspec(uuid("23A1B25B-587A-4a4e-9506-396BE62A50CE")) IQuadooContainer : IUnknown
@@ -499,6 +507,7 @@ interface __declspec(uuid("C91E38D9-86BF-4d71-8571-0251840CD542")) IQuadooObject
 	virtual HRESULT STDMETHODCALLTYPE GetMemberVariable (DWORD idxMember, __deref_out QuadooVM::QVARIANT** ppqvMember) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetDefaultValue (__out QuadooVM::QVARIANT* pqvResult) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetInterface (RSTRING rstrInterface, __deref_out IQuadooInterface** ppInterface) = 0;
+	virtual HRESULT STDMETHODCALLTYPE DeleteProperty (RSTRING rstrProperty, __out_opt QuadooVM::QVARIANT* pqv) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Destruct (VOID) = 0;
 };
 
@@ -517,6 +526,7 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE GetMemberVariable (DWORD idxMember, __deref_out QuadooVM::QVARIANT** ppqvMember) { return E_NOTIMPL; }
 	virtual HRESULT STDMETHODCALLTYPE GetDefaultValue (__out QuadooVM::QVARIANT* pqvResult) { return E_NOTIMPL; }
 	virtual HRESULT STDMETHODCALLTYPE GetInterface (RSTRING rstrInterface, __deref_out IQuadooInterface** ppInterface) { return E_NOTIMPL; }
+	virtual HRESULT STDMETHODCALLTYPE DeleteProperty (RSTRING rstrProperty, __out_opt QuadooVM::QVARIANT* pqv) { return E_NOTIMPL; }
 	virtual HRESULT STDMETHODCALLTYPE Destruct (VOID) { return S_FALSE; }
 };
 
@@ -660,6 +670,7 @@ HRESULT WINAPI QVMGetProperty (__in_opt IQuadooVM* pVM, QuadooVM::QVARIANT* pqvO
 HRESULT WINAPI QVMSetProperty (__in_opt IQuadooVM* pVM, QuadooVM::QVARIANT* pqvObject, RSTRING rstrProperty, QuadooVM::QVARIANT* pqvSrc);
 HRESULT WINAPI QVMGetPropertyIndexed (__in_opt IQuadooVM* pVM, QuadooVM::QVARIANT* pqvObject, RSTRING rstrProperty, QuadooVM::QVARIANT* pqvIndex, __out QuadooVM::QVARIANT* pqvDest);
 HRESULT WINAPI QVMSetPropertyIndexed (__in_opt IQuadooVM* pVM, QuadooVM::QVARIANT* pqvObject, RSTRING rstrProperty, QuadooVM::QVARIANT* pqvIndex, QuadooVM::QVARIANT* pqvSrc);
+HRESULT WINAPI QVMOptFind (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARIANT* pqvField, QuadooVM::QVARIANT* pqvDefault, __out QuadooVM::QVARIANT* pqvResult);
 HRESULT WINAPI QVMInvokeManagedMethod (QuadooVM::QVARIANT* pqvObject, RSTRING rstrMethod, QuadooVM::QVPARAMS* pqvParams, __out QuadooVM::QVARIANT* pqvResult);
 HRESULT WINAPI QVMFindJSONArrayObject (IJSONArray* pJSONArray, QuadooVM::QVARIANT* pqvField, QuadooVM::QVARIANT* pqvValue, __deref_out IJSONObject** ppObject, __out_opt sysint* pidxItem);
-HRESULT WINAPI QVMOptFind (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARIANT* pqvField, QuadooVM::QVARIANT* pqvDefault, __out QuadooVM::QVARIANT* pqvResult);
+HRESULT WINAPI QVMDeleteProperty (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARIANT* pqvProperty, __out QuadooVM::QVARIANT* pqvResult);

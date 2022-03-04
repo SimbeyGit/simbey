@@ -5,7 +5,7 @@ namespace Text
 	HRESULT WINAPI AllocateUnicode (const BYTE* pbRawText, ULONG cbRawText, PWSTR* ppwzText, INT* pcchText);
 	HRESULT WINAPI AllocateUnicodeFromCodePage (const BYTE* pbRawText, ULONG cbRawText, PWSTR* ppwzText, INT* pcchText, UINT nCodePage);
 	HRESULT WINAPI AllocateUnicodeByteOrder (const BYTE* pbRawText, ULONG cbRawText, PWSTR* ppwzText, INT* pcchText, bool fIsBigEndian);
-	HRESULT WINAPI ConvertRawTextToUnicode (const BYTE* pbRawText, ULONG cbRawText, PWSTR* ppwzText, INT* pcchText);
+	HRESULT WINAPI ConvertRawTextToUnicode (const BYTE* pbRawText, ULONG cbRawText, PWSTR* ppwzText, INT* pcchText, UINT nCodePage = CP_ACP);
 
 	HRESULT WINAPI SaveToHandle (PCWSTR pcwzText, INT cchText, HANDLE hFile);
 	HRESULT WINAPI SaveToFile (PCWSTR pcwzText, INT cchText, PCWSTR pcwzFile);

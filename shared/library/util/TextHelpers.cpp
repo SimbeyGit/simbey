@@ -63,7 +63,7 @@ namespace Text
 		return hr;
 	}
 
-	HRESULT WINAPI ConvertRawTextToUnicode (const BYTE* pbRawText, ULONG cbRawText, PWSTR* ppwzText, INT* pcchText)
+	HRESULT WINAPI ConvertRawTextToUnicode (const BYTE* pbRawText, ULONG cbRawText, PWSTR* ppwzText, INT* pcchText, UINT nCodePage)
 	{
 		HRESULT hr;
 		if(2 <= cbRawText && 0xFF == pbRawText[0] && 0xFE == pbRawText[1])			// UTF-16 LE
@@ -73,7 +73,7 @@ namespace Text
 		else if(3 <= cbRawText && 0xEF == pbRawText[0] && 0xBB == pbRawText[1] && 0xBF == pbRawText[2])
 			hr = AllocateUnicodeFromCodePage(pbRawText + 3, cbRawText - 3, ppwzText, pcchText, CP_UTF8);
 		else
-			hr = AllocateUnicodeFromCodePage(pbRawText, cbRawText, ppwzText, pcchText, CP_ACP);
+			hr = AllocateUnicodeFromCodePage(pbRawText, cbRawText, ppwzText, pcchText, nCodePage);
 		return hr;
 	}
 
