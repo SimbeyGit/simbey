@@ -48,18 +48,19 @@ protected:
 
 	virtual HRESULT FinalizeAndShow (DWORD dwStyle, INT nCmdShow);
 	virtual BOOL DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
+	virtual BOOL SystemMessageHandler (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 
 	HRESULT Create (DWORD dwExStyle, DWORD dwStyle, LPCTSTR lpcszClass, LPCTSTR lpcszTitle, INT x, INT y, INT nWidth, INT nHeight, HWND hwndParent, INT nCmdShow);
 	HRESULT CreateWithId (DWORD dwExStyle, DWORD dwStyle, LPCTSTR lpcszClass, LPCTSTR lpcszTitle, INT x, INT y, INT nWidth, INT nHeight, HWND hwndParent, INT nCmdShow, WORD wControlId);
 	HRESULT AttachBaseWinProc (VOID);
 	VOID ClearAllSubclasses (VOID);
 
-	static HRESULT RegisterClass (const WNDCLASSEX* lpWndClass, ATOM* lpAtom);
+	static HRESULT RegisterClass (const WNDCLASSEX* lpWndClass, ATOM* lpAtom, __in_opt WNDPROC pfnWndProc = NULL);
 	static HRESULT UnregisterClass (LPCTSTR lpcszClass, HINSTANCE hInstance);
 
-private:
 	BOOL InnerWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 
+private:
 	static LRESULT WINAPI _DefWinProcCreate (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 	static LRESULT WINAPI _DefWinProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 };

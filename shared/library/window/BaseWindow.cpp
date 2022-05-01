@@ -134,7 +134,7 @@ BOOL CBaseWindow::InvokeMessageHandler (BaseWindowMessage::Flag eTarget, UINT uM
 		fHandled = DefWindowProc(uMsg, wParam, lParam, lResult);
 
 	if((eTarget & BaseWindowMessage::DefaultWindowProc) && !fHandled)
-		::DefWindowProc(m_hwnd, uMsg, wParam, lParam);
+		fHandled = SystemMessageHandler(uMsg, wParam, lParam, lResult);
 
 	return fHandled;
 }
@@ -349,6 +349,12 @@ BOOL CBaseWindow::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 	return FALSE;
 }
 
+BOOL CBaseWindow::SystemMessageHandler (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+{
+	lResult = ::DefWindowProc(m_hwnd, message, wParam, lParam);
+	return FALSE;
+}
+
 HRESULT CBaseWindow::Create (DWORD dwExStyle, DWORD dwStyle, LPCTSTR lpcszClass, LPCTSTR lpcszTitle, INT x, INT y, INT nWidth, INT nHeight, HWND hwndParent, INT nCmdShow)
 {
 	HRESULT hr = E_UNEXPECTED;
@@ -422,7 +428,7 @@ VOID CBaseWindow::ClearAllSubclasses (VOID)
 	}
 }
 
-HRESULT CBaseWindow::RegisterClass (const WNDCLASSEX* lpWndClass, ATOM* lpAtom)
+HRESULT CBaseWindow::RegisterClass (const WNDCLASSEX* lpWndClass, ATOM* lpAtom, __in_opt WNDPROC pfnWndProc)
 {
 	HRESULT hr = E_INVALIDARG;
 	if(lpWndClass && lpWndClass->lpszClassName && lpWndClass->hInstance)
@@ -431,7 +437,7 @@ HRESULT CBaseWindow::RegisterClass (const WNDCLASSEX* lpWndClass, ATOM* lpAtom)
 		ATOM atom;
 
 		CopyMemory(&wnd, lpWndClass, sizeof(wnd));
-		wnd.lpfnWndProc = _DefWinProcCreate;
+		wnd.lpfnWndProc = pfnWndProc ? pfnWndProc : _DefWinProcCreate;
 
 		atom = ::RegisterClassEx(&wnd);
 		if(lpAtom)

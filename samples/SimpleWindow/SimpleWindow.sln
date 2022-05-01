@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphWindow", "GraphWindow\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CADWindow", "CADWindow\CADWindow.vcproj", "{2ABC80C8-8D94-4826-9AEA-1E40CC6C7451}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MDIWindow", "MDIWindow\MDIWindow.vcproj", "{625A3B32-9671-4D3E-A87A-B09681BB7B7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
