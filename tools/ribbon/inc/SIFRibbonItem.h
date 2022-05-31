@@ -1,29 +1,16 @@
 #pragma once
 
-#include "SIFRibbon.h"
+#include "BaseRibbonItem.h"
 
-class CSIFRibbonItem :
-	public CBaseUnknown,
-	public IUISimplePropertySet
+class CSIFRibbonItem : public CBaseRibbonItem
 {
 protected:
-	CSIFRibbon* m_pRibbon;
 	ISimbeyInterchangeFile* m_pIcons;
-
-	PWSTR m_pwzItem;
 	UINT m_nIcon;
 
 public:
-	IMP_BASE_UNKNOWN
-
-	BEGIN_UNK_MAP
-		UNK_INTERFACE(IUISimplePropertySet)
-	END_UNK_MAP
-
 	static HRESULT Create (CSIFRibbon* pRibbon, ISimbeyInterchangeFile* pIcons, __deref_out CSIFRibbonItem** ppItem);
 
-	HRESULT SetItemText (PCWSTR pcwzItem);
-	HRESULT SetItemText (PCSTR pcszItem);
 	VOID SetItemIcon (UINT nIcon);
 
 protected:

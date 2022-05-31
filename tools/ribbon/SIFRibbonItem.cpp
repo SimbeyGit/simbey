@@ -19,52 +19,16 @@ Cleanup:
 }
 
 CSIFRibbonItem::CSIFRibbonItem (CSIFRibbon* pRibbon, ISimbeyInterchangeFile* pIcons) :
-	m_pRibbon(pRibbon),
+	CBaseRibbonItem(pRibbon),
 	m_pIcons(pIcons),
-	m_pwzItem(NULL),
 	m_nIcon(0)
 {
-	m_pRibbon->AddRef();
 	m_pIcons->AddRef();
 }
 
 CSIFRibbonItem::~CSIFRibbonItem ()
 {
-	SafeDeleteArray(m_pwzItem);
 	m_pIcons->Release();
-	m_pRibbon->Release();
-}
-
-HRESULT CSIFRibbonItem::SetItemText (PCWSTR pcwzItem)
-{
-	HRESULT hr;
-
-	CheckIf(NULL == pcwzItem, E_INVALIDARG);
-	Check(TReplaceStringAssert(pcwzItem, &m_pwzItem));
-
-Cleanup:
-	return hr;
-}
-
-HRESULT CSIFRibbonItem::SetItemText (PCSTR pcszItem)
-{
-	HRESULT hr;
-	INT cchItem;
-
-	CheckIf(NULL == pcszItem, E_INVALIDARG);
-
-	cchItem = MultiByteToWideChar(CP_UTF8, 0, pcszItem, -1, NULL, 0);
-	CheckIf(0 == cchItem, E_INVALIDARG);
-
-	m_pwzItem = __new WCHAR[cchItem];
-	CheckAlloc(m_pwzItem);
-
-	SideAssertCompare(MultiByteToWideChar(CP_UTF8, 0, pcszItem, -1, m_pwzItem, cchItem), cchItem);
-
-	hr = S_OK;
-
-Cleanup:
-	return hr;
 }
 
 VOID CSIFRibbonItem::SetItemIcon (UINT nIcon)
@@ -76,24 +40,16 @@ VOID CSIFRibbonItem::SetItemIcon (UINT nIcon)
 
 HRESULT STDMETHODCALLTYPE CSIFRibbonItem::GetValue (REFPROPERTYKEY key, PROPVARIANT* value)
 {
-	HRESULT hr = E_NOTIMPL;
+	HRESULT hr = __super::GetValue(key, value);
 
-	if(UI_PKEY_Label == key)
-	{
-		value->bstrVal = SysAllocString(m_pwzItem);
-		CheckIf(NULL == value->bstrVal, E_OUTOFMEMORY);
-		value->vt = VT_BSTR;
-		hr = S_OK;
-	}
-	else if(0 != m_nIcon)
+	if(E_NOTIMPL != hr && 0 != m_nIcon)
 	{
 		if(UI_PKEY_ItemImage == key)
-			Check(LoadRibbonImage(value));
+			hr = LoadRibbonImage(value);
 		else if(UI_PKEY_LargeImage == key || UI_PKEY_SmallImage == key)
-			Check(LoadRibbonImage(value));
+			hr = LoadRibbonImage(value);
 	}
 
-Cleanup:
 	return hr;
 }
 

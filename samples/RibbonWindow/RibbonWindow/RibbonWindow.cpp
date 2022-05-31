@@ -145,28 +145,33 @@ HRESULT STDMETHODCALLTYPE CRibbonWindow::Execute (UINT32 commandId, UI_EXECUTION
 {
 	HRESULT hr;
 
-	switch(commandId)
+	if(UI_EXECUTIONVERB_EXECUTE == verb)
 	{
-	case ID_EXIT:
-		PostMessage(m_hwnd, WM_CLOSE, 0, 0);
-		hr = S_OK;
-		break;
-	case ID_GENERIC:
-		MessageBox(m_hwnd, L"Generic Button", L"Generic Title", MB_OK);
-		hr = S_OK;
-		break;
-	case ID_GALLERY:
-		MessageBox(m_hwnd, L"Generic Gallery", L"Generic Title", MB_OK);
-		hr = S_OK;
-		break;
-	case ID_DROPDOWN:
-		MessageBox(m_hwnd, L"Generic DropDown", L"Generic Title", MB_OK);
-		hr = S_OK;
-		break;
-	default:
-		hr = E_NOTIMPL;
-		break;
+		switch(commandId)
+		{
+		case ID_EXIT:
+			PostMessage(m_hwnd, WM_CLOSE, 0, 0);
+			hr = S_OK;
+			break;
+		case ID_GENERIC:
+			MessageBox(m_hwnd, L"Generic Button", L"Generic Title", MB_OK);
+			hr = S_OK;
+			break;
+		case ID_GALLERY:
+			MessageBox(m_hwnd, L"Generic Gallery", L"Generic Title", MB_OK);
+			hr = S_OK;
+			break;
+		case ID_DROPDOWN:
+			MessageBox(m_hwnd, L"Generic DropDown", L"Generic Title", MB_OK);
+			hr = S_OK;
+			break;
+		default:
+			hr = E_NOTIMPL;
+			break;
+		}
 	}
+	else
+		hr = S_FALSE;
 
 	return hr;
 }

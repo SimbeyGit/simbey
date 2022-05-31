@@ -215,7 +215,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling ribbon XML"
-						CommandLine="call ..\..\..\tools\ribbon\BuildRibbon.cmd Ribbon"
+						CommandLine="call ..\..\..\tools\ribbon\BuildRibbon.cmd Ribbon&#x0D;&#x0A;"
 						Outputs="Ribbon.h Ribbon.rc Ribbon.bml RibbonMappings.h"
 					/>
 				</FileConfiguration>
@@ -225,7 +225,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Compiling ribbon XML"
-						CommandLine="call ..\..\..\tools\ribbon\BuildRibbon.cmd Ribbon"
+						CommandLine="call ..\..\..\tools\ribbon\BuildRibbon.cmd Ribbon&#x0D;&#x0A;"
 						Outputs="Ribbon.h Ribbon.rc Ribbon.bml RibbonMappings.h"
 					/>
 				</FileConfiguration>
@@ -325,6 +325,14 @@
 			<Filter
 				Name="Ribbon"
 				>
+				<File
+					RelativePath="..\..\..\tools\ribbon\BaseRibbonItem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\tools\ribbon\inc\BaseRibbonItem.h"
+					>
+				</File>
 				<File
 					RelativePath="..\..\..\tools\ribbon\SIFRibbon.cpp"
 					>

@@ -19,49 +19,13 @@ Cleanup:
 }
 
 CStringGalleryItem::CStringGalleryItem (CSIFRibbon* pRibbon) :
-	m_pRibbon(pRibbon),
-	m_pwzItem(NULL),
+	CBaseRibbonItem(pRibbon),
 	m_nIcon(0)
 {
-	m_pRibbon->AddRef();
 }
 
 CStringGalleryItem::~CStringGalleryItem ()
 {
-	SafeDeleteArray(m_pwzItem);
-	m_pRibbon->Release();
-}
-
-HRESULT CStringGalleryItem::SetItemText (PCWSTR pcwzItem)
-{
-	HRESULT hr;
-
-	CheckIf(NULL == pcwzItem, E_INVALIDARG);
-	Check(TReplaceStringAssert(pcwzItem, &m_pwzItem));
-
-Cleanup:
-	return hr;
-}
-
-HRESULT CStringGalleryItem::SetItemText (PCSTR pcszItem)
-{
-	HRESULT hr;
-	INT cchItem;
-
-	CheckIf(NULL == pcszItem, E_INVALIDARG);
-
-	cchItem = MultiByteToWideChar(CP_UTF8, 0, pcszItem, -1, NULL, 0);
-	CheckIf(0 == cchItem, E_INVALIDARG);
-
-	m_pwzItem = __new WCHAR[cchItem];
-	CheckAlloc(m_pwzItem);
-
-	SideAssertCompare(MultiByteToWideChar(CP_UTF8, 0, pcszItem, -1, m_pwzItem, cchItem), cchItem);
-
-	hr = S_OK;
-
-Cleanup:
-	return hr;
 }
 
 VOID CStringGalleryItem::SetItemIcon (UINT nIcon)
@@ -73,20 +37,15 @@ VOID CStringGalleryItem::SetItemIcon (UINT nIcon)
 
 HRESULT STDMETHODCALLTYPE CStringGalleryItem::GetValue (REFPROPERTYKEY key, PROPVARIANT* value)
 {
-	HRESULT hr = E_NOTIMPL;
+	HRESULT hr = __super::GetValue(key, value);
 
-	if(UI_PKEY_Label == key)
+	if(E_NOTIMPL == hr && 0 != m_nIcon)
 	{
-		value->bstrVal = SysAllocString(m_pwzItem);
-		CheckIf(NULL == value->bstrVal, E_OUTOFMEMORY);
-		value->vt = VT_BSTR;
-		hr = S_OK;
-	}
-	else if(UI_PKEY_ItemImage == key && 0 != m_nIcon)
-	{
-		Check(m_pRibbon->LoadImageForCommand(m_nIcon, UI_PKEY_SmallImage, value));
+		if(UI_PKEY_ItemImage == key)
+			hr = m_pRibbon->LoadImageForCommand(m_nIcon, UI_PKEY_SmallImage, value);
+		else if(UI_PKEY_SmallImage == key || UI_PKEY_LargeImage == key)
+			hr = m_pRibbon->LoadImageForCommand(m_nIcon, key, value);
 	}
 
-Cleanup:
 	return hr;
 }
