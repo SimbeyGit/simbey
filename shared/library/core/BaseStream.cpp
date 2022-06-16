@@ -127,7 +127,7 @@ HRESULT CBaseStream::Seek (LONG lMove, DWORD dwOrigin, __out ULONG* pulNewPositi
 	switch(dwOrigin)
 	{
 	case STREAM_SEEK_SET:
-		if(0 <= lMove && (ULONG)lMove < m_cbData)
+		if(0 <= lMove && (ULONG)lMove <= m_cbData)
 		{
 			m_iReadPtr = lMove;
 			*pulNewPosition = m_iReadPtr;

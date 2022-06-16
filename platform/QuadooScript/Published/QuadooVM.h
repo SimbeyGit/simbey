@@ -115,6 +115,7 @@ namespace QuadooVM
 		CAST_DOUBLE,
 		CAST_CURRENCY,
 		CAST_BOOL,
+		CAST_VOID,
 		GET_PROPERTY_INDIRECT,
 		SET_PROPERTY_INDIRECT,
 		GET_PROPERTY_INDEXED_INDIRECT,
@@ -248,6 +249,7 @@ namespace QuadooVM
 		INT_READER,			// reader(binary) - Creates a new binary reader object on the provided binary object
 		INT_ATOU,			// atou(string, base) - Ascii To Unsigned
 		INT_INPUT,			// input(cb) - Reads text from the input source (IQuadooInputSource)
+		INT_LINEREADER,		// linereader(stream) - Creates a new text line reader object
 		INT_TYPEOF = 0xFF	// typeof(value) - Return the type of the value using the Type enumeration below
 	};
 
@@ -290,7 +292,8 @@ namespace QuadooVM
 		Object,
 		JSONArray,
 		JSONObject,
-		Ref
+		Ref,
+		Void
 	};
 
 	enum State
@@ -321,6 +324,7 @@ namespace QuadooVM
 			IJSONArray* pJSONArray;
 			IJSONObject* pJSONObject;
 			QVARIANT* pRef;
+			PVOID pv;
 		};
 	};
 
@@ -663,6 +667,7 @@ HRESULT WINAPI QVMConvertToFloat (__inout QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMConvertToDouble (__inout QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMConvertToCurrency (__inout QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMConvertToBool (__inout QuadooVM::QVARIANT* pqv);
+HRESULT WINAPI QVMConvertToVoid (__inout QuadooVM::QVARIANT* pqv);
 
 HRESULT WINAPI QVMConvertFromJSON (__in_opt IJSONValue* pv, __out QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMConvertToJSON (QuadooVM::QVARIANT* pqv, __deref_out IJSONValue** ppv);
@@ -674,3 +679,4 @@ HRESULT WINAPI QVMOptFind (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARIANT* pq
 HRESULT WINAPI QVMInvokeManagedMethod (QuadooVM::QVARIANT* pqvObject, RSTRING rstrMethod, QuadooVM::QVPARAMS* pqvParams, __out QuadooVM::QVARIANT* pqvResult);
 HRESULT WINAPI QVMFindJSONArrayObject (IJSONArray* pJSONArray, QuadooVM::QVARIANT* pqvField, QuadooVM::QVARIANT* pqvValue, __deref_out IJSONObject** ppObject, __out_opt sysint* pidxItem);
 HRESULT WINAPI QVMDeleteProperty (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARIANT* pqvProperty, __out QuadooVM::QVARIANT* pqvResult);
+HRESULT WINAPI QVMCreateLineReader (ISequentialStream* pStream, __out QuadooVM::QVARIANT* pqv);
