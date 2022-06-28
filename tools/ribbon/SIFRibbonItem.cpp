@@ -42,7 +42,7 @@ HRESULT STDMETHODCALLTYPE CSIFRibbonItem::GetValue (REFPROPERTYKEY key, PROPVARI
 {
 	HRESULT hr = __super::GetValue(key, value);
 
-	if(E_NOTIMPL != hr && 0 != m_nIcon)
+	if(E_NOTIMPL == hr && 0 != m_nIcon)
 	{
 		if(UI_PKEY_ItemImage == key)
 			hr = LoadRibbonImage(value);

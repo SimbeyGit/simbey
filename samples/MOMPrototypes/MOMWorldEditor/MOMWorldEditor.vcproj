@@ -506,6 +506,14 @@
 				Name="Ribbon"
 				>
 				<File
+					RelativePath="..\..\..\tools\ribbon\BaseRibbonItem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\tools\ribbon\inc\BaseRibbonItem.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\tools\ribbon\SIFRibbon.cpp"
 					>
 				</File>
