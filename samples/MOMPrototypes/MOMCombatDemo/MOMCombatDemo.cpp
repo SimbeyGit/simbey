@@ -40,6 +40,10 @@ public:
 	{
 		Stream::TPrintF(&m_stmErrors, L"%ls at %d of %ls, Code:0x%.8X\r\n", pcwzError, nLine, pcwzFile, hrCode);
 	}
+	virtual STDMETHODIMP OnCompilerResolvePath (PCWSTR pcwzPath, __out_ecount(cchMaxAbsolutePath) PWSTR pwzAbsolutePath, INT cchMaxAbsolutePath)
+	{
+		return E_NOTIMPL;
+	}
 };
 
 CMOMCombatDemo::CMOMCombatDemo (HINSTANCE hInstance) :

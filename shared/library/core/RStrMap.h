@@ -416,6 +416,25 @@ public:
 		return hr;
 	}
 
+	VOID Swap (TRStrMap<TValue>& mapOther)
+	{
+		m_Store.Swap(mapOther.m_Store);
+	}
+
+	VOID DeleteAll (VOID)
+	{
+		NAMED_MAP_ENTRY* pData;
+		sysint cList;
+
+		m_Store.GetData(&pData, &cList);
+		for(sysint i = 0; i < cList; i++)
+		{
+			RStrRelease(pData[i].rstrName);
+			__delete pData[i].value;
+		}
+		m_Store.Clear();
+	}
+
 protected:
 	HRESULT BinaryFind (RSTRING rstrName, sysint* pnPosition) const
 	{

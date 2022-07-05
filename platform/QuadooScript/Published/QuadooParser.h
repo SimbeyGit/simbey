@@ -11,6 +11,7 @@ interface IQuadooCompilerStatus
 	virtual VOID STDMETHODCALLTYPE OnCompilerAddFile (PCWSTR pcwzFile, INT cchFile) = 0;
 	virtual VOID STDMETHODCALLTYPE OnCompilerStatus (PCWSTR pcwzStatus) = 0;
 	virtual VOID STDMETHODCALLTYPE OnCompilerError (HRESULT hrCode, INT nLine, PCWSTR pcwzFile, PCWSTR pcwzError) = 0;
+	virtual STDMETHODIMP OnCompilerResolvePath (PCWSTR pcwzPath, __out_ecount(cchMaxAbsolutePath) PWSTR pwzAbsolutePath, INT cchMaxAbsolutePath) = 0;
 };
 
 HRESULT WINAPI QuadooParseToStream (PCWSTR pcwzFile, DWORD dwFlags, __out ISequentialStream* pstmBinaryScript, __out_opt ISequentialStream* pstmDebug, IQuadooCompilerStatus* pStatus);

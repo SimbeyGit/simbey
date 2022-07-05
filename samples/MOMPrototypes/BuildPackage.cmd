@@ -1,0 +1,3 @@
+@Echo off
+Echo Running package.quadoo...
+..\..\bin\QVM.exe package.quadoo
