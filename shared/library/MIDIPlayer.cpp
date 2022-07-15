@@ -16,7 +16,8 @@ namespace MIDI
 		m_hStop(NULL),
 		m_pNotify(NULL),
 		m_nResumePoint(0),
-		m_msSwitchDelay(0)
+		m_msSwitchDelay(0),
+		m_pmResume(NULL)
 	{
 		InitializeCriticalSection(&m_cs);
 	}
@@ -24,6 +25,7 @@ namespace MIDI
 	CPlayer::~CPlayer ()
 	{
 		Stop();
+		Assert(NULL == m_pNotify);
 		SafeCloseHandle(m_hStop);
 		if(m_hMidiOut)
 			midiOutClose(m_hMidiOut);
@@ -137,7 +139,7 @@ namespace MIDI
 
 	HRESULT CPlayer::Stop (__out_opt MIDI_RESUME* pmResume)
 	{
-		HRESULT hr = S_FALSE;
+		HRESULT hr;
 		HANDLE hThread;
 
 		EnterCriticalSection(&m_cs);
@@ -147,22 +149,24 @@ namespace MIDI
 
 		if(hThread)
 		{
+			Assert(NULL == m_pmResume);
+			m_pmResume = pmResume;
+
 			SetEvent(m_hStop);
 			WaitForSingleObject(hThread, INFINITE);
 			CloseHandle(hThread);
 			hr = S_OK;
 		}
-
-		if(m_hMidiOut)
-			midiOutReset(m_hMidiOut);
-
-		if(pmResume)
+		else
 		{
-			pmResume->nPPQN = m_nPPQN;
-			pmResume->nResumePoint = m_nResumePoint;
-		}
+			if(pmResume)
+			{
+				pmResume->nPPQN = 0;
+				pmResume->nResumePoint = 0;
+			}
 
-		SafeRelease(m_pNotify);
+			hr = S_FALSE;
+		}
 
 		return hr;
 	}
@@ -356,6 +360,17 @@ namespace MIDI
 
 	Cleanup:
 		timeEndPeriod(1);
+
+		midiOutReset(hMidiOut);
+
+		if(m_pmResume)
+		{
+			m_pmResume->nPPQN = m_nPPQN;
+			m_pmResume->nResumePoint = m_nResumePoint;
+
+			// Set m_pmResume back to NULL before calling NotifyDone().
+			m_pmResume = NULL;
+		}
 
 		NotifyDone(fCompleted);
 	}

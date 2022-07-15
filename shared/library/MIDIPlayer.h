@@ -94,6 +94,7 @@ namespace MIDI
 		INotifyFinished* m_pNotify;
 		sysint m_nResumePoint;
 		DWORD m_msSwitchDelay;
+		MIDI_RESUME* m_pmResume;
 
 	public:
 		CPlayer ();
