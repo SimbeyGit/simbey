@@ -11,9 +11,8 @@ class CBaseWindow : public IBaseWindow
 
 protected:
 	HWND m_hwnd;
-	ISubclassedHandler** m_lplpSubclasses;
-	sysint m_cSubclasses;
 
+	TArray<ISubclassedHandler*>* m_paSubclasses;
 	TArray<UINT>* m_paUserMessages;
 	TArray<UINT_PTR>* m_paTimers;
 

@@ -62,6 +62,14 @@ namespace Geometry
 #endif
 	}
 
+	DOUBLE WINAPI PointDistanceD (PDPOINT lpPoint1, PDPOINT lpPoint2)
+	{
+		DOUBLE xDiff = lpPoint2->x - lpPoint1->x;
+		DOUBLE yDiff = lpPoint2->y - lpPoint1->y;
+		DOUBLE zDiff = lpPoint2->z - lpPoint1->z;
+		return sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff);
+	}
+
 	BOOL WINAPI SameSide (PFPOINT lpP1, PFPOINT lpP2, PFPOINT lpA, PFPOINT lpB)
 	{
 		FPOINT v1, v2;
@@ -308,5 +316,49 @@ namespace Geometry
 		fpt.x = (FLOAT)(r * cos(s) * sin(t));
 		fpt.y = (FLOAT)(r * sin(s) * sin(t));
 		fpt.z = (FLOAT)(r * cos(t));
+	}
+
+	BOOL WINAPI GetLineIntersectionF (FLOAT p0_x, FLOAT p0_y, FLOAT p1_x, FLOAT p1_y,
+		FLOAT p2_x, FLOAT p2_y, FLOAT p3_x, FLOAT p3_y, FLOAT* i_x, FLOAT* i_y)
+	{
+		FLOAT s1_x, s1_y, s2_x, s2_y;
+		s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
+		s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
+
+		FLOAT s, t;
+		s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+		t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+		if(s >= 0 && s <= 1 && t >= 0 && t <= 1)
+		{
+			// Collision detected
+			*i_x = p0_x + (t * s1_x);
+			*i_y = p0_y + (t * s1_y);
+			return TRUE;
+		}
+
+		return FALSE; // No collision
+	}
+
+	BOOL WINAPI GetLineIntersectionD (DOUBLE p0_x, DOUBLE p0_y, DOUBLE p1_x, DOUBLE p1_y,
+		DOUBLE p2_x, DOUBLE p2_y, DOUBLE p3_x, DOUBLE p3_y, DOUBLE* i_x, DOUBLE* i_y)
+	{
+		DOUBLE s1_x, s1_y, s2_x, s2_y;
+		s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
+		s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
+
+		DOUBLE s, t;
+		s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+		t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+		if(s >= 0 && s <= 1 && t >= 0 && t <= 1)
+		{
+			// Collision detected
+			*i_x = p0_x + (t * s1_x);
+			*i_y = p0_y + (t * s1_y);
+			return TRUE;
+		}
+
+		return FALSE; // No collision
 	}
 };

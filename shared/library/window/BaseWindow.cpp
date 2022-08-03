@@ -74,9 +74,8 @@ HRESULT TRemoveItemFromTArray (TArray<T>* pArray, T tItem)
 CBaseWindow::CBaseWindow ()
 {
 	m_hwnd = NULL;
-	m_lplpSubclasses = NULL;
-	m_cSubclasses = 0;
 
+	m_paSubclasses = NULL;
 	m_paUserMessages = NULL;
 	m_paTimers = NULL;
 }
@@ -120,9 +119,10 @@ BOOL CBaseWindow::InvokeMessageHandler (BaseWindowMessage::Flag eTarget, UINT uM
 
 	if(eTarget & BaseWindowMessage::SubclassedHandlers)
 	{
-		for(sysint i = 0; i < m_cSubclasses; i++)
+		sysint cSubclasses = m_paSubclasses ? m_paSubclasses->Length() : 0;
+		for(sysint i = 0; i < cSubclasses; i++)
 		{
-			if(m_lplpSubclasses[i]->OnSubclassMessage(this, uMsg, wParam, lParam, lResult))
+			if((*m_paSubclasses)[i]->OnSubclassMessage(this, uMsg, wParam, lParam, lResult))
 			{
 				fHandled = TRUE;
 				break;
@@ -195,64 +195,43 @@ HMENU CBaseWindow::GetMenu (VOID)
 HRESULT CBaseWindow::AttachSubclassHandler (ISubclassedHandler* lpSubclass)
 {
 	HRESULT hr = E_INVALIDARG;
+
 	if(lpSubclass)
 	{
-		ISubclassedHandler** lplpNew = __new ISubclassedHandler*[m_cSubclasses + 1];
-		if(lplpNew)
+		if(NULL == m_paSubclasses)
+			m_paSubclasses = __new TArray<ISubclassedHandler*>;
+		if(m_paSubclasses)
 		{
-			*lplpNew = lpSubclass;
-			CopyMemory(lplpNew + 1, m_lplpSubclasses, m_cSubclasses * sizeof(ISubclassedHandler*));
-			__delete_array m_lplpSubclasses;
-			m_lplpSubclasses = lplpNew;
-			m_cSubclasses++;
-
-			lpSubclass->OnAttached(this);
-
-			hr = S_OK;
+			hr = m_paSubclasses->Append(lpSubclass);
+			if(SUCCEEDED(hr))
+				lpSubclass->OnAttached(this);
 		}
 		else
 			hr = E_OUTOFMEMORY;
 	}
+
 	return hr;
 }
 
 HRESULT CBaseWindow::DetachSubclassHandler (ISubclassedHandler* lpSubclass)
 {
 	HRESULT hr = E_INVALIDARG;
-	if(lpSubclass)
+
+	if(lpSubclass && m_paSubclasses)
 	{
-		for(sysint i = 0; i < m_cSubclasses; i++)
+		sysint idxSubclass;
+		if(m_paSubclasses->IndexOf(lpSubclass, idxSubclass))
 		{
-			if(lpSubclass == m_lplpSubclasses[i])
+			m_paSubclasses->Remove(idxSubclass, NULL);
+			if(0 == m_paSubclasses->Length())
 			{
-				MoveMemory(m_lplpSubclasses + i, m_lplpSubclasses + i + 1, (m_cSubclasses - (i + 1)) * sizeof(ISubclassedHandler*));
-				m_cSubclasses--;
-				hr = S_OK;
-				break;
+				__delete m_paSubclasses;
+				m_paSubclasses = NULL;
 			}
-		}
-
-		if(SUCCEEDED(hr))
-		{
-			if(0 == m_cSubclasses)
-			{
-				__delete_array m_lplpSubclasses;
-				m_lplpSubclasses = NULL;
-			}
-			else
-			{
-				ISubclassedHandler** lplpNew = __new ISubclassedHandler*[m_cSubclasses];
-				if(lplpNew)
-				{
-					CopyMemory(lplpNew, m_lplpSubclasses, m_cSubclasses * sizeof(ISubclassedHandler*));
-					__delete_array m_lplpSubclasses;
-					m_lplpSubclasses = lplpNew;
-				}
-			}
-
 			lpSubclass->OnDetached(this);
 		}
 	}
+
 	return hr;
 }
 
@@ -416,15 +395,16 @@ HRESULT CBaseWindow::AttachBaseWinProc (VOID)
 
 VOID CBaseWindow::ClearAllSubclasses (VOID)
 {
-	if(0 < m_cSubclasses)
+	if(m_paSubclasses)
 	{
-		for(sysint i = 0; i < m_cSubclasses; i++)
-		{
-			m_lplpSubclasses[i]->OnDetached(this);
-		}
-		__delete_array m_lplpSubclasses;
-		m_lplpSubclasses = NULL;
-		m_cSubclasses = 0;
+		TArray<ISubclassedHandler*> aClear;
+
+		aClear.Swap(*m_paSubclasses);
+		__delete m_paSubclasses;
+		m_paSubclasses = NULL;
+
+		for(sysint i = 0; i < aClear.Length(); i++)
+			aClear[i]->OnDetached(this);
 	}
 }
 

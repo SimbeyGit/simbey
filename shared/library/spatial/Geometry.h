@@ -74,6 +74,7 @@ namespace Geometry
 	VOID WINAPI LutRotatePointAround (PFPOINT lpPoint, PFPOINT lpCenter, FLOAT fDegrees);
 
 	FLOAT WINAPI PointDistance (PFPOINT lpPoint1, PFPOINT lpPoint2);
+	DOUBLE WINAPI PointDistanceD (PDPOINT lpPoint1, PDPOINT lpPoint2);
 	BOOL WINAPI SameSide (PFPOINT lpP1, PFPOINT lpP2, PFPOINT lpA, PFPOINT lpB);
 	BOOL WINAPI PointInTriangleOld (PFPOINT lpTest, PFPOINT lpTriangle);
 	BOOL WINAPI PointInTriangleOld (PFPOINT lpTest, PFPOINT lpT1, PFPOINT lpT2, PFPOINT lpT3);
@@ -95,6 +96,11 @@ namespace Geometry
 	VOID WINAPI GetPlaneNormal (const FPOINT& A, const FPOINT& B, const FPOINT& C, __out PFPOINT pN);
 
 	VOID WINAPI CalculateSpherePoint (DOUBLE r, DOUBLE degS, DOUBLE degT, __out FPOINT& fpt);
+
+	BOOL WINAPI GetLineIntersectionF (FLOAT p0_x, FLOAT p0_y, FLOAT p1_x, FLOAT p1_y,
+		FLOAT p2_x, FLOAT p2_y, FLOAT p3_x, FLOAT p3_y, FLOAT* i_x, FLOAT* i_y);
+	BOOL WINAPI GetLineIntersectionD (DOUBLE p0_x, DOUBLE p0_y, DOUBLE p1_x, DOUBLE p1_y,
+		DOUBLE p2_x, DOUBLE p2_y, DOUBLE p3_x, DOUBLE p3_y, DOUBLE* i_x, DOUBLE* i_y);
 };
 
 #endif
