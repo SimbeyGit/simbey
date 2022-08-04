@@ -1,0 +1,186 @@
+[
+	{
+		package: "buildsif",
+		name: "entities.sif",
+		files: ["*.png"]
+	},
+	{
+		package: "sif",
+		name: "Barrel.SIF"
+	},
+	{
+		package: "model",
+		name: "Barrel.SML"
+	},
+	{
+		package: "sif",
+		name: "Chalice.SIF"
+	},
+	{
+		package: "model",
+		name: "Chalice.SML"
+	},
+	{
+		package: "sif",
+		name: "Chest.SIF"
+	},
+	{
+		package: "model",
+		name: "Chest.SML"
+	},
+	{
+		package: "sif",
+		name: "Column.SIF"
+	},
+	{
+		package: "model",
+		name: "Column.SML"
+	},
+	{
+		package: "sif",
+		name: "Cross.SIF"
+	},
+	{
+		package: "model",
+		name: "Cross.SML"
+	},
+	{
+		package: "sif",
+		name: "Crown.SIF"
+	},
+	{
+		package: "model",
+		name: "Crown.SML"
+	},
+	{
+		package: "sif",
+		name: "Drum.SIF"
+	},
+	{
+		package: "model",
+		name: "Drum.SML"
+	},
+	{
+		package: "sif",
+		name: "Spear.SIF"
+	},
+	{
+		package: "model",
+		name: "Spear.SML"
+	},
+	{
+		package: "sif",
+		name: "GoldKey.SIF"
+	},
+	{
+		package: "sif",
+		name: "SilverKey.SIF"
+	},
+	{
+		package: "model",
+		name: "Key.SML"
+	},
+	{
+		package: "json",
+		name: "models.json",
+		data:
+		{
+			type: "models",
+			namespace: "iw",
+			models:
+			[
+				{
+					name: "Barrel",
+					type: "obstacle",
+					sif: "Barrel.SIF",
+					model: "Barrel.SML",
+					entity: "Barrel.PNG"
+				},
+				{
+					name: "Chalice",
+					type: "item",
+					sif: "Chalice.SIF",
+					model: "Chalice.SML",
+					entity: "Chalice.PNG",
+					pickup: "PickupChalice.wav",
+					points: 5
+				},
+				{
+					name: "Chest",
+					type: "item",
+					sif: "Chest.SIF",
+					model: "Chest.SML",
+					entity: "Chest.PNG",
+					pickup: "PickupChest.wav",
+					points: 25
+				},
+				{
+					name: "Column",
+					type: "obstacle",
+					sif: "Column.SIF",
+					model: "Column.SML",
+					entity: "Column.PNG"
+				}
+				{
+					name: "Cross",
+					type: "item",
+					sif: "Cross.SIF",
+					model: "Cross.SML",
+					entity: "Cross.PNG",
+					pickup: "PickupCross.wav",
+					points: 10
+				},
+				{
+					name: "Crown",
+					type: "item",
+					sif: "Crown.SIF",
+					model: "Crown.SML",
+					entity: "Crown.PNG",
+					pickup: "PickupCrown.wav",
+					points: 100
+				},
+				{
+					name: "Drum",
+					type: "obstacle",
+					sif: "Drum.SIF",
+					model: "Drum.SML",
+					entity: "Drum.PNG"
+				},
+				{
+					name: "Spear",
+					type: "item",
+					sif: "Spear.SIF",
+					model: "Spear.SML",
+					entity: "Spear.PNG",
+					pickup: "PickupSpear.wav",
+					key: "Gold",
+					points: 1000
+				},
+				{
+					name: "GoldKey",
+					type: "item",
+					sif: "GoldKey.SIF",
+					model: "Key.SML",
+					entity: "GoldKey.PNG",
+					pickup: "PickupKey.wav",
+					key: "Gold"
+				},
+				{
+					name: "SilverKey",
+					type: "item",
+					sif: "SilverKey.SIF",
+					model: "Key.SML",
+					entity: "SilverKey.PNG",
+					pickup: "PickupKey.wav",
+					key: "Silver"
+				},
+				{
+					name: "StartNorth",
+					type: "start",
+					entity: "StartNorth.PNG",
+					direction: "north"
+				}
+			]
+		}
+	}
+]

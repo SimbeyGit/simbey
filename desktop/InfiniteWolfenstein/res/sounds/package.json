@@ -1,0 +1,50 @@
+[
+	{
+		package: "sound",
+		name: "DoorClose.wav"
+	},
+	{
+		package: "sound",
+		name: "DoorOpen.wav"
+	},
+	{
+		package: "sound",
+		name: "Elevator.wav"
+	},
+	{
+		package: "sound",
+		name: "NoWay.wav"
+	},
+	{
+		package: "sound",
+		name: "PickupChalice.wav"
+	},
+	{
+		package: "sound",
+		name: "PickupChest.wav"
+	},
+	{
+		package: "sound",
+		name: "PickupCross.wav"
+	},
+	{
+		package: "sound",
+		name: "PickupCrown.wav"
+	},
+	{
+		package: "sound",
+		name: "PickupKey.wav"
+	},
+	{
+		package: "sound",
+		name: "PickupLife.wav"
+	},
+	{
+		package: "sound",
+		name: "PickupSpear.wav"
+	},
+	{
+		package: "sound",
+		name: "SecretDoor.wav"
+	}
+]

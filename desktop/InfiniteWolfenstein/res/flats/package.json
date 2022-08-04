@@ -1,0 +1,19 @@
+[
+	{
+		package: "buildsif",
+		name: "flats.sif",
+		canvas: 1024,
+		arrange: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "flats.json",
+		data:
+		{
+			type: "flats",
+			sif: "flats.sif",
+			namespace: "iw_flats"
+		}
+	}
+]

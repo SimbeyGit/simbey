@@ -1,0 +1,94 @@
+[
+	{
+		package: "buildsif",
+		name: "walls.sif",
+		canvas: 1024,
+		arrange: true,
+		files: ["*.png", "*.gif"]
+	},
+	{
+		package: "json",
+		name: "walls.json",
+		data:
+		{
+			type: "walls",
+			sif: "walls.sif",
+			namespace: "iw",
+			doors:
+			[
+				{
+					name: "NormalDoor",
+					texture: "0108.png",
+					lockable: false,
+					track: "0109.png"
+				},
+				{
+					name: "ElevatorDoorLight",
+					texture: "0112.png",
+					lockable: false,
+					track: "0109.png"
+				},
+				{
+					name: "ElevatorDoorDark",
+					texture: "0113.png",
+					lockable: false,
+					track: "0109.png"
+				},
+				{
+					name: "LockedDoorLight",
+					texture: "0114.png",
+					lockable: true,
+					track: "0109.png"
+				},
+				{
+					name: "LockedDoorDark",
+					texture: "0115.png",
+					lockable: true,
+					track: "0109.png"
+				},
+				{
+					name: "AltNormalDoor",
+					texture: "0116.png",
+					lockable: false,
+					track: "0117.png"
+				},
+				{
+					name: "AltElevatorDoor",
+					texture: "0116.png",
+					lockable: false,
+					track: "0117.png"
+				},
+				{
+					name: "AltLockedDoor",
+					texture: "0121.png",
+					lockable: false,
+					track: "0117.png"
+				}
+			],
+			switches:
+			[
+				{
+					name: "NormalElevator",
+					down: "0110.png",
+					up: "0111.png"
+				},
+				{
+					name: "AltElevator",
+					down: "0119.png",
+					up: "0120.png"
+				}
+			],
+			railing:
+			[
+				{
+					name: "NormalRailing",
+					texture: "0106.png"
+				},
+				{
+					name: "AltRailing",
+					texture: "0104.png"
+				}
+			]
+		}
+	}
+]

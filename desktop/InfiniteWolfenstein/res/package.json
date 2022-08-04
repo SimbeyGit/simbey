@@ -1,0 +1,1198 @@
+[
+	{
+		package: "json",
+		name: "wallthemes.json",
+		data:
+		{
+			type: "wallthemes",
+			namespace: "iw",
+			data:
+			[
+				{
+					name: "GrayBricks1",
+					walls: ["iw.0000.png", "iw.0001.png"],
+					decorations: ["iw.0002.png", "iw.0003.png"]
+				},
+				{
+					name: "GrayBricks2",
+					walls: ["iw.0004.png"],
+					decorations: ["iw.0005.png", "iw.0006.png"]
+				},
+				{
+					name: "WoodPanel",
+					walls: ["iw.0007.png"],
+					decorations: ["iw.0008.png", "iw.0009.png", "iw.0010.png"]
+				},
+				{
+					name: "RedBricks1",
+					walls: ["iw.0011.png"],
+					decorations: ["iw.0012.png", "iw.0013.png", "iw.0014.png"]
+				},
+				{
+					name: "Dungeon1",
+					walls: ["iw.0015.png", "iw.0016.png"],
+					decorations: ["iw.0017.png", "iw.0018.png", "iw.0019.png"]
+				},
+				{
+					name: "SteelPanel1",
+					walls: ["iw.0020.png"],
+					decorations: ["iw.0021.png", "iw.0022.png"]
+				},
+				{
+					name: "BlueBricks1",
+					walls: ["iw.0023.png"],
+					decorations: ["iw.0024.png", "iw.0025.png"]
+				},
+				{
+					name: "CutBricks1",
+					walls: ["iw.0026.png"],
+					decorations: ["iw.0027.png", "iw.0028.png", "iw.0029.png", "iw.0030.png", "iw.0031.png", "iw.0032.png"]
+				},
+				{
+					name: "MossBricks",
+					walls: ["iw.0033.png", "iw.0034.png"],
+					decorations: ["iw.0000.png", "iw.0001.png", "iw.0002.png", "iw.0003.png"]
+				},
+				{
+					name: "BrownRock",
+					walls: ["iw.0035.png"],
+					decorations: ["iw.0036.png", "iw.0037.png", "iw.0038.png"]
+				},
+				{
+					name: "BrownMarble",
+					walls: ["iw.0039.png", "iw.0040.png"],
+					decorations: ["iw.0041.png", "iw.0042.png"]
+				},
+				{
+					name: "WoodFrame",
+					walls: ["iw.0043.png"],
+					decorations: []
+				},
+				{
+					name: "OrangeBricks",
+					walls: ["iw.0045.png", "iw.0046.png"],
+					decorations: ["iw.0047.png", "iw.0048.png"]
+				},
+				{
+					name: "PurpleRock",
+					walls: ["iw.0049.png"],
+					decorations: ["iw.0050.png", "iw.0051.png"]
+				},
+				{
+					name: "GrayBrownStone",
+					walls: ["iw.0052.png", "iw.0053.png"],
+					decorations: ["iw.0054.png", "iw.0055.png"]
+				},
+				{
+					name: "GrayRock1",
+					walls: ["iw.0056.png", "iw.0057.png"],
+					decorations: ["iw.0058.png", "iw.0059.png"]
+				},
+				{
+					name: "HellRock",
+					walls: ["iw.0060.png"],
+					decorations: ["iw.0061.png", "iw.0062.png"]
+				},
+				{
+					name: "GrayRock2",
+					walls: ["iw.0063.png"],
+					decorations: ["iw.0064.png", "iw.0065.png", "iw.0066.png", "iw.0067.png"]
+				},
+				{
+					name: "CutBricks2",
+					walls: ["iw.0068.png"],
+					decorations: ["iw.0069.png", "iw.0070.png", "iw.0071.png", "iw.0072.png"]
+				},
+				{
+					name: "RedBricks2",
+					walls: ["iw.0073.png"],
+					decorations: ["iw.0074.png", "iw.0075.png"]
+				},
+				{
+					name: "Dungeon2",
+					walls: ["iw.0076.png"],
+					decorations: ["iw.0077.png", "iw.0078.png", "iw.0079.png"]
+				},
+				{
+					name: "BlueBricks2",
+					walls: ["iw.0080.png"],
+					decorations: ["iw.0081.png", "iw.0082.png", "iw.0083.png"]
+				},
+				{
+					name: "GrayBricks3",
+					walls: ["iw.0084.png"],
+					decorations: ["iw.0085.png", "iw.0086.png"]
+				},
+				{
+					name: "PurpleBricks",
+					walls: ["iw.0087.png"],
+					decorations: ["iw.0088.png", "iw.0089.png", "iw.0090.png"]
+				},
+				{
+					name: "TechWalls",
+					walls: ["iw.0091.png"],
+					decorations: ["iw.0092.png", "iw.0093.png", "iw.0094.png", "iw.0095.png", "iw.0096.png", "iw.0097.png", "iw.0098.png", "iw.0099.png"]
+				},
+				{
+					name: "SteelPanel2",
+					walls: ["iw.0100.png"],
+					decorations: ["iw.0101.png"]
+				},
+				{
+					name: "Backrooms1",
+					walls: ["iw.0122.png"],
+					decorations: ["iw.0123.png"]
+				},
+				{
+					name: "WhiteWall",
+					walls: ["iw.0142.png"],
+					decorations: ["iw.0143.png", "iw.0144.png"]
+				},
+				{
+					name: "Backrooms2",
+					walls: ["iw.0163.png"],
+					decorations: ["iw.0164.png", "iw.0165.png", "iw.0166.png", "iw.0167.png", "iw.0168.png"]
+				},
+				{
+					name: "BlueGrayBricks",
+					walls: ["iw.0170.gif"],
+					decorations: ["iw.0171.gif", "iw.0172.gif", "iw.0173.gif"]
+				},
+				{
+					name: "SteelPanel3",
+					walls: ["iw.0174.gif"],
+					decorations: ["iw.0175.gif"]
+				},
+				{
+					name: "GrayBrickRedPanel",
+					walls: ["iw.0176.gif"],
+					decorations: ["iw.0177.png"]
+				},
+				{
+					name: "GrayBrownBrick",
+					walls: ["iw.0178.gif"],
+					decorations: ["iw.0179.png"]
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "chunkthemes.json",
+		data:
+		{
+			type: "chunkthemes",
+			namespace: "iw",
+			templates:
+			[
+				{
+					name: "Wolfenstein",
+					fill: "iw.GrayBricks1",
+					decorations: 5,
+					door: ["iw.NormalDoor"],
+					locked_door: ["iw.LockedDoorLight", "iw.LockedDoorDark"],
+					elevator: ["iw.ElevatorDoorLight", "iw.ElevatorDoorDark"],
+					switch: ["iw.NormalElevator"],
+					railing: ["iw.NormalRailing"],
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat01.png"
+				}
+			],
+			data:
+			[
+				{
+					name: "Wolfenstein1",
+					template: "Wolfenstein",
+					music: ["Death to the Commies.MID", "Funkie Colonel Bill.mid", "Get Them Before They Get You.MID", "P.O.W..MID", "Searching For the Enemy.MID", "The Nazi Rap.MID", "The SS Gonna Get You.MID", "Tiptoeing Around.MID"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.GrayBricks1",
+							chance: 4
+						},
+						{
+							theme: "iw.GrayBricks2",
+							chance: 35
+						},
+						{
+							theme: "iw.WoodPanel",
+							chance: 20
+						},
+						{
+							theme: "iw.RedBricks1",
+							chance: 14
+						},
+						{
+							theme: "iw.Dungeon1",
+							chance: 15
+						},
+						{
+							theme: "iw.SteelPanel1",
+							chance: 10
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 2
+						}
+					]
+				},
+				{
+					name: "Wolfenstein2",
+					template: "Wolfenstein",
+					fill: "iw.MossBricks",
+					decorations: 10,
+					music: ["Lurking.mid", "Pounding Headache.mid", "Searching For the Enemy.MID", "The Mutant Level.mid", "Twelfth Hour.mid"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.GrayBricks1",
+							chance: 30
+						},
+						{
+							theme: "iw.MossBricks",
+							chance: 30
+						},
+						{
+							theme: "iw.RedBricks1",
+							chance: 10
+						},
+						{
+							theme: "iw.SteelPanel1",
+							chance: 20
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 10
+						}
+					]
+				},
+				{
+					name: "Wolfenstein3",
+					template: "Wolfenstein",
+					fill: "iw.GrayBricks2",
+					decorations: 10,
+					music: ["Death to the Commies.MID", "Funkie Colonel Bill.mid", "Kill the S.O.B..mid", "Searching For the Enemy.MID", "The Nazi Rap.MID", "The SS Gonna Get You.MID", "Zero Hour.MID"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.GrayBricks1",
+							chance: 5
+						},
+						{
+							theme: "iw.GrayBricks2",
+							chance: 20
+						},
+						{
+							theme: "iw.RedBricks1",
+							chance: 25
+						},
+						{
+							theme: "iw.SteelPanel1",
+							chance: 15
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 10
+						},
+						{
+							theme: "iw.WoodPanel",
+							chance: 10
+						},
+						{
+							theme: "iw.CutBricks1",
+							chance: 15
+						}
+					]
+				},
+				{
+					name: "Wolfenstein4",
+					template: "Wolfenstein",
+					fill: "iw.Dungeon1",
+					decorations: 20,
+					music: ["Lurking.mid", "P.O.W..MID", "Pounding Headache.mid", "Suspense.MID"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.GrayBricks1",
+							chance: 2
+						},
+						{
+							theme: "iw.GrayBricks2",
+							chance: 3
+						},
+						{
+							theme: "iw.RedBricks1",
+							chance: 5
+						},
+						{
+							theme: "iw.SteelPanel1",
+							chance: 5
+						},
+						{
+							theme: "iw.Dungeon1",
+							chance: 35
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 30
+						},
+						{
+							theme: "iw.CutBricks1",
+							chance: 20
+						}
+					]
+				},
+				{
+					name: "Wolfenstein5",
+					template: "Wolfenstein",
+					fill: "iw.WoodPanel",
+					music: ["Death to the Commies.MID", "Funkie Colonel Bill.mid", "Get Them Before They Get You.MID", "P.O.W..MID", "Suspense.MID", "Twelfth Hour.mid"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.GrayBricks1",
+							chance: 7
+						},
+						{
+							theme: "iw.GrayBricks2",
+							chance: 13
+						},
+						{
+							theme: "iw.RedBricks1",
+							chance: 8
+						},
+						{
+							theme: "iw.Dungeon1",
+							chance: 4
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 8
+						},
+						{
+							theme: "iw.CutBricks1",
+							chance: 10
+						},
+						{
+							theme: "iw.WoodPanel",
+							chance: 45
+						},
+						{
+							theme: "iw.BrownMarble",
+							chance: 5
+						}
+					]
+				},
+				{
+					name: "Wolfenstein6",
+					template: "Wolfenstein",
+					fill: "iw.BrownRock",
+					music: ["Death to the Commies.MID", "Funkie Colonel Bill.mid", "Get Them Before They Get You.MID", "The Nazi Rap.MID", "Tiptoeing Around.MID", "Zero Hour.MID"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.GrayBricks2",
+							chance: 15
+						},
+						{
+							theme: "iw.RedBricks1",
+							chance: 5
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 3
+						},
+						{
+							theme: "iw.CutBricks1",
+							chance: 12
+						},
+						{
+							theme: "iw.WoodPanel",
+							chance: 5
+						},
+						{
+							theme: "iw.BrownMarble",
+							chance: 20
+						},
+						{
+							theme: "iw.OrangeBricks",
+							chance: 25
+						},
+						{
+							theme: "iw.BrownRock",
+							chance: 15
+						}
+					]
+				},
+				{
+					name: "PurpleSecretChunk",
+					template: "Wolfenstein",
+					fill: "iw.PurpleRock",
+					music: ["Enemy Around the Corner.MID"],
+					spear: false,
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat02.png",
+					rooms:
+					[
+						{
+							theme: "iw.PurpleRock",
+							chance: 50
+						},
+						{
+							theme: "iw.RedBricks1",
+							chance: 5
+						},
+						{
+							theme: "iw.Dungeon1",
+							chance: 3
+						},
+						{
+							theme: "iw.GrayBricks1",
+							chance: 12
+						},
+						{
+							theme: "iw.WoodPanel",
+							chance: 3
+						},
+						{
+							theme: "iw.PurpleBricks",
+							chance: 27
+						}
+					]
+				},
+				{
+					name: "SecretDungeonsChunk",
+					template: "Wolfenstein",
+					fill: "iw.Dungeon1",
+					decorations: 10,
+					music: ["Into the Dungeons.mid"],
+					spear: false,
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat03.png",
+					rooms:
+					[
+						{
+							theme: "iw.Dungeon1",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "SecretPacManChunk",
+					template: "Wolfenstein",
+					fill: "iw.Dungeon1",
+					decorations: 2,
+					music: ["Wolf Pac.mid"],
+					spear: false,
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat03.png",
+					rooms:
+					[
+						{
+							theme: "iw.Dungeon1",
+							chance: 85
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 10
+						},
+						{
+							theme: "iw.GrayBricks2",
+							chance: 5
+						}
+					]
+				},
+				{
+					name: "FunkySecretChunk",
+					template: "Wolfenstein",
+					fill: "iw.OrangeBricks",
+					decorations: 10,
+					music: ["Funk You!.mid"],
+					spear: false,
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat05.png",
+					rooms:
+					[
+						{
+							theme: "iw.OrangeBricks",
+							chance: 32
+						},
+						{
+							theme: "iw.MossBricks",
+							chance: 23
+						},
+						{
+							theme: "iw.BrownRock",
+							chance: 15
+						},
+						{
+							theme: "iw.BrownMarble",
+							chance: 20
+						},
+						{
+							theme: "iw.GrayBricks2",
+							chance: 10
+						}
+					]
+				},
+				{
+					name: "SecretJazzChunk",
+					template: "Wolfenstein",
+					fill: "iw.RedBricks1",
+					music: ["Jazzin' Them Commies.MID"],
+					spear: false,
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat06.png",
+					rooms:
+					[
+						{
+							theme: "iw.RedBricks1",
+							chance: 30
+						},
+						{
+							theme: "iw.GrayBricks1",
+							chance: 10
+						},
+						{
+							theme: "iw.GrayBricks2",
+							chance: 15
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 15
+						},
+						{
+							theme: "iw.SteelPanel1",
+							chance: 10
+						},
+						{
+							theme: "iw.CutBricks1",
+							chance: 20
+						}
+					]
+				},
+				{
+					name: "EntryDungeonChunk",
+					template: "Wolfenstein",
+					fill: "iw.GrayRock1",
+					decorations: 3,
+					music: ["Into the Dungeons.mid"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.GrayBrownStone",
+							chance: 65
+						},
+						{
+							theme: "iw.GrayRock1",
+							chance: 10
+						},
+						{
+							theme: "iw.Dungeon1",
+							chance: 25
+						}
+					]
+				},
+				{
+					name: "GenericFinalLevel1",
+					template: "Wolfenstein",
+					fill: "iw.RedBricks1",
+					decorations: 10,
+					music: ["The March to War.MID"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.RedBricks1",
+							chance: 35
+						},
+						{
+							theme: "iw.GrayBricks1",
+							chance: 20
+						},
+						{
+							theme: "iw.GrayBricks2",
+							chance: 25
+						},
+						{
+							theme: "iw.CutBricks1",
+							chance: 20
+						}
+					]
+				},
+				{
+					name: "GenericFinalLevel2",
+					template: "Wolfenstein",
+					fill: "iw.SteelPanel1",
+					decorations: 10,
+					music: ["The March to War.MID"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.SteelPanel1",
+							chance: 90
+						},
+						{
+							theme: "iw.SteelPanel2",
+							chance: 10
+						}
+					]
+				},
+				{
+					name: "GenericFinalLevel3",
+					template: "Wolfenstein",
+					fill: "iw.CutBricks1",
+					decorations: 4,
+					music: ["The March to War.MID"],
+					spear: false,
+					rooms:
+					[
+						{
+							theme: "iw.CutBricks1",
+							chance: 60
+						},
+						{
+							theme: "iw.RedBricks1",
+							chance: 25
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 15
+						}
+					]
+				},
+				{
+					name: "Bunker1",
+					template: "Wolfenstein",
+					fill: "iw.GrayBricks1",
+					decorations: 10,
+					music: ["The Ultimate Challenge.MID"],
+					spear: false,
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat04.png",
+					rooms:
+					[
+						{
+							theme: "iw.GrayBricks2",
+							chance: 20
+						},
+						{
+							theme: "iw.WoodPanel",
+							chance: 20
+						},
+						{
+							theme: "iw.SteelPanel1",
+							chance: 60
+						}
+					]
+				},
+				{
+					name: "Bunker2",
+					template: "Wolfenstein",
+					fill: "iw.BrownRock",
+					music: ["The Ultimate Challenge.MID"],
+					spear: false,
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat05.png",
+					rooms:
+					[
+						{
+							theme: "iw.BrownRock",
+							chance: 20
+						},
+						{
+							theme: "iw.OrangeBricks",
+							chance: 40
+						},
+						{
+							theme: "iw.SteelPanel1",
+							chance: 40
+						}
+					]
+				},
+				{
+					name: "Bunker3",
+					template: "Wolfenstein",
+					fill: "iw.RedBricks1",
+					decorations: 15,
+					music: ["Victory March.mid"],
+					spear: false,
+					floor: "iw_flats.flat09.png",
+					ceiling: "iw_flats.flat06.png",
+					rooms:
+					[
+						{
+							theme: "iw.RedBricks1",
+							chance: 20
+						},
+						{
+							theme: "iw.SteelPanel1",
+							chance: 30
+						},
+						{
+							theme: "iw.SteelPanel3",
+							chance: 20
+						},
+						{
+							theme: "iw.WoodPanel",
+							chance: 10
+						},
+						{
+							theme: "iw.CutBricks1",
+							chance: 20
+						}
+					]
+				},
+				{
+					name: "Ramparts",
+					template: "Wolfenstein",
+					fill: "iw.GrayBrownStone",
+					decorations: 1,
+					music: ["Puttin' It to the Enemy.mid"],
+					rooms:
+					[
+						{
+							theme: "iw.GrayBrownStone",
+							chance: 25
+						},
+						{
+							theme: "iw.CutBricks1",
+							chance: 30
+						},
+						{
+							theme: "iw.WoodPanel",
+							chance: 25
+						},
+						{
+							theme: "iw.WoodFrame",
+							chance: 20
+						}
+					]
+				},
+				{
+					name: "Tower",
+					template: "Wolfenstein",
+					fill: "iw.GrayBrownStone",
+					decorations: 8,
+					music: ["The Tower.mid"],
+					spear: true,
+					floor: "iw_flats.flat03.png",
+					ceiling: "iw_flats.flat04.png",
+					rooms:
+					[
+						{
+							theme: "iw.GrayBrownStone",
+							chance: 20
+						},
+						{
+							theme: "iw.OrangeBricks",
+							chance: 40
+						},
+						{
+							theme: "iw.BlueBricks1",
+							chance: 35
+						},
+						{
+							theme: "iw.BrownMarble",
+							chance: 5
+						}
+					]
+				},
+				{
+					name: "Hell",
+					template: "Wolfenstein",
+					fill: "iw.HellRock",
+					decorations: 0,
+					music: ["Evil Incarnate.mid"],
+					spear: false,
+					floor: "iw_flats.flat07.png",
+					ceiling: "iw_flats.flat08.png",
+					rooms:
+					[
+						{
+							theme: "iw.HellRock",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Backrooms",
+					template: "Wolfenstein",
+					fill: "iw.Backrooms2",
+					decorations: 0,
+					music: ["Blake Stone Rumba.mid"],
+					spear: false,
+					floor: "iw_flats.flat10.png",
+					ceiling: "iw_flats.flat05.png",
+					rooms:
+					[
+						{
+							theme: "iw.Backrooms2",
+							chance: 99
+						},
+						{
+							theme: "iw.Backrooms1",
+							chance: 1
+						}
+					]
+				},
+				{
+					name: "AllCustomWalls",
+					template: "Wolfenstein",
+					fill: "iw.GrayBrownBrick",
+					decorations: 0,
+					music: ["Blake Stone Freedom.mid", "Blake Stone Jungle.mid"],
+					spear: false,
+					floor: "iw_flats.flat00.png",
+					ceiling: "iw_flats.flat03.png",
+					rooms:
+					[
+						{
+							theme: "iw.GrayBrownBrick",
+							chance: 20
+						},
+						{
+							theme: "iw.GrayBrickRedPanel",
+							chance: 35
+						},
+						{
+							theme: "iw.SteelPanel3",
+							chance: 20
+						},
+						{
+							theme: "iw.BlueGrayBricks",
+							chance: 25
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "levels.json",
+		data:
+		{
+			type: "levels",
+			namespace: "iw",
+			data:
+			[
+				{
+					name: "Generic Level 1",
+					minimum: 0,
+					chunks:
+					[
+						{
+							theme: "iw.Wolfenstein1",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Secret Level 1",
+					minimum: 2,
+					chunks:
+					[
+						{
+							theme: "iw.PurpleSecretChunk",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Final Level 1",
+					minimum: 3,
+					chunks:
+					[
+						{
+							theme: "iw.GenericFinalLevel1",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Generic Level 2",
+					minimum: 4,
+					chunks:
+					[
+						{
+							theme: "iw.Wolfenstein2",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Secret Level 2",
+					minimum: 6,
+					chunks:
+					[
+						{
+							theme: "iw.SecretDungeonsChunk",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Final Level 2",
+					minimum: 7,
+					chunks:
+					[
+						{
+							theme: "iw.GenericFinalLevel2",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Generic Level 3",
+					minimum: 8,
+					chunks:
+					[
+						{
+							theme: "iw.Wolfenstein3",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Secret Level 3",
+					minimum: 10,
+					chunks:
+					[
+						{
+							theme: "iw.SecretPacManChunk",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Final Level 3",
+					minimum: 11,
+					chunks:
+					[
+						{
+							theme: "iw.Bunker1",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Generic Level 4",
+					minimum: 12,
+					chunks:
+					[
+						{
+							theme: "iw.Wolfenstein4",
+							chance: 60
+						},
+						{
+							theme: "iw.Wolfenstein5",
+							chance: 40
+						}
+					]
+				},
+				{
+					name: "Secret Level 4",
+					minimum: 14,
+					chunks:
+					[
+						{
+							theme: "iw.SecretJazzChunk",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Final Level 4",
+					minimum: 15,
+					chunks:
+					[
+						{
+							theme: "iw.GenericFinalLevel3",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Generic Level 5",
+					minimum: 16,
+					chunks:
+					[
+						{
+							theme: "iw.Wolfenstein5",
+							chance: 60
+						},
+						{
+							theme: "iw.Wolfenstein4",
+							chance: 40
+						}
+					]
+				},
+				{
+					name: "Generic Level 6",
+					minimum: 20,
+					chunks:
+					[
+						{
+							theme: "iw.Wolfenstein4",
+							chance: 30
+						},
+						{
+							theme: "iw.Wolfenstein5",
+							chance: 30
+						},
+						{
+							theme: "iw.Wolfenstein6",
+							chance: 40
+						}
+					]
+				},
+				{
+					name: "Secret Level 5",
+					minimum: 22,
+					chunks:
+					[
+						{
+							theme: "iw.FunkySecretChunk",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Final Level 6",
+					minimum: 23,
+					chunks:
+					[
+						{
+							theme: "iw.Bunker2",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Spear of Destiny Dungeons",
+					minimum: 24,
+					chunks:
+					[
+						{
+							theme: "iw.EntryDungeonChunk",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Generic Boss Level",
+					minimum: 28,
+					chunks:
+					[
+						{
+							theme: "iw.Bunker1",
+							chance: 10
+						},
+						{
+							theme: "iw.Bunker2",
+							chance: 10
+						},
+						{
+							theme: "iw.GenericFinalLevel1",
+							chance: 25
+						},
+						{
+							theme: "iw.GenericFinalLevel2",
+							chance: 25
+						},
+						{
+							theme: "iw.GenericFinalLevel3",
+							chance: 30
+						}
+					]
+				},
+				{
+					name: "Spear of Destiny Ramparts",
+					minimum: 32,
+					chunks:
+					[
+						{
+							theme: "iw.Ramparts",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Spear of Destiny Tower",
+					minimum: 36,
+					chunks:
+					[
+						{
+							theme: "iw.Tower",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Bonus Bunkers",
+					minimum: 40,
+					chunks:
+					[
+						{
+							theme: "iw.Bunker1",
+							chance: 25
+						},
+						{
+							theme: "iw.Bunker2",
+							chance: 25
+						},
+						{
+							theme: "iw.Bunker3",
+							chance: 35
+						},
+						{
+							theme: "iw.AllCustomWalls",
+							chance: 15
+						}
+					]
+				},
+				{
+					name: "Backrooms",
+					minimum: 80,
+					chunks:
+					[
+						{
+							theme: "iw.Backrooms",
+							chance: 100
+						}
+					]
+				},
+				{
+					name: "Hell",
+					minimum: -1,
+					chunks:
+					[
+						{
+							theme: "iw.Hell",
+							chance: 100
+						}
+					]
+				}
+			]
+		}
+	},
+	{
+		package: "json",
+		name: "rooms.json",
+		file: "rooms.json"
+	},
+	{
+		package: "json",
+		name: "special.json",
+		file: "special.json"
+	}
+]

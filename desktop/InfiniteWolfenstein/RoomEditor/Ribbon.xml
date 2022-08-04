@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns='http://schemas.microsoft.com/windows/2009/Ribbon'>
+  <Application.Commands />
+  <Application.Views>
+    <Ribbon>
+      <Ribbon.ApplicationMenu>
+        <ApplicationMenu CommandName="ID_APP_MENU">
+          <MenuGroup>
+            <Button CommandName="ID_NEW" LabelTitle="New" LargeBitmap="auto" />
+            <Button CommandName="ID_OPEN" LabelTitle="Open" LargeBitmap="auto" />
+            <Button CommandName="ID_SAVE" LabelTitle="Save" LargeBitmap="auto" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="ID_EXIT" LabelTitle="Exit" LargeBitmap="auto" />
+          </MenuGroup>
+        </ApplicationMenu>
+      </Ribbon.ApplicationMenu>
+      <Ribbon.Tabs>
+        <Tab CommandName="ID_TAB_MAIN" LabelTitle="Main">
+          <Tab.ScalingPolicy>
+            <ScalingPolicy>
+              <ScalingPolicy.IdealSizes>
+                <Scale Group="ID_GROUP_ROOM_COMMANDS" Size="Large"/>
+              </ScalingPolicy.IdealSizes>
+              <Scale Group="ID_GROUP_ROOM_COMMANDS" Size="Medium"/>
+              <Scale Group="ID_GROUP_ROOM_COMMANDS" Size="Popup"/>
+            </ScalingPolicy>
+          </Tab.ScalingPolicy>
+          <Group CommandName="ID_GROUP_ROOM_COMMANDS" LabelTitle="Rooms" SizeDefinition="SevenButtons" GroupImage="ID_SELECT_ROOM">
+            <DropDownGallery CommandName="ID_SELECT_ROOM" Type="Items" LabelTitle="Select Room" LargeBitmap="auto" >
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1" Rows="10" Gripper="None" />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <Button CommandName="ID_NEW_ROOM" LabelTitle="New Room" LargeBitmap="auto" />
+            <Button CommandName="ID_RENAME_ROOM" LabelTitle="Rename Room" LargeBitmap="auto" />
+            <Button CommandName="ID_DELETE_ROOM" LabelTitle="Delete Room" LargeBitmap="auto" />
+            <Button CommandName="ID_CLONE_ROOM" LabelTitle="Clone Room" LargeBitmap="auto" />
+            <DropDownGallery CommandName="ID_PAINT_TYPE" Type="Items" LabelTitle="Tile/Object" Bitmap="" >
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1" Rows="8" Gripper="None" />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <ToggleButton CommandName="ID_ENABLE_ROTATION" LabelTitle="Enable Rotation" LargeBitmap="auto" />
+          </Group>
+        </Tab>
+      </Ribbon.Tabs>
+    </Ribbon>
+  </Application.Views>
+</Application>
