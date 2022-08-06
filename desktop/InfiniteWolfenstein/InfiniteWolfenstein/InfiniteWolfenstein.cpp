@@ -19,7 +19,6 @@
 
 GLfloat LightAmbient[]=		{ 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat LightDiffuse[]=		{ 1.0f, 1.0f, 1.0f, 1.0f };
-GLfloat LightPosition[]=	{ 0.0f, 0.9f, 0.0f, 1.0f };
 
 const WCHAR c_wzInfiniteWolfenstein[] = L"InfiniteWolfensteinCls";
 
@@ -226,7 +225,8 @@ VOID CLevelRenderer::DrawFrame (VOID)
 
 	m_camera.SetPerspective();
 
-	//glLightfv(GL_LIGHT1, GL_POSITION, LightPosition);	// Position The Light
+	GLfloat LightPosition[] = {m_camera.m_dblPoint.x, m_camera.m_dblPoint.y, m_camera.m_dblPoint.z, 1.0f};
+	glLightfv(GL_LIGHT1, GL_POSITION, LightPosition);	// Position The Light
 
 	mlData.dpCamera = m_camera.m_dblPoint;
 	mlData.paModels = &m_aModels;
@@ -255,7 +255,7 @@ VOID CLevelRenderer::DrawFrame (VOID)
 		}
 	}
 
-	//glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 	m_pModels->BindTexture();
 
 	sysint cModels;
@@ -265,7 +265,7 @@ VOID CLevelRenderer::DrawFrame (VOID)
 		prgModels[i]->DrawModel();
 
 	m_aModels.Clear();
-	//glDisable(GL_LIGHTING);
+	glDisable(GL_LIGHTING);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -802,7 +802,6 @@ HRESULT CLevelSelector::AddLevel (INT nLevel, BOOL fSelected)
 
 VOID CLevelSelector::DrawFrame (VOID)
 {
-	glDisable(GL_LIGHT1);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -845,7 +844,6 @@ VOID CLevelSelector::DrawFrame (VOID)
 	sifPopOrthoMode();
 
 	glDisable(GL_BLEND);
-	glEnable(GL_LIGHT1);
 }
 
 VOID CLevelSelector::UpdateFrame (VOID)

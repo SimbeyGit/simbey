@@ -148,7 +148,7 @@ VOID CSIFMeshData::RecalculateNormals (ULONG idVertex)
 				SideAssertHr(m_mapVertex.FindPtr(pFace->nVertex[1], &pfptB));
 				SideAssertHr(m_mapVertex.FindPtr(pFace->nVertex[2], &pfptC));
 
-				Geometry::GetPlaneNormal(*pfptA, *pfptB, *pfptC, &pFace->fNormal);
+				Geometry::GetPlaneNormal(*pfptC, *pfptB, *pfptA, &pFace->fNormal);
 				break;
 			}
 		}
