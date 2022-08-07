@@ -235,6 +235,7 @@ VOID CLevelRenderer::DrawFrame (VOID)
 	xRegion = m_xRegion;
 	zRegion = m_zRegion;
 
+	glEnable(GL_LIGHTING);
 	m_pWalls->BindTexture();
 
 	for(INT z = -2; z <= 2; z++)
@@ -255,7 +256,6 @@ VOID CLevelRenderer::DrawFrame (VOID)
 		}
 	}
 
-	glEnable(GL_LIGHTING);
 	m_pModels->BindTexture();
 
 	sysint cModels;
@@ -284,6 +284,8 @@ VOID CLevelRenderer::DrawFrame (VOID)
 	}
 
 	glPushMatrix();
+
+	glColor3f(1.0f, 1.0f, 1.0f);
 
 	glTranslated(static_cast<DOUBLE>(psWindow->cx) - 10.0, static_cast<DOUBLE>(psWindow->cy) - 10.0, 0.0);
 	m_pGame->m_pGLFont->DrawTextGL(m_wzLevelLabel, 0.5f, DT_RIGHT);
@@ -706,7 +708,7 @@ VOID CLevelRenderer::RenderCeiling (FLOAT x, FLOAT y, FLOAT z, sysint idxCeiling
 	{
 		y += 1.0f;
 
-		glNormal3f(0.0f, 1.0f, 0.0f);
+		glNormal3f(0.0f, -1.0f, 0.0f);
 		glTexCoord2f(rc.left, rc.bottom); glVertex3f(x, y, z);
 		glTexCoord2f(rc.right, rc.bottom); glVertex3f(x + 1.0f, y, z);
 		glTexCoord2f(rc.right, rc.top); glVertex3f(x + 1.0f, y, z + 1.0f);
@@ -716,11 +718,7 @@ VOID CLevelRenderer::RenderCeiling (FLOAT x, FLOAT y, FLOAT z, sysint idxCeiling
 
 VOID CLevelRenderer::RenderSides (BLOCK_DATA* pbRegion, sysint* pidxSides, INT xBlock, INT zBlock, FLOAT x, FLOAT z)
 {
-	static const FCOLOR fclrDark = {0.7f, 0.7f, 0.7f};
-	static const FCOLOR fclrLight = {1.0f, 1.0f, 1.0f};
 	FRECT rc;
-
-	glColor3f(fclrDark.red, fclrDark.green, fclrDark.blue);
 
 	if(zBlock == 0 || TYPE_ANY_FLOOR == pbRegion[(zBlock - 1) * REGION_WIDTH + xBlock].idxBlock)
 	{
@@ -747,8 +745,6 @@ VOID CLevelRenderer::RenderSides (BLOCK_DATA* pbRegion, sysint* pidxSides, INT x
 			glTexCoord2f(rc.left, rc.top); glVertex3f(x, 1.0f, z);
 		}
 	}
-
-	glColor3f(fclrLight.red, fclrLight.green, fclrLight.blue);
 
 	if(zBlock == (REGION_WIDTH - 1) || TYPE_ANY_FLOOR == pbRegion[(zBlock + 1) * REGION_WIDTH + xBlock].idxBlock)
 	{
