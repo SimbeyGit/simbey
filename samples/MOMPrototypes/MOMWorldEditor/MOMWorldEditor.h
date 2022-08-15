@@ -14,6 +14,8 @@ interface IJSONValue;
 interface IJSONObject;
 interface IJSONArray;
 
+class CTileRules;
+
 class CTile
 {
 private:
@@ -59,7 +61,7 @@ private:
 class CPlaceItem
 {
 public:
-	IJSONObject* m_pTileRules;
+	CTileRules* m_pTileRules;
 
 	RSTRING m_rstrTile;
 	WCHAR m_wzKey[12];
@@ -68,11 +70,12 @@ public:
 	INT m_x, m_y;	// Adjusted tile coordinates
 
 public:
-	CPlaceItem (IJSONObject* pTileRules, CTile* pTile, INT x, INT y);
+	CPlaceItem (CTileRules* pTileRules, CTile* pTile, INT x, INT y);
 	~CPlaceItem ();
 
 	bool IsSameTile (RSTRING rstrTile);
-	bool IsTileCompatible (PCWSTR pcwzType, RSTRING rstrTile);
+	bool IsBorderTile (RSTRING rstrTile);
+	bool IsSpecialTile (RSTRING rstrTile);
 
 	VOID SetTileOnly (RSTRING rstrTile);
 	HRESULT SetTileKey (TRStrMap<CTileSet*>* pmapTileSets, Dir::Value eDir, WCHAR wchValue);
@@ -83,7 +86,6 @@ public:
 
 private:
 	HRESULT SetAltTile (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey);
-	HRESULT GetTileData (RSTRING rstrTile, __deref_out IJSONObject** ppData);
 };
 
 class CTerrainGallery :
@@ -238,7 +240,7 @@ protected:
 
 	bool m_fKeys[256];
 
-	IJSONObject* m_pTileRules;
+	CTileRules* m_pTileRules;
 
 	TRStrMap<CTileSet*> m_mapArcanus, m_mapMyrror;
 	CTerrainGallery* m_pArcanusTerrain;

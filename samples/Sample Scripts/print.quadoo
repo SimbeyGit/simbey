@@ -1,0 +1,23 @@
+function main ()
+{
+	print(#[[16:36:45] [Server thread/ERROR]: No key dirt_provider in MapLike[{decorators:[],foliage_placer:{offset:0,radius:2,type:"minecraft:acacia_foliage_placer"},heightmap:"OCEAN_FLOOR",ignore_vines:1b,leaves_provider:{state:{Name:"minecraft:acacia_leaves",Properties:{distance:"7",persistent:"false"}},type:"minecraft:simple_state_provider"},max_water_depth:0,minimum_size:{limit:1,lower_size:0,type:"minecraft:two_layers_feature_size",upper_size:2},trunk_placer:{base_height:5,height_rand_a:2,height_rand_b:2,type:"minecraft:forking_trunk_placer"},trunk_provider:{state:{Name:"minecraft:acacia_log",Properties:{axis:"y"}},type:"minecraft:simple_state_provider"}}]; No key sapling_provider in MapLike[{decorators:[],foliage_placer:{offset:0,radius:2,type:"minecraft:acacia_foliage_placer"},heightmap:"OCEAN_FLOOR",ignore_vines:1b,leaves_provider:{state:{Name:"minecraft:acacia_leaves",Properties:{distance:"7",persistent:"false"}},type:"minecraft:simple_state_provider"},max_water_depth:0,minimum_size:{limit:1,lower_size:0,type:"minecraft:two_layers_feature_size",upper_size:2},trunk_placer:{base_height:5,height_rand_a:2,height_rand_b:2,type:"minecraft:forking_trunk_placer"},trunk_provider:{state:{Name:"minecraft:acacia_log",Properties:{axis:"y"}},type:"minecraft:simple_state_provider"}}]; No key foliage_provider in MapLike[{decorators:[],foliage_placer:{offset:0,radius:2,type:"minecraft:acacia_foliage_placer"},heightmap:"OCEAN_FLOOR",ignore_vines:1b,leaves_provider:{state:{Name:"minecraft:acacia_leaves",Properties:{distance:"7",persistent:"false"}},type:"minecraft:simple_state_provider"},max_water_depth:0,minimum_size:{limit:1,lower_size:0,type:"minecraft:two_layers_feature_size",upper_size:2},trunk_placer:{base_height:5,height_rand_a:2,height_rand_b:2,type:"minecraft:forking_trunk_placer"},trunk_provider:{state:{Name:"minecraft:acacia_log",Properties:{axis:"y"}},type:"minecraft:simple_state_provider"}}]
+[16:36:45] [Server thread/ERROR]: Exception loading structure piece with id minecraft:jigsaw\r\n]#);
+
+	print("First line\nAnd ");
+	sleep(2000);
+
+	print("this ");
+	sleep(2000);
+	print("is a really long message: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\r\n");
+
+	print("More text\n");
+
+	print("Some stuff\nPartial write ");
+	sleep(2000);
+	print("This is line 1!\nThis is line 2!\n");
+	sleep(2000);
+
+	print("And even more text\n");
+
+	print("Last line!\n");
+}

@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TileRules.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -210,6 +214,10 @@
 			</File>
 			<File
 				RelativePath=".\NewWorldDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TileRules.h"
 				>
 			</File>
 			<File

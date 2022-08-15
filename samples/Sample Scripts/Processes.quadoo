@@ -1,0 +1,18 @@
+function main ()
+{
+	if(Host.FindParam("child"))
+	{
+		println("Message Received: " + input(256));
+		println("Child Exiting...");
+	}
+	else
+	{
+		var oPipe = Host.CreatePipe();
+		var oChild = Host.CreateProcess(Host.NativeModule, "\"" + Host.Args(0) + "\" -args -child", oPipe, Host.OpenStdOutPipe(), Host.OpenStdErrorPipe());
+
+		oPipe.Write("Message from parent!\r\n");
+		wait(oChild, -1);
+
+		println("Parent Exiting...");
+	}
+}

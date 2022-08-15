@@ -12,6 +12,7 @@
 #include "Published\JSON.h"
 #include "Ribbon.h"
 #include "RibbonMappings.h"
+#include "TileRules.h"
 #include "NewWorldDlg.h"
 #include "CityDlg.h"
 #include "MOMWorldEditor.h"
@@ -162,12 +163,11 @@ Cleanup:
 // CPlaceItem
 ///////////////////////////////////////////////////////////////////////////////
 
-CPlaceItem::CPlaceItem (IJSONObject* pTileRules, CTile* pTile, INT x, INT y) :
+CPlaceItem::CPlaceItem (CTileRules* pTileRules, CTile* pTile, INT x, INT y) :
+	m_pTileRules(pTileRules),
 	m_pTile(pTile),
 	m_x(x), m_y(y)
 {
-	SetInterface(m_pTileRules, pTileRules);
-
 	if(m_pTile)
 	{
 		RStrSet(m_rstrTile, m_pTile->GetTileSet());
@@ -183,32 +183,24 @@ CPlaceItem::CPlaceItem (IJSONObject* pTileRules, CTile* pTile, INT x, INT y) :
 CPlaceItem::~CPlaceItem ()
 {
 	RStrRelease(m_rstrTile);
-
-	SafeRelease(m_pTileRules);
 }
 
 bool CPlaceItem::IsSameTile (RSTRING rstrTile)
 {
-	return NULL == m_pTile || IsTileCompatible(L"same", rstrTile);
+	CTileRuleSet* pRuleSet;
+	return NULL == m_pTile || (SUCCEEDED(m_pTileRules->GetTileRuleSet(m_rstrTile, &pRuleSet)) && pRuleSet->IsSameTile(rstrTile));
 }
 
-bool CPlaceItem::IsTileCompatible (PCWSTR pcwzType, RSTRING rstrTile)
+bool CPlaceItem::IsBorderTile (RSTRING rstrTile)
 {
-	TStackRef<IJSONObject> srData;
+	CTileRuleSet* pRuleSet;
+	return SUCCEEDED(m_pTileRules->GetTileRuleSet(m_rstrTile, &pRuleSet)) && pRuleSet->IsBorderTile(rstrTile);
+}
 
-	if(SUCCEEDED(GetTileData(m_rstrTile, &srData)))
-	{
-		TStackRef<IJSONValue> srv;
-		TStackRef<IJSONArray> srList;
-
-		if(SUCCEEDED(srData->FindNonNullValueW(pcwzType, &srv)) && SUCCEEDED(srv->GetArray(&srList)))
-		{
-			if(SUCCEEDED(JSONFindArrayString(srList, rstrTile, NULL)))
-				return true;
-		}
-	}
-
-	return false;
+bool CPlaceItem::IsSpecialTile (RSTRING rstrTile)
+{
+	CTileRuleSet* pRuleSet;
+	return SUCCEEDED(m_pTileRules->GetTileRuleSet(m_rstrTile, &pRuleSet)) && pRuleSet->IsSpecialTile(rstrTile);
 }
 
 VOID CPlaceItem::SetTileOnly (RSTRING rstrTile)
@@ -234,12 +226,12 @@ Cleanup:
 HRESULT CPlaceItem::GetTransitionTile (__in_opt RSTRING rstrTile, __out RSTRING* prstrTile)
 {
 	HRESULT hr;
-	TStackRef<IJSONObject> srData;
-	TStackRef<IJSONValue> srv;
+	CTileRuleSet* pRuleSet;
 
-	Check(GetTileData(rstrTile ? rstrTile : m_rstrTile, &srData));
-	CheckNoTrace(srData->FindNonNullValueW(L"transition", &srv));
-	Check(srv->GetString(prstrTile));
+	Check(m_pTileRules->GetTileRuleSet(rstrTile ? rstrTile : m_rstrTile, &pRuleSet));
+	*prstrTile = pRuleSet->GetTransition();
+	CheckIfIgnore(NULL == *prstrTile, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
+	RStrAddRef(*prstrTile);
 
 Cleanup:
 	return hr;
@@ -307,7 +299,9 @@ HRESULT CPlaceItem::SmoothTile (CTileSet* pTileSet, PWSTR pwzKey, WCHAR wchValue
 HRESULT CPlaceItem::SetAltTile (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey)
 {
 	HRESULT hr;
+	CTileRuleSet* pRuleSet;
 	CTileSet* pTileSet;
+	RSTRING rstrKey = NULL;
 	TArray<CTile*>* pTiles;
 	TStackRef<IJSONObject> srData;
 	TStackRef<IJSONValue> srv;
@@ -316,13 +310,9 @@ HRESULT CPlaceItem::SetAltTile (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKe
 	TStackRef<IJSONArray> srSame;
 	RSTRING rstrNewTile;
 
-	Check(GetTileData(m_rstrTile, &srData));
-	Check(srData->FindNonNullValueW(L"tiles", &srv));
-	Check(JSONFindArrayObjectIndirect(srv, RSTRING_CAST(L"key"), RSTRING_CAST(pcwzKey), &srTile, NULL));
-	srv.Release();
-
-	Check(srTile->FindNonNullValueW(L"tile", &srv));
-	Check(srv->GetString(&rstrNewTile));
+	Check(m_pTileRules->GetTileRuleSet(m_rstrTile, &pRuleSet));
+	Check(RStrCreateW(8, pcwzKey, &rstrKey));
+	Check(pRuleSet->GetAltTile(rstrKey, &rstrNewTile));
 	RStrRelease(m_rstrTile); m_rstrTile = rstrNewTile;
 
 	Check(pmapTileSets->Find(m_rstrTile, &pTileSet));
@@ -331,23 +321,12 @@ HRESULT CPlaceItem::SetAltTile (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKe
 	Check(TStrCchCpy(m_wzKey, ARRAYSIZE(m_wzKey), pcwzKey));
 
 Cleanup:
-	return hr;
-}
-
-HRESULT CPlaceItem::GetTileData (RSTRING rstrTile, __deref_out IJSONObject** ppData)
-{
-	HRESULT hr;
-	TStackRef<IJSONValue> srv;
-
-	Check(m_pTileRules->FindNonNullValue(rstrTile, &srv));
-	Check(srv->GetObject(ppData));
-
-Cleanup:
+	RStrRelease(rstrKey);
 	return hr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// CMOMWorldEditor
+// CTerrainGallery
 ///////////////////////////////////////////////////////////////////////////////
 
 CTerrainGallery::CTerrainGallery (CSIFRibbon* pRibbon, ISimbeyInterchangeFile* pSIF) :
@@ -541,7 +520,7 @@ CMOMWorldEditor::~CMOMWorldEditor ()
 		(*m_mapFeatures.GetValuePtr(i))->Release();
 
 	SafeRelease(m_pFeatures);
-	SafeRelease(m_pTileRules);
+	SafeDelete(m_pTileRules);
 
 	SafeRelease(m_pSurface);
 	SafeRelease(m_pPackage);
@@ -590,7 +569,10 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 	Check(m_pPackage->OpenPackage(L"Assets.pkg"));	// This file must be built by SIFPackage.exe
 
 	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\rules.json"), &srvRules));
-	Check(srvRules->GetObject(&m_pTileRules));
+
+	m_pTileRules = __new CTileRules;
+	CheckAlloc(m_pTileRules);
+	Check(m_pTileRules->Initialize(srvRules));
 
 	Check(m_pPackage->OpenSIF(L"overland\\features\\features.sif", &pSIF));
 	m_pFeatures = __new CTerrainGallery(m_pRibbon, pSIF);
@@ -1679,7 +1661,7 @@ VOID CMOMWorldEditor::GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, __in_ecoun
 
 			if(pItem->IsSameTile(rstrOther))
 				pwzKey[i] = L'0';
-			else if(pItem->IsTileCompatible(L"special", rstrOther))
+			else if(pItem->IsSpecialTile(rstrOther))
 				pwzKey[i] = L'2';
 			else
 				pwzKey[i] = L'1';
@@ -1764,7 +1746,7 @@ HRESULT CMOMWorldEditor::PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStr
 				wzKey[i] = L'1';
 			}
 		}
-		else if(pItem->IsTileCompatible(L"special", pPlaced->m_rstrTile))
+		else if(pItem->IsSpecialTile(pPlaced->m_rstrTile))
 		{
 			// This direction might be able to use the special '2' connecting tile.
 			if(SUCCEEDED(pItem->SetTileKey(pmapTileSets, ~static_cast<Dir::Value>(i), L'2')))
@@ -1778,12 +1760,12 @@ HRESULT CMOMWorldEditor::PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStr
 				wzKey[i] = L'1';
 			}
 		}
-		else if(pPlaced->IsTileCompatible(L"border", pItem->m_rstrTile))
+		else if(pPlaced->IsBorderTile(pItem->m_rstrTile))
 		{
 			// The placed tile supports a border against the adjacent tile.
 			wzKey[i] = L'1';
 		}
-		else if(pItem->IsTileCompatible(L"border", pPlaced->m_rstrTile))
+		else if(pItem->IsBorderTile(pPlaced->m_rstrTile))
 		{
 			// Set the other tile's key to border against the placed tile.
 			if(SUCCEEDED(pItem->SetTileKey(pmapTileSets, ~static_cast<Dir::Value>(i), L'1')))

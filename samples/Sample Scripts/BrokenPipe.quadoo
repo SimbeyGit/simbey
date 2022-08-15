@@ -1,0 +1,19 @@
+function main ()
+{
+	if(Host.FindParam("child"))
+	{
+		var vMessage = input(256);
+
+		if(null == vMessage)
+			println("Broken Pipe!");
+		else
+			println("Received: " + vMessage);
+	}
+	else
+	{
+		var oPipe = Host.CreatePipe();
+		var oChild = Host.CreateProcess(Host.NativeModule, "\"" + Host.Args(0) + "\" -args -child", oPipe, Host.OpenStdOutPipe(), Host.OpenStdErrorPipe());
+
+		println("Parent Exiting...");
+	}
+}
