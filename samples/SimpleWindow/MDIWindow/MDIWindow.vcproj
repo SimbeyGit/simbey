@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\shared"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SIF"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -62,8 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Comctl32.lib"
+				AdditionalDependencies="Comctl32.lib SIF.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\..\target\lib\debug"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="..\..\..\target\pdb\$(ConfigurationName)\$(TargetName).pdb"
 				SubSystem="2"
@@ -118,7 +119,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\shared"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SIF"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -138,8 +139,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Comctl32.lib"
+				AdditionalDependencies="Comctl32.lib SIF.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\..\target\lib\release"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -217,6 +219,14 @@
 		<Filter
 			Name="Library"
 			>
+			<File
+				RelativePath="..\..\..\shared\library\ChooseFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\shared\library\ChooseFile.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\shared\library\DPI.cpp"
 				>

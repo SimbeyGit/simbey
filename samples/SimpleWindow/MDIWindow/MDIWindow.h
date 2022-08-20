@@ -2,6 +2,7 @@
 
 #include "Library\Core\BaseUnknown.h"
 #include "Library\Window\BaseMDIFrame.h"
+#include "Published\SIF.h"
 
 class CMDIChild :
 	public CBaseUnknown,
@@ -31,6 +32,42 @@ public:
 	static HRESULT Unregister (HINSTANCE hInstance);
 
 	HRESULT Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight);
+
+protected:
+	virtual HINSTANCE GetInstance (VOID);
+
+	DECL_WM_HANDLER(OnPaint);
+};
+
+class CImageChild :
+	public CBaseUnknown,
+	public CBaseMDIChild
+{
+protected:
+	HINSTANCE m_hInstance;
+	ISimbeyInterchangeFile* m_pSIF;
+
+public:
+	IMP_BASE_UNKNOWN
+
+	BEGIN_UNK_MAP
+		UNK_INTERFACE(IOleWindow)
+		UNK_INTERFACE(IBaseWindow)
+	END_UNK_MAP
+
+	BEGIN_WM_MAP
+		HANDLE_WM(WM_PAINT, OnPaint)
+	END_WM_MAP
+
+public:
+	CImageChild (HINSTANCE hInstance);
+	~CImageChild ();
+
+	static HRESULT Register (HINSTANCE hInstance);
+	static HRESULT Unregister (HINSTANCE hInstance);
+
+	HRESULT Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight);
+	HRESULT AddLayer (PCWSTR pcwzImageFile);
 
 protected:
 	virtual HINSTANCE GetInstance (VOID);
@@ -78,6 +115,8 @@ protected:
 	virtual HRESULT FinalizeAndShow (DWORD dwStyle, INT nCmdShow);
 
 	virtual BOOL GetMDIMenuData (__out HMENU* phWindowMenu, __out UINT* pidFirstChild);
+
+	HRESULT OpenImageWindow (VOID);
 
 	DECL_WM_HANDLER(OnCreate);
 	DECL_WM_HANDLER(OnPaint);

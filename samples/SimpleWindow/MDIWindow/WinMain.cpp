@@ -21,6 +21,7 @@ INT WINAPI wWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 
 	Check(CMDIWindow::Register(hInstance));
 	Check(CMDIChild::Register(hInstance));
+	Check(CImageChild::Register(hInstance));
 
 	pApp = __new CMDIWindow(hInstance);
 	CheckAlloc(pApp);

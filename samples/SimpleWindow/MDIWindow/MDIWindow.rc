@@ -62,6 +62,7 @@ BEGIN
     BEGIN
         MENUITEM "New &Pie",                    ID_WINDOW_NEWPIE
         MENUITEM "New &Square",                 ID_WINDOW_NEWSQUARE
+        MENUITEM "New &Image",                  ID_WINDOW_NEWIMAGE
     END
 END
 
