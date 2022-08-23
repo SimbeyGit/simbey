@@ -1015,8 +1015,13 @@ HRESULT CInfiniteWolfenstein::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 
 	if(GetFileAttributes(L"InfiniteWolfenstein.pkg") != INVALID_FILE_ATTRIBUTES)
 		Check(LoadPackage(L"InfiniteWolfenstein.pkg", TRUE));
-	else
+	else if(GetFileAttributes(L"..\\InfiniteWolfenstein.pkg") != INVALID_FILE_ATTRIBUTES)
 		Check(LoadPackage(L"..\\InfiniteWolfenstein.pkg", TRUE));
+	else
+	{
+		MessageBox(GetDesktopWindow(), L"Could not find InfiniteWolfenstein.pkg!", L"Missing Data Package", MB_ICONERROR | MB_OK);
+		Check(HRESULT_FROM_WIN32(ERROR_MISSING_SYSTEMFILE));
+	}
 
 	if(options.FindParam(L"pkg", &idxPkgCmd))
 	{
@@ -1355,6 +1360,13 @@ HRESULT CInfiniteWolfenstein::LoadPackage (PCWSTR pcwzPackage, BOOL fRequireAll)
 	}
 
 Cleanup:
+	if(FAILED(hr) && fRequireAll)
+	{
+		WCHAR wzError[MAX_PATH];
+		Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Failed to load \"%ls\" with error: 0x%.8X", pcwzPackage, hr);
+		MessageBox(GetDesktopWindow(), wzError, L"Package Loader Error", MB_ICONERROR | MB_OK);
+	}
+
 	__delete pMIDIFile;
 	RStrRelease(rstrFile);
 	return hr;
