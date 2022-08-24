@@ -270,6 +270,8 @@ HRESULT CModelTemplate::SaveNode (ISequentialStream* pStream, CModelNode* pNode)
 		{
 			CModelMesh* pMesh = pMirror->GetParent();
 			Check(aNames.Append(pMirror->GetRelativeName()));
+			if(NULL == pMesh)
+				break;
 			Check(aNames.Append(pMesh->GetRelativeName()));
 			pMirror = pMesh->GetParent();
 		}
