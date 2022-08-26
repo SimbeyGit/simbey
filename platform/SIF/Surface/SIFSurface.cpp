@@ -978,7 +978,7 @@ VOID CSIFSurface::TranslateClientPointToCanvas (INT x, INT y, CSIFCanvas* pCanva
 	*pyView = pt.y;
 }
 
-HRESULT CSIFSurface::AddCanvas (__in_opt const RECT* pcrcCanvas, BOOL fInteractive, __out CSIFCanvas** ppCanvas)
+HRESULT CSIFSurface::AddCanvas (__in_opt const RECT* pcrcCanvas, BOOL fInteractive, __deref_out CSIFCanvas** ppCanvas)
 {
 	HRESULT hr;
 	CANVAS_DESC* pcd;
@@ -1014,6 +1014,29 @@ HRESULT CSIFSurface::AddCanvas (__in_opt const RECT* pcrcCanvas, BOOL fInteracti
 Cleanup:
 	if(pCanvas)
 		FreeCanvas(pCanvas);
+	return hr;
+}
+
+HRESULT CSIFSurface::MoveCanvasToTop (CSIFCanvas* pCanvas)
+{
+	HRESULT hr;
+	sysint idxCanvas = -1;
+
+	for(sysint i = 0; i < m_aCanvas.Length(); i++)
+	{
+		if(m_aCanvas[i].pCanvas == pCanvas)
+		{
+			idxCanvas = i;
+			break;
+		}
+	}
+
+	CheckIf(-1 == idxCanvas, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
+	CheckIf(idxCanvas == m_aCanvas.Length() - 1, S_FALSE);
+	m_aCanvas.MoveItem(m_aCanvas.Length() - 1, idxCanvas);
+	hr = S_OK;
+
+Cleanup:
 	return hr;
 }
 

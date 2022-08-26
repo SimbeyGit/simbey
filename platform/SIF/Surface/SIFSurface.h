@@ -248,7 +248,8 @@ public:
 	VOID TranslateClientPointToView (INT x, INT y, __deref_out_opt CSIFCanvas** ppCanvas, __out INT* pxView, __out INT* pyView);
 	VOID TranslateClientPointToCanvas (INT x, INT y, CSIFCanvas* pCanvas, __out INT* pxView, __out INT* pyView);
 
-	HRESULT AddCanvas (__in_opt const RECT* pcrcCanvas, BOOL fInteractive, __out CSIFCanvas** ppCanvas);
+	HRESULT AddCanvas (__in_opt const RECT* pcrcCanvas, BOOL fInteractive, __deref_out CSIFCanvas** ppCanvas);
+	HRESULT MoveCanvasToTop (CSIFCanvas* pCanvas);
 	HRESULT RemoveCanvas (CSIFCanvas* pCanvas);
 
 	DOUBLE GetStretchScale (VOID);
