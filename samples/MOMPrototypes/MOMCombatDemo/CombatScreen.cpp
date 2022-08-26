@@ -5,6 +5,8 @@
 #include "Library\Util\StreamHelpers.h"
 #include "Published\JSON.h"
 #include "CombatScreen.h"
+#include "CombatSpells.h"
+#include "SpellBook.h"
 
 #define	TILE_WIDTH			32
 #define	TILE_HEIGHT			16
@@ -978,198 +980,6 @@ VOID CUnitUpdater::Update (VOID)
 	}
 }
 
-CSummonSpell::CSummonSpell (RSTRING rstrCaster, RSTRING rstrName, CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile) :
-	CAction(pScreen),
-	m_pCanvas(pCanvas),
-	m_nLayer(nLayer),
-	m_pIsometric(pIsometric),
-	m_xTile(xTile),
-	m_yTile(yTile),
-	m_eState(Idle),
-	m_pObject(NULL),
-	m_pOriginalAnimator(NULL)
-{
-	RStrSet(m_rstrCaster, rstrCaster);
-	RStrSet(m_rstrName, rstrName);
-}
-
-CSummonSpell::~CSummonSpell ()
-{
-	SafeRelease(m_pOriginalAnimator);
-
-	RStrRelease(m_rstrName);
-	RStrRelease(m_rstrCaster);
-}
-
-VOID CSummonSpell::Update (VOID)
-{
-	switch(m_eState)
-	{
-	case Idle:
-		m_cTicks = 4;
-		m_cFrame = 24;
-		m_eState = Spawn;
-		m_cLocks = 2;
-		Start();
-		break;
-	case Spawn:
-		if(0 == --m_cTicks)
-		{
-			m_cTicks = 4;
-
-			if(0 == --m_cFrame)
-			{
-				m_eState = Up;
-				m_cFrame = 16;
-
-				// Show the units, then sort while the units are in the final position.
-				m_pObject->ShowOrHide(m_pCanvas, m_nLayer, TRUE);
-				m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer);
-
-				// After sorting, shift the units to the "spawning" location.
-				m_pObject->ShiftObject(0, 16);
-
-				// Update the units' heights.
-				UpdateSpriteSize();
-			}
-		}
-		break;
-	case Up:
-		if(0 == --m_cTicks)
-		{
-			m_cTicks = 5;
-			m_pObject->ShiftObject(0, -1);
-
-			if(0 == --m_cFrame)
-			{
-				m_eState = Done;
-				m_pObject->ReplaceAnimator(m_pOriginalAnimator, m_pCanvas, m_nLayer);
-
-				if(0 == --m_cLocks)
-					m_pScreen->ClearAction(this);
-			}
-			else
-				UpdateSpriteSize();
-		}
-		break;
-	}
-}
-
-// ISpriteAnimationCompleted
-
-VOID CSummonSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
-{
-	m_pCanvas->RemoveSpriteLater(m_nLayer, pSprite);
-	if(0 == --m_cLocks)
-		m_pScreen->ClearAction(this);
-}
-
-HRESULT CSummonSpell::Start (VOID)
-{
-	HRESULT hr;
-	FMOD::Sound* pSummoning;
-	TStackRef<ISimbeyInterchangeFile> srSIF;
-	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
-	TStackRef<ISimbeyInterchangeSprite> srSprite, srFirstUnit;
-	INT xIso, yIso, xView, yView;
-
-	Check(m_pScreen->FindSound(RSTRING_CAST(L"Summoning.mp3"), &pSummoning));
-	m_pScreen->PlaySound(pSummoning);
-
-	Check(m_pScreen->GetPackage()->OpenSIF(L"spells\\Summoning\\cast.sif", &srSIF));
-	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 12, FALSE, &srAnimator, NULL));
-	Check(srAnimator->CreateSprite(&srSprite));
-	Check(srSprite->SelectAnimation(0));
-	Check(srSprite->SetAnimationCompletedCallback(this));
-
-	m_pIsometric->TileToView(m_xTile, m_yTile, &xIso, &yIso);
-	m_pIsometric->IsometricToView(m_pCanvas, xIso, yIso, &xView, &yView);
-	srSprite->SetPosition(xView, yView - 17);
-
-	Check(m_pScreen->PlaceUnit(m_rstrName, m_rstrCaster, m_xTile, m_yTile, m_nLayer, 0, 0, 0, false, &m_pObject));
-	Check(m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer));
-
-	Check(m_pObject->GetFirstVisibleSprite(&srFirstUnit));
-	Check(srFirstUnit->GetAnimator(&m_pOriginalAnimator));
-	Check(m_pCanvas->AddSpriteBefore(m_nLayer, srSprite, srFirstUnit, NULL));
-
-	// Hide the units until the summoning portal is fully formed.
-	m_pObject->ShowOrHide(m_pCanvas, m_nLayer, FALSE);
-
-Cleanup:
-	if(srSIF)
-		srSIF->Close();
-	return hr;
-}
-
-HRESULT CSummonSpell::UpdateSpriteSize (VOID)
-{
-	HRESULT hr;
-	TStackRef<ISimbeyInterchangeAnimator> srDup;
-	INT cImages, cMergeShift = m_cFrame;
-
-	Check(m_pOriginalAnimator->Duplicate(&srDup));
-	cImages = srDup->GetImageCount();
-	for(INT i = 0; i < cImages; i++)
-	{
-		PBYTE pBits;
-		INT nWidth, nHeight, xOffset, yOffset;
-
-		Check(srDup->GetImage(i, &pBits, &nWidth, &nHeight));
-		Check(srDup->GetImageOffset(i, &xOffset, &yOffset));
-		Check(srDup->SetImage(i, FALSE, pBits, nWidth, max(nHeight - cMergeShift, 0), xOffset, yOffset));
-	}
-
-	m_pObject->ReplaceAnimator(srDup, m_pCanvas, m_nLayer);
-
-Cleanup:
-	return hr;
-}
-
-CCastSpell::CCastSpell (RSTRING rstrCaster)
-{
-	RStrSet(m_rstrCaster, rstrCaster);
-}
-
-CCastSpell::~CCastSpell ()
-{
-	RStrRelease(m_rstrCaster);
-}
-
-HRESULT CCastSpell::Query (INT xTile, INT yTile, __in_opt CMovingObject* pUnit)
-{
-	return NULL == pUnit ? S_OK : S_FALSE;
-}
-
-HRESULT CCastSpell::Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, __in_opt CMovingObject* pUnit, __deref_out CAction** ppAction)
-{
-	HRESULT hr;
-	RSTRING rstrName = NULL;
-
-	switch(rand() % 4)
-	{
-	case 0:
-		Check(RStrCreateW(LSP(L"Phantom Warriors"), &rstrName));
-		break;
-	case 1:
-		Check(RStrCreateW(LSP(L"Hell Hounds"), &rstrName));
-		break;
-	case 2:
-		Check(RStrCreateW(LSP(L"Earth Elemental"), &rstrName));
-		break;
-	case 3:
-		Check(RStrCreateW(LSP(L"Skeletons"), &rstrName));
-		break;
-	}
-
-	*ppAction = __new CSummonSpell(m_rstrCaster, rstrName, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile);
-	CheckAlloc(*ppAction);
-
-Cleanup:
-	RStrRelease(rstrName);
-	return hr;
-}
-
 CCombatBar::CCombatBar () :
 	m_pSurface(NULL),
 	m_pBar(NULL),
@@ -1360,7 +1170,7 @@ BOOL CCombatBar::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPAR
 			if(GetButtonFromPoint(xView, yView) == m_idxPressed)
 			{
 				if(0 == m_idxPressed)
-					m_pScreen->CastSpell(__new CCastSpell(GetLeftName()));
+					m_pScreen->ShowSpellBook();
 				else if(2 == m_idxPressed)
 					m_pScreen->ShowSelectedUnitInfo();
 				else
@@ -1417,6 +1227,8 @@ CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface,
 	m_yHoverTile(-1),
 	m_pUnitStats(NULL),
 	m_pBlood(NULL),
+	m_pCombatBar(NULL),
+	m_pSpellBook(NULL),
 	m_pBackground(NULL),
 	m_dblBackground(0.0),
 	m_pCornerA(NULL),
@@ -1443,7 +1255,9 @@ CCombatScreen::~CCombatScreen ()
 	SafeRelease(m_pCornerC);
 	SafeRelease(m_pCornerD);
 
-	SafeDelete(m_pCastSpell);
+	Assert(NULL == m_pCombatBar);
+	Assert(NULL == m_pCastSpell);
+	Assert(NULL == m_pSpellBook);
 
 	SafeRelease(m_pCombatBarFont);
 	SafeRelease(m_pSmallYellowFont);
@@ -1669,7 +1483,14 @@ VOID CCombatScreen::OnDestroy (VOID)
 		m_pCombat = NULL;
 	}
 
+	if(m_pSpellBook)
+	{
+		m_pSpellBook->Destroy();
+		SafeRelease(m_pSpellBook);
+	}
+
 	SafeRelease(m_pCombatBar);
+	SafeDelete(m_pCastSpell);
 
 	m_aActions.Clear();
 	m_aObjects.DeleteAll();
@@ -2349,6 +2170,38 @@ HRESULT CCombatScreen::UpdateStatsPanel (VOID)
 	return UpdateStatsPanel(xTile, yTile);
 }
 
+HRESULT CCombatScreen::ShowSpellBook (VOID)
+{
+	HRESULT hr;
+	CSpellBook* pSpellBook = NULL;
+
+	CheckIf(NULL != m_pSpellBook, E_UNEXPECTED);
+
+	pSpellBook = __new CSpellBook(m_pSurface, this, m_pWizard);
+	CheckAlloc(pSpellBook);
+
+	Check(pSpellBook->Initialize());
+	Check(m_pSurface->MoveCanvasToTop(m_pMouse));
+
+	m_pSpellBook = pSpellBook;
+
+Cleanup:
+	if(FAILED(hr))
+		SafeRelease(pSpellBook);
+	return hr;
+}
+
+HRESULT CCombatScreen::RemoveSpellBook (VOID)
+{
+	if(m_pSpellBook)
+	{
+		m_pSpellBook->Destroy();
+		SafeRelease(m_pSpellBook);
+		return S_OK;
+	}
+	return S_FALSE;
+}
+
 HRESULT CCombatScreen::ShowSelectedUnitInfo (VOID)
 {
 	HRESULT hr;
@@ -2371,7 +2224,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CCombatScreen::CastSpell (CCastSpell* pSpell)
+HRESULT CCombatScreen::AttachSpellCaster (CCastSpell* pSpell)
 {
 	HRESULT hr;
 

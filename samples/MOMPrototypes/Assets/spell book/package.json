@@ -1,0 +1,9 @@
+[
+	{
+		package: "buildsif",
+		name: "spellbook.sif",
+		files: ["*.png"],
+		trim: true,
+		canvas: 32
+	}
+]

@@ -12,6 +12,8 @@ interface IJSONObject;
 interface IJSONArray;
 
 class CCombatScreen;
+class CSpellBook;
+class CCastSpell;
 
 class CAction;
 class CMoveUnitAction;
@@ -254,66 +256,6 @@ public:
 	virtual VOID Update (VOID);
 };
 
-class CSummonSpell :
-	public CAction,
-	public ISpriteAnimationCompleted
-{
-	enum State
-	{
-		Idle,
-		Spawn,
-		Up,
-		Done
-	};
-
-private:
-	RSTRING m_rstrCaster;
-	RSTRING m_rstrName;
-
-	CSIFCanvas* m_pCanvas;
-	sysint m_nLayer;
-	CIsometricTranslator* m_pIsometric;
-	INT m_xTile;
-	INT m_yTile;
-
-	State m_eState;
-
-	INT m_cFrame;
-	INT m_cTicks;
-	CMovingObject* m_pObject;
-	ISimbeyInterchangeAnimator* m_pOriginalAnimator;
-
-	INT m_cLocks;
-
-public:
-	IMP_UNKNOWN(CAction)
-
-	CSummonSpell (RSTRING rstrCaster, RSTRING rstrName, CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile);
-	~CSummonSpell ();
-
-	virtual VOID Update (VOID);
-
-	// ISpriteAnimationCompleted
-	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
-
-private:
-	HRESULT Start (VOID);
-	HRESULT UpdateSpriteSize (VOID);
-};
-
-class CCastSpell
-{
-private:
-	RSTRING m_rstrCaster;
-
-public:
-	CCastSpell (RSTRING rstrCaster);
-	~CCastSpell ();
-
-	HRESULT Query (INT xTile, INT yTile, __in_opt CMovingObject* pUnit);
-	HRESULT Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, __in_opt CMovingObject* pUnit, __deref_out CAction** ppAction);
-};
-
 class CCombatBar :
 	public CBaseUnknown,
 	public ILayerInputHandler
@@ -411,6 +353,7 @@ protected:
 	ISimbeyInterchangeAnimator* m_pBlood;
 
 	CCombatBar* m_pCombatBar;
+	CSpellBook* m_pSpellBook;
 
 	ULONG m_idxExpandStats;
 	ULONG m_idxCreateCombatObject;
@@ -447,8 +390,10 @@ public:
 	HRESULT ExpandStats (IJSONObject* pBase, INT nLevel, __deref_out IJSONObject** ppStats);
 	HRESULT GetHealthPct (IJSONObject* pUnit, IJSONObject* pStats, __out DOUBLE* pdblHealth);
 	HRESULT UpdateStatsPanel (VOID);
+	HRESULT ShowSpellBook (VOID);
+	HRESULT RemoveSpellBook (VOID);
 	HRESULT ShowSelectedUnitInfo (VOID);
-	HRESULT CastSpell (CCastSpell* pSpell);
+	HRESULT AttachSpellCaster (CCastSpell* pSpell);
 	VOID UpdateMouse (LPARAM lParam);
 
 	// IScreen
