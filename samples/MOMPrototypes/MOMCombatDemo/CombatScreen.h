@@ -343,6 +343,7 @@ protected:
 	ISimbeyInterchangeFileFont* m_pYellowFont;
 	ISimbeyInterchangeFileFont* m_pSmallYellowFont;
 	ISimbeyInterchangeFileFont* m_pCombatBarFont;
+	ISimbeyFontCollection* m_pFonts;
 
 	ISimbeyInterchangeSprite* m_pMoveType;
 

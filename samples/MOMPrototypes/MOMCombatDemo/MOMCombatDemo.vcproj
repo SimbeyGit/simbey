@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Winmm.lib fmodex_vc.lib SIF.lib SimbeyCore.lib JSON.lib QuadooVM.lib QuadooParser.lib"
+				AdditionalDependencies="Winmm.lib fmodex_vc.lib gdiplus.lib SIF.lib SimbeyCore.lib JSON.lib QuadooVM.lib QuadooParser.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\target\lib\debug;..\..\..\target\lib\3rdParty\fmod\4.26.31\x86"
 				GenerateDebugInformation="true"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Winmm.lib fmodex_vc.lib SIF.lib SimbeyCore.lib JSON.lib QuadooVM.lib QuadooParser.lib"
+				AdditionalDependencies="Winmm.lib fmodex_vc.lib gdiplus.lib SIF.lib SimbeyCore.lib JSON.lib QuadooVM.lib QuadooParser.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\target\lib\release;..\..\..\target\lib\3rdParty\fmod\4.26.31\x86"
 				GenerateDebugInformation="true"

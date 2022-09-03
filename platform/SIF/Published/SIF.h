@@ -242,6 +242,7 @@ interface __declspec(uuid("1F33FDB9-8333-4869-871C-5AA8B0B9C709")) ISimbeyFontCo
 {
 	virtual HRESULT LoadFontFile (PCWSTR pcwzFontFile) = 0;
 	virtual HRESULT LoadMemoryFont (const VOID* pcvFont, INT cbFont) = 0;
+	virtual HRESULT LoadStreamFont (ISequentialStream* pstmFont, INT cbFont) = 0;
 	virtual INT GetFamilyCount (VOID) = 0;
 	virtual HRESULT GetFamilies (__deref_out PVOID* ppvFamilies, __out INT* pcFamilies) = 0;
 	virtual HRESULT GetFamilyName (PVOID pvFamilies, INT nFamily, __out_ecount(LF_FACESIZE) PWSTR pwzFamilyName) = 0;

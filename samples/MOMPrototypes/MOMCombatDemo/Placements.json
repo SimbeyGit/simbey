@@ -1,6 +1,70 @@
 {
 	player: "defense",
 	floating: true,
+	mana: 500,
+	spells:
+	[
+		{
+			group: "Combat Spells",
+			spells:
+			[
+				{
+					name: "Skeletons",
+					school: "death",
+					cost: 20,
+					spawn: "Skeletons"
+				},
+				{
+					name: "Ghouls",
+					school: "death",
+					cost: 80,
+					spawn: "Ghouls"
+				},
+				{
+					name: "Phantom Warriors",
+					school: "sorcery",
+					cost: 10,
+					spawn: "Phantom Warriors"
+				},
+				{
+					name: "Phantom Beast",
+					school: "sorcery",
+					cost: 35,
+					spawn: "Phantom Beast"
+				},
+				{
+					name: "Hell Hounds",
+					school: "chaos",
+					cost: 40,
+					spawn: "Hell Hounds"
+				},
+				{
+					name: "Fire Elemental",
+					school: "chaos",
+					cost: 20,
+					spawn: "Fire Elemental"
+				},
+				{
+					name: "Earth Elemental",
+					school: "nature",
+					cost: 60,
+					spawn: "Earth Elemental"
+				},
+				{
+					name: "War Bears",
+					school: "nature",
+					cost: 70,
+					spawn: "War Bears"
+				},
+				{
+					name: "Unicorns",
+					school: "life",
+					cost: 250,
+					spawn: "Unicorns"
+				}
+			]
+		}
+	],
 	defense:
 	{
 		objects:
@@ -8,8 +72,8 @@
 			{
 				// Add the wizard's tower
 				type: "building",
-				x: 8,
-				y: 16,
+				x: 10,
+				y: 18,
 				object: 5
 			},
 			{
@@ -74,8 +138,8 @@
 			{
 				// Add the tower of wizardry
 				type: "building",
-				x: 20,
-				y: 16,
+				x: 22,
+				y: 18,
 				object: 7
 			},
 			{

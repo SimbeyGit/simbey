@@ -2,7 +2,21 @@
 	{
 		package: "buildsif",
 		name: "spellbook.sif",
-		files: ["*.png"],
+		files: ["background.png", "closeButtonNormal.png", "closeButtonPressed.png", "closeButtonPressedInline.png", "turnPageLeft.png", "turnPageRight.png", "variableManaSlider.png", "Arcane.png", "Chaos.png", "Death.png", "Life.png", "Nature.png", "Sorcery.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "pageanimation.sif",
+		files: ["spellBookAnim-frame*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "spellswirl.sif",
+		files: ["swirl-frame-*.png"],
 		trim: true,
 		canvas: 32
 	}

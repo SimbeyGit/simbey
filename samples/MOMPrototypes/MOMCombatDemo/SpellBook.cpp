@@ -1,23 +1,292 @@
 #include <windows.h>
+#include <gdiplus.h>
 #include "Library\Core\CoreDefs.h"
+#include "Library\Util\Formatting.h"
 #include "CombatSpells.h"
 #include "SpellBook.h"
 
-CSpellBook::CSpellBook (CSIFSurface* pSurface, CCombatScreen* pWindow, IJSONObject* pWizard) :
+///////////////////////////////////////////////////////////////////////////////
+// CSpellBookPage
+///////////////////////////////////////////////////////////////////////////////
+
+CSpellBookPage::CSpellBookPage (SPELL_PAGE* pPage, PVOID pvTitle, PVOID pvLabel, INT x, INT y) :
+	m_pPage(pPage),
+	m_pvTitle(pvTitle),
+	m_pvLabel(pvLabel),
+	m_x(x),
+	m_y(y)
+{
+	ZeroMemory(m_bits, sizeof(m_bits));
+}
+
+CSpellBookPage::~CSpellBookPage ()
+{
+}
+
+HRESULT CSpellBookPage::CreateDIB (ISimbeyInterchangeFile* pSIF, INT nMagicPower)
+{
+	struct GLYPH_DATA
+	{
+		ISimbeyInterchangeFileLayer* pGlyph;
+		INT y;
+		INT cGlyphs;
+		INT xFillerStart, xFillerEnd;
+	};
+
+	HRESULT hr = S_FALSE;
+	RSTRING rstrName = NULL, rstrSchool = NULL;
+	GLYPH_DATA data[6] = {0};
+
+	Gdiplus::SolidBrush solidBrush(Gdiplus::Color(255, 45, 35, 16));
+	Gdiplus::Bitmap bitmap(SPELL_BOOK_PAGE_WIDTH, SPELL_BOOK_PAGE_HEIGHT, SPELL_BOOK_PAGE_WIDTH * 4, PixelFormat32bppARGB, m_bits);
+	Gdiplus::Graphics g(&bitmap);
+	Gdiplus::StringFormat fmt;
+
+	g.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAliasGridFit);
+	fmt.SetFormatFlags(Gdiplus::StringFormatFlagsBypassGDI);
+
+	Gdiplus::PointF pt(0.0f, 0.0f);
+	Gdiplus::RectF box;
+	g.MeasureString(RStrToWide(m_pPage->rstrGroup), RStrLen(m_pPage->rstrGroup), reinterpret_cast<Gdiplus::Font*>(m_pvTitle), pt, &box);
+
+	pt.X = static_cast<FLOAT>(SPELL_BOOK_PAGE_WIDTH / 2) - box.Width / 2.0f;
+	g.DrawString(RStrToWide(m_pPage->rstrGroup), RStrLen(m_pPage->rstrGroup), reinterpret_cast<Gdiplus::Font*>(m_pvTitle), pt, &fmt, &solidBrush);
+
+	pt.Y += 16.0f;
+	for(INT i = 0; i < m_pPage->cSpells; i++)
+	{
+		TStackRef<IJSONValue> srv;
+		INT nCost;
+		WCHAR wzMP[8], wzGlyph[32];
+		INT cchMP;
+
+		Check(m_pPage->prgSpells[i]->FindNonNullValueW(L"name", &srv));
+		Check(srv->GetString(&rstrName));
+		srv.Release();
+
+		pt.X = 0.0f;
+		g.MeasureString(RStrToWide(rstrName), RStrLen(rstrName), reinterpret_cast<Gdiplus::Font*>(m_pvLabel), pt, &box);
+		g.DrawString(RStrToWide(rstrName), RStrLen(rstrName), reinterpret_cast<Gdiplus::Font*>(m_pvLabel), pt, &fmt, &solidBrush);
+		data[i].xFillerStart = static_cast<INT>(box.Width) + 2;
+
+		Check(m_pPage->prgSpells[i]->FindNonNullValueW(L"cost", &srv));
+		Check(srv->GetInteger(&nCost));
+		srv.Release();
+
+		Check(Formatting::TPrintF(wzMP, ARRAYSIZE(wzMP), &cchMP, L"%d MP", nCost));
+		g.MeasureString(wzMP, cchMP, reinterpret_cast<Gdiplus::Font*>(m_pvLabel), pt, &box);
+		pt.X = SPELL_BOOK_PAGE_WIDTH - box.Width;
+		g.DrawString(wzMP, cchMP, reinterpret_cast<Gdiplus::Font*>(m_pvLabel), pt, &fmt, &solidBrush);
+		data[i].xFillerEnd = static_cast<INT>(pt.X) - 2;
+
+		Check(m_pPage->prgSpells[i]->FindNonNullValueW(L"school", &srv));
+		Check(srv->GetString(&rstrSchool));
+		Check(Formatting::TPrintF(wzGlyph, ARRAYSIZE(wzGlyph), NULL, L"%r.png", rstrSchool));
+		wzGlyph[0] = TUpperCase(wzGlyph[0]);
+		Check(pSIF->FindLayer(wzGlyph, &data[i].pGlyph, NULL));
+		data[i].y = static_cast<INT>(pt.Y);
+		data[i].cGlyphs = nMagicPower / nCost;
+		if(data[i].cGlyphs > 38)
+			data[i].cGlyphs = 38;
+
+		RStrRelease(rstrSchool); rstrSchool = NULL;
+		RStrRelease(rstrName); rstrName = NULL;
+		pt.Y += 21.0f;
+	}
+
+	PBYTE pbPtr = m_bits;
+	for(INT i = 0; i < SPELL_BOOK_PAGE_WIDTH * SPELL_BOOK_PAGE_HEIGHT; i++)
+	{
+		SwapData(pbPtr[0], pbPtr[2]);
+		pbPtr += sizeof(DWORD);
+	}
+
+	SIF_SURFACE sifSurface32;
+	sifSurface32.cBitsPerPixel = 32;
+	sifSurface32.lPitch = SPELL_BOOK_PAGE_WIDTH * 4;
+	sifSurface32.pbSurface = m_bits;
+	sifSurface32.xSize = SPELL_BOOK_PAGE_WIDTH;
+	sifSurface32.ySize = SPELL_BOOK_PAGE_HEIGHT;
+
+	for(INT i = 0; i < m_pPage->cSpells; i++)
+	{
+		ISimbeyInterchangeFileLayer* pGlyph = data[i].pGlyph;
+		INT x = 2, y = data[i].y;
+
+		DrawSpellFiller(data[i].xFillerStart, data[i].xFillerEnd, y + 5);
+
+		y += 10;
+
+		if(data[i].cGlyphs < 19)
+			DrawSpellFiller(4 + data[i].cGlyphs * 6, SPELL_BOOK_PAGE_WIDTH - 5, y + 1);
+
+		INT cFinalGlyphs = data[i].cGlyphs - 19;
+		if(cFinalGlyphs < 0)
+			cFinalGlyphs = 0;
+		if(cFinalGlyphs < 19)
+			DrawSpellFiller(4 + cFinalGlyphs * 6, SPELL_BOOK_PAGE_WIDTH - 5, y + 7);
+
+		for(INT n = 0; n < data[i].cGlyphs; n++)
+		{
+			pGlyph->DrawToBits32(&sifSurface32, x, y);
+			x += 6;
+
+			if(n == 18)
+			{
+				x = 2;
+				y += 6;
+			}
+		}
+	}
+
+Cleanup:
+	for(INT i = 0; i < m_pPage->cSpells; i++)
+		SafeRelease(data[i].pGlyph);
+
+	RStrRelease(rstrSchool);
+	RStrRelease(rstrName);
+	return hr;
+}
+
+// ISimbeyInterchangeSprite
+
+HRESULT CSpellBookPage::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
+{
+	return S_FALSE;
+}
+
+VOID CSpellBookPage::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
+{
+}
+
+VOID CSpellBookPage::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
+{
+}
+
+VOID CSpellBookPage::GetCurrentHitBox (__out RECT* prcHitBox)
+{
+}
+
+VOID CSpellBookPage::UpdateFrameTick (VOID)
+{
+}
+
+VOID CSpellBookPage::SetPosition (INT x, INT y)
+{
+	m_x = x;
+	m_y = y;
+}
+
+VOID CSpellBookPage::GetPosition (__out INT& x, __out INT& y)
+{
+	x = m_x;
+	y = m_y;
+}
+
+BOOL CSpellBookPage::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+{
+	return sifDrawBits32ToDIB24(psifSurface24->pbSurface, m_x, m_y, psifSurface24->xSize, psifSurface24->ySize, m_bits, SPELL_BOOK_PAGE_WIDTH, SPELL_BOOK_PAGE_HEIGHT);
+}
+
+BOOL CSpellBookPage::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
+{
+	return FALSE;
+}
+
+BOOL CSpellBookPage::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+{
+	return DrawMaskedToDIB24(xOffset, yOffset, psifSurface24);
+}
+
+BOOL CSpellBookPage::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+{
+	return DrawMaskedToDIB24(xOffset, yOffset, psifSurface24);
+}
+
+COLORREF CSpellBookPage::GetColorized (VOID)
+{
+	return 0;
+}
+
+BOOL CSpellBookPage::SetColorized (COLORREF cr)
+{
+	return FALSE;
+}
+
+VOID CSpellBookPage::GetFrameOffset (__out INT& x, __out INT& y)
+{
+	x = 0;
+	y = 0;
+}
+
+VOID CSpellBookPage::DrawSpellFiller (INT xFillerStart, INT xFillerEnd, INT yFiller)
+{
+	INT xRange = xFillerEnd - xFillerStart;
+
+	for(INT y = 0; y < 3; y++)
+	{
+		PBYTE pbRow = m_bits + (SPELL_BOOK_PAGE_WIDTH * 4) * (yFiller + y * 2) + xFillerStart * 4;
+		INT x = 0;
+
+		while(x < xRange)
+		{
+			INT xSize = (rand() % 8) + 1;
+			if(x + xSize > xRange)
+				xSize = xRange - x;
+			for(INT i = 0; i < xSize; i++)
+			{
+				pbRow[3] = 255;
+				pbRow[0] = 90;
+				pbRow[1] = 70;
+				pbRow[2] = 32;
+				pbRow += sizeof(DWORD);
+			}
+			x += xSize + 1;
+			pbRow += sizeof(DWORD);
+		}
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CSpellBook
+///////////////////////////////////////////////////////////////////////////////
+
+CSpellBook::CSpellBook (CSIFSurface* pSurface, CCombatScreen* pWindow, IJSONObject* pWizard, ISimbeyFontCollection* pFonts, INT nMagicPower) :
 	m_pSurface(pSurface),
 	m_pScreen(pWindow),
 	m_pWizard(pWizard),
+	m_pFonts(pFonts),
+	m_nMagicPower(nMagicPower),
+	m_pvTitle(NULL),
+	m_pvLabel(NULL),
+	m_pLeft(NULL),
+	m_pRight(NULL),
 	m_pCanvas(NULL),
 	m_pLayer(NULL),
 	m_pSIF(NULL),
 	m_pCloseButton(NULL)
 {
 	m_pWizard->AddRef();
+	m_pFonts->AddRef();
 }
 
 CSpellBook::~CSpellBook ()
 {
+	for(sysint i = 0; i < m_aPages.Length(); i++)
+	{
+		SPELL_PAGE& page = m_aPages[i];
+		for(INT n = 0; n < page.cSpells; n++)
+			page.prgSpells[n]->Release();
+		RStrRelease(page.rstrGroup);
+	}
+
+	if(m_pvLabel)
+		m_pFonts->DeleteFont(m_pvLabel);
+	if(m_pvTitle)
+		m_pFonts->DeleteFont(m_pvTitle);
+
 	SafeRelease(m_pCloseButton);
+	SafeRelease(m_pFonts);
 	SafeRelease(m_pWizard);
 
 	if(m_pSIF)
@@ -30,7 +299,7 @@ CSpellBook::~CSpellBook ()
 	Assert(NULL == m_pCanvas);
 }
 
-HRESULT CSpellBook::Initialize (VOID)
+HRESULT CSpellBook::Initialize (IJSONArray* pSpells)
 {
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeFileLayer> srBackground, srCloseButton;
@@ -47,21 +316,39 @@ HRESULT CSpellBook::Initialize (VOID)
 	m_pSurface->GetViewSize(&xView, &yView);
 	Check(m_pSurface->AddCanvas(NULL, TRUE, &m_pCanvas));
 
-	xClose = xView / 2 - (rc.right - rc.left) / 2;
-	yClose = yView / 2 - (rc.bottom - rc.top) / 2;
+	m_xBook = xView / 2 - (rc.right - rc.left) / 2;
+	m_yBook = yView / 2 - (rc.bottom - rc.top) / 2;
 
 	Check(m_pCanvas->AddLayer(FALSE, FALSE, 0, &m_idxBackground));
-	Check(sifCreateStaticSprite(srBackground, xClose, yClose, &srSprite));
+	Check(sifCreateStaticSprite(srBackground, m_xBook, m_yBook, &srSprite));
 	Check(m_pCanvas->AddSprite(m_idxBackground, srSprite, &idxSpellBook));
 
-	xClose += 159;
-	yClose += 168;
+	xClose = m_xBook + 159;
+	yClose = m_yBook + 168;
 
 	Check(m_pSIF->FindLayer(L"closeButtonPressedInline.png", &srCloseButton, NULL));
 	Check(srCloseButton->GetPosition(&rc));
 	Check(sifCreateStaticSprite(srCloseButton, xClose, yClose, &m_pCloseButton));
 
 	Check(static_cast<CInteractiveCanvas*>(m_pCanvas)->AddInteractiveLayer(TRUE, FALSE, 0, this, &m_pLayer));
+
+	Check(BuildPageList(pSpells));
+
+	if(0 < m_aPages.Length())
+	{
+		m_pLeft = &m_aPages[0];
+		if(1 < m_aPages.Length())
+			m_pRight = &m_aPages[1];
+	}
+
+	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 12.5f, &m_pvTitle));
+	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 9.0f, &m_pvLabel));
+
+	if(m_pLeft)
+		Check(CreateSpellBookPage(m_pLeft, m_xBook + 14, m_yBook + 4, NULL));
+
+	if(m_pRight)
+		Check(CreateSpellBookPage(m_pRight, m_xBook + 147, m_yBook + 4, NULL));
 
 Cleanup:
 	return hr;
@@ -104,37 +391,28 @@ BOOL CSpellBook::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPAR
 		}
 		else
 		{
-			RSTRING rstrName = NULL;
-			HRESULT hr;
+			TStackRef<IJSONObject> srSpell;
 
-			switch(rand() % 4)
+			if(FindSpellAt(m_pLeft, xView, yView, m_xBook + 14, m_yBook + 4, &srSpell) ||
+				FindSpellAt(m_pRight, xView, yView, m_xBook + 147, m_yBook + 4, &srSpell))
 			{
-			case 0:
-				hr = RStrCreateW(LSP(L"Phantom Warriors"), &rstrName);
-				break;
-			case 1:
-				hr = RStrCreateW(LSP(L"Hell Hounds"), &rstrName);
-				break;
-			case 2:
-				hr = RStrCreateW(LSP(L"Earth Elemental"), &rstrName);
-				break;
-			case 3:
-				hr = RStrCreateW(LSP(L"Skeletons"), &rstrName);
-				break;
-			}
-
-			if(SUCCEEDED(hr))
-			{
-				TStackRef<IJSONValue> srvName;
+				TStackRef<IJSONValue> srvCaster, srvSpawn;
 				RSTRING rstrCasterW;
 
-				SideAssertHr(m_pWizard->FindNonNullValueW(L"name", &srvName));
-				SideAssertHr(srvName->GetString(&rstrCasterW));
-				m_pScreen->AttachSpellCaster(__new CCastSummonSpell(rstrCasterW, rstrName));
-				RStrRelease(rstrCasterW);
-				RStrRelease(rstrName);
+				SideAssertHr(m_pWizard->FindNonNullValueW(L"name", &srvCaster));
+				SideAssertHr(srvCaster->GetString(&rstrCasterW));
 
-				Close();
+				if(SUCCEEDED(srSpell->FindNonNullValueW(L"spawn", &srvSpawn)))
+				{
+					RSTRING rstrSpawn;
+					SideAssertHr(srvSpawn->GetString(&rstrSpawn));
+					m_pScreen->AttachSpellCaster(__new CCastSummonSpell(rstrCasterW, rstrSpawn));
+					RStrRelease(rstrSpawn);
+
+					Close();
+				}
+
+				RStrRelease(rstrCasterW);
 			}
 		}
 
@@ -155,6 +433,81 @@ BOOL CSpellBook::ProcessKeyboardInput (LayerInput::Keyboard eType, WPARAM wParam
 	return FALSE;
 }
 
+HRESULT CSpellBook::BuildPageList (IJSONArray* pSpellGroups)
+{
+	HRESULT hr;
+	sysint cSpellGroups = pSpellGroups->Count();
+	RSTRING rstrGroup = NULL;
+
+	for(sysint i = 0; i < cSpellGroups; i++)
+	{
+		TStackRef<IJSONObject> srGroup;
+		TStackRef<IJSONValue> srv;
+		TStackRef<IJSONArray> srSpells;
+
+		Check(pSpellGroups->GetObject(i, &srGroup));
+		Check(srGroup->FindNonNullValueW(L"group", &srv));
+		Check(srv->GetString(&rstrGroup));
+		srv.Release();
+
+		Check(srGroup->FindNonNullValueW(L"spells", &srv));
+		Check(srv->GetArray(&srSpells));
+		Check(AddSpellGroup(rstrGroup, srSpells));
+
+		RStrRelease(rstrGroup); rstrGroup = NULL;
+	}
+
+Cleanup:
+	RStrRelease(rstrGroup);
+	return hr;
+}
+
+HRESULT CSpellBook::AddSpellGroup (RSTRING rstrGroup, IJSONArray* pSpells)
+{
+	HRESULT hr = S_FALSE;
+	SPELL_PAGE page;
+	sysint cSpells = pSpells->Count();
+
+	page.rstrGroup = rstrGroup;
+	page.cSpells = 0;
+
+	for(sysint i = 0; i < cSpells; i++)
+	{
+		Check(pSpells->GetObject(i, page.prgSpells + page.cSpells));
+		if(++page.cSpells == ARRAYSIZE(page.prgSpells))
+		{
+			Check(m_aPages.Append(page));
+			RStrAddRef(page.rstrGroup);
+			page.cSpells = 0;
+		}
+	}
+
+	if(0 < page.cSpells)
+	{
+		Check(m_aPages.Append(page));
+		RStrAddRef(page.rstrGroup);
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CSpellBook::CreateSpellBookPage (SPELL_PAGE* pPage, INT x, INT y, __deref_opt_out CSpellBookPage** ppPage)
+{
+	HRESULT hr;
+	TStackRef<CSpellBookPage> srPage;
+	
+	srPage.Attach(__new CSpellBookPage(pPage, m_pvTitle, m_pvLabel, x, y));
+	CheckAlloc(srPage);
+	Check(srPage->CreateDIB(m_pSIF, m_nMagicPower));
+	Check(m_pLayer->AddSprite(srPage, NULL));
+	if(ppPage)
+		*ppPage = srPage.Detach();
+
+Cleanup:
+	return hr;
+}
+
 BOOL CSpellBook::MouseOverCloseButton (INT x, INT y)
 {
 	INT xBtn, yBtn, xSize, ySize;
@@ -163,4 +516,25 @@ BOOL CSpellBook::MouseOverCloseButton (INT x, INT y)
 	m_pCloseButton->GetCurrentFrameSize(&xSize, &ySize);
 
 	return x >= xBtn && y >= yBtn && x < xBtn + xSize && y < yBtn + ySize;
+}
+
+BOOL CSpellBook::FindSpellAt (SPELL_PAGE* pPage, INT x, INT y, INT xPage, INT yPage, __deref_out IJSONObject** ppSpell)
+{
+	if(pPage && x >= xPage && x < xPage + SPELL_BOOK_PAGE_WIDTH && y >= yPage && y < yPage + SPELL_BOOK_PAGE_HEIGHT)
+	{
+		y -= (yPage + 16);
+
+		if(y >= 0)
+		{
+			y /= 21;
+
+			if(y < pPage->cSpells)
+			{
+				SetInterface(*ppSpell, pPage->prgSpells[y]);
+				return TRUE;
+			}
+		}
+	}
+
+	return FALSE;
 }

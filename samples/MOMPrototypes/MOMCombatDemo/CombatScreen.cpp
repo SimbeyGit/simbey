@@ -1222,6 +1222,7 @@ CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface,
 	m_pSelected(NULL),
 	m_pCastSpell(NULL),
 	m_pCombatBarFont(NULL),
+	m_pFonts(NULL),
 	m_pMoveType(NULL),
 	m_xHoverTile(-1),
 	m_yHoverTile(-1),
@@ -1259,6 +1260,7 @@ CCombatScreen::~CCombatScreen ()
 	Assert(NULL == m_pCastSpell);
 	Assert(NULL == m_pSpellBook);
 
+	SafeRelease(m_pFonts);
 	SafeRelease(m_pCombatBarFont);
 	SafeRelease(m_pSmallYellowFont);
 	SafeRelease(m_pYellowFont);
@@ -1272,6 +1274,8 @@ HRESULT CCombatScreen::Initialize (VOID)
 	HRESULT hr;
 	TStackRef<IJSONValue> srv;
 	ISimbeyInterchangeFile* pSIF = NULL;
+	TStackRef<IPersistedFile> srFont;
+	ULARGE_INTEGER uliFont;
 	DWORD cParams;
 
 	INT xScroll, yScroll;
@@ -1313,6 +1317,19 @@ HRESULT CCombatScreen::Initialize (VOID)
 
 	Check(m_pPackage->OpenSIF(L"graphics\\CombatBarFont.sif", &pSIF));
 	Check(sifCreateFontFromSIF(pSIF, TRUE, &m_pCombatBarFont));
+
+	Check(sifCreateFontCollection(&m_pFonts));
+
+	Check(m_pPackage->OpenFile(SLP(L"fonts\\Aclonica.ttf"), &srFont, &uliFont));
+	Check(m_pFonts->LoadStreamFont(srFont, uliFont.LowPart));
+	srFont.Release();
+
+	Check(m_pPackage->OpenFile(SLP(L"fonts\\DreamOrphanage.ttf"), &srFont, &uliFont));
+	Check(m_pFonts->LoadStreamFont(srFont, uliFont.LowPart));
+	srFont.Release();
+
+	Check(m_pPackage->OpenFile(SLP(L"fonts\\KingthingsPetrock.ttf"), &srFont, &uliFont));
+	Check(m_pFonts->LoadStreamFont(srFont, uliFont.LowPart));
 
 	Check(m_pHost->GetVM()->FindFunction(L"ExpandStats", &m_idxExpandStats, &cParams));
 	CheckIf(2 != cParams, E_UNEXPECTED);
@@ -2173,14 +2190,24 @@ HRESULT CCombatScreen::UpdateStatsPanel (VOID)
 HRESULT CCombatScreen::ShowSpellBook (VOID)
 {
 	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONArray> srSpells;
 	CSpellBook* pSpellBook = NULL;
+	INT nMagicPower;
 
 	CheckIf(NULL != m_pSpellBook, E_UNEXPECTED);
 
-	pSpellBook = __new CSpellBook(m_pSurface, this, m_pWizard);
+	Check(m_pPlacements->FindNonNullValueW(L"spells", &srv));
+	Check(srv->GetArray(&srSpells));
+	srv.Release();
+
+	Check(m_pPlacements->FindNonNullValueW(L"mana", &srv));
+	Check(srv->GetInteger(&nMagicPower));
+
+	pSpellBook = __new CSpellBook(m_pSurface, this, m_pWizard, m_pFonts, nMagicPower);
 	CheckAlloc(pSpellBook);
 
-	Check(pSpellBook->Initialize());
+	Check(pSpellBook->Initialize(srSpells));
 	Check(m_pSurface->MoveCanvasToTop(m_pMouse));
 
 	m_pSpellBook = pSpellBook;
