@@ -23,7 +23,7 @@ CSpellBookPage::~CSpellBookPage ()
 {
 }
 
-HRESULT CSpellBookPage::CreateDIB (ISimbeyInterchangeFile* pSIF, INT nMagicPower)
+HRESULT CSpellBookPage::Initialize (ISimbeyInterchangeFile* pSIF, INT nMagicPower)
 {
 	struct GLYPH_DATA
 	{
@@ -264,7 +264,11 @@ CSpellBook::CSpellBook (CSIFSurface* pSurface, CCombatScreen* pWindow, IJSONObje
 	m_pCanvas(NULL),
 	m_pLayer(NULL),
 	m_pSIF(NULL),
-	m_pCloseButton(NULL)
+	m_pCloseButton(NULL),
+	m_pTurnLeft(NULL),
+	m_pTurnRight(NULL),
+	m_pLeftPage(NULL),
+	m_pRightPage(NULL)
 {
 	m_pWizard->AddRef();
 	m_pFonts->AddRef();
@@ -272,6 +276,9 @@ CSpellBook::CSpellBook (CSIFSurface* pSurface, CCombatScreen* pWindow, IJSONObje
 
 CSpellBook::~CSpellBook ()
 {
+	Assert(NULL == m_pLeftPage);
+	Assert(NULL == m_pRightPage);
+
 	for(sysint i = 0; i < m_aPages.Length(); i++)
 	{
 		SPELL_PAGE& page = m_aPages[i];
@@ -341,23 +348,120 @@ HRESULT CSpellBook::Initialize (IJSONArray* pSpells)
 			m_pRight = &m_aPages[1];
 	}
 
+	Check(UpdatePageNav());
+
 	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 12.5f, &m_pvTitle));
 	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 9.0f, &m_pvLabel));
 
 	if(m_pLeft)
-		Check(CreateSpellBookPage(m_pLeft, m_xBook + 14, m_yBook + 4, NULL));
+		Check(CreateSpellBookPage(m_pLeft, m_xBook + 14, m_yBook + 4, &m_pLeftPage));
 
 	if(m_pRight)
-		Check(CreateSpellBookPage(m_pRight, m_xBook + 147, m_yBook + 4, NULL));
+		Check(CreateSpellBookPage(m_pRight, m_xBook + 147, m_yBook + 4, &m_pRightPage));
 
 Cleanup:
 	return hr;
+}
+
+HRESULT CSpellBook::UpdatePageNav (VOID)
+{
+	HRESULT hr = S_FALSE;
+	TStackRef<ISimbeyInterchangeFileLayer> srTurnLeft, srTurnRight;
+
+	Assert(NULL == m_pTurnLeft);
+	Assert(NULL == m_pTurnRight);
+
+	if(m_pLeft && m_pLeft > &m_aPages[0])
+	{
+		Check(m_pSIF->FindLayer(L"turnPageLeft.png", &srTurnLeft, NULL));
+		Check(sifCreateStaticSprite(srTurnLeft, m_xBook + 13, m_yBook + 3, &m_pTurnLeft));
+		Check(m_pLayer->AddSprite(m_pTurnLeft, NULL));
+	}
+
+	if(m_pRight && 2 < m_aPages.Length() && m_pRight < &m_aPages[m_aPages.Length() - 1])
+	{
+		Check(m_pSIF->FindLayer(L"turnPageRight.png", &srTurnRight, NULL));
+		Check(sifCreateStaticSprite(srTurnRight, m_xBook + 258, m_yBook + 3, &m_pTurnRight));
+		Check(m_pLayer->AddSprite(m_pTurnRight, NULL));
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CSpellBook::StartPageNav (BOOL fForward)
+{
+	HRESULT hr;
+
+	RemovePageNav();
+
+	if(m_pLeftPage)
+	{
+		m_pLayer->RemoveSprite(m_pLeftPage);
+		SafeRelease(m_pLeftPage);
+	}
+
+	if(m_pRightPage)
+	{
+		m_pLayer->RemoveSprite(m_pRightPage);
+		SafeRelease(m_pRightPage);
+	}
+
+	if(fForward)
+		m_pLeft += 2;
+	else
+		m_pLeft -= 2;
+
+	Assert(m_pLeft >= &m_aPages[0]);
+	m_pRight = m_pLeft + 1;
+	if(m_pRight > &m_aPages[m_aPages.Length() - 1])
+		m_pRight = NULL;
+
+	if(m_pLeft)
+		Check(CreateSpellBookPage(m_pLeft, m_xBook + 14, m_yBook + 4, &m_pLeftPage));
+
+	if(m_pRight)
+		Check(CreateSpellBookPage(m_pRight, m_xBook + 147, m_yBook + 4, &m_pRightPage));
+
+	Check(UpdatePageNav());
+
+Cleanup:
+	return hr;
+}
+
+VOID CSpellBook::RemovePageNav (VOID)
+{
+	if(m_pTurnLeft)
+	{
+		m_pLayer->RemoveSprite(m_pTurnLeft);
+		SafeRelease(m_pTurnLeft);
+	}
+
+	if(m_pTurnRight)
+	{
+		m_pLayer->RemoveSprite(m_pTurnRight);
+		SafeRelease(m_pTurnRight);
+	}
 }
 
 VOID CSpellBook::Destroy (VOID)
 {
 	if(m_pCanvas)
 	{
+		if(m_pLeftPage)
+		{
+			m_pLayer->RemoveSprite(m_pLeftPage);
+			SafeRelease(m_pLeftPage);
+		}
+		
+		if(m_pRightPage)
+		{
+			m_pLayer->RemoveSprite(m_pRightPage);
+			SafeRelease(m_pRightPage);
+		}
+
+		RemovePageNav();
+
 		SafeRelease(m_pLayer);
 		m_pSurface->RemoveCanvas(m_pCanvas);
 		m_pCanvas = NULL;
@@ -377,7 +481,7 @@ BOOL CSpellBook::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPAR
 		m_pScreen->UpdateMouse(lParam);
 	else if(LayerInput::LButtonDown == eType)
 	{
-		if(MouseOverCloseButton(xView, yView))
+		if(MouseOverSprite(xView, yView, m_pCloseButton))
 			m_pCanvas->AddSprite(m_idxBackground, m_pCloseButton, NULL);
 		return TRUE;
 	}
@@ -386,9 +490,13 @@ BOOL CSpellBook::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPAR
 		if(S_OK == m_pCanvas->FindSprite(m_idxBackground, m_pCloseButton, NULL))
 		{
 			m_pCanvas->RemoveSprite(m_idxBackground, m_pCloseButton);
-			if(MouseOverCloseButton(xView, yView))
+			if(MouseOverSprite(xView, yView, m_pCloseButton))
 				Close();
 		}
+		else if(m_pTurnLeft && MouseOverSprite(xView, yView, m_pTurnLeft))
+			StartPageNav(FALSE);
+		else if(m_pTurnRight && MouseOverSprite(xView, yView, m_pTurnRight))
+			StartPageNav(TRUE);
 		else
 		{
 			TStackRef<IJSONObject> srSpell;
@@ -499,7 +607,7 @@ HRESULT CSpellBook::CreateSpellBookPage (SPELL_PAGE* pPage, INT x, INT y, __dere
 	
 	srPage.Attach(__new CSpellBookPage(pPage, m_pvTitle, m_pvLabel, x, y));
 	CheckAlloc(srPage);
-	Check(srPage->CreateDIB(m_pSIF, m_nMagicPower));
+	Check(srPage->Initialize(m_pSIF, m_nMagicPower));
 	Check(m_pLayer->AddSprite(srPage, NULL));
 	if(ppPage)
 		*ppPage = srPage.Detach();
@@ -508,12 +616,12 @@ Cleanup:
 	return hr;
 }
 
-BOOL CSpellBook::MouseOverCloseButton (INT x, INT y)
+BOOL CSpellBook::MouseOverSprite (INT x, INT y, ISimbeyInterchangeSprite* pSprite)
 {
 	INT xBtn, yBtn, xSize, ySize;
 
-	m_pCloseButton->GetFrameOffset(xBtn, yBtn);
-	m_pCloseButton->GetCurrentFrameSize(&xSize, &ySize);
+	pSprite->GetFrameOffset(xBtn, yBtn);
+	pSprite->GetCurrentFrameSize(&xSize, &ySize);
 
 	return x >= xBtn && y >= yBtn && x < xBtn + xSize && y < yBtn + ySize;
 }

@@ -34,7 +34,7 @@ public:
 	CSpellBookPage (SPELL_PAGE* pPage, PVOID pvTitle, PVOID pvLabel, INT x, INT y);
 	~CSpellBookPage ();
 
-	HRESULT CreateDIB (ISimbeyInterchangeFile* pSIF, INT nMagicPower);
+	HRESULT Initialize (ISimbeyInterchangeFile* pSIF, INT nMagicPower);
 
 	// ISimbeyInterchangeSprite
 	virtual HRESULT SelectAnimation (INT nAnimation, INT nFrame, INT cTicks);
@@ -91,6 +91,9 @@ private:
 	sysint m_idxBackground;
 	ISimbeyInterchangeSprite* m_pCloseButton;
 
+	ISimbeyInterchangeSprite* m_pTurnLeft, *m_pTurnRight;
+	CSpellBookPage* m_pLeftPage, *m_pRightPage;
+
 public:
 	IMP_BASE_UNKNOWN
 
@@ -101,6 +104,9 @@ public:
 	~CSpellBook ();
 
 	HRESULT Initialize (IJSONArray* pSpells);
+	HRESULT UpdatePageNav (VOID);
+	HRESULT StartPageNav (BOOL fForward);
+	VOID RemovePageNav (VOID);
 	VOID Destroy (VOID);
 	VOID Close (VOID);
 
@@ -114,6 +120,6 @@ private:
 
 	HRESULT CreateSpellBookPage (SPELL_PAGE* pPage, INT x, INT y, __deref_opt_out CSpellBookPage** ppPage = NULL);
 
-	BOOL MouseOverCloseButton (INT x, INT y);
+	BOOL MouseOverSprite (INT x, INT y, ISimbeyInterchangeSprite* pSprite);
 	BOOL FindSpellAt (SPELL_PAGE* pPage, INT x, INT y, INT xPage, INT yPage, __deref_out IJSONObject** ppSpell);
 };

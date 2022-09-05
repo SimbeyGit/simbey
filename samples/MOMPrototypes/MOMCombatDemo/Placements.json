@@ -5,7 +5,7 @@
 	spells:
 	[
 		{
-			group: "Combat Spells",
+			group: "Summoning",
 			spells:
 			[
 				{
@@ -61,6 +61,17 @@
 					school: "life",
 					cost: 250,
 					spawn: "Unicorns"
+				}
+			]
+		},
+		{
+			group: "Combat Spells",
+			spells:
+			[
+				{
+					name: "Cracks Call",
+					school: "nature",
+					cost: 20
 				}
 			]
 		}
