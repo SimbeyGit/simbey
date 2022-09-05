@@ -315,10 +315,12 @@ Cleanup:
 BOOL CDisintegrate::CheckDestroyUnit (CMovingObject* pTarget)
 {
 	HRESULT hr;
+	TStackRef<IJSONObject> srStats;
 	TStackRef<IJSONValue> srv;
 	INT nResistance;
 
-	Check(JSONGetValueFromObject(pTarget->m_pDef, SLP(L"base:stats:resist"), &srv));
+	Check(m_pScreen->ExpandStats(pTarget->m_pDef, pTarget->m_nLevel, &srStats));
+	Check(srStats->FindNonNullValueW(L"resist", &srv));
 	Check(srv->GetInteger(&nResistance));
 
 Cleanup:
