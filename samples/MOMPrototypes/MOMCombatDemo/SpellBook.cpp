@@ -513,14 +513,24 @@ BOOL CSpellBook::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPAR
 				if(SUCCEEDED(srSpell->FindNonNullValueW(L"spawn", &srvSpawn)))
 				{
 					RSTRING rstrSpawn;
+
 					SideAssertHr(srvSpawn->GetString(&rstrSpawn));
 					m_pScreen->AttachSpellCaster(__new CCastSummonSpell(rstrCasterW, rstrSpawn));
 					RStrRelease(rstrSpawn);
+				}
+				else
+				{
+					TStackRef<IJSONValue> srvName;
+					RSTRING rstrSpellW;
 
-					Close();
+					SideAssertHr(srSpell->FindNonNullValueW(L"name", &srvName));
+					srvName->GetString(&rstrSpellW);
+					m_pScreen->AttachSpellCaster(__new CCastTargetSpell(rstrCasterW, rstrSpellW));
+					RStrRelease(rstrSpellW);
 				}
 
 				RStrRelease(rstrCasterW);
+				Close();
 			}
 		}
 

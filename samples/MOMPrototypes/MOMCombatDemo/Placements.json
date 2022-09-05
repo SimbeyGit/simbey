@@ -72,6 +72,11 @@
 					name: "Cracks Call",
 					school: "nature",
 					cost: 20
+				},
+				{
+					name: "Disintegrate",
+					school: "chaos",
+					cost: 50
 				}
 			]
 		}

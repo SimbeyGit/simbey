@@ -21,6 +21,10 @@
 	},
 	{
 		package: "sound",
+		name: "CracksCall.mp3"
+	},
+	{
+		package: "sound",
 		name: "CreatureA.mp3"
 	},
 	{
@@ -30,6 +34,10 @@
 	{
 		package: "sound",
 		name: "DeathBolt.mp3"
+	},
+	{
+		package: "sound",
+		name: "Disintegrate.mp3"
 	},
 	{
 		package: "sound",

@@ -312,7 +312,7 @@ HRESULT CObject::CloneSprite (__deref_out ISimbeyInterchangeSprite** ppSprite)
 	return m_aSprites[0].pSprite->Clone(ppSprite);
 }
 
-HRESULT CObject::UpdateVisList (CSIFCanvas* pCanvas, sysint nLayer, INT cVisible)
+HRESULT CObject::UpdateVisList (CSIFCanvas* pCanvas, sysint nLayer, INT cVisible, bool fDeferredRemoval)
 {
 	HRESULT hr = S_FALSE;
 
@@ -328,6 +328,8 @@ HRESULT CObject::UpdateVisList (CSIFCanvas* pCanvas, sysint nLayer, INT cVisible
 				ISimbeyInterchangeSprite* pPrev = 0 < i ? m_aSprites[i].pSprite : NULL;
 				Check(pCanvas->AddSpriteAfter(nLayer, sprite.pSprite, pPrev, NULL));
 			}
+			else if(fDeferredRemoval)
+				Check(pCanvas->RemoveSpriteLater(nLayer, sprite.pSprite));
 			else
 				Check(pCanvas->RemoveSprite(nLayer, sprite.pSprite));
 		}
@@ -1689,6 +1691,8 @@ BOOL CCombatScreen::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, L
 					pSpellAction->Release();
 					SafeDelete(m_pCastSpell);
 				}
+				else if(FAILED(hrSpell))
+					SafeDelete(m_pCastSpell);
 			}
 			else if(m_pSelected)
 			{
@@ -1787,17 +1791,6 @@ Cleanup:
 BOOL CCombatScreen::ProcessKeyboardInput (LayerInput::Keyboard eType, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
 	return FALSE;
-}
-
-CObject* CCombatScreen::FindObject (INT xTile, INT yTile)
-{
-	for(sysint i = 0; i < m_aObjects.Length(); i++)
-	{
-		CObject* pObject = m_aObjects[i];
-		if(xTile == pObject->m_xTile && yTile == pObject->m_yTile)
-			return pObject;
-	}
-	return NULL;
 }
 
 HRESULT CCombatScreen::StartMergingAction (INT xTile, INT yTile)
@@ -3086,6 +3079,24 @@ Cleanup:
 	RStrRelease(rstrProjectile);
 	RStrRelease(rstrValue);
 	return hr;
+}
+
+CObject* CCombatScreen::FindObject (INT xTile, INT yTile)
+{
+	for(sysint i = 0; i < m_aObjects.Length(); i++)
+	{
+		CObject* pObject = m_aObjects[i];
+		if(xTile == pObject->m_xTile && yTile == pObject->m_yTile)
+			return pObject;
+	}
+	return NULL;
+}
+
+VOID CCombatScreen::DestroyUnit (CMovingObject* pObject)
+{
+	pObject->UpdateVisList(m_pMain, m_nUnitLayer, 0, true);
+	RemoveUnitFromBoard(pObject);
+	UpdateStatsPanel();
 }
 
 HRESULT CCombatScreen::ConfigureBackground (ISimbeyInterchangeFile* pLayers, INT idxLayer, INT x, INT y, __deref_out ISimbeyInterchangeSprite** ppSprite)

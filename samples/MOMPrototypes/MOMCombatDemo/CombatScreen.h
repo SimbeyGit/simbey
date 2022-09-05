@@ -64,7 +64,7 @@ public:
 
 	HRESULT AddSprite (ISimbeyInterchangeSprite* pSprite, bool fVisible);
 	HRESULT CloneSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
-	HRESULT UpdateVisList (CSIFCanvas* pCanvas, sysint nLayer, INT cVisible);
+	HRESULT UpdateVisList (CSIFCanvas* pCanvas, sysint nLayer, INT cVisible, bool fDeferredRemoval = false);
 	HRESULT GetFirstVisibleSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
 	HRESULT GetLastVisibleSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
 	VOID ShowOrHide (CSIFCanvas* pCanvas, sysint nLayer, BOOL fShow);
@@ -411,8 +411,6 @@ protected:
 	// IAStarCallback2D
 	virtual BOOL GetPathValue (INT x, INT y, INT xFrom, INT yFrom, __out INT* pnValue);
 
-	CObject* FindObject (INT xTile, INT yTile);
-
 	HRESULT StartMergingAction (INT xTile, INT yTile);
 	HRESULT StartMovingAction (INT xTile, INT yTile);
 
@@ -437,6 +435,8 @@ protected:
 
 public:
 	HRESULT PlaceUnit (RSTRING rstrName, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, INT nDirection, INT nLevel, COLORREF crColorize, bool fEnchanted, __deref_opt_out CMovingObject** ppObject = NULL);
+	CObject* FindObject (INT xTile, INT yTile);
+	VOID DestroyUnit (CMovingObject* pObject);
 	HRESULT ConfigureBackground (ISimbeyInterchangeFile* pLayers, INT idxLayer, INT x, INT y, __deref_out ISimbeyInterchangeSprite** ppSprite);
 
 protected:
