@@ -358,6 +358,7 @@ protected:
 
 	ULONG m_idxExpandStats;
 	ULONG m_idxCreateCombatObject;
+	ULONG m_idxApplyHealing;
 
 	CSIFCanvas* m_pBackground;
 	DOUBLE m_dblBackground;
@@ -438,6 +439,7 @@ public:
 	CObject* FindObject (INT xTile, INT yTile);
 	VOID DestroyUnit (CMovingObject* pObject);
 	HRESULT ConfigureBackground (ISimbeyInterchangeFile* pLayers, INT idxLayer, INT x, INT y, __deref_out ISimbeyInterchangeSprite** ppSprite);
+	HRESULT ApplyHealing (CMovingObject* pTarget, INT nHealingPoints);
 
 protected:
 	HRESULT PlaceObjects (sysint nLayer, PCWSTR pcwzGroup, RSTRING rstrOwner, const POINT* prgptPlace, INT nDirection, COLORREF crColorize);

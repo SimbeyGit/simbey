@@ -53,6 +53,10 @@
 	},
 	{
 		package: "sound",
+		name: "HeavenlyLight.mp3"
+	},
+	{
+		package: "sound",
 		name: "HeavyWalking.mp3"
 	},
 	{

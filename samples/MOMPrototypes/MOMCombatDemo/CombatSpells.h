@@ -108,6 +108,37 @@ protected:
 	virtual BOOL CheckDestroyUnit (CMovingObject* pTarget);
 };
 
+class CHealingSpell :
+	public CAction,
+	public ISpriteAnimationCompleted
+{
+private:
+	RSTRING m_rstrCaster;
+
+	CSIFCanvas* m_pCanvas;
+	sysint m_nLayer;
+	CIsometricTranslator* m_pIsometric;
+	INT m_xTile;
+	INT m_yTile;
+
+	BOOL m_fIdle;
+	CMovingObject* m_pTarget;
+
+public:
+	IMP_UNKNOWN(CAction)
+
+	CHealingSpell (RSTRING rstrCaster, CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile);
+	~CHealingSpell ();
+
+	virtual VOID Update (VOID);
+
+	// ISpriteAnimationCompleted
+	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
+
+private:
+	HRESULT Start (VOID);
+};
+
 class CCastSpell
 {
 public:
@@ -151,6 +182,19 @@ private:
 public:
 	CCastTargetSpell (RSTRING rstrCaster, RSTRING rstrSpell);
 	~CCastTargetSpell ();
+
+	// CCastSpell
+	virtual HRESULT Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, __in_opt CMovingObject* pUnit, __deref_out CAction** ppAction);
+};
+
+class CCastFriendlySpell : public CCastSpell
+{
+private:
+	RSTRING m_rstrSpell;
+
+public:
+	CCastFriendlySpell (RSTRING rstrCaster, RSTRING rstrSpell);
+	~CCastFriendlySpell ();
 
 	// CCastSpell
 	virtual HRESULT Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, __in_opt CMovingObject* pUnit, __deref_out CAction** ppAction);

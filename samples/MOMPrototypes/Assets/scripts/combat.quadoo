@@ -572,3 +572,22 @@ function CreateCombatObject (strPlayer1, oPlayer1, strPlayer2, oPlayer2)
 {
 	return new Combat(strPlayer1, oPlayer1, strPlayer2, oPlayer2);
 }
+
+function ApplyHealing (oUnit, nLevel, nHealPoints)
+{
+	var oExpStats = ExpandStats(oUnit, nLevel);
+	var cHits = oExpStats.hits;
+	var cMaxHeads = oExpStats.actors;
+	var nMaxHits = cMaxHeads * cHits;
+
+	var nDamage = oUnit.damage;
+	if(nHealPoints > nDamage)
+		nHealPoints = nDamage;
+	nDamage -= nHealPoints;
+	oUnit.damage = nDamage;
+
+	if(oUnit.base.Has("heads"))
+		return nDamage < nMaxHits ? 1 : 0;
+
+	return len((new CombatUnit(oUnit, oExpStats)).Heads);
+}

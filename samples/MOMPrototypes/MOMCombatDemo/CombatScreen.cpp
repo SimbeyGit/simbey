@@ -325,7 +325,7 @@ HRESULT CObject::UpdateVisList (CSIFCanvas* pCanvas, sysint nLayer, INT cVisible
 			sprite.fVisible = fUpdate;
 			if(fUpdate)
 			{
-				ISimbeyInterchangeSprite* pPrev = 0 < i ? m_aSprites[i].pSprite : NULL;
+				ISimbeyInterchangeSprite* pPrev = 0 < i ? m_aSprites[i - 1].pSprite : NULL;
 				Check(pCanvas->AddSpriteAfter(nLayer, sprite.pSprite, pPrev, NULL));
 			}
 			else if(fDeferredRemoval)
@@ -1338,6 +1338,9 @@ HRESULT CCombatScreen::Initialize (VOID)
 
 	Check(m_pHost->GetVM()->FindFunction(L"CreateCombatObject", &m_idxCreateCombatObject, &cParams));
 	CheckIf(4 != cParams, E_UNEXPECTED);
+
+	Check(m_pHost->GetVM()->FindFunction(L"ApplyHealing", &m_idxApplyHealing, &cParams));
+	CheckIf(3 != cParams, E_UNEXPECTED);
 
 	Check(LoadData());
 	Check(LoadProjectiles());
@@ -3107,6 +3110,34 @@ HRESULT CCombatScreen::ConfigureBackground (ISimbeyInterchangeFile* pLayers, INT
 	Check(pLayers->GetLayerByIndex(idxLayer, &srLayer));
 	Check(sifCreateStaticSprite(srLayer, 0, 0, ppSprite));
 	(*ppSprite)->SetPosition(x, y);
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CCombatScreen::ApplyHealing (CMovingObject* pTarget, INT nHealingPoints)
+{
+	HRESULT hr;
+	QuadooVM::QVARIANT qvArg, qvFigures; qvFigures.eType = QuadooVM::Null;
+
+	Check(UpdatePositionInJSON(pTarget));
+
+	qvArg.lVal = nHealingPoints;
+	qvArg.eType = QuadooVM::I4;
+	Check(m_pHost->GetVM()->PushValue(&qvArg));
+
+	qvArg.lVal = pTarget->m_nLevel;
+	qvArg.eType = QuadooVM::I4;
+	Check(m_pHost->GetVM()->PushValue(&qvArg));
+
+	qvArg.pJSONObject = pTarget->m_pDef;
+	qvArg.eType = QuadooVM::JSONObject;
+	Check(m_pHost->GetVM()->PushValue(&qvArg));
+
+	Check(m_pHost->GetVM()->RunFunction(m_idxApplyHealing, &qvFigures));
+	CheckIf(QuadooVM::I4 != qvFigures.eType, DISP_E_BADVARTYPE);
+	Check(pTarget->UpdateVisList(m_pMain, m_nUnitLayer, qvFigures.lVal));
+	UpdateStatsPanel();
 
 Cleanup:
 	return hr;

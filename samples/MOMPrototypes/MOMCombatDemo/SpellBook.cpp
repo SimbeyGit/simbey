@@ -520,12 +520,17 @@ BOOL CSpellBook::ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPAR
 				}
 				else
 				{
-					TStackRef<IJSONValue> srvName;
+					TStackRef<IJSONValue> srvName, srvFriendly;
 					RSTRING rstrSpellW;
+					bool fFriendly;
 
 					SideAssertHr(srSpell->FindNonNullValueW(L"name", &srvName));
 					srvName->GetString(&rstrSpellW);
-					m_pScreen->AttachSpellCaster(__new CCastTargetSpell(rstrCasterW, rstrSpellW));
+
+					if(SUCCEEDED(srSpell->FindNonNullValueW(L"friendly", &srvFriendly)) && SUCCEEDED(srvFriendly->GetBoolean(&fFriendly)) && fFriendly)
+						m_pScreen->AttachSpellCaster(__new CCastFriendlySpell(rstrCasterW, rstrSpellW));
+					else
+						m_pScreen->AttachSpellCaster(__new CCastTargetSpell(rstrCasterW, rstrSpellW));
 					RStrRelease(rstrSpellW);
 				}
 

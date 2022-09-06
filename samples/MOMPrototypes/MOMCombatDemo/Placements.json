@@ -77,6 +77,12 @@
 					name: "Disintegrate",
 					school: "chaos",
 					cost: 50
+				},
+				{
+					name: "Healing",
+					school: "life",
+					cost: 15,
+					friendly: true
 				}
 			]
 		}

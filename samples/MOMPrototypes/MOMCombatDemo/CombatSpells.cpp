@@ -328,6 +328,82 @@ Cleanup:
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// CHealingSpell
+///////////////////////////////////////////////////////////////////////////////
+
+CHealingSpell::CHealingSpell (RSTRING rstrCaster, CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile) :
+	CAction(pScreen),
+	m_pCanvas(pCanvas),
+	m_nLayer(nLayer),
+	m_pIsometric(pIsometric),
+	m_xTile(xTile),
+	m_yTile(yTile),
+	m_fIdle(TRUE),
+	m_pTarget(NULL)
+{
+}
+
+CHealingSpell::~CHealingSpell ()
+{
+}
+
+VOID CHealingSpell::Update (VOID)
+{
+	if(m_fIdle)
+	{
+		m_fIdle = FALSE;
+		Start();
+	}
+}
+
+// ISpriteAnimationCompleted
+
+VOID CHealingSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
+{
+	m_pScreen->ApplyHealing(m_pTarget, 5);
+	m_pCanvas->RemoveSpriteLater(m_nLayer, pSprite);
+	m_pScreen->ClearAction(this);
+}
+
+HRESULT CHealingSpell::Start (VOID)
+{
+	HRESULT hr;
+	FMOD::Sound* pSound;
+	TStackRef<ISimbeyInterchangeFile> srSIF;
+	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
+	TStackRef<ISimbeyInterchangeSprite> srSprite, srSortUnit;
+	INT xIso, yIso, xView, yView;
+	CObject* pObject;
+
+	Check(m_pScreen->FindSound(RSTRING_CAST(L"HeavenlyLight.mp3"), &pSound));
+	m_pScreen->PlaySound(pSound);
+
+	Check(m_pScreen->GetPackage()->OpenSIF(L"spells\\Healing\\cast.sif", &srSIF));
+	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 10, FALSE, &srAnimator, NULL));
+	Check(srAnimator->CreateSprite(&srSprite));
+	Check(srSprite->SelectAnimation(0));
+	Check(srSprite->SetAnimationCompletedCallback(this));
+
+	m_pIsometric->TileToView(m_xTile, m_yTile, &xIso, &yIso);
+	m_pIsometric->IsometricToView(m_pCanvas, xIso, yIso, &xView, &yView);
+	srSprite->SetPosition(xView - 15, yView - 24);
+
+	pObject = m_pScreen->FindObject(m_xTile, m_yTile);
+	CheckIf(!pObject->CanBeMoved(), E_FAIL);
+	m_pTarget = static_cast<CMovingObject*>(pObject);
+
+	Check(m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer));
+
+	Check(m_pTarget->GetLastVisibleSprite(&srSortUnit));
+	Check(m_pCanvas->AddSpriteAfter(m_nLayer, srSprite, srSortUnit, NULL));
+
+Cleanup:
+	if(srSIF)
+		srSIF->Close();
+	return hr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // CCastSpell
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -411,6 +487,35 @@ HRESULT CCastTargetSpell::Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sys
 		*ppAction = __new CCracksCall(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile);
 	else if(SUCCEEDED(RStrCompareW(m_rstrSpell, L"Disintegrate", &nResult)) && 0 == nResult)
 		*ppAction = __new CDisintegrate(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile);
+	else
+		*ppAction = NULL;
+
+	return *ppAction ? S_OK : E_OUTOFMEMORY;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CCastFriendlySpell
+///////////////////////////////////////////////////////////////////////////////
+
+CCastFriendlySpell::CCastFriendlySpell (RSTRING rstrCaster, RSTRING rstrSpell) :
+	CCastSpell(rstrCaster, CCastSpell::FriendlyUnits)
+{
+	RStrSet(m_rstrSpell, rstrSpell);
+}
+
+CCastFriendlySpell::~CCastFriendlySpell ()
+{
+	RStrRelease(m_rstrSpell);
+}
+
+// CCastSpell
+
+HRESULT CCastFriendlySpell::Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, __in_opt CMovingObject* pUnit, __deref_out CAction** ppAction)
+{
+	INT nResult;
+
+	if(SUCCEEDED(RStrCompareW(m_rstrSpell, L"Healing", &nResult)) && 0 == nResult)
+		*ppAction = __new CHealingSpell(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile);
 	else
 		*ppAction = NULL;
 
