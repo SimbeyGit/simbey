@@ -385,7 +385,11 @@ public:
 	HRESULT FindUnitAbility (IJSONObject* pUnit, RSTRING rstrAbility, __deref_out IJSONObject** ppAbility);
 	HRESULT PlaceStat (CSIFCanvas* pCanvas, ISimbeyInterchangeFileFont* pFont, sysint nLayer, INT x, INT y, IJSONObject* pSource, PCWSTR pcwzField, bool fStatSprite = true);
 	HRESULT AddEffect (CSIFCanvas* pCanvas, sysint nLayer, ISimbeyInterchangeSprite* pSprite, ISimbeyInterchangeSprite* pAddAfter, INT cTicksRemaining);
+
 	HRESULT PerformAttack (CMovingObject* pSource, CMovingObject* pTarget, BOOL fRange);
+	HRESULT PerformSpellAttack (IJSONObject* pAbilities, IJSONObject* pWeapon, CMovingObject* pTarget);
+	HRESULT InvokeAttackMethod (__in_opt CMovingObject* pSource, CMovingObject* pTarget, RSTRING rstrAttackMethod, BOOL fUpdateSource, QuadooVM::QVPARAMS* pqvParams);
+
 	HRESULT ShowBloodSpatter (IJSONObject* pResult, PCWSTR pcwzImpact, CMovingObject* pUnit);
 	HRESULT UpdateUnitAsync (IJSONObject* pResult, PCWSTR pcwzFigures, CMovingObject* pUnit);
 	HRESULT RemoveUnitFromBoard (CMovingObject* pUnit);

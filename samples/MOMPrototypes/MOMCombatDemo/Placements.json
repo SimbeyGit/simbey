@@ -83,6 +83,11 @@
 					school: "life",
 					cost: 15,
 					friendly: true
+				},
+				{
+					name: "Ice Bolt",
+					school: "nature",
+					cost: 10
 				}
 			]
 		}

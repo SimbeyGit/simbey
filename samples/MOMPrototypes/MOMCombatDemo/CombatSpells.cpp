@@ -404,6 +404,191 @@ Cleanup:
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// CSpellAttack
+///////////////////////////////////////////////////////////////////////////////
+
+CSpellAttack::CSpellAttack (RSTRING rstrCaster, CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, RSTRING rstrSpell, INT nAdditionalPower) :
+	CAction(pScreen),
+	m_pCanvas(pCanvas),
+	m_nLayer(nLayer),
+	m_pIsometric(pIsometric),
+	m_xTile(xTile),
+	m_yTile(yTile),
+	m_pTarget(NULL),
+	m_nAdditionalPower(nAdditionalPower),
+	m_nFrame(-1),
+	m_pSlide(NULL),
+	m_pWeapon(NULL),
+	m_pSprite(NULL)
+{
+	RStrSet(m_rstrSpell, rstrSpell);
+	RStrSet(m_rstrCaster, rstrCaster);
+}
+
+CSpellAttack::~CSpellAttack ()
+{
+	SafeRelease(m_pSprite);
+
+	SafeRelease(m_pWeapon);
+	SafeRelease(m_pSlide);
+
+	RStrRelease(m_rstrCaster);
+	RStrRelease(m_rstrSpell);
+}
+
+VOID CSpellAttack::Update (VOID)
+{
+	m_nFrame++;
+
+	if(0 == m_nFrame)
+		Start();
+	else if(m_nFrame <= m_cSteps)
+	{
+		TStackRef<IJSONValue> srv;
+		INT x, y, xStep = 0, yStep = 0;
+
+		if(SUCCEEDED(m_pSlide->FindNonNullValueW(L"x_step", &srv)))
+		{
+			srv->GetInteger(&xStep);
+			srv.Release();
+		}
+		if(SUCCEEDED(m_pSlide->FindNonNullValueW(L"y_step", &srv)))
+			srv->GetInteger(&yStep);
+
+		m_pSprite->GetPosition(x, y);
+		x += xStep;
+		y += yStep;
+		m_pSprite->SetPosition(x, y);
+
+		if(m_nFrame == m_cSteps)
+		{
+			TStackRef<IJSONObject> srAbilities;
+
+			JSONCreateObject(&srAbilities);
+
+			m_pSprite->SelectAnimation(1);
+			m_pScreen->PerformSpellAttack(srAbilities, m_pWeapon, m_pTarget);
+		}
+	}
+}
+
+// ISpriteAnimationCompleted
+
+VOID CSpellAttack::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
+{
+	Assert(m_pSprite == pSprite);
+	SafeRelease(m_pSprite);
+
+	m_pCanvas->RemoveSpriteLater(m_nLayer, pSprite);
+	m_pScreen->ClearAction(this);
+}
+
+HRESULT CSpellAttack::Start (VOID)
+{
+	HRESULT hr;
+	TStackRef<CSIFPackage> srSpellDir;
+	TStackRef<IJSONObject> srData, srDef;
+	TStackRef<IJSONValue> srv;
+	TStackRef<ISimbeyInterchangeFile> srSIF;
+	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
+	TStackRef<ISimbeyInterchangeSprite> srSprite, srSortUnit;
+	WCHAR wzSpellDir[MAX_PATH];
+	INT cchSpellDir;
+	RSTRING rstrSound = NULL;
+	FMOD::Sound* pSound;
+	INT xIso, yIso, xView, yView;
+	INT xStart, yStart;
+	CObject* pObject;
+
+	Check(Formatting::TPrintF(wzSpellDir, ARRAYSIZE(wzSpellDir), &cchSpellDir, L"spells\\%r", m_rstrSpell));
+	Check(m_pScreen->GetPackage()->OpenDirectory(wzSpellDir, cchSpellDir, &srSpellDir));
+	Check(srSpellDir->OpenSIF(L"cast.sif", &srSIF));
+
+	Check(srSpellDir->GetJSONData(SLP(L"data.json"), &srv));
+	Check(srv->GetObject(&srData));
+	srv.Release();
+
+	Check(srData->FindNonNullValueW(L"slide", &srv));
+	Check(srv->GetObject(&m_pSlide));
+	srv.Release();
+
+	Check(srData->FindNonNullValueW(L"weapon", &srv));
+	Check(srv->GetObject(&m_pWeapon));
+	srv.Release();
+
+	if(SUCCEEDED(srData->FindNonNullValueW(L"adjustable_weapon_value", &srv)))
+	{
+		bool fAdjustable;
+
+		if(SUCCEEDED(srv->GetBoolean(&fAdjustable)) && fAdjustable)
+		{
+			INT nValue;
+
+			srv.Release();
+
+			Check(m_pWeapon->FindNonNullValueW(L"value", &srv));
+			Check(srv->GetInteger(&nValue));
+			srv.Release();
+
+			nValue += m_nAdditionalPower;
+			Check(JSONCreateInteger(nValue, &srv));
+			Check(m_pWeapon->AddValueW(L"value", srv));
+		}
+
+		srv.Release();
+	}
+
+	Check(srSpellDir->GetJSONData(SLP(L"projectile.json"), &srv));
+	Check(srv->GetObject(&srDef));
+	srv.Release();
+
+	Check(CBaseScreen::CreateAnimator(srSIF, srDef, &srAnimator, TRUE));
+	Check(srData->FindNonNullValueW(L"sound", &srv));
+	Check(srv->GetString(&rstrSound));
+
+	Check(m_pScreen->FindSound(rstrSound, &pSound));
+	m_pScreen->PlaySound(pSound);
+
+	Check(srAnimator->CreateSprite(&srSprite));
+	Check(srSprite->SelectAnimation(0));
+	Check(srSprite->SetAnimationCompletedCallback(this));
+
+	m_pIsometric->TileToView(m_xTile, m_yTile, &xIso, &yIso);
+	m_pIsometric->IsometricToView(m_pCanvas, xIso, yIso, &xView, &yView);
+
+	srv.Release();
+	Check(m_pSlide->FindNonNullValueW(L"x_start", &srv));
+	Check(srv->GetInteger(&xStart));
+
+	srv.Release();
+	Check(m_pSlide->FindNonNullValueW(L"y_start", &srv));
+	Check(srv->GetInteger(&yStart));
+
+	srv.Release();
+	Check(m_pSlide->FindNonNullValueW(L"steps", &srv));
+	Check(srv->GetInteger(&m_cSteps));
+
+	srSprite->SetPosition(xView + xStart, yView + yStart);
+
+	pObject = m_pScreen->FindObject(m_xTile, m_yTile);
+	CheckIf(!pObject->CanBeMoved(), E_FAIL);
+	m_pTarget = static_cast<CMovingObject*>(pObject);
+
+	Check(m_pIsometric->SortIsometricLayer(m_pCanvas, m_nLayer));
+
+	Check(m_pTarget->GetLastVisibleSprite(&srSortUnit));
+	Check(m_pCanvas->AddSpriteAfter(m_nLayer, srSprite, srSortUnit, NULL));
+
+	m_pSprite = srSprite.Detach();
+
+Cleanup:
+	if(srSIF)
+		srSIF->Close();
+	RStrRelease(rstrSound);
+	return hr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // CCastSpell
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -487,6 +672,8 @@ HRESULT CCastTargetSpell::Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sys
 		*ppAction = __new CCracksCall(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile);
 	else if(SUCCEEDED(RStrCompareW(m_rstrSpell, L"Disintegrate", &nResult)) && 0 == nResult)
 		*ppAction = __new CDisintegrate(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile);
+	else if(SUCCEEDED(RStrCompareW(m_rstrSpell, L"Ice Bolt", &nResult)) && 0 == nResult)
+		*ppAction = __new CSpellAttack(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile, RSTRING_CAST(L"IceBolt"), 40);
 	else
 		*ppAction = NULL;
 

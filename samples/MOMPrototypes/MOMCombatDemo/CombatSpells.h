@@ -139,6 +139,43 @@ private:
 	HRESULT Start (VOID);
 };
 
+class CSpellAttack :
+	public CAction,
+	public ISpriteAnimationCompleted
+{
+private:
+	RSTRING m_rstrCaster;
+	RSTRING m_rstrSpell;
+
+	CSIFCanvas* m_pCanvas;
+	sysint m_nLayer;
+	CIsometricTranslator* m_pIsometric;
+	INT m_xTile;
+	INT m_yTile;
+
+	CMovingObject* m_pTarget;
+
+	INT m_nAdditionalPower;
+	INT m_nFrame, m_cSteps;
+	IJSONObject* m_pSlide;
+	IJSONObject* m_pWeapon;
+	ISimbeyInterchangeSprite* m_pSprite;
+
+public:
+	IMP_UNKNOWN(CAction)
+
+	CSpellAttack (RSTRING rstrCaster, CCombatScreen* pScreen, CSIFCanvas* pCanvas, sysint nLayer, CIsometricTranslator* pIsometric, INT xTile, INT yTile, RSTRING rstrSpell, INT nAdditionalPower);
+	~CSpellAttack ();
+
+	virtual VOID Update (VOID);
+
+	// ISpriteAnimationCompleted
+	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
+
+private:
+	HRESULT Start (VOID);
+};
+
 class CCastSpell
 {
 public:

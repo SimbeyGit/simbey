@@ -1993,11 +1993,8 @@ Cleanup:
 HRESULT CCombatScreen::PerformAttack (CMovingObject* pSource, CMovingObject* pTarget, BOOL fRange)
 {
 	HRESULT hr;
-	QuadooVM::QVARIANT qvArgs[6], qvResult; qvResult.eType = QuadooVM::Null;
+	QuadooVM::QVARIANT qvArgs[6];
 	QuadooVM::QVPARAMS qvParams;
-	IJSONObject* pResult;
-
-	CheckIf(NULL == m_pCombat, E_UNEXPECTED);
 
 	Check(UpdatePositionInJSON(pSource));
 	Check(UpdatePositionInJSON(pTarget));
@@ -2023,10 +2020,57 @@ HRESULT CCombatScreen::PerformAttack (CMovingObject* pSource, CMovingObject* pTa
 	qvParams.pqvArgs = qvArgs;
 	qvParams.cArgs = ARRAYSIZE(qvArgs);
 
-	Check(m_pCombat->Invoke(NULL, fRange ? RSTRING_CAST(L"RangeAttack") : RSTRING_CAST(L"MeleeAttack"), &qvParams, &qvResult));
+	Check(InvokeAttackMethod(pSource, pTarget, fRange ? RSTRING_CAST(L"RangeAttack") : RSTRING_CAST(L"MeleeAttack"), !fRange, &qvParams));
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CCombatScreen::PerformSpellAttack (IJSONObject* pAbilities, IJSONObject* pWeapon, CMovingObject* pTarget)
+{
+	HRESULT hr;
+	QuadooVM::QVARIANT qvArgs[5];
+	QuadooVM::QVPARAMS qvParams;
+
+	Check(UpdatePositionInJSON(pTarget));
+
+	qvArgs[4].pJSONObject = pAbilities;
+	qvArgs[4].eType = QuadooVM::JSONObject;
+
+	qvArgs[3].pJSONObject = pWeapon;
+	qvArgs[3].eType = QuadooVM::JSONObject;
+
+	qvArgs[2].rstrVal = pTarget->m_rstrOwner;
+	qvArgs[2].eType = QuadooVM::String;
+
+	qvArgs[1].pJSONObject = pTarget->m_pDef;
+	qvArgs[1].eType = QuadooVM::JSONObject;
+
+	qvArgs[0].lVal = pTarget->m_nLevel;
+	qvArgs[0].eType = QuadooVM::I4;
+
+	qvParams.pqvArgs = qvArgs;
+	qvParams.cArgs = ARRAYSIZE(qvArgs);
+
+	Check(InvokeAttackMethod(NULL, pTarget, RSTRING_CAST(L"SpellAttack"), FALSE, &qvParams));
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CCombatScreen::InvokeAttackMethod (__in_opt CMovingObject* pSource, CMovingObject* pTarget, RSTRING rstrAttackMethod, BOOL fUpdateSource, QuadooVM::QVPARAMS* pqvParams)
+{
+	HRESULT hr;
+	QuadooVM::QVARIANT qvResult; qvResult.eType = QuadooVM::Null;
+	IJSONObject* pResult;
+
+	CheckIf(NULL == m_pCombat, E_UNEXPECTED);
+
+	Check(m_pCombat->Invoke(NULL, rstrAttackMethod, pqvParams, &qvResult));
 	if(QuadooVM::Object == qvResult.eType)
 	{
 		QuadooVM::QVARIANT qvInner;
+		QuadooVM::QVPARAMS qvParams;
 
 		qvParams.cArgs = 0;
 		Check(qvResult.pObject->Invoke(NULL, RSTRING_CAST(L"ToString"), &qvParams, &qvInner));
@@ -2043,8 +2087,9 @@ HRESULT CCombatScreen::PerformAttack (CMovingObject* pSource, CMovingObject* pTa
 	Check(ShowBloodSpatter(pResult, L"target_impact", pTarget));
 	Check(UpdateUnitAsync(pResult, L"target_figures", pTarget));
 
-	if(!fRange)
+	if(fUpdateSource)
 	{
+		Assert(pSource);
 		Check(ShowBloodSpatter(pResult, L"source_impact", pSource));
 		Check(UpdateUnitAsync(pResult, L"source_figures", pSource));
 	}

@@ -65,6 +65,47 @@ function ExpandStats (oUnit, nLevel)
 	return oStats;
 }
 
+class SpellCaster
+{
+	var m_aHeads;
+	var m_oAbilities;
+
+	SpellCaster (oAbilities) :
+		m_oAbilities(oAbilities),
+		m_aHeads(JSONCreateArray())
+	{
+		var oHead = JSONCreateObject();
+		oHead.hits = 1;
+		oHead.damage = 0;
+		oHead.frozen = false;
+		m_aHeads.Append(oHead);
+	}
+
+	property Abilities
+	{
+		get
+		{
+			return m_oAbilities;
+		}
+	}
+
+	property Heads
+	{
+		get
+		{
+			return m_aHeads;
+		}
+	}
+
+	function FindAbility (strName)
+	{
+		try
+			return m_oAbilities[strName];
+		catch
+			return null;
+	}
+};
+
 class CombatUnit
 {
 	var m_oUnit;
@@ -222,6 +263,25 @@ class DamageCalculator
 		m_oTarget(oTarget),
 		m_nTargetLevel(nTargetLevel)
 	{
+	}
+
+	function SpellAttack (oAbilities, oWeapon)
+	{
+		var oResult = JSONCreateObject();
+		var oExpTarget = ExpandStats(m_oTarget, m_nTargetLevel);
+
+		m_oSourceCombatUnit = new SpellCaster(oAbilities);
+		m_oTargetCombatUnit = new CombatUnit(m_oTarget, oExpTarget);
+
+		SingleAttack(m_oSourceCombatUnit, oWeapon, m_oTargetCombatUnit);
+
+		var nDamageToTarget = m_oTargetCombatUnit.CommitDamage();
+		var nMaxHealth = oExpTarget.actors * oExpTarget.hits;
+
+		oResult.target_figures = m_oTargetCombatUnit.LiveHeads;
+		oResult.target_impact = (double)nDamageToTarget / (double)nMaxHealth;
+
+		return oResult;
 	}
 
 	function RangeAttack (mapRange)
@@ -553,6 +613,12 @@ class Combat
 	function AddRangeAttack (strName, oData)
 	{
 		m_mapRange.Add(strName, oData);
+	}
+
+	function SpellAttack (oAbilities, oWeapon, strTarget, oTarget, nTargetLevel)
+	{
+		var oDamageCalculator = new DamageCalculator("", null, 0, strTarget, oTarget, nTargetLevel);
+		return oDamageCalculator.SpellAttack(oAbilities, oWeapon);
 	}
 
 	function RangeAttack (strSource, oSource, nSourceLevel, strTarget, oTarget, nTargetLevel)
