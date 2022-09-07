@@ -674,6 +674,10 @@ HRESULT CCastTargetSpell::Cast (CCombatScreen* pScreen, CSIFCanvas* pCanvas, sys
 		*ppAction = __new CDisintegrate(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile);
 	else if(SUCCEEDED(RStrCompareW(m_rstrSpell, L"Ice Bolt", &nResult)) && 0 == nResult)
 		*ppAction = __new CSpellAttack(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile, RSTRING_CAST(L"IceBolt"), 40);
+	else if(SUCCEEDED(RStrCompareW(m_rstrSpell, L"Fire Bolt", &nResult)) && 0 == nResult)
+		*ppAction = __new CSpellAttack(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile, RSTRING_CAST(L"FireBolt"), 20);
+	else if(SUCCEEDED(RStrCompareW(m_rstrSpell, L"Doom Bolt", &nResult)) && 0 == nResult)
+		*ppAction = __new CSpellAttack(m_rstrCaster, pScreen, pCanvas, nLayer, pIsometric, xTile, yTile, RSTRING_CAST(L"DoomBolt"), 0);
 	else
 		*ppAction = NULL;
 

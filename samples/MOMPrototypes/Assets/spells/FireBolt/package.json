@@ -1,0 +1,71 @@
+[
+	{
+		package: "buildsif",
+		name: "cast.sif",
+		files: ["cast-frame*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			adjustable_weapon_value: true,
+			sound: "FireBolt.mp3",
+			weapon:
+			{
+				type: "magic",
+				immunity: "fire",
+				value: 5,
+				realm: "chaos",
+				to_hit: 3,
+				abilities: []
+			},
+			slide:
+			{
+				x_start: 100,
+				y_start: -100,
+				x_step: -2,
+				y_step: 2,
+				steps: 50
+			}
+		}
+	},
+	{
+		package: "json",
+		name: "projectile.json",
+		data:
+		{
+			type: "animation",
+			animation: "projectile",
+			images:
+			[
+				{ layer: 0 },	// cast-frame01
+				{ layer: 1 },	// cast-frame02
+				{ layer: 2 },	// cast-frame03
+				{ layer: 3 }	// cast-frame04
+			],
+			animations:
+			[
+				// cast-frame (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 1, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 2, ticks: 1, xoffset: 4, yoffset: -22 }
+					]
+				},
+				// strike-frame (animation 1)
+				{
+					frames:
+					[
+						{ image: 3, ticks: 20, xoffset: 4, yoffset: -22 },
+					],
+					next: 0
+				}
+			]
+		}
+	}
+]

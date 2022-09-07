@@ -455,13 +455,36 @@ class DamageCalculator
 			nToHit--;
 		}
 
-		// If the target has immunity to the weapon, then increase
-		// the target's defense to 50 for this attack.
-		if(oWeapon.Has("immunity"))
+		bool fDoom;
+		if(oWeapon.Has("damage"))
+			fDoom = oWeapon.damage == "doom";
+
+		if(fDoom && (!oCombatTarget.FindImmunity("magic") || !oCombatTarget.FindAbility("Righteousness")))
 		{
-			var oImmunity = oCombatTarget.FindImmunity(oWeapon.immunity);
-			if(oImmunity && nDefense < 50)
-				nDefense = 50;
+			// If the target does not have magic immunity, then the target has no defense against doom.
+			nDefense = 0;
+		}
+		else
+		{
+			// If the target has immunity to the weapon, then increase
+			// the target's defense to 50 for this attack.
+			if(oWeapon.Has("immunity"))
+			{
+				var oImmunity = oCombatTarget.FindImmunity(oWeapon.immunity);
+				if(oImmunity && nDefense < 50)
+					nDefense = 50;
+			}
+
+			// If the weapon is magical, check whether the target has a
+			// general immunity to magic attacks.
+			if(nDefense < 50 && oWeapon.type == "magic")
+			{
+				var oImmunity = oCombatTarget.FindImmunity("magic");
+				if(oImmunity && nDefense < 50)
+					nDefense = 50;
+				else if(oCombatTarget.FindAbility("Righteousness") && (oWeapon.realm == "death" || oWeapon.realm == "chaos"))
+					nDefense = 50;
+			}
 		}
 
 		// If the attacker has "Armor Piercing" then the target's

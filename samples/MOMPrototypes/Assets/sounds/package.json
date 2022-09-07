@@ -41,6 +41,10 @@
 	},
 	{
 		package: "sound",
+		name: "DoomBolt.mp3"
+	},
+	{
+		package: "sound",
 		name: "DrakeAttack.mp3"
 	},
 	{

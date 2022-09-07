@@ -88,6 +88,16 @@
 					name: "Ice Bolt",
 					school: "nature",
 					cost: 10
+				},
+				{
+					name: "Fire Bolt",
+					school: "chaos",
+					cost: 5
+				},
+				{
+					name: "Doom Bolt",
+					school: "chaos",
+					cost: 40
 				}
 			]
 		}
