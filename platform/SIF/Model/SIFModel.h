@@ -54,7 +54,8 @@ public:
 	ULONG FindClosestPoint (FPOINT* ppt, FLOAT rTolerance);
 	VOID RecalculateNormals (ULONG idVertex);
 	HRESULT GetJoint (PCSTR pcszJoint, __deref_out JOINT** ppJoint);
-	HRESULT BuildMirrorFrom (CSIFMeshData* pMesh);
+	BOOL HasJoint (PCSTR pcszJoint);
+	HRESULT BuildMirrorFrom (CSIFMeshData* pMesh, TNamedMapA<PCSTR>& mapNodeMirrors);
 	HRESULT FindFace (FPOINT* ppt, ULONG* pidFace);
 
 	HRESULT SaveToStream (ISequentialStream* pStream);
@@ -98,6 +99,9 @@ public:
 	~CSIFModel ();
 
 	HRESULT GetMeshData (PCSTR pcszMesh, __deref_out CSIFMeshData** ppMeshData);
+	BOOL HasMeshData (PCSTR pcszMesh);
+	HRESULT GetMeshByIndex (sysint idxMesh, __out PCSTR* pcszMesh, __deref_out CSIFMeshData** ppMeshData);
+	CModelTemplate* GetTemplate (VOID) { return m_pTemplate; }
 
 	ISimbeyInterchangeFile* GetSIF (VOID);
 	VOID SetSIF (ISimbeyInterchangeFile* pSIF);

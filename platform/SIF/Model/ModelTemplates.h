@@ -91,6 +91,7 @@ public:
 	TNamedMapA<CModelMesh*>* GetModelMeshes (VOID);
 
 	HRESULT GetMesh (INT nMesh, __deref_out CModelMesh** ppMesh);
+	CModelNode* GetRootNode (VOID) { return m_pRoot; }
 
 protected:
 	HRESULT SaveNode (ISequentialStream* pStream, CModelNode* pNode);

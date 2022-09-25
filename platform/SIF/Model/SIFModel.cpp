@@ -168,7 +168,12 @@ HRESULT CSIFMeshData::GetJoint (PCSTR pcszJoint, __deref_out JOINT** ppJoint)
 	return hr;
 }
 
-HRESULT CSIFMeshData::BuildMirrorFrom (CSIFMeshData* pMesh)
+BOOL CSIFMeshData::HasJoint (PCSTR pcszJoint)
+{
+	return m_mapJoint.HasItem(pcszJoint);
+}
+
+HRESULT CSIFMeshData::BuildMirrorFrom (CSIFMeshData* pMesh, TNamedMapA<PCSTR>& mapNodeMirrors)
 {
 	HRESULT hr = S_FALSE;
 	TMap<ULONG, FPOINT>& mapVertex = pMesh->m_mapVertex;
@@ -189,11 +194,11 @@ HRESULT CSIFMeshData::BuildMirrorFrom (CSIFMeshData* pMesh)
 		Check(mapFace.GetValueChecked(i, &face));
 
 		// Swap the first two vertices.
-		Check(mapVertex.Find(face.nVertex[0], fpPoints + 1));
-		Check(mapVertex.Find(face.nVertex[1], fpPoints + 0));
+		Check(mapVertex.Find(face.nVertex[0], fpPoints + 2));
+		Check(mapVertex.Find(face.nVertex[2], fpPoints + 0));
 
 		// The third vertex is still the third vertex.
-		Check(mapVertex.Find(face.nVertex[2], fpPoints + 2));
+		Check(mapVertex.Find(face.nVertex[1], fpPoints + 1));
 
 		// Mirror the x coordinates.
 		fpPoints[0].x = -fpPoints[0].x;
@@ -205,11 +210,17 @@ HRESULT CSIFMeshData::BuildMirrorFrom (CSIFMeshData* pMesh)
 		Check(m_mapFace.FindPtr(idFace, &pFace));
 
 		// Setup the texture coordinates (swap first two).
-		pFace->Align[0] = face.Align[1];
-		pFace->Align[1] = face.Align[0];
-		pFace->Align[2] = face.Align[2];
+		pFace->Align[0] = face.Align[2];
+		pFace->Align[1] = face.Align[1];
+		pFace->Align[2] = face.Align[0];
 
 		pFace->idLayer = face.idLayer;
+	}
+
+	for(sysint i = 0; i < m_mapVertex.Length(); i++)
+	{
+		ULONG idVertex = m_mapVertex.GetKey(i);
+		RecalculateNormals(idVertex);
 	}
 
 	for(sysint i = 0; i < mapJoint.Length(); i++)
@@ -217,15 +228,21 @@ HRESULT CSIFMeshData::BuildMirrorFrom (CSIFMeshData* pMesh)
 		PCSTR pcszName;
 		JOINT joint;
 
+		// Get the original joint's name and position/rotation data.
 		Check(mapJoint.GetKeyAndValue(i, &pcszName, &joint));
-		joint.fPos.x = -joint.fPos.x;
-		if(0.0f < joint.yRot)
-			joint.yRot = 360.0f - joint.yRot;
-		if(0.0f < joint.zRot)
-			joint.zRot = 360.0f - joint.zRot;
 
-		// Add the mirrored joint.
-		Check(m_mapJoint.Add(pcszName, joint));
+		// Translate the original joint's name to the mirrored name.
+		if(SUCCEEDED(mapNodeMirrors.Find(pcszName, &pcszName)))
+		{
+			joint.fPos.x = -joint.fPos.x;
+			if(0.0f < joint.yRot)
+				joint.yRot = 360.0f - joint.yRot;
+			if(0.0f < joint.zRot)
+				joint.zRot = 360.0f - joint.zRot;
+
+			// Add the mirrored joint.
+			Check(m_mapJoint.Add(pcszName, joint));
+		}
 	}
 
 	CopyMemory(&m_Material, &pMesh->m_Material, sizeof(MATERIAL));
@@ -451,6 +468,16 @@ HRESULT CSIFModel::GetMeshData (PCSTR pcszMesh, __deref_out CSIFMeshData** ppMes
 Cleanup:
 	SafeDelete(pMeshData);
 	return hr;
+}
+
+BOOL CSIFModel::HasMeshData (PCSTR pcszMesh)
+{
+	return m_mapMeshData.HasItem(pcszMesh);
+}
+
+HRESULT CSIFModel::GetMeshByIndex (sysint idxMesh, __out PCSTR* pcszMesh, __deref_out CSIFMeshData** ppMeshData)
+{
+	return m_mapMeshData.GetKeyAndValue(idxMesh, pcszMesh, ppMeshData);
 }
 
 ISimbeyInterchangeFile* CSIFModel::GetSIF (VOID)
