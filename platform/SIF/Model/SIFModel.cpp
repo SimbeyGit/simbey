@@ -235,10 +235,10 @@ HRESULT CSIFMeshData::BuildMirrorFrom (CSIFMeshData* pMesh, TNamedMapA<PCSTR>& m
 		if(SUCCEEDED(mapNodeMirrors.Find(pcszName, &pcszName)))
 		{
 			joint.fPos.x = -joint.fPos.x;
-			if(0.0f < joint.yRot)
-				joint.yRot = 360.0f - joint.yRot;
-			if(0.0f < joint.zRot)
-				joint.zRot = 360.0f - joint.zRot;
+			if(0.0f < joint.fRot.y)
+				joint.fRot.y = 360.0f - joint.fRot.y;
+			if(0.0f < joint.fRot.z)
+				joint.fRot.z = 360.0f - joint.fRot.z;
 
 			// Add the mirrored joint.
 			Check(m_mapJoint.Add(pcszName, joint));
@@ -424,6 +424,124 @@ BOOL CSIFMeshData::IsEquivalentFace (ULONG* prgFaceA, ULONG* prgFaceB)
 	return FALSE;
 }
 
+// CSIFFrame
+
+CSIFFrame::CSIFFrame () :
+	m_yOffset(0),
+	m_cTicks(15)
+{
+	ZeroMemory(&m_fRootRotation, sizeof(m_fRootRotation));
+}
+
+CSIFFrame::~CSIFFrame ()
+{
+}
+
+HRESULT CSIFFrame::SaveToStream (ISequentialStream* pStream)
+{
+	HRESULT hr;
+	ULONG cb;
+	sysint cJoints = m_mapJoints.Length();
+
+	Check(pStream->Write(&m_yOffset, sizeof(m_yOffset), &cb));
+	Check(pStream->Write(&m_cTicks, sizeof(m_cTicks), &cb));
+
+	CheckIf(cJoints > USHORT_MAX, E_FAIL);
+	USHORT usJoints = static_cast<USHORT>(cJoints);
+
+	Check(pStream->Write(&usJoints, sizeof(usJoints), &cb));
+	for(USHORT i = 0; i < usJoints; i++)
+	{
+		PCSTR pcszName;
+		FPOINT* pJoint;
+
+		Check(m_mapJoints.GetKeyAndValuePtr(i, &pcszName, &pJoint));
+		Check(WriteString(pStream, pcszName));
+		Check(pStream->Write(pJoint, sizeof(FPOINT), &cb));
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CSIFFrame::LoadFromStream (ISequentialStream* pStream)
+{
+	HRESULT hr;
+	USHORT usJoints;
+	PSTR pszItem = NULL;
+	INT cch;
+	ULONG cb;
+
+	Check(pStream->Read(&m_yOffset, sizeof(m_yOffset), &cb));
+	Check(pStream->Read(&m_cTicks, sizeof(m_cTicks), &cb));
+	Check(pStream->Read(&usJoints, sizeof(usJoints), &cb));
+
+	for(USHORT i = 0; i < usJoints; i++)
+	{
+		FPOINT* pJoint;
+		Check(LoadString(pStream, &pszItem, &cch));
+		Check(m_mapJoints.AddSlot(pszItem, &pJoint));
+		Check(pStream->Read(pJoint, sizeof(FPOINT), &cb));
+		__delete_array pszItem; pszItem = NULL;
+	}
+
+Cleanup:
+	__delete_array pszItem;
+	return hr;
+}
+
+// CSIFAnimation
+
+CSIFAnimation::CSIFAnimation ()
+{
+}
+
+CSIFAnimation::~CSIFAnimation ()
+{
+	m_aFrames.DeleteAll();
+}
+
+HRESULT CSIFAnimation::SaveToStream (ISequentialStream* pStream)
+{
+	HRESULT hr;
+	sysint cFrames = m_aFrames.Length();
+	ULONG cb;
+
+	CheckIf(cFrames > USHORT_MAX, E_FAIL);
+	USHORT usFrames = static_cast<USHORT>(cFrames);
+
+	Check(pStream->Write(&usFrames, sizeof(usFrames), &cb));
+
+	for(sysint i = 0; i < cFrames; i++)
+		Check(m_aFrames[i]->SaveToStream(pStream));
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CSIFAnimation::LoadFromStream (ISequentialStream* pStream)
+{
+	HRESULT hr;
+	USHORT usFrames;
+	ULONG cb;
+	CSIFFrame* pFrame = NULL;
+
+	Check(pStream->Read(&usFrames, sizeof(usFrames), &cb));
+
+	for(USHORT i = 0; i < usFrames; i++)
+	{
+		pFrame = __new CSIFFrame;
+		CheckAlloc(pFrame);
+		Check(pFrame->LoadFromStream(pStream));
+		Check(m_aFrames.Append(pFrame));
+		pFrame = NULL;
+	}
+
+Cleanup:
+	__delete pFrame;
+	return hr;
+}
+
 // CSIFModel
 
 CSIFModel::CSIFModel (CModelTemplate* pTemplate, bool fOwnTemplate) :
@@ -434,6 +552,7 @@ CSIFModel::CSIFModel (CModelTemplate* pTemplate, bool fOwnTemplate) :
 	m_wScaleNumerator(1),
 	m_wScaleDenominator(64)
 {
+	ZeroMemory(&m_fRootRotation, sizeof(m_fRootRotation));
 }
 
 CSIFModel::~CSIFModel ()
@@ -443,8 +562,8 @@ CSIFModel::~CSIFModel ()
 		m_pSIF->Close();
 		m_pSIF->Release();
 	}
-	for(INT i = 0; i < m_mapMeshData.Length(); i++)
-		__delete *m_mapMeshData.GetValuePtr(i);
+	m_mapAnimations.DeleteAll();
+	m_mapMeshData.DeleteAll();
 	if(m_fOwnTemplate)
 		__delete m_pTemplate;
 }
@@ -475,9 +594,40 @@ BOOL CSIFModel::HasMeshData (PCSTR pcszMesh)
 	return m_mapMeshData.HasItem(pcszMesh);
 }
 
-HRESULT CSIFModel::GetMeshByIndex (sysint idxMesh, __out PCSTR* pcszMesh, __deref_out CSIFMeshData** ppMeshData)
+HRESULT CSIFModel::GetMeshByIndex (sysint idxMesh, __out PCSTR* ppcszMesh, __deref_out CSIFMeshData** ppMeshData)
 {
-	return m_mapMeshData.GetKeyAndValue(idxMesh, pcszMesh, ppMeshData);
+	return m_mapMeshData.GetKeyAndValue(idxMesh, ppcszMesh, ppMeshData);
+}
+
+HRESULT CSIFModel::GetAnimation (PCSTR pcszAnimation, __deref_out CSIFAnimation** ppAnimation)
+{
+	HRESULT hr;
+	CSIFAnimation* pAnimation = NULL;
+
+	if(SUCCEEDED(m_mapAnimations.Find(pcszAnimation, ppAnimation)))
+		hr = S_OK;
+	else
+	{
+		pAnimation = __new CSIFAnimation;
+		CheckAlloc(pAnimation);
+		Check(m_mapAnimations.Add(pcszAnimation, pAnimation));
+		*ppAnimation = pAnimation;
+		pAnimation = NULL;
+	}
+
+Cleanup:
+	SafeDelete(pAnimation);
+	return hr;
+}
+
+BOOL CSIFModel::HasAnimation (PCSTR pcszAnimation)
+{
+	return m_mapAnimations.HasItem(pcszAnimation);
+}
+
+HRESULT CSIFModel::GetAnimationByIndex (sysint idxAnimation, __out PCSTR* ppcszAnimation, __deref_out CSIFAnimation** ppAnimation)
+{
+	return m_mapAnimations.GetKeyAndValue(idxAnimation, ppcszAnimation, ppAnimation);
 }
 
 ISimbeyInterchangeFile* CSIFModel::GetSIF (VOID)
@@ -520,11 +670,13 @@ HRESULT CSIFModel::SaveToStream (ISequentialStream* pStream)
 {
 	HRESULT hr;
 	sysint cMeshes = m_mapMeshData.Length();
+	sysint cAnimations = m_mapAnimations.Length();
 	USHORT usMeshes;
 	ULONG cb;
 
 	Check(pStream->Write(&m_wScaleNumerator, sizeof(m_wScaleNumerator), &cb));
 	Check(pStream->Write(&m_wScaleDenominator, sizeof(m_wScaleDenominator), &cb));
+	Check(pStream->Write(&m_fRootRotation, sizeof(m_fRootRotation), &cb));
 
 	CheckIf(cMeshes > USHORT_MAX, E_FAIL);
 	usMeshes = static_cast<USHORT>(cMeshes);
@@ -540,6 +692,20 @@ HRESULT CSIFModel::SaveToStream (ISequentialStream* pStream)
 		Check(pMesh->SaveToStream(pStream));
 	}
 
+	CheckIf(cAnimations > USHORT_MAX, E_FAIL);
+	USHORT usAnimations = static_cast<USHORT>(cAnimations);
+
+	Check(pStream->Write(&usAnimations, sizeof(usAnimations), &cb));
+	for(sysint i = 0; i < cAnimations; i++)
+	{
+		PCSTR pcszName;
+		CSIFAnimation* pAnimation;
+
+		Check(m_mapAnimations.GetKeyAndValue(i, &pcszName, &pAnimation));
+		Check(WriteString(pStream, pcszName));
+		Check(pAnimation->SaveToStream(pStream));
+	}
+
 Cleanup:
 	return hr;
 }
@@ -547,34 +713,50 @@ Cleanup:
 HRESULT CSIFModel::LoadFromStream (ISequentialStream* pStream)
 {
 	HRESULT hr;
-	USHORT usMeshes;
+	USHORT usMeshes, usAnimations;
 	ULONG cb;
-	PSTR pszMesh = NULL;
+	PSTR pszItem = NULL;
+	INT cch;
 	CSIFMeshData* pData = NULL;
+	CSIFAnimation* pAnimation = NULL;
 
 	Check(pStream->Read(&m_wScaleNumerator, sizeof(m_wScaleNumerator), &cb));
 	Check(pStream->Read(&m_wScaleDenominator, sizeof(m_wScaleDenominator), &cb));
+	Check(pStream->Read(&m_fRootRotation, sizeof(m_fRootRotation), &cb));
 
 	Check(pStream->Read(&usMeshes, sizeof(usMeshes), &cb));
-
 	for(USHORT i = 0; i < usMeshes; i++)
 	{
-		INT cch;
-
-		Check(LoadString(pStream, &pszMesh, &cch));
+		Check(LoadString(pStream, &pszItem, &cch));
 
 		pData = __new CSIFMeshData;
 		CheckAlloc(pData);
 
 		Check(pData->LoadFromStream(pStream));
-		Check(m_mapMeshData.Add(pszMesh, pData));
+		Check(m_mapMeshData.Add(pszItem, pData));
 		pData = NULL;
 
-		__delete_array pszMesh; pszMesh = NULL;
+		__delete_array pszItem; pszItem = NULL;
+	}
+
+	Check(pStream->Read(&usAnimations, sizeof(usAnimations), &cb));
+	for(USHORT i = 0; i < usAnimations; i++)
+	{
+		Check(LoadString(pStream, &pszItem, &cch));
+
+		pAnimation = __new CSIFAnimation;
+		CheckAlloc(pAnimation);
+
+		Check(pAnimation->LoadFromStream(pStream));
+		Check(m_mapAnimations.Add(pszItem, pAnimation));
+		pAnimation = NULL;
+
+		__delete_array pszItem; pszItem = NULL;
 	}
 
 Cleanup:
+	__delete pAnimation;
 	__delete pData;
-	__delete_array pszMesh;
+	__delete_array pszItem;
 	return hr;
 }

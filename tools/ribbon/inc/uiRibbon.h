@@ -1,5 +1,7 @@
 #pragma once
 
+#define UI_MAKEAPPMODE(x) (1 << (x))
+
 #ifndef	PROPERTYKEY_DEFINED
 #define	PROPERTYKEY_DEFINED
 

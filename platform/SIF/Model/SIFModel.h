@@ -30,9 +30,7 @@ struct MATERIAL
 struct JOINT
 {
 	FPOINT fPos;
-	FLOAT xRot;
-	FLOAT yRot;
-	FLOAT zRot;
+	FPOINT fRot;
 };
 
 class CSIFMeshData
@@ -79,6 +77,35 @@ public:
 	}
 };
 
+class CSIFFrame
+{
+public:
+	WORD m_yOffset;
+	WORD m_cTicks;
+	FPOINT m_fRootRotation;
+	TNamedMapA<FPOINT> m_mapJoints;
+
+public:
+	CSIFFrame ();
+	~CSIFFrame ();
+
+	HRESULT SaveToStream (ISequentialStream* pStream);
+	HRESULT LoadFromStream (ISequentialStream* pStream);
+};
+
+class CSIFAnimation
+{
+public:
+	TArray<CSIFFrame*> m_aFrames;
+
+public:
+	CSIFAnimation ();
+	~CSIFAnimation ();
+
+	HRESULT SaveToStream (ISequentialStream* pStream);
+	HRESULT LoadFromStream (ISequentialStream* pStream);
+};
+
 class CSIFModel
 {
 protected:
@@ -86,6 +113,7 @@ protected:
 	bool m_fOwnTemplate;
 
 	TNamedMapA<CSIFMeshData*> m_mapMeshData;
+	TNamedMapA<CSIFAnimation*> m_mapAnimations;
 
 	ISimbeyInterchangeFile* m_pSIF;
 	UINT m_nTexture;
@@ -93,6 +121,7 @@ protected:
 public:
 	WORD m_wScaleNumerator;
 	WORD m_wScaleDenominator;
+	FPOINT m_fRootRotation;
 
 public:
 	CSIFModel (CModelTemplate* pTemplate, bool fOwnTemplate);
@@ -100,8 +129,12 @@ public:
 
 	HRESULT GetMeshData (PCSTR pcszMesh, __deref_out CSIFMeshData** ppMeshData);
 	BOOL HasMeshData (PCSTR pcszMesh);
-	HRESULT GetMeshByIndex (sysint idxMesh, __out PCSTR* pcszMesh, __deref_out CSIFMeshData** ppMeshData);
+	HRESULT GetMeshByIndex (sysint idxMesh, __out PCSTR* ppcszMesh, __deref_out CSIFMeshData** ppMeshData);
 	CModelTemplate* GetTemplate (VOID) { return m_pTemplate; }
+
+	HRESULT GetAnimation (PCSTR pcszAnimation, __deref_out CSIFAnimation** ppAnimation);
+	BOOL HasAnimation (PCSTR pcszAnimation);
+	HRESULT GetAnimationByIndex (sysint idxAnimation, __out PCSTR* ppcszAnimation, __deref_out CSIFAnimation** ppAnimation);
 
 	ISimbeyInterchangeFile* GetSIF (VOID);
 	VOID SetSIF (ISimbeyInterchangeFile* pSIF);
