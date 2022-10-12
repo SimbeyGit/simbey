@@ -7,6 +7,7 @@
 #include "CombatScreen.h"
 #include "CombatSpells.h"
 #include "SpellBook.h"
+#include "UnitStats.h"
 
 #define	TILE_WIDTH			32
 #define	TILE_HEIGHT			16
@@ -1231,7 +1232,6 @@ CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface,
 	m_pUnitStats(NULL),
 	m_pBlood(NULL),
 	m_pCombatBar(NULL),
-	m_pSpellBook(NULL),
 	m_pBackground(NULL),
 	m_dblBackground(0.0),
 	m_pCornerA(NULL),
@@ -1260,7 +1260,7 @@ CCombatScreen::~CCombatScreen ()
 
 	Assert(NULL == m_pCombatBar);
 	Assert(NULL == m_pCastSpell);
-	Assert(NULL == m_pSpellBook);
+	Assert(0 == m_aViews.Length());
 
 	SafeRelease(m_pFonts);
 	SafeRelease(m_pCombatBarFont);
@@ -1505,11 +1505,9 @@ VOID CCombatScreen::OnDestroy (VOID)
 		m_pCombat = NULL;
 	}
 
-	if(m_pSpellBook)
-	{
-		m_pSpellBook->Destroy();
-		SafeRelease(m_pSpellBook);
-	}
+	for(sysint i = m_aViews.Length() - 1; i >= 0; i--)
+		m_aViews[i]->Destroy();
+	m_aViews.Clear();
 
 	SafeRelease(m_pCombatBar);
 	SafeDelete(m_pCastSpell);
@@ -2236,8 +2234,6 @@ HRESULT CCombatScreen::ShowSpellBook (VOID)
 	CSpellBook* pSpellBook = NULL;
 	INT nMagicPower;
 
-	CheckIf(NULL != m_pSpellBook, E_UNEXPECTED);
-
 	Check(m_pPlacements->FindNonNullValueW(L"spells", &srv));
 	Check(srv->GetArray(&srSpells));
 	srv.Release();
@@ -2249,66 +2245,34 @@ HRESULT CCombatScreen::ShowSpellBook (VOID)
 	CheckAlloc(pSpellBook);
 
 	Check(pSpellBook->Initialize(srSpells));
-	Check(m_pSurface->MoveCanvasToTop(m_pMouse));
-
-	m_pSpellBook = pSpellBook;
+	Check(AddPopup(pSpellBook));
 
 Cleanup:
-	if(FAILED(hr))
-		SafeRelease(pSpellBook);
+	SafeRelease(pSpellBook);
 	return hr;
-}
-
-HRESULT CCombatScreen::RemoveSpellBook (VOID)
-{
-	if(m_pSpellBook)
-	{
-		m_pSpellBook->Destroy();
-		SafeRelease(m_pSpellBook);
-		return S_OK;
-	}
-	return S_FALSE;
 }
 
 HRESULT CCombatScreen::ShowSelectedUnitInfo (VOID)
 {
 	HRESULT hr;
-	TStackRef<IQuadooObject> srObject;
-	QuadooVM::QVPARAMS qvParams;
-	QuadooVM::QVARIANT qv, qvResult; qvResult.eType = QuadooVM::Null;
+	TStackRef<IJSONObject> srStats;
+	CMovingObject* pSelected;
+	CUnitStats* pUnitStats = NULL;
 
 	CheckIf(NULL == m_pSelected, S_FALSE);
-	qv.pJSONObject = static_cast<CMovingObject*>(m_pSelected)->m_pDef;
-	qv.eType = QuadooVM::JSONObject;
+	pSelected = static_cast<CMovingObject*>(m_pSelected);
 
-	Check(m_pHost->QueryInterface(&srObject));
-	qvParams.cArgs = 1;
-	qvParams.pqvArgs = &qv;
+	pUnitStats = __new CUnitStats(m_pSurface, this);
+	CheckAlloc(pUnitStats);
 
-	Check(srObject->Invoke(NULL, RSTRING_CAST(L"Display"), &qvParams, &qvResult));
+	Check(ExpandStats(pSelected->m_pDef, pSelected->m_nLevel, &srStats));
 
-Cleanup:
-	QVMClearVariant(&qvResult);
-	return hr;
-}
-
-HRESULT CCombatScreen::AttachSpellCaster (CCastSpell* pSpell)
-{
-	HRESULT hr;
-
-	CheckIf(NULL != m_pCastSpell, E_UNEXPECTED);
-	Check(m_pMoveType->SelectAnimation(3));
-	m_pCastSpell = pSpell;
+	Check(pUnitStats->Initialize(pSelected->m_pDef, srStats, pSelected->m_nLevel));
+	Check(AddPopup(pUnitStats));
 
 Cleanup:
+	SafeRelease(pUnitStats);
 	return hr;
-}
-
-VOID CCombatScreen::UpdateMouse (LPARAM lParam)
-{
-	INT xView, yView;
-	m_pSurface->TranslateClientPointToCanvas(LOWORD(lParam), HIWORD(lParam), m_pMouse, &xView, &yView);
-	m_pMoveType->SetPosition(xView, yView);
 }
 
 HRESULT CCombatScreen::LoadData (VOID)
@@ -3375,6 +3339,52 @@ Cleanup:
 	RStrRelease(rstrPlayer);
 	RStrRelease(rstrLeft);
 	RStrRelease(rstrRight);
+	return hr;
+}
+
+// IPopupHost
+
+HRESULT CCombatScreen::AddPopup (IPopupView* pView)
+{
+	HRESULT hr;
+
+	Check(m_aViews.Append(pView));
+	Check(m_pSurface->MoveCanvasToTop(m_pMouse));
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CCombatScreen::RemovePopup (IPopupView* pView)
+{
+	for(sysint i = 0; i < m_aViews.Length(); i++)
+	{
+		if(m_aViews[i] == pView)
+		{
+			pView->Destroy();
+			m_aViews.Remove(i, NULL);
+			return S_OK;
+		}
+	}
+	return S_FALSE;
+}
+
+VOID CCombatScreen::UpdateMouse (LPARAM lParam)
+{
+	INT xView, yView;
+	m_pSurface->TranslateClientPointToCanvas(LOWORD(lParam), HIWORD(lParam), m_pMouse, &xView, &yView);
+	m_pMoveType->SetPosition(xView, yView);
+}
+
+HRESULT CCombatScreen::AttachSpellCaster (CCastSpell* pSpell)
+{
+	HRESULT hr;
+
+	CheckIf(NULL != m_pCastSpell, E_UNEXPECTED);
+	Check(m_pMoveType->SelectAnimation(3));
+	m_pCastSpell = pSpell;
+
+Cleanup:
 	return hr;
 }
 

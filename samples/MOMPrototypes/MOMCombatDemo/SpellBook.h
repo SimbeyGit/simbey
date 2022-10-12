@@ -1,6 +1,7 @@
 #pragma once
 
-#include "CombatScreen.h"
+#include "BaseScreen.h"
+#include "PopupHost.h"
 
 #define	SPELL_BOOK_PAGE_WIDTH		124
 #define	SPELL_BOOK_PAGE_HEIGHT		145
@@ -66,10 +67,11 @@ private:
 
 class CSpellBook :
 	public CBaseUnknown,
+	public IPopupView,
 	public ILayerInputHandler
 {
 private:
-	CCombatScreen* m_pScreen;
+	IPopupHost* m_pScreen;
 	CSIFSurface* m_pSurface;
 	IJSONObject* m_pWizard;
 	ISimbeyFontCollection* m_pFonts;
@@ -97,18 +99,22 @@ private:
 public:
 	IMP_BASE_UNKNOWN
 
-	EMPTY_UNK_MAP
+	BEGIN_UNK_MAP
+		UNK_INTERFACE(IPopupView)
+	END_UNK_MAP
 
 public:
-	CSpellBook (CSIFSurface* pSurface, CCombatScreen* pWindow, IJSONObject* pWizard, ISimbeyFontCollection* pFonts, INT nMagicPower);
+	CSpellBook (CSIFSurface* pSurface, IPopupHost* pScreen, IJSONObject* pWizard, ISimbeyFontCollection* pFonts, INT nMagicPower);
 	~CSpellBook ();
 
 	HRESULT Initialize (IJSONArray* pSpells);
 	HRESULT UpdatePageNav (VOID);
 	HRESULT StartPageNav (BOOL fForward);
 	VOID RemovePageNav (VOID);
-	VOID Destroy (VOID);
 	VOID Close (VOID);
+
+	// IPopupView
+	virtual VOID Destroy (VOID);
 
 	// ILayerInputHandler
 	virtual BOOL ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPARAM lParam, INT xView, INT yView, LRESULT& lResult);

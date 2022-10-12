@@ -3,7 +3,14 @@
 		package: "buildsif",
 		name: "combat_stats.sif",
 		trim: true,
-		files: ["*.png"]
+		files: ["*.png"],
+		exclude: ["UnitDetails.png"]
+	},
+	{
+		package: "buildsif",
+		name: "unit_details.sif",
+		trim: true,
+		files: ["UnitDetails.png"]
 	},
 	{
 		package: "json",

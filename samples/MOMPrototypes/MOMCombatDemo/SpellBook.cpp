@@ -251,9 +251,9 @@ VOID CSpellBookPage::DrawSpellFiller (INT xFillerStart, INT xFillerEnd, INT yFil
 // CSpellBook
 ///////////////////////////////////////////////////////////////////////////////
 
-CSpellBook::CSpellBook (CSIFSurface* pSurface, CCombatScreen* pWindow, IJSONObject* pWizard, ISimbeyFontCollection* pFonts, INT nMagicPower) :
+CSpellBook::CSpellBook (CSIFSurface* pSurface, IPopupHost* pScreen, IJSONObject* pWizard, ISimbeyFontCollection* pFonts, INT nMagicPower) :
 	m_pSurface(pSurface),
-	m_pScreen(pWindow),
+	m_pScreen(pScreen),
 	m_pWizard(pWizard),
 	m_pFonts(pFonts),
 	m_nMagicPower(nMagicPower),
@@ -444,6 +444,13 @@ VOID CSpellBook::RemovePageNav (VOID)
 	}
 }
 
+VOID CSpellBook::Close (VOID)
+{
+	m_pScreen->RemovePopup(this);
+}
+
+// IPopupView
+
 VOID CSpellBook::Destroy (VOID)
 {
 	if(m_pCanvas)
@@ -453,7 +460,7 @@ VOID CSpellBook::Destroy (VOID)
 			m_pLayer->RemoveSprite(m_pLeftPage);
 			SafeRelease(m_pLeftPage);
 		}
-		
+
 		if(m_pRightPage)
 		{
 			m_pLayer->RemoveSprite(m_pRightPage);
@@ -466,11 +473,6 @@ VOID CSpellBook::Destroy (VOID)
 		m_pSurface->RemoveCanvas(m_pCanvas);
 		m_pCanvas = NULL;
 	}
-}
-
-VOID CSpellBook::Close (VOID)
-{
-	m_pScreen->RemoveSpellBook();
 }
 
 // ILayerInputHandler

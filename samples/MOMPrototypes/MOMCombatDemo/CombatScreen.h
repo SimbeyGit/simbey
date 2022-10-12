@@ -6,6 +6,7 @@
 #include "Library\Spatial\AStar2D.h"
 #include "Published\QuadooVM.h"
 #include "BaseScreen.h"
+#include "PopupHost.h"
 
 interface IJSONValue;
 interface IJSONObject;
@@ -308,6 +309,7 @@ private:
 class CCombatScreen :
 	public CBaseScreen,
 	public ILayerInputHandler,
+	public IPopupHost,
 	public IAStarCallback2D
 {
 protected:
@@ -354,7 +356,7 @@ protected:
 	ISimbeyInterchangeAnimator* m_pBlood;
 
 	CCombatBar* m_pCombatBar;
-	CSpellBook* m_pSpellBook;
+	TRefArray<IPopupView> m_aViews;
 
 	ULONG m_idxExpandStats;
 	ULONG m_idxCreateCombatObject;
@@ -374,8 +376,6 @@ public:
 
 	VOID PlaySound (FMOD::Sound* pSound);
 	HRESULT FindSound (RSTRING rstrName, FMOD::Sound** ppSound) { return m_pHost->FindSound(rstrName, ppSound); }
-
-	CSIFPackage* GetPackage (VOID) { return m_pPackage; }
 
 	VOID ClearAction (CAction* pAction);
 	VOID RemoveUnitSprite (ISimbeyInterchangeSprite* pSprite);
@@ -397,10 +397,7 @@ public:
 	HRESULT GetHealthPct (IJSONObject* pUnit, IJSONObject* pStats, __out DOUBLE* pdblHealth);
 	HRESULT UpdateStatsPanel (VOID);
 	HRESULT ShowSpellBook (VOID);
-	HRESULT RemoveSpellBook (VOID);
 	HRESULT ShowSelectedUnitInfo (VOID);
-	HRESULT AttachSpellCaster (CCastSpell* pSpell);
-	VOID UpdateMouse (LPARAM lParam);
 
 	// IScreen
 	virtual VOID OnDestroy (VOID);
@@ -411,6 +408,13 @@ public:
 	// ILayerInputHandler
 	virtual BOOL ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPARAM lParam, INT xView, INT yView, LRESULT& lResult);
 	virtual BOOL ProcessKeyboardInput (LayerInput::Keyboard eType, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
+
+	// IPopupHost
+	virtual HRESULT AddPopup (IPopupView* pView);
+	virtual CSIFPackage* GetPackage (VOID) { return m_pPackage; }
+	virtual HRESULT RemovePopup (IPopupView* pView);
+	virtual VOID UpdateMouse (LPARAM lParam);
+	virtual HRESULT AttachSpellCaster (CCastSpell* pSpell);
 
 protected:
 	// IAStarCallback2D

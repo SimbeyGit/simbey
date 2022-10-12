@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UnitStats.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -241,11 +245,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PopupHost.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
 				RelativePath=".\SpellBook.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UnitStats.h"
 				>
 			</File>
 			<File
