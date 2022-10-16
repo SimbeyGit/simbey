@@ -1,6 +1,6 @@
 {
 	player: "defense",
-	floating: true,
+	floating: false,
 	mana: 500,
 	spells:
 	[
@@ -106,12 +106,42 @@
 	{
 		objects:
 		[
+			/*
 			{
 				// Add the wizard's tower
 				type: "building",
 				x: 10,
 				y: 18,
 				object: 5
+			},
+			*/
+			{
+				// Add the Ivory Tower A
+				type: "building",
+				x: 9,
+				y: 18,
+				object: 10
+			},
+			{
+				// Add the Ivory Tower B
+				type: "building",
+				x: 9,
+				y: 17,
+				object: 11
+			},
+			{
+				// Add the Ivory Tower C
+				type: "building",
+				x: 10,
+				y: 17,
+				object: 12
+			},
+			{
+				// Add the Ivory Tower D
+				type: "building",
+				x: 10,
+				y: 18,
+				object: 13
 			},
 			{
 				type: "unit",

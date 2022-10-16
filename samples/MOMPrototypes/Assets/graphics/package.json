@@ -69,7 +69,11 @@
 				{ layer: 6 },	// keep
 				{ layer: 7 },	// tower of wizardry
 				{ layer: 8 },	// fallen temple
-				{ layer: 9 }	// ruins
+				{ layer: 9 },	// ruins
+				{ layer: 10 },	// ivory tower A
+				{ layer: 11 },	// ivory tower B
+				{ layer: 12 },	// ivory tower C
+				{ layer: 13 }	// ivory tower D
 			],
 			animations:
 			[
@@ -131,6 +135,30 @@
 					frames:
 					[
 						{ image: 9, ticks: 1, xoffset: 0, yoffset: -46 }
+					]
+				},
+				{	// ivory tower A
+					frames:
+					[
+						{ image: 10, ticks: 1, xoffset: 1, yoffset: -63 }
+					]
+				},
+				{	// ivory tower B
+					frames:
+					[
+						{ image: 11, ticks: 1, xoffset: 14, yoffset: -56 }
+					]
+				},
+				{	// ivory tower C
+					frames:
+					[
+						{ image: 12, ticks: 1, xoffset: 0, yoffset: -67 }
+					]
+				},
+				{	// ivory tower D
+					frames:
+					[
+						{ image: 13, ticks: 1, xoffset: 0, yoffset: 8 }
 					]
 				}
 			]
