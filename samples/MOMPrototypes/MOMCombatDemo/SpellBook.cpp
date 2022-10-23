@@ -350,8 +350,8 @@ HRESULT CSpellBook::Initialize (IJSONArray* pSpells)
 
 	Check(UpdatePageNav());
 
-	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 12.5f, &m_pvTitle));
-	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 9.0f, &m_pvLabel));
+	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 12.5f, Gdiplus::FontStyleRegular, &m_pvTitle));
+	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 9.0f, Gdiplus::FontStyleRegular, &m_pvLabel));
 
 	if(m_pLeft)
 		Check(CreateSpellBookPage(m_pLeft, m_xBook + 14, m_yBook + 4, &m_pLeftPage));

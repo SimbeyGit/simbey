@@ -246,7 +246,7 @@ interface __declspec(uuid("1F33FDB9-8333-4869-871C-5AA8B0B9C709")) ISimbeyFontCo
 	virtual INT GetFamilyCount (VOID) = 0;
 	virtual HRESULT GetFamilies (__deref_out PVOID* ppvFamilies, __out INT* pcFamilies) = 0;
 	virtual HRESULT GetFamilyName (PVOID pvFamilies, INT nFamily, __out_ecount(LF_FACESIZE) PWSTR pwzFamilyName) = 0;
-	virtual HRESULT CreateFont (PCWSTR pcwzFamily, FLOAT rSize, __deref_out PVOID* ppvFont) = 0;
+	virtual HRESULT CreateFont (PCWSTR pcwzFamily, FLOAT rSize, INT nFontStyles, __deref_out PVOID* ppvFont) = 0;
 	virtual VOID DeleteFont (PVOID pvFont) = 0;
 	virtual VOID DeleteFamilies (PVOID pvFamilies) = 0;
 };

@@ -2,15 +2,8 @@
 	{
 		package: "buildsif",
 		name: "combat_stats.sif",
-		trim: true,
-		files: ["*.png"],
-		exclude: ["UnitDetails.png"]
-	},
-	{
-		package: "buildsif",
-		name: "unit_details.sif",
-		trim: true,
-		files: ["UnitDetails.png"]
+		trim: false,
+		files: ["*.png"]
 	},
 	{
 		package: "json",
@@ -189,6 +182,36 @@
 					name: "Move Air",
 					image: "MoveAir.png",
 					animation: "flying_unit"
+				},
+				{
+					stat: "food1",
+					type: "upkeep",
+					image: "Food1.png"
+				},
+				{
+					stat: "food10",
+					type: "upkeep",
+					image: "Food10.png"
+				},
+				{
+					stat: "gold1",
+					type: "upkeep",
+					image: "Gold1.png"
+				},
+				{
+					stat: "gold10",
+					type: "upkeep",
+					image: "Gold10.png"
+				},
+				{
+					stat: "mana1",
+					type: "upkeep",
+					image: "Mana1.png"
+				},
+				{
+					stat: "mana10",
+					type: "upkeep",
+					image: "Mana10.png"
 				}
 			]
 		}

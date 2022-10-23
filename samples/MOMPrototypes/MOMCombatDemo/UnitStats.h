@@ -10,12 +10,14 @@ class CUnitStats :
 {
 private:
 	IPopupHost* m_pScreen;
+	ISimbeyFontCollection* m_pFonts;
 	CSIFSurface* m_pSurface;
 
 	CSIFCanvas* m_pCanvas;
 	CInteractiveLayer* m_pLayer;
 
 	ISimbeyInterchangeFile* m_pSIF;
+	ISimbeyInterchangeFile* m_pGenerated;
 
 	sysint m_idxBackground;
 	INT m_xStats, m_yStats;
@@ -28,10 +30,10 @@ public:
 	END_UNK_MAP
 
 public:
-	CUnitStats (CSIFSurface* pSurface, IPopupHost* pScreen);
+	CUnitStats (CSIFSurface* pSurface, ISimbeyFontCollection* pFonts, IPopupHost* pScreen);
 	~CUnitStats ();
 
-	HRESULT Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLevel);
+	HRESULT Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLevel, ISimbeyInterchangeSprite* pUnitSprite);
 	VOID Close (VOID);
 
 	// IPopupView
@@ -40,4 +42,10 @@ public:
 	// ILayerInputHandler
 	virtual BOOL ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPARAM lParam, INT xView, INT yView, LRESULT& lResult);
 	virtual BOOL ProcessKeyboardInput (LayerInput::Keyboard eType, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
+
+private:
+	HRESULT RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimbeyInterchangeFileLayer* pBackground, IJSONObject* pDef, IJSONObject* pStats, INT nLevel);
+	HRESULT RenderComponents (SIF_SURFACE* psifSurface, ISimbeyInterchangeFileLayer** prgComponentTiles, INT xBase, INT yBase, IJSONObject* pDef, IJSONObject* pStats, PCWSTR pcwzStat, ISimbeyInterchangeFile* pCombatStats, IJSONArray* pStatTypes);
+	HRESULT RenderUpkeep (SIF_SURFACE* psifSurface, IJSONArray* pUpkeep, INT x, INT y, ISimbeyInterchangeFile* pCombatStats, IJSONArray* pStatTypes);
+	HRESULT DrawComponents (SIF_SURFACE* psifSurface, ISimbeyInterchangeFileLayer* pComponent, ISimbeyInterchangeFileLayer* pIcon, INT& xBase, INT& yBase, INT& x, INT& y, INT& idxTile, INT cTiles);
 };

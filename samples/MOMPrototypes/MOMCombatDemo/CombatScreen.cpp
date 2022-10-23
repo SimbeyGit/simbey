@@ -2255,6 +2255,7 @@ Cleanup:
 HRESULT CCombatScreen::ShowSelectedUnitInfo (VOID)
 {
 	HRESULT hr;
+	TStackRef<ISimbeyInterchangeSprite> srUnitSprite;
 	TStackRef<IJSONObject> srStats;
 	CMovingObject* pSelected;
 	CUnitStats* pUnitStats = NULL;
@@ -2262,12 +2263,15 @@ HRESULT CCombatScreen::ShowSelectedUnitInfo (VOID)
 	CheckIf(NULL == m_pSelected, S_FALSE);
 	pSelected = static_cast<CMovingObject*>(m_pSelected);
 
-	pUnitStats = __new CUnitStats(m_pSurface, this);
+	pUnitStats = __new CUnitStats(m_pSurface, m_pFonts, this);
 	CheckAlloc(pUnitStats);
 
 	Check(ExpandStats(pSelected->m_pDef, pSelected->m_nLevel, &srStats));
 
-	Check(pUnitStats->Initialize(pSelected->m_pDef, srStats, pSelected->m_nLevel));
+	Check(pSelected->CloneSprite(&srUnitSprite));
+	Check(srUnitSprite->SelectAnimation(9));
+
+	Check(pUnitStats->Initialize(pSelected->m_pDef, srStats, pSelected->m_nLevel, srUnitSprite));
 	Check(AddPopup(pUnitStats));
 
 Cleanup:

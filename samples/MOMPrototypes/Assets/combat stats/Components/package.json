@@ -1,0 +1,7 @@
+[
+	{
+		package: "buildsif",
+		name: "components.sif",
+		files: ["*.png"]
+	},
+]
