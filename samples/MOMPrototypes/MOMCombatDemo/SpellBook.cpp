@@ -94,19 +94,15 @@ HRESULT CSpellBookPage::Initialize (ISimbeyInterchangeFile* pSIF, INT nMagicPowe
 		pt.Y += 21.0f;
 	}
 
-	PBYTE pbPtr = m_bits;
-	for(INT i = 0; i < SPELL_BOOK_PAGE_WIDTH * SPELL_BOOK_PAGE_HEIGHT; i++)
-	{
-		SwapData(pbPtr[0], pbPtr[2]);
-		pbPtr += sizeof(DWORD);
-	}
-
 	SIF_SURFACE sifSurface32;
 	sifSurface32.cBitsPerPixel = 32;
 	sifSurface32.lPitch = SPELL_BOOK_PAGE_WIDTH * 4;
 	sifSurface32.pbSurface = m_bits;
 	sifSurface32.xSize = SPELL_BOOK_PAGE_WIDTH;
 	sifSurface32.ySize = SPELL_BOOK_PAGE_HEIGHT;
+
+	// Format the surface for SIF.
+	sifToggleChannels(&sifSurface32);
 
 	for(INT i = 0; i < m_pPage->cSpells; i++)
 	{

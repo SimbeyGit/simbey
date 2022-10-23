@@ -167,13 +167,8 @@ HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimb
 	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 12.0f, Gdiplus::FontStyleBold, &pvTagLine));
 	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 10.0f, Gdiplus::FontStyleBold, &pvLabel));
 
-	DWORD cPixels = sifSurface.xSize * sifSurface.ySize;
-	PBYTE pbPtr = sifSurface.pbSurface;
-	for(DWORD i = 0; i < cPixels; i++)
-	{
-		SwapData(pbPtr[0], pbPtr[2]);
-		pbPtr += sizeof(DWORD);
-	}
+	// Toggle into the compatible GDI format.
+	sifToggleChannels(&sifSurface);
 
 	{
 		Gdiplus::SolidBrush solidBrush(Gdiplus::Color(255, 130, 220, 240));
@@ -237,12 +232,8 @@ HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimb
 		g.DrawString(SLP(L"Hits"), reinterpret_cast<Gdiplus::Font*>(pvTitle), pt, &fmt, &solidBrush);
 	}
 
-	pbPtr = sifSurface.pbSurface;
-	for(DWORD i = 0; i < cPixels; i++)
-	{
-		SwapData(pbPtr[0], pbPtr[2]);
-		pbPtr += sizeof(DWORD);
-	}
+	// Toggle back to the SIF format.
+	sifToggleChannels(&sifSurface);
 
 	Check(RenderUpkeep(&sifSurface, srUpkeep, 122, 33, srCombatStats, srStatTypes));
 

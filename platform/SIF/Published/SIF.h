@@ -295,6 +295,7 @@ HRESULT WINAPI sifLoadFromRawImage (const BYTE* pcbData, ULONG cbData, BOOL fUse
 HRESULT WINAPI sifLoadToDDB (const BYTE* pcbData, ULONG cbData, BOOL fUseEmbeddedColorManagement, HDC hdc, __out INT* pnWidth, __out INT* pnHeight, __out HBITMAP* phDDB);
 HRESULT WINAPI sifResizeBitsX (__in_bcount(lPitch * nHeight) const BYTE* pcbBits, INT nWidth, INT nHeight, INT cBytesPerPixel, LONG lPitch, __deref_out_bcount(lResizePitch * yResize) PBYTE pbResized, INT xResize, INT yResize, LONG lResizePitch, INT nMode);
 HRESULT WINAPI sifTrimBits32 (const BYTE* pcbData, INT xSize, INT ySize, __deref_out_bcount(*pxNew * *pyNew * 4) BYTE** ppbNew, __out INT* pxNew, __out INT* pyNew, __out INT* pxOffset, __out INT* pyOffset);
+BOOL WINAPI sifToggleChannels (SIF_SURFACE* psifSurface);
 HRESULT WINAPI sifCreateStaticSprite (ISimbeyInterchangeFileLayer* pLayer, INT xStaticOffset, INT yStaticOffset, __deref_out ISimbeyInterchangeSprite** ppSprite);
 
 BOOL WINAPI sifDrawBits32ToDIB32 (__out_bcount(nWidth * nHeight * 4) PBYTE pDIB32, INT xDest, INT yDest, INT nWidth, INT nHeight, __in_bcount(nWidthBits * nHeightBits * 4) const BYTE* pBits, INT nWidthBits, INT nHeightBits);
