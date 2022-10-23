@@ -36,7 +36,7 @@ CUnitStats::~CUnitStats ()
 	Assert(NULL == m_pCanvas);
 }
 
-HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLevel, ISimbeyInterchangeSprite* pUnitSprite)
+HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLevel, ISimbeyInterchangeSprite* pUnitSprite, ISimbeyInterchangeFileLayer* pPortrait)
 {
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeFileLayer> srBackground, srGenerated;
@@ -66,8 +66,27 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 	Check(m_pCanvas->AddSprite(m_idxBackground, srSprite, &idxUnitStats));
 
 	Check(static_cast<CInteractiveCanvas*>(m_pCanvas)->AddInteractiveLayer(TRUE, FALSE, 0, this, &m_pLayer));
-	Check(m_pLayer->AddSprite(pUnitSprite, NULL));
-	pUnitSprite->SetPosition(m_xStats + 25, m_yStats + 35);
+
+	if(pPortrait)
+	{
+		PBYTE pBits;
+		DWORD cb;
+		RECT rcPortrait;
+		BYTE bits[62 * 62 * 4];
+
+		Check(pPortrait->GetBitsPtr(&pBits, &cb));
+		Check(pPortrait->GetPosition(&rcPortrait));
+
+		Check(sifResizeBitsX(pBits, rcPortrait.right - rcPortrait.left, rcPortrait.bottom - rcPortrait.top, 4, (rcPortrait.right - rcPortrait.left) * 4, bits, 62, 62, 62 * 4, SIF_RESIZE_BICUBIC));
+
+		Check(srGenerated->GetBitsPtr(&pBits, &cb));
+		sifCopyBits32(pBits, 6, 5, rc.right - rc.left, rc.bottom - rc.top, bits, 0, 0, 62, 62, 62, 62);
+	}
+	else
+	{
+		Check(m_pLayer->AddSprite(pUnitSprite, NULL));
+		pUnitSprite->SetPosition(m_xStats + 25, m_yStats + 35);
+	}
 
 Cleanup:
 	return hr;
@@ -147,9 +166,11 @@ HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimb
 		srv.Release();
 	}
 
-	Check(JSONGetValueFromObject(pDef, SLP(L"base:upkeep"), &srv));
-	Check(srv->GetArray(&srUpkeep));
-	srv.Release();
+	if(SUCCEEDED(JSONGetValueFromObject(pDef, SLP(L"base:upkeep"), &srv)))
+	{
+		Check(srv->GetArray(&srUpkeep));
+		srv.Release();
+	}
 
 	Check(pStats->FindNonNullValueW(L"move", &srv));
 	Check(srv->GetArray(&srMoves));
@@ -235,7 +256,8 @@ HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimb
 	// Toggle back to the SIF format.
 	sifToggleChannels(&sifSurface);
 
-	Check(RenderUpkeep(&sifSurface, srUpkeep, 122, 33, srCombatStats, srStatTypes));
+	if(srUpkeep)
+		Check(RenderUpkeep(&sifSurface, srUpkeep, 122, 33, srCombatStats, srStatTypes));
 
 	if(0 < srMoves->Count())
 	{

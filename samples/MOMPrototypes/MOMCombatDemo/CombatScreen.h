@@ -88,6 +88,7 @@ class CMovingObject : public CObject
 {
 public:
 	IJSONObject* m_pDef;
+	CSIFPackage* m_pPackage;
 	RSTRING m_rstrOwner;
 	INT m_nDirection;
 	INT m_nLevel;
@@ -97,10 +98,11 @@ public:
 	FMOD::Sound* m_pRange;
 
 public:
-	CMovingObject (IJSONObject* pDef, RSTRING rstrOwner, INT xTile, INT yTile, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange);
+	CMovingObject (IJSONObject* pDef, CSIFPackage* pPackage, RSTRING rstrOwner, INT xTile, INT yTile, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange);
 	~CMovingObject ();
 
 	HRESULT GetObjectDef (__deref_out IJSONObject** ppDef);
+	HRESULT LoadPortrait (__deref_out ISimbeyInterchangeFileLayer** ppPortrait);
 
 	virtual bool CanBeMoved (VOID) { return true; }
 	virtual FMOD::Sound* GetMovingSound (VOID) { return m_pMove; }
@@ -436,7 +438,7 @@ protected:
 
 	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
 	HRESULT AddStaticObject (INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation);
-	HRESULT AddMovingObject (IJSONObject* pDef, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange, __deref_opt_out CMovingObject** ppObject = NULL);
+	HRESULT AddMovingObject (IJSONObject* pDef, CSIFPackage* pPackage, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange, __deref_opt_out CMovingObject** ppObject = NULL);
 	HRESULT UpdatePositionInJSON (CMovingObject* pObject);
 
 	HRESULT CreateRandomAbility (IJSONArray* pAbilities, RSTRING rstrRandom, __deref_out IJSONValue** ppvAbility);

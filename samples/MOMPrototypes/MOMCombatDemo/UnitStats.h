@@ -33,7 +33,7 @@ public:
 	CUnitStats (CSIFSurface* pSurface, ISimbeyFontCollection* pFonts, IPopupHost* pScreen);
 	~CUnitStats ();
 
-	HRESULT Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLevel, ISimbeyInterchangeSprite* pUnitSprite);
+	HRESULT Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLevel, ISimbeyInterchangeSprite* pUnitSprite, ISimbeyInterchangeFileLayer* pPortrait);
 	VOID Close (VOID);
 
 	// IPopupView

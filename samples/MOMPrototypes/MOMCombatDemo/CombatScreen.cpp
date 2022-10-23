@@ -395,6 +395,7 @@ VOID CObject::ShiftObject (INT xShift, INT yShift)
 }
 
 CMovingObject::CMovingObject (IJSONObject* pDef,
+	CSIFPackage* pPackage,
 	RSTRING rstrOwner,
 	INT xTile, INT yTile,
 	INT nDirection, INT nLevel,
@@ -409,12 +410,14 @@ CMovingObject::CMovingObject (IJSONObject* pDef,
 	m_pRange(pRange)
 {
 	SetInterface(m_pDef, pDef);
+	SetInterface(m_pPackage, pPackage);
 	RStrSet(m_rstrOwner, rstrOwner);
 }
 
 CMovingObject::~CMovingObject ()
 {
 	RStrRelease(m_rstrOwner);
+	SafeRelease(m_pPackage);
 	SafeRelease(m_pDef);
 }
 
@@ -422,6 +425,23 @@ HRESULT CMovingObject::GetObjectDef (__deref_out IJSONObject** ppDef)
 {
 	SetInterface(*ppDef, m_pDef);
 	return S_OK;
+}
+
+HRESULT CMovingObject::LoadPortrait (__deref_out ISimbeyInterchangeFileLayer** ppPortrait)
+{
+	HRESULT hr;
+	TStackRef<ISimbeyInterchangeFile> srSIF;
+	PBYTE pBits;
+	DWORD cb;
+
+	Check(m_pPackage->OpenSIF(L"unit.sif", &srSIF));
+	CheckNoTrace(srSIF->FindLayer(L"portrait.png", ppPortrait, NULL));
+	Check((*ppPortrait)->GetBitsPtr(&pBits, &cb));
+
+Cleanup:
+	if(srSIF)
+		srSIF->Close();
+	return hr;
 }
 
 VOID CMovingObject::UpdateDirection (INT nDirection)
@@ -2255,6 +2275,7 @@ Cleanup:
 HRESULT CCombatScreen::ShowSelectedUnitInfo (VOID)
 {
 	HRESULT hr;
+	TStackRef<ISimbeyInterchangeFileLayer> srPortrait;
 	TStackRef<ISimbeyInterchangeSprite> srUnitSprite;
 	TStackRef<IJSONObject> srStats;
 	CMovingObject* pSelected;
@@ -2271,7 +2292,10 @@ HRESULT CCombatScreen::ShowSelectedUnitInfo (VOID)
 	Check(pSelected->CloneSprite(&srUnitSprite));
 	Check(srUnitSprite->SelectAnimation(9));
 
-	Check(pUnitStats->Initialize(pSelected->m_pDef, srStats, pSelected->m_nLevel, srUnitSprite));
+	// Portraits are optional.
+	pSelected->LoadPortrait(&srPortrait);
+
+	Check(pUnitStats->Initialize(pSelected->m_pDef, srStats, pSelected->m_nLevel, srUnitSprite, srPortrait));
 	Check(AddPopup(pUnitStats));
 
 Cleanup:
@@ -2737,7 +2761,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CCombatScreen::AddMovingObject (IJSONObject* pDef, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange, __deref_opt_out CMovingObject** ppObject)
+HRESULT CCombatScreen::AddMovingObject (IJSONObject* pDef, CSIFPackage* pPackage, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange, __deref_opt_out CMovingObject** ppObject)
 {
 	HRESULT hr;
 	TStackRef<IJSONObject> srStats, srUnit, srMove;
@@ -2794,7 +2818,7 @@ HRESULT CCombatScreen::AddMovingObject (IJSONObject* pDef, RSTRING rstrOwner, IN
 	Check(JSONWrapObject(srMove, &srv));
 	Check(srUnit->AddValueW(L"moveStat", srv));
 
-	pObject = __new CMovingObject(srUnit, rstrOwner, xTile, yTile, nDirection, nLevel, pfnBaseAnimation, pMove, pMelee, pRange);
+	pObject = __new CMovingObject(srUnit, pPackage, rstrOwner, xTile, yTile, nDirection, nLevel, pfnBaseAnimation, pMove, pMelee, pRange);
 	CheckAlloc(pObject);
 
 	for(INT i = 0; i < cFigures; i++)
@@ -3088,7 +3112,7 @@ HRESULT CCombatScreen::PlaceUnit (RSTRING rstrName, RSTRING rstrOwner, INT xTile
 		if(srNew)
 			srAnimator = srNew;
 	}
-	Check(AddMovingObject(srUnit, rstrOwner, xTile, yTile, nLayer, srAnimator, nDirection, nLevel, pfnBaseAnimation, pMoveSound, pMeleeSound, pRangeSound, ppObject));
+	Check(AddMovingObject(srUnit, pUnitData->m_pUnitPackage, rstrOwner, xTile, yTile, nLayer, srAnimator, nDirection, nLevel, pfnBaseAnimation, pMoveSound, pMeleeSound, pRangeSound, ppObject));
 
 Cleanup:
 	RStrRelease(rstrMelee);
