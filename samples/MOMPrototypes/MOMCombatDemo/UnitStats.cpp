@@ -80,12 +80,12 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 		Check(sifResizeBitsX(pBits, rcPortrait.right - rcPortrait.left, rcPortrait.bottom - rcPortrait.top, 4, (rcPortrait.right - rcPortrait.left) * 4, bits, 62, 62, 62 * 4, SIF_RESIZE_BICUBIC));
 
 		Check(srGenerated->GetBitsPtr(&pBits, &cb));
-		sifCopyBits32(pBits, 6, 5, rc.right - rc.left, rc.bottom - rc.top, bits, 0, 0, 62, 62, 62, 62);
+		sifCopyBits32(pBits, 5, 5, rc.right - rc.left, rc.bottom - rc.top, bits, 0, 0, 62, 62, 62, 62);
 	}
 	else
 	{
 		Check(m_pLayer->AddSprite(pUnitSprite, NULL));
-		pUnitSprite->SetPosition(m_xStats + 25, m_yStats + 35);
+		pUnitSprite->SetPosition(m_xStats + 24, m_yStats + 35);
 	}
 
 Cleanup:
