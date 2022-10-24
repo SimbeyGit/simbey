@@ -57,7 +57,7 @@
 			abilities:
 			[
 				{ name: "Wall Crusher", type: "ability" },
-				{ name: "First Striker", type: "ability" }
+				{ name: "First Strike", type: "ability" }
 			]
 		}
 	}

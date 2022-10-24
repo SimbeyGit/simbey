@@ -18,9 +18,14 @@ private:
 
 	ISimbeyInterchangeFile* m_pSIF;
 	ISimbeyInterchangeFile* m_pGenerated;
+	ISimbeyInterchangeFileLayer* m_pBaseLayer;
+	ISimbeyInterchangeFileLayer* m_pAbilitiesLayer;
 
 	sysint m_idxBackground;
 	INT m_xStats, m_yStats;
+
+	IJSONArray* m_pAbilities;
+	INT m_idxAbilities;
 
 public:
 	IMP_BASE_UNKNOWN
@@ -48,4 +53,6 @@ private:
 	HRESULT RenderComponents (SIF_SURFACE* psifSurface, ISimbeyInterchangeFileLayer** prgComponentTiles, INT xBase, INT yBase, IJSONObject* pDef, IJSONObject* pStats, PCWSTR pcwzStat, ISimbeyInterchangeFile* pCombatStats, IJSONArray* pStatTypes);
 	HRESULT RenderUpkeep (SIF_SURFACE* psifSurface, IJSONArray* pUpkeep, INT x, INT y, ISimbeyInterchangeFile* pCombatStats, IJSONArray* pStatTypes);
 	HRESULT DrawComponents (SIF_SURFACE* psifSurface, ISimbeyInterchangeFileLayer* pComponent, ISimbeyInterchangeFileLayer* pIcon, INT& xBase, INT& yBase, INT& x, INT& y, INT& idxTile, INT cTiles);
+
+	HRESULT RenderAbilities (VOID);
 };

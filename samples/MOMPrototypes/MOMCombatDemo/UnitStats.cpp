@@ -4,6 +4,23 @@
 #include "Library\Util\Formatting.h"
 #include "UnitStats.h"
 
+HRESULT ResolveLink (IJSONArray* pTypes, ISimbeyInterchangeFile* pSIF, RSTRING rstrKeyW, RSTRING rstrValueW, __deref_out ISimbeyInterchangeFileLayer** ppIcon)
+{
+	HRESULT hr;
+	TStackRef<IJSONObject> srLink;
+	TStackRef<IJSONValue> srv;
+	RSTRING rstrImageW = NULL;
+
+	Check(JSONFindArrayObject(pTypes, rstrKeyW, rstrValueW, &srLink, NULL));
+	Check(srLink->FindNonNullValueW(L"image", &srv));
+	Check(srv->GetString(&rstrImageW));
+	Check(pSIF->FindLayer(RStrToWide(rstrImageW), ppIcon, NULL));
+
+Cleanup:
+	RStrRelease(rstrImageW);
+	return hr;
+}
+
 CUnitStats::CUnitStats (CSIFSurface* pSurface, ISimbeyFontCollection* pFonts, IPopupHost* pScreen) :
 	m_pSurface(pSurface),
 	m_pFonts(pFonts),
@@ -11,13 +28,21 @@ CUnitStats::CUnitStats (CSIFSurface* pSurface, ISimbeyFontCollection* pFonts, IP
 	m_pCanvas(NULL),
 	m_pLayer(NULL),
 	m_pSIF(NULL),
-	m_pGenerated(NULL)
+	m_pGenerated(NULL),
+	m_pBaseLayer(NULL),
+	m_pAbilitiesLayer(NULL),
+	m_pAbilities(NULL),
+	m_idxAbilities(0)
 {
 	m_pFonts->AddRef();
 }
 
 CUnitStats::~CUnitStats ()
 {
+	SafeRelease(m_pAbilities);
+	SafeRelease(m_pAbilitiesLayer);
+	SafeRelease(m_pBaseLayer);
+
 	if(m_pGenerated)
 	{
 		m_pGenerated->Close();
@@ -41,9 +66,10 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeFileLayer> srBackground, srGenerated;
 	TStackRef<ISimbeyInterchangeSprite> srSprite;
+	TStackRef<IJSONValue> srv;
 	INT xView, yView;
 	RECT rc;
-	sysint idxUnitStats;
+	sysint idxUnitStats, idxAbilities;
 
 	CSIFPackage* pPackage = m_pScreen->GetPackage();
 	Check(pPackage->OpenSIF(L"graphics\\unit_details.sif", &m_pSIF));
@@ -64,6 +90,17 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 
 	Check(sifCreateStaticSprite(srGenerated, m_xStats, m_yStats, &srSprite));
 	Check(m_pCanvas->AddSprite(m_idxBackground, srSprite, &idxUnitStats));
+	srSprite.Release();
+
+	m_pBaseLayer = srGenerated.Detach();
+
+	if(SUCCEEDED(JSONGetValueFromObject(pDef, SLP(L"base:abilities"), &srv)))
+		Check(srv->GetArray(&m_pAbilities));
+
+	Check(m_pGenerated->AddLayer(400, 90, &m_pAbilitiesLayer, NULL));
+	Check(sifCreateStaticSprite(m_pAbilitiesLayer, m_xStats + 5, m_yStats + 178, &srSprite));
+	Check(m_pCanvas->AddSprite(m_idxBackground, srSprite, &idxAbilities));
+	Check(RenderAbilities());
 
 	Check(static_cast<CInteractiveCanvas*>(m_pCanvas)->AddInteractiveLayer(TRUE, FALSE, 0, this, &m_pLayer));
 
@@ -79,7 +116,7 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 
 		Check(sifResizeBitsX(pBits, rcPortrait.right - rcPortrait.left, rcPortrait.bottom - rcPortrait.top, 4, (rcPortrait.right - rcPortrait.left) * 4, bits, 62, 62, 62 * 4, SIF_RESIZE_BICUBIC));
 
-		Check(srGenerated->GetBitsPtr(&pBits, &cb));
+		Check(m_pBaseLayer->GetBitsPtr(&pBits, &cb));
 		sifCopyBits32(pBits, 5, 5, rc.right - rc.left, rc.bottom - rc.top, bits, 0, 0, 62, 62, 62, 62);
 	}
 	else
@@ -137,7 +174,7 @@ HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimb
 	ISimbeyInterchangeFileLayer* rgComponentTiles[2] = {0};
 	TStackRef<IJSONValue> srv, srv2;
 	TStackRef<IJSONArray> srStatTypes, srUpkeep, srMoves;
-	RSTRING rstrNameW = NULL, rstrTagLineW = NULL, rstrMoveW = NULL, rstrImageW = NULL;
+	RSTRING rstrNameW = NULL, rstrTagLineW = NULL, rstrMoveW = NULL;
 	DWORD cbBits;
 	RECT rc;
 	SIF_SURFACE sifSurface;
@@ -276,12 +313,8 @@ HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimb
 		Check(srv->GetInteger(&cMoves));
 		srv.Release();
 
-		Check(JSONFindArrayObject(srStatTypes, RSTRING_CAST(L"stat"), rstrMoveW, &srMove, NULL));
-		Check(srMove->FindNonNullValueW(L"image", &srv));
-		Check(srv->GetString(&rstrImageW));
-		srv.Release();
+		Check(ResolveLink(srStatTypes, srCombatStats, RSTRING_CAST(L"stat"), rstrMoveW, &srMoveIcon));
 
-		Check(srCombatStats->FindLayer(RStrToWide(rstrImageW), &srMoveIcon, NULL));
 		for(INT i = 0; i < cMoves; i++)
 			Check(srMoveIcon->DrawToBits32(&sifSurface, 120 + i * 11, 43));
 	}
@@ -299,7 +332,6 @@ Cleanup:
 		m_pFonts->DeleteFont(pvTagLine);
 	if(pvTitle)
 		m_pFonts->DeleteFont(pvTitle);
-	RStrRelease(rstrImageW);
 	RStrRelease(rstrMoveW);
 	RStrRelease(rstrTagLineW);
 	RStrRelease(rstrNameW);
@@ -319,10 +351,9 @@ HRESULT CUnitStats::RenderComponents (SIF_SURFACE* psifSurface, ISimbeyInterchan
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeFileLayer> srIcon;
 	TStackRef<IJSONValue> srv;
-	TStackRef<IJSONObject> srStatDef;
 	WCHAR wzBaseStat[32];
 	INT cchBaseStat;
-	RSTRING rstrStatW = NULL, rstrImageW = NULL;
+	RSTRING rstrStatW = NULL;
 
 	Check(Formatting::TPrintF(wzBaseStat, ARRAYSIZE(wzBaseStat), &cchBaseStat, L"base:stats:%ls", pcwzStat));
 	if(SUCCEEDED(JSONGetValueFromObject(pDef, wzBaseStat, cchBaseStat, &srv)))
@@ -363,22 +394,18 @@ HRESULT CUnitStats::RenderComponents (SIF_SURFACE* psifSurface, ISimbeyInterchan
 		Check(srv->GetInteger(&nExpanded));
 		srv.Release();
 
-		if(FAILED(JSONFindArrayObject(pStatTypes, RSTRING_CAST(L"stat"), rstrStatW, &srStatDef, NULL)))
+		if(FAILED(ResolveLink(pStatTypes, pCombatStats, RSTRING_CAST(L"stat"), rstrStatW, &srIcon)))
 		{
 			RStrRelease(rstrStatW); rstrStatW = NULL;
 			Check(RStrCreateW(TStrLenAssert(pcwzStat), pcwzStat, &rstrStatW));
-			Check(JSONFindArrayObject(pStatTypes, RSTRING_CAST(L"stat"), rstrStatW, &srStatDef, NULL));
+			Check(ResolveLink(pStatTypes, pCombatStats, RSTRING_CAST(L"stat"), rstrStatW, &srIcon));
 		}
-		Check(srStatDef->FindNonNullValueW(L"image", &srv));
-		Check(srv->GetString(&rstrImageW));
-		Check(pCombatStats->FindLayer(RStrToWide(rstrImageW), &srIcon, NULL));
 
 		Check(DrawComponents(psifSurface, prgComponentTiles[0], srIcon, xBase, yBase, x, y, idxTile, nBaseValue));
 		Check(DrawComponents(psifSurface, prgComponentTiles[1], srIcon, xBase, yBase, x, y, idxTile, nExpanded - nBaseValue));
 	}
 
 Cleanup:
-	RStrRelease(rstrImageW);
 	RStrRelease(rstrStatW);
 	return hr;
 }
@@ -421,14 +448,7 @@ HRESULT CUnitStats::RenderUpkeep (SIF_SURFACE* psifSurface, IJSONArray* pUpkeep,
 				xMove = 10;
 			}
 
-			Check(JSONFindArrayObject(pStatTypes, RSTRING_CAST(L"stat"), rstrIconW, &srStat, NULL));
-
-			srv.Release();
-			Check(srStat->FindNonNullValueW(L"image", &srv));
-
-			RStrRelease(rstrIconW); rstrIconW = NULL;
-			Check(srv->GetString(&rstrIconW));
-			Check(pCombatStats->FindLayer(RStrToWide(rstrIconW), &srIcon, NULL));
+			Check(ResolveLink(pStatTypes, pCombatStats, RSTRING_CAST(L"stat"), rstrIconW, &srIcon));
 			Check(srIcon->DrawToBits32(psifSurface, x, y));
 			x += xMove;
 
@@ -470,5 +490,133 @@ HRESULT CUnitStats::DrawComponents (SIF_SURFACE* psifSurface, ISimbeyInterchange
 	}
 
 Cleanup:
+	return hr;
+}
+
+HRESULT CUnitStats::RenderAbilities (VOID)
+{
+	HRESULT hr = S_OK;
+	TStackRef<ISimbeyInterchangeFile> srSIF;
+	TStackRef<IJSONObject> srAbilityMaps;
+	TStackRef<IJSONArray> srHeroAbilities, srUnitAbilities;
+	TStackRef<IJSONValue> srv;
+	SIF_SURFACE sifSurface;
+	PBYTE pbSource;
+	DWORD cbBits;
+	RECT rc;
+	INT nSourceWidth, nSourceHeight;
+	RSTRING rstrAbilityW = NULL, rstrLabelW = NULL;
+	PVOID pvLabel = NULL;
+
+	CheckIf(NULL == m_pAbilities, S_FALSE);
+
+	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 10.0f, Gdiplus::FontStyleBold, &pvLabel));
+
+	CSIFPackage* pPackage = m_pScreen->GetPackage();
+	Check(pPackage->OpenSIF(L"abilities\\abilities.sif", &srSIF));
+	Check(pPackage->GetJSONData(SLP(L"abilities\\abilities.json"), &srv));
+	Check(srv->GetObject(&srAbilityMaps));
+
+	srv.Release();
+	Check(srAbilityMaps->FindNonNullValueW(L"hero_abilities", &srv));
+	Check(srv->GetArray(&srHeroAbilities));
+
+	srv.Release();
+	Check(srAbilityMaps->FindNonNullValueW(L"unit_abilities", &srv));
+	Check(srv->GetArray(&srUnitAbilities));
+
+	Check(m_pBaseLayer->GetBitsPtr(&pbSource, &cbBits));
+	Check(m_pBaseLayer->GetPosition(&rc));
+	nSourceWidth = rc.right - rc.left;
+	nSourceHeight = rc.bottom - rc.top;
+
+	Check(m_pAbilitiesLayer->GetBitsPtr(&sifSurface.pbSurface, &cbBits));
+	Check(m_pAbilitiesLayer->GetPosition(&rc));
+
+	sifSurface.cBitsPerPixel = 32;
+	sifSurface.xSize = rc.right - rc.left;
+	sifSurface.ySize = rc.bottom - rc.top;
+	sifSurface.lPitch = sifSurface.xSize * 4;
+	sifCopyBits32(sifSurface.pbSurface, 0, 0, sifSurface.xSize, sifSurface.ySize, pbSource, 5, 179, nSourceWidth, nSourceHeight, sifSurface.xSize, sifSurface.ySize);
+
+	INT x = 3, y = 2;
+
+	for(INT i = 0; i < 10; i++)
+	{
+		TStackRef<IJSONObject> srAbility;
+		TStackRef<ISimbeyInterchangeFileLayer> srIcon;
+		Gdiplus::SolidBrush solidBrush(Gdiplus::Color(255, 130, 220, 240));
+		Gdiplus::Bitmap bitmap(sifSurface.xSize, sifSurface.ySize, sifSurface.lPitch, PixelFormat32bppARGB, sifSurface.pbSurface);
+		Gdiplus::Graphics g(&bitmap);
+		Gdiplus::StringFormat fmt;
+		Gdiplus::PointF pt;
+
+		g.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAliasGridFit);
+		fmt.SetFormatFlags(Gdiplus::StringFormatFlagsBypassGDI);
+
+		sysint idxAbility = m_idxAbilities + i;
+		if(idxAbility >= m_pAbilities->Count())
+			break;
+		Check(m_pAbilities->GetObject(idxAbility, &srAbility));
+
+		srv.Release();
+		Check(srAbility->FindNonNullValueW(L"name", &srv));
+		Check(srv->GetString(&rstrAbilityW));
+
+		if(FAILED(ResolveLink(srHeroAbilities, srSIF, RSTRING_CAST(L"name"), rstrAbilityW, &srIcon)))
+			Check(ResolveLink(srUnitAbilities, srSIF, RSTRING_CAST(L"name"), rstrAbilityW, &srIcon));
+
+		Check(srIcon->DrawToBits32(&sifSurface, x, y));
+
+		srv.Release();
+		if(SUCCEEDED(srAbility->FindNonNullValueW(L"value", &srv)))
+		{
+			INT nValue;
+			if(SUCCEEDED(srv->GetInteger(&nValue)))
+				Check(RStrFormatW(&rstrLabelW, L"%r x %d", rstrAbilityW, nValue));
+			else
+			{
+				DOUBLE dblValue;
+				Check(srv->GetDouble(&dblValue));
+				Check(RStrFormatW(&rstrLabelW, L"%r x %.1f", rstrAbilityW, dblValue));
+			}
+		}
+		else
+			RStrSet(rstrLabelW, rstrAbilityW);
+
+		sifToggleChannels(&sifSurface);
+		pt.X = static_cast<FLOAT>(x + 20);
+		pt.Y = static_cast<FLOAT>(y + 1);
+		g.DrawString(RStrToWide(rstrLabelW), RStrLen(rstrLabelW), reinterpret_cast<Gdiplus::Font*>(pvLabel), pt, &fmt, &solidBrush);
+		sifToggleChannels(&sifSurface);
+
+		if(i == 5)
+		{
+			x = 200;
+			y = 2;
+		}
+		else
+			y += 18;
+
+		RStrRelease(rstrLabelW); rstrLabelW = NULL;
+		RStrRelease(rstrAbilityW); rstrAbilityW = NULL;
+	}
+
+Cleanup:
+	RStrRelease(rstrLabelW);
+	if(rstrAbilityW)
+	{
+#ifdef	_DEBUG
+		OutputDebugStringW(L"Could not resolve ability: ");
+		OutputDebugStringW(RStrToWide(rstrAbilityW));
+		OutputDebugStringW(L"\r\n");
+#endif
+
+		RStrRelease(rstrAbilityW);
+	}
+	if(srSIF)
+		srSIF->Close();
+	if(pvLabel)
+		m_pFonts->DeleteFont(pvLabel);
 	return hr;
 }

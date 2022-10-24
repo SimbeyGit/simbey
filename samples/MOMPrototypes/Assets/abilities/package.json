@@ -1,0 +1,354 @@
+[
+	{
+		package: "buildsif",
+		name: "abilities.sif",
+		trim: false,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "abilities.json",
+		data:
+		{
+			type: "abilities",
+			hero_abilities:
+			[
+				{
+					name: "Agility",
+					image: "Hero_Agility.png"
+				},
+				{
+					name: "Arcane Power",
+					image: "Hero_ArcanePower.png"
+				},
+				{
+					name: "Armsmaster",
+					image: "Hero_Armsmaster.png"
+				},
+				{
+					name: "Blademaster",
+					image: "Hero_Blademaster.png"
+				},
+				{
+					name: "Caster",
+					image: "Hero_Caster.png"
+				},
+				{
+					name: "Charmed",
+					image: "Hero_Charmed.png"
+				},
+				{
+					name: "Constitution",
+					image: "Hero_Constitution.png"
+				},
+				{
+					name: "Leadership",
+					image: "Hero_Leadership.png"
+				},
+				{
+					name: "Legendary",
+					image: "Hero_Legendary.png"
+				},
+				{
+					name: "Lucky",
+					image: "Hero_Lucky.png"
+				},
+				{
+					name: "Might",
+					image: "Hero_Might.png"
+				},
+				{
+					name: "Noble",
+					image: "Hero_Noble.png"
+				},
+				{
+					name: "Prayermaster",
+					image: "Hero_Prayermaster.png"
+				},
+				{
+					name: "Sage",
+					image: "Hero_Sage.png"
+				},
+				{
+					name: "Super Agility",
+					image: "Hero_Agility.png"
+				},
+				{
+					name: "Super Arcane Power",
+					image: "Hero_ArcanePower.png"
+				},
+				{
+					name: "Super Armsmaster",
+					image: "Hero_Armsmaster.png"
+				},
+				{
+					name: "Super Blademaster",
+					image: "Hero_Blademaster.png"
+				},
+				{
+					name: "Super Caster",
+					image: "Hero_Caster.png"
+				},
+				{
+					name: "Super Charmed",
+					image: "Hero_Charmed.png"
+				},
+				{
+					name: "Super Constitution",
+					image: "Hero_Constitution.png"
+				},
+				{
+					name: "Super Leadership",
+					image: "Hero_Leadership.png"
+				},
+				{
+					name: "Super Legendary",
+					image: "Hero_Legendary.png"
+				},
+				{
+					name: "Super Lucky",
+					image: "Hero_Lucky.png"
+				},
+				{
+					name: "Super Might",
+					image: "Hero_Might.png"
+				},
+				{
+					name: "Super Noble",
+					image: "Hero_Noble.png"
+				},
+				{
+					name: "Super Prayermaster",
+					image: "Hero_Prayermaster.png"
+				},
+				{
+					name: "Super Sage",
+					image: "Hero_Sage.png"
+				}
+			],
+			unit_abilities:
+			[
+				{
+					name: "Armor Piercing",
+					image: "Unit_ArmorPiercing.png"
+				},
+				{
+					name: "Caster",
+					image: "Unit_Caster.png"
+				},
+				{
+					name: "Cause Fear",
+					image: "Unit_CauseFear.png"
+				},
+				{
+					name: "Cold Immunity",
+					image: "Unit_ColdImmunity.png"
+				},
+				{
+					name: "Construction",
+					image: "Unit_Construction.png"
+				},
+				{
+					name: "Create Outpost",
+					image: "Unit_CreateOutpost.png"
+				},
+				{
+					name: "Create Undead",
+					image: "Unit_CreateUndead.png"
+				},
+				{
+					name: "Death Gaze",
+					image: "Unit_DeathGaze.png"
+				},
+				{
+					name: "Death Immunity",
+					image: "Unit_DeathImmunity.png"
+				},
+				{
+					name: "Dispel Evil",
+					image: "Unit_DispelEvil.png"
+				},
+				{
+					name: "Doom Bolt",
+					image: "Unit_DoomBolt.png"
+				},
+				{
+					name: "Doom Gaze",
+					image: "Unit_DoomGaze.png"
+				},
+				{
+					name: "Fireball Spell",
+					image: "Unit_FireballSpell.png"
+				},
+				{
+					name: "Fire Breath",
+					image: "Unit_FireBreath.png"
+				},
+				{
+					name: "Fire Immunity",
+					image: "Unit_FireImmunity.png"
+				},
+				{
+					name: "First Strike",
+					image: "Unit_FirstStrike.png"
+				},
+				{
+					name: "Forester",
+					image: "Unit_Forester.png"
+				},
+				{
+					name: "Healer",
+					image: "Unit_Healer.png"
+				},
+				{
+					name: "Healing Spell",
+					image: "Unit_HealingSpell.png"
+				},
+				{
+					name: "Holy Bonus",
+					image: "Unit_HolyBonus.png"
+				},
+				{
+					name: "Illusion",
+					image: "Unit_Illusion.png"
+				},
+				{
+					name: "Illusions Immunity",
+					image: "Unit_IllusionsImmunity.png"
+				},
+				{
+					name: "Immolation",
+					image: "Unit_Immolation.png"
+				},
+				{
+					name: "Invisibility",
+					image: "Unit_Invisibility.png"
+				},
+				{
+					name: "Large Shield",
+					image: "Unit_LargeShield.png"
+				},
+				{
+					name: "Life Steal",
+					image: "Unit_LifeSteal.png"
+				},
+				{
+					name: "Lightning Breath",
+					image: "Unit_LightningBreath.png"
+				},
+				{
+					name: "Long Range",
+					image: "Unit_LongRange.png"
+				},
+				{
+					name: "Lucky",
+					image: "Unit_Lucky.png"
+				},
+				{
+					name: "Magic Immunity",
+					image: "Unit_MagicImmunity.png"
+				},
+				{
+					name: "Meld",
+					image: "Unit_Meld.png"
+				},
+				{
+					name: "Merging",
+					image: "Unit_Merging.png"
+				},
+				{
+					name: "Missile Immunity",
+					image: "Unit_MissileImmunity.png"
+				},
+				{
+					name: "Mountaineer",
+					image: "Unit_Mountaineer.png"
+				},
+				{
+					name: "Negate First Strike",
+					image: "Unit_NegateFirstStrike.png"
+				},
+				{
+					name: "Non-Corporeal",
+					image: "Unit_NonCorporeal.png"
+				},
+				{
+					name: "Pathfinding",
+					image: "Unit_PathFinding.png"
+				},
+				{
+					name: "Plane Shift",
+					image: "Unit_PlaneShift.png"
+				},
+				{
+					name: "Poison Immunity",
+					image: "Unit_PoisonImmunity.png"
+				},
+				{
+					name: "Poison Touch",
+					image: "Unit_PoisonTouch.png"
+				},
+				{
+					name: "Purify",
+					image: "Unit_Purify.png"
+				},
+				{
+					name: "Ranged Attack",
+					image: "Unit_Quiver.png"
+				},
+				{
+					name: "Regeneration",
+					image: "Unit_Regeneration.png"
+				},
+				{
+					name: "Resistance to All",
+					image: "Unit_ResistanceToAll.png"
+				},
+				{
+					name: "Scouting",
+					image: "Unit_Scouting.png"
+				},
+				{
+					name: "Stoning Gaze",
+					image: "Unit_StoningGaze.png"
+				},
+				{
+					name: "Stoning Immunity",
+					image: "Unit_StoningImmunity.png"
+				},
+				{
+					name: "Stoning Touch",
+					image: "Unit_StoningTouch.png"
+				},
+				{
+					name: "Summon Demons",
+					image: "Unit_SummonDemons.png"
+				},
+				{
+					name: "Teleporting",
+					image: "Unit_Teleporting.png"
+				},
+				{
+					name: "Thrown",
+					image: "Unit_Thrown.png"
+				},
+				{
+					name: "To Hit",
+					image: "Unit_ToHit.png"
+				},
+				{
+					name: "Wall Crusher",
+					image: "Unit_WallCrusher.png"
+				},
+				{
+					name: "Weapon Immunity",
+					image: "Unit_WeaponImmunity.png"
+				},
+				{
+					name: "Wind Walking",
+					image: "Unit_WindWalking.png"
+				}
+			]
+		}
+	}
+]
