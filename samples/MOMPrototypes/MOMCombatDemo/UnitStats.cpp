@@ -61,7 +61,7 @@ CUnitStats::~CUnitStats ()
 	Assert(NULL == m_pCanvas);
 }
 
-HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLevel, ISimbeyInterchangeSprite* pUnitSprite, ISimbeyInterchangeFileLayer* pPortrait)
+HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLevel, ISimbeyInterchangeSprite* pUnitSprite, ISimbeyInterchangeFileLayer* pPortrait, INT cLiveHeads)
 {
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeFileLayer> srBackground, srGenerated;
@@ -86,7 +86,7 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 
 	Check(sifCreateNew(&m_pGenerated));
 	Check(m_pGenerated->AddLayer(static_cast<WORD>(rc.right - rc.left), static_cast<WORD>(rc.bottom - rc.top), &srGenerated, NULL));
-	Check(RenderUnitStats(srGenerated, srBackground, pDef, pStats, nLevel));
+	Check(RenderUnitStats(srGenerated, srBackground, pDef, pStats, nLevel, cLiveHeads));
 
 	Check(sifCreateStaticSprite(srGenerated, m_xStats, m_yStats, &srSprite));
 	Check(m_pCanvas->AddSprite(m_idxBackground, srSprite, &idxUnitStats));
@@ -100,7 +100,7 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 	Check(m_pGenerated->AddLayer(400, 90, &m_pAbilitiesLayer, NULL));
 	Check(sifCreateStaticSprite(m_pAbilitiesLayer, m_xStats + 5, m_yStats + 178, &srSprite));
 	Check(m_pCanvas->AddSprite(m_idxBackground, srSprite, &idxAbilities));
-	Check(RenderAbilities());
+	Check(RenderAbilities(pDef));
 
 	Check(static_cast<CInteractiveCanvas*>(m_pCanvas)->AddInteractiveLayer(TRUE, FALSE, 0, this, &m_pLayer));
 
@@ -167,7 +167,7 @@ BOOL CUnitStats::ProcessKeyboardInput (LayerInput::Keyboard eType, WPARAM wParam
 	return FALSE;
 }
 
-HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimbeyInterchangeFileLayer* pBackground, IJSONObject* pDef, IJSONObject* pStats, INT nLevel)
+HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimbeyInterchangeFileLayer* pBackground, IJSONObject* pDef, IJSONObject* pStats, INT nLevel, INT cLiveHeads)
 {
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeFile> srCombatStats, srComponents;
@@ -266,8 +266,16 @@ HRESULT CUnitStats::RenderUnitStats (ISimbeyInterchangeFileLayer* pTarget, ISimb
 
 		Check(Formatting::TInt32ToAsc(nDamage, wzDamage, ARRAYSIZE(wzDamage), 10, &cchDamage));
 		pt.X = 120.0f;
-		pt.Y = 54.0f;
 		g.DrawString(wzDamage, cchDamage, reinterpret_cast<Gdiplus::Font*>(pvLabel), pt, &fmt, &solidBrush);
+
+		if(-1 != cLiveHeads)
+		{
+			pt.X = 160.0f;
+			g.DrawString(SLP(L"Heads"), reinterpret_cast<Gdiplus::Font*>(pvLabel), pt, &fmt, &solidBrush);
+			Check(Formatting::TInt32ToAsc(cLiveHeads, wzDamage, ARRAYSIZE(wzDamage), 10, &cchDamage));
+			pt.X = 195.0f;
+			g.DrawString(wzDamage, cchDamage, reinterpret_cast<Gdiplus::Font*>(pvLabel), pt, &fmt, &solidBrush);
+		}
 
 		pt.X = 8.0f;
 		pt.Y = 71.0f;
@@ -493,7 +501,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CUnitStats::RenderAbilities (VOID)
+HRESULT CUnitStats::RenderAbilities (IJSONObject* pDef)
 {
 	HRESULT hr = S_OK;
 	TStackRef<ISimbeyInterchangeFile> srSIF;
@@ -505,10 +513,14 @@ HRESULT CUnitStats::RenderAbilities (VOID)
 	DWORD cbBits;
 	RECT rc;
 	INT nSourceWidth, nSourceHeight;
-	RSTRING rstrAbilityW = NULL, rstrLabelW = NULL;
+	RSTRING rstrTypeW = NULL, rstrAbilityW = NULL, rstrLabelW = NULL;
 	PVOID pvLabel = NULL;
 
 	CheckIf(NULL == m_pAbilities, S_FALSE);
+
+	Check(JSONGetValueFromObject(pDef, SLP(L"base:type"), &srv));
+	Check(srv->GetString(&rstrTypeW));
+	srv.Release();
 
 	Check(m_pFonts->CreateFont(L"Dream Orphanage Rg", 10.0f, Gdiplus::FontStyleBold, &pvLabel));
 
@@ -517,9 +529,12 @@ HRESULT CUnitStats::RenderAbilities (VOID)
 	Check(pPackage->GetJSONData(SLP(L"abilities\\abilities.json"), &srv));
 	Check(srv->GetObject(&srAbilityMaps));
 
-	srv.Release();
-	Check(srAbilityMaps->FindNonNullValueW(L"hero_abilities", &srv));
-	Check(srv->GetArray(&srHeroAbilities));
+	if(0 == TStrCmpAssert(RStrToWide(rstrTypeW), L"hero") || 0 == TStrCmpAssert(RStrToWide(rstrTypeW), L"champion"))
+	{
+		srv.Release();
+		Check(srAbilityMaps->FindNonNullValueW(L"hero_abilities", &srv));
+		Check(srv->GetArray(&srHeroAbilities));
+	}
 
 	srv.Release();
 	Check(srAbilityMaps->FindNonNullValueW(L"unit_abilities", &srv));
@@ -563,7 +578,7 @@ HRESULT CUnitStats::RenderAbilities (VOID)
 		Check(srAbility->FindNonNullValueW(L"name", &srv));
 		Check(srv->GetString(&rstrAbilityW));
 
-		if(FAILED(ResolveLink(srHeroAbilities, srSIF, RSTRING_CAST(L"name"), rstrAbilityW, &srIcon)))
+		if(NULL == srHeroAbilities || FAILED(ResolveLink(srHeroAbilities, srSIF, RSTRING_CAST(L"name"), rstrAbilityW, &srIcon)))
 			Check(ResolveLink(srUnitAbilities, srSIF, RSTRING_CAST(L"name"), rstrAbilityW, &srIcon));
 
 		Check(srIcon->DrawToBits32(&sifSurface, x, y));
@@ -573,12 +588,20 @@ HRESULT CUnitStats::RenderAbilities (VOID)
 		{
 			INT nValue;
 			if(SUCCEEDED(srv->GetInteger(&nValue)))
-				Check(RStrFormatW(&rstrLabelW, L"%r x %d", rstrAbilityW, nValue));
+			{
+				if(0 < nValue)
+					Check(RStrFormatW(&rstrLabelW, L"%r x %d", rstrAbilityW, nValue));
+				else
+					RStrSet(rstrLabelW, rstrAbilityW);
+			}
 			else
 			{
 				DOUBLE dblValue;
 				Check(srv->GetDouble(&dblValue));
-				Check(RStrFormatW(&rstrLabelW, L"%r x %.1f", rstrAbilityW, dblValue));
+				if(0.0 < dblValue)
+					Check(RStrFormatW(&rstrLabelW, L"%r x %.1f", rstrAbilityW, dblValue));
+				else
+					RStrSet(rstrLabelW, rstrAbilityW);
 			}
 		}
 		else
@@ -614,6 +637,7 @@ Cleanup:
 
 		RStrRelease(rstrAbilityW);
 	}
+	RStrRelease(rstrTypeW);
 	if(srSIF)
 		srSIF->Close();
 	if(pvLabel)

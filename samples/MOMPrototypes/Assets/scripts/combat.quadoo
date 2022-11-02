@@ -680,3 +680,9 @@ function ApplyHealing (oUnit, nLevel, nHealPoints)
 
 	return len((new CombatUnit(oUnit, oExpStats)).Heads);
 }
+
+function GetLiveHeads (oUnit, nLevel)
+{
+	var oExpStats = ExpandStats(oUnit, nLevel);
+	return len((new CombatUnit(oUnit, oExpStats)).Heads);
+}

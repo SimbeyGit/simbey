@@ -53,9 +53,9 @@
 			},
 			abilities:
 			[
-				{ type: "To Hit", type: "tohit", value: 1 }
-				{ type: "Regeneration", type: "ability" },
-				{ type: "Fire Breath", type: "breath", breath: "fire", value: 5 }
+				{ name: "To Hit", type: "tohit", value: 1 }
+				{ name: "Regeneration", type: "ability" },
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 5 }
 			]
 		}
 	}

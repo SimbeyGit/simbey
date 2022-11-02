@@ -363,6 +363,7 @@ protected:
 	ULONG m_idxExpandStats;
 	ULONG m_idxCreateCombatObject;
 	ULONG m_idxApplyHealing;
+	ULONG m_idxGetLiveHeads;
 
 	CSIFCanvas* m_pBackground;
 	DOUBLE m_dblBackground;
@@ -397,6 +398,7 @@ public:
 	HRESULT RemoveUnitFromBoard (CMovingObject* pUnit);
 	HRESULT ExpandStats (IJSONObject* pBase, INT nLevel, __deref_out IJSONObject** ppStats);
 	HRESULT GetHealthPct (IJSONObject* pUnit, IJSONObject* pStats, __out DOUBLE* pdblHealth);
+	HRESULT GetLiveHeads (IJSONObject* pUnit, INT nLevel, __out INT* pcLiveHeads);
 	HRESULT UpdateStatsPanel (VOID);
 	HRESULT ShowSpellBook (VOID);
 	HRESULT ShowSelectedUnitInfo (VOID);

@@ -1362,6 +1362,9 @@ HRESULT CCombatScreen::Initialize (VOID)
 	Check(m_pHost->GetVM()->FindFunction(L"ApplyHealing", &m_idxApplyHealing, &cParams));
 	CheckIf(3 != cParams, E_UNEXPECTED);
 
+	Check(m_pHost->GetVM()->FindFunction(L"GetLiveHeads", &m_idxGetLiveHeads, &cParams));
+	CheckIf(2 != cParams, E_UNEXPECTED);
+
 	Check(LoadData());
 	Check(LoadProjectiles());
 	Check(LoadSprites());
@@ -2225,14 +2228,39 @@ HRESULT CCombatScreen::GetHealthPct (IJSONObject* pUnit, IJSONObject* pStats, __
 	Check(srv->GetInteger(&nHits));
 	srv.Release();
 
-	// TODO - Fix for hydra!
-	Check(JSONGetValueFromObject(pUnit, SLP(L"base:figures"), &srv));
+	if(FAILED(JSONGetValueFromObject(pUnit, SLP(L"base:heads"), &srv)))
+		Check(JSONGetValueFromObject(pUnit, SLP(L"base:figures"), &srv));
 	Check(srv->GetInteger(&cFigures));
 
 	nTotal = cFigures * nHits;
 	*pdblHealth = static_cast<DOUBLE>(nTotal - nDamage) / static_cast<DOUBLE>(nTotal);
 
 Cleanup:
+	return hr;
+}
+
+HRESULT CCombatScreen::GetLiveHeads (IJSONObject* pUnit, INT nLevel, __out INT* pcLiveHeads)
+{
+	HRESULT hr;
+	QuadooVM::QVARIANT qvArg;
+	QuadooVM::QVARIANT qvResult; qvResult.eType = QuadooVM::Null;
+
+	qvArg.eType = QuadooVM::I4;
+	qvArg.lVal = nLevel;
+	Check(m_pHost->GetVM()->PushValue(&qvArg));
+
+	qvArg.eType = QuadooVM::JSONObject;
+	qvArg.pJSONObject = pUnit;
+	Check(m_pHost->GetVM()->PushValue(&qvArg));
+
+	Check(m_pHost->GetVM()->RunFunction(m_idxGetLiveHeads, &qvResult));
+	CheckIf(QuadooVM::I4 != qvResult.eType, E_UNEXPECTED);
+
+	*pcLiveHeads = qvResult.lVal;
+	qvResult.eType = QuadooVM::Null;
+
+Cleanup:
+	QVMClearVariant(&qvResult);
 	return hr;
 }
 
@@ -2278,8 +2306,10 @@ HRESULT CCombatScreen::ShowSelectedUnitInfo (VOID)
 	TStackRef<ISimbeyInterchangeFileLayer> srPortrait;
 	TStackRef<ISimbeyInterchangeSprite> srUnitSprite;
 	TStackRef<IJSONObject> srStats;
+	TStackRef<IJSONValue> srv;
 	CMovingObject* pSelected;
 	CUnitStats* pUnitStats = NULL;
+	INT cLiveHeads = -1;
 
 	CheckIf(NULL == m_pSelected, S_FALSE);
 	pSelected = static_cast<CMovingObject*>(m_pSelected);
@@ -2295,7 +2325,10 @@ HRESULT CCombatScreen::ShowSelectedUnitInfo (VOID)
 	// Portraits are optional.
 	pSelected->LoadPortrait(&srPortrait);
 
-	Check(pUnitStats->Initialize(pSelected->m_pDef, srStats, pSelected->m_nLevel, srUnitSprite, srPortrait));
+	if(SUCCEEDED(JSONGetValueFromObject(pSelected->m_pDef, SLP(L"base:heads"), &srv)))
+		Check(GetLiveHeads(pSelected->m_pDef, pSelected->m_nLevel, &cLiveHeads));
+
+	Check(pUnitStats->Initialize(pSelected->m_pDef, srStats, pSelected->m_nLevel, srUnitSprite, srPortrait, cLiveHeads));
 	Check(AddPopup(pUnitStats));
 
 Cleanup:
