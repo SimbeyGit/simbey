@@ -376,6 +376,8 @@ public:
 	HRESULT PlaceOrModifyCity (MAPTILE* pWorld, INT xTile, INT yTile);
 
 protected:
+	HRESULT LoadPackage (VOID);
+
 	HRESULT LoadFeatures (ISimbeyInterchangeFile* pFeatures);
 	HRESULT LoadCityTiles (ISimbeyInterchangeFile* pCityTiles);
 

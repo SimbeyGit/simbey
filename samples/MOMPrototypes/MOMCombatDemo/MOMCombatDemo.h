@@ -111,6 +111,7 @@ protected:
 	// INotifyFinished
 	virtual VOID OnNotifyFinished (MIDI::CPlayer* pPlayer, BOOL fCompleted);
 
+	HRESULT LoadPackage (VOID);
 	HRESULT LoadSounds (VOID);
 	HRESULT LoadSoundFiles (PCWSTR pcwzSounds, INT cchSounds, TRStrMap<FMOD::Sound*>& mapSounds);
 	HRESULT LoadScript (VOID);

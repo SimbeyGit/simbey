@@ -564,9 +564,7 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 	CheckAlloc(m_pSurface);
 	m_pSurface->EnableClear(RGB(255, 255, 255));
 
-	m_pPackage = __new CSIFPackage;
-	CheckAlloc(m_pPackage);
-	Check(m_pPackage->OpenPackage(L"Assets.pkg"));	// This file must be built by SIFPackage.exe
+	Check(LoadPackage());
 
 	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\rules.json"), &srvRules));
 
@@ -1902,6 +1900,38 @@ HRESULT CMOMWorldEditor::PlaceOrModifyCity (MAPTILE* pWorld, INT xTile, INT yTil
 
 Cleanup:
 	__delete pdlgCity;
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::LoadPackage (VOID)
+{
+	HRESULT hr;
+	bool fMissingPackage = false;
+
+	m_pPackage = __new CSIFPackage;
+	CheckAlloc(m_pPackage);
+
+	// This file must be built by SIFPackage.exe
+	if(GetFileAttributes(L"Assets.pkg") != INVALID_FILE_ATTRIBUTES)
+		Check(m_pPackage->OpenPackage(L"Assets.pkg"));
+	else if(GetFileAttributes(L"..\\Assets.pkg") != INVALID_FILE_ATTRIBUTES)
+		Check(m_pPackage->OpenPackage(L"..\\Assets.pkg"));
+	else if(GetFileAttributes(L"Assets\\Assets.pkg") != INVALID_FILE_ATTRIBUTES)
+		Check(m_pPackage->OpenPackage(L"Assets\\Assets.pkg"));
+	else
+	{
+		fMissingPackage = true;
+		MessageBox(GetDesktopWindow(), L"Could not find Assets.pkg!", L"Missing Data Package", MB_ICONERROR | MB_OK);
+		Check(HRESULT_FROM_WIN32(ERROR_MISSING_SYSTEMFILE));
+	}
+
+Cleanup:
+	if(FAILED(hr) && !fMissingPackage)
+	{
+		WCHAR wzError[100];
+		if(SUCCEEDED(Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Could not load Assets.pkg due to error: 0x%.8X!", hr)))
+			MessageBox(GetDesktopWindow(), wzError, L"Data Package Error", MB_ICONERROR | MB_OK);
+	}
 	return hr;
 }
 

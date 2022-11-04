@@ -119,18 +119,13 @@ HRESULT CMOMCombatDemo::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 	CheckAlloc(m_pSurface);
 	m_pSurface->EnableClear(RGB(255, 255, 255));
 
-	m_pPackage = __new CSIFPackage;
-	CheckAlloc(m_pPackage);
-
 	// Look for Placements.json first in the "Assets" folder and then in the current folder
 	if(FAILED(Text::LoadFromFile(L"Assets\\Placements.json", &pwzJSON, &cchJSON)))
 		Check(Text::LoadFromFile(L"Placements.json", &pwzJSON, &cchJSON));
 	Check(JSONParse(NULL, pwzJSON, cchJSON, &srv));
 	Check(srv->GetObject(&m_pPlacements));
 
-	// This file must be built by SIFPackage.exe
-	if(FAILED(m_pPackage->OpenPackage(L"Assets\\Assets.pkg")))
-		Check(m_pPackage->OpenPackage(L"Assets.pkg"));
+	Check(LoadPackage());
 
 	CheckIfGetLastError(!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE));
 	Check(Create(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE, WS_OVERLAPPEDWINDOW,
@@ -412,6 +407,38 @@ VOID CMOMCombatDemo::OnNotifyFinished (MIDI::CPlayer* pPlayer, BOOL fCompleted)
 {
 	if(m_pScreen)
 		m_pScreen->OnNotifyFinished(fCompleted);
+}
+
+HRESULT CMOMCombatDemo::LoadPackage (VOID)
+{
+	HRESULT hr;
+	bool fMissingPackage = false;
+
+	m_pPackage = __new CSIFPackage;
+	CheckAlloc(m_pPackage);
+
+	// This file must be built by SIFPackage.exe
+	if(GetFileAttributes(L"Assets.pkg") != INVALID_FILE_ATTRIBUTES)
+		Check(m_pPackage->OpenPackage(L"Assets.pkg"));
+	else if(GetFileAttributes(L"..\\Assets.pkg") != INVALID_FILE_ATTRIBUTES)
+		Check(m_pPackage->OpenPackage(L"..\\Assets.pkg"));
+	else if(GetFileAttributes(L"Assets\\Assets.pkg") != INVALID_FILE_ATTRIBUTES)
+		Check(m_pPackage->OpenPackage(L"Assets\\Assets.pkg"));
+	else
+	{
+		fMissingPackage = true;
+		MessageBox(GetDesktopWindow(), L"Could not find Assets.pkg!", L"Missing Data Package", MB_ICONERROR | MB_OK);
+		Check(HRESULT_FROM_WIN32(ERROR_MISSING_SYSTEMFILE));
+	}
+
+Cleanup:
+	if(FAILED(hr) && !fMissingPackage)
+	{
+		WCHAR wzError[100];
+		if(SUCCEEDED(Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Could not load Assets.pkg due to error: 0x%.8X!", hr)))
+			MessageBox(GetDesktopWindow(), wzError, L"Data Package Error", MB_ICONERROR | MB_OK);
+	}
+	return hr;
 }
 
 HRESULT CMOMCombatDemo::LoadSounds (VOID)
