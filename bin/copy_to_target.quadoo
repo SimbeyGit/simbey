@@ -19,4 +19,12 @@ function main ()
 			oSource.CopyHardLink(strName, oDebug.GetPathOf(strName));
 		}
 	} while(oEnum.Next());
+
+	var oFModx86 = oSource.CreateFolder("..\\target\\lib\\3rdParty\\fmod\\4.26.31\\x86");
+	try oRelease.DeleteFile("fmodex.dll"); catch;
+	try oDebug.DeleteFile("fmodex.dll"); catch;
+
+	println("Copying fmodex.dll");
+	oFModx86.CopyHardLink("fmodex.dll", oRelease.GetPathOf("fmodex.dll"));
+	oFModx86.CopyHardLink("fmodex.dll", oDebug.GetPathOf("fmodex.dll"));
 }
