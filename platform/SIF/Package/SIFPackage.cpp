@@ -109,6 +109,7 @@ HRESULT CSIFPackage::OpenPackage (PCWSTR pcwzPackage)
 	Check(RStrConvertToW(CP_UTF8, cbDir, pszDir, &rstrDirW));
 
 	Check(JSONParseWithDictionary(NULL, NULL, RStrToWide(rstrDirW), RStrLen(rstrDirW), &srv));
+	CheckIf(NULL == srv, HRESULT_FROM_WIN32(ERROR_EMPTY));
 	Check(srv->GetArray(&m_pDirectory));
 
 	Check(RStrCreateW(LSP(L"name"), &m_rstrName));
