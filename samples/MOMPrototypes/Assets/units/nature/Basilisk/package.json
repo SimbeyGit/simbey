@@ -53,7 +53,7 @@
 			abilities:
 			[
 				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "Stoning Gaze", type: "gaze", gaze: "stoning", value: 1 }
+				{ name: "Stoning Gaze", type: "gaze", gaze: "stoning", value: -1 }
 			]
 		}
 	}

@@ -55,8 +55,8 @@
 				{ name: "Cause Fear", type: "ability" },
 				{ name: "Poison Touch", type: "touch", touch: "poison", value: 4 },
 				{ name: "Doom Gaze", type: "gaze", gaze: "doom", value: 4 },
-				{ name: "Death Gaze", type: "gaze", gaze: "death", value: 4 },
-				{ name: "Stoning Gaze", type: "gaze", gaze: "stoning", value: 4 }
+				{ name: "Death Gaze", type: "gaze", gaze: "death", value: -4 },
+				{ name: "Stoning Gaze", type: "gaze", gaze: "stoning", value: -4 }
 			]
 		}
 	}

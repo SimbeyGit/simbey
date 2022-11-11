@@ -53,7 +53,7 @@
 			abilities:
 			[
 				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "Stoning Touch", type: "touch", touch: "stoning", value: 3 }
+				{ name: "Stoning Touch", type: "touch", touch: "stoning", value: -3 }
 			]
 		}
 	}

@@ -507,10 +507,25 @@ class DamageCalculator
 
 			if(fResist)
 			{
-				var nResist = oTargetStats.resist - nStrength;
-				var nRolled = dice(10);
-				if(nRolled > nResist)
-					cDamage = nRolled - nResist;
+				var nResist = oTargetStats.resist;
+
+				if(nStrength < 0)
+				{
+					var nRolled = dice(10);
+
+					nResist += nStrength;
+					if(nRolled > nResist)
+						cDamage = oCombatTarget.Stats.hits;
+				}
+				else
+				{
+					for(int s = 0; s < nStrength; s++)
+					{
+						var nRolled = dice(10);
+						if(nRolled > nResist)
+							cDamage++;
+					}
+				}
 			}
 			else
 			{

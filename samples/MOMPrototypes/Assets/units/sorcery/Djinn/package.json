@@ -22,7 +22,7 @@
 			name: "Djinn",
 			realm: "sorcery",
 			figures: 1,
-			animation: "air_unit",
+			animation: "flying_unit",
 			upkeep:
 			[
 				{

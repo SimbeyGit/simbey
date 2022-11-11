@@ -141,6 +141,10 @@
 					image: "Unit_CauseFear.png"
 				},
 				{
+					name: "Cold Breath",
+					image: "Unit_ColdBreath.png"
+				},
+				{
 					name: "Cold Immunity",
 					image: "Unit_ColdImmunity.png"
 				},
