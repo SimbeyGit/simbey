@@ -1,6 +1,26 @@
 [
 	{
 		package: "sound",
+		name: "BlakeStoneGoldBars.wav"
+	},
+	{
+		package: "sound",
+		name: "BlakeStoneLoot.wav"
+	},
+	{
+		package: "sound",
+		name: "BlakeStoneMoneyBag.wav"
+	},
+	{
+		package: "sound",
+		name: "BlakeStoneToken.wav"
+	},
+	{
+		package: "sound",
+		name: "BlakeStoneXylanOrb.wav"
+	},
+	{
+		package: "sound",
 		name: "DoorClose.wav"
 	},
 	{

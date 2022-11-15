@@ -62,6 +62,14 @@
 	},
 	{
 		package: "sif",
+		name: "GoldBars.SIF"
+	},
+	{
+		package: "model",
+		name: "GoldBars.SML"
+	},
+	{
+		package: "sif",
 		name: "Spear.SIF"
 	},
 	{
@@ -145,6 +153,15 @@
 					sif: "Drum.SIF",
 					model: "Drum.SML",
 					entity: "Drum.PNG"
+				},
+				{
+					name: "GoldBars",
+					type: "item",
+					sif: "GoldBars.SIF",
+					model: "GoldBars.SML",
+					entity: "GoldBars.PNG",
+					pickup: "BlakeStoneGoldBars.wav",
+					points: 50
 				},
 				{
 					name: "Spear",
