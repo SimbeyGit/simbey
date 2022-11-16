@@ -101,6 +101,9 @@ namespace Geometry
 		FLOAT p2_x, FLOAT p2_y, FLOAT p3_x, FLOAT p3_y, FLOAT* i_x, FLOAT* i_y);
 	BOOL WINAPI GetLineIntersectionD (DOUBLE p0_x, DOUBLE p0_y, DOUBLE p1_x, DOUBLE p1_y,
 		DOUBLE p2_x, DOUBLE p2_y, DOUBLE p3_x, DOUBLE p3_y, DOUBLE* i_x, DOUBLE* i_y);
+
+	BOOL WINAPI LineSegmentIntersectsCircle (DOUBLE x1, DOUBLE y1, DOUBLE x2, DOUBLE y2, DOUBLE cx, DOUBLE cy, DOUBLE r);
+	VOID WINAPI FindNearestPointOnLineSegment (DOUBLE x1, DOUBLE y1, DOUBLE x2, DOUBLE y2, DOUBLE cx, DOUBLE cy, __out DOUBLE* px, __out DOUBLE* py);
 };
 
 #endif

@@ -311,8 +311,8 @@ VOID CModelObstacle::GetCollisionLines (TArray<LINE_SEGMENT>* paSegments)
 
 	// North Face
 	seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = -1.0f;
-	seg.ptA.x = xCell; seg.ptA.y = 0.0; seg.ptA.z = zCell;
-	seg.ptB.x = xCell + 1; seg.ptB.y = 0.0; seg.ptB.z = zCell;
+	seg.ptA.x = xCell + 1; seg.ptA.y = 0.0; seg.ptA.z = zCell;
+	seg.ptB.x = xCell; seg.ptB.y = 0.0; seg.ptB.z = zCell;
 	paSegments->Append(seg);
 
 	// West Face

@@ -361,4 +361,38 @@ namespace Geometry
 
 		return FALSE; // No collision
 	}
+
+	BOOL WINAPI LineSegmentIntersectsCircle (DOUBLE x1, DOUBLE y1, DOUBLE x2, DOUBLE y2, DOUBLE cx, DOUBLE cy, DOUBLE r)
+	{
+		DOUBLE x_linear = x2 - x1;
+		DOUBLE x_constant = x1 - cx;
+		DOUBLE y_linear = y2 - y1;
+		DOUBLE y_constant = y1 - cy;
+		DOUBLE a = x_linear * x_linear + y_linear * y_linear;
+		DOUBLE half_b = x_linear * x_constant + y_linear * y_constant;
+		DOUBLE c = x_constant * x_constant + y_constant * y_constant - r * r;
+		return half_b * half_b >= a * c &&
+			(-half_b <= a || c + half_b + half_b + a <= 0) &&
+			(half_b <= 0 || c <= 0);
+	}
+
+	VOID WINAPI FindNearestPointOnLineSegment (DOUBLE x1, DOUBLE y1, DOUBLE x2, DOUBLE y2, DOUBLE cx, DOUBLE cy, __out DOUBLE* px, __out DOUBLE* py)
+	{
+		DOUBLE xHeading = x2 - x1, yHeading = y2 - y1;
+		DOUBLE rMagnitude = sqrt((xHeading * xHeading) + (yHeading * yHeading));
+		DOUBLE rScale = 1.0 / rMagnitude;
+		xHeading *= rScale;
+		yHeading *= rScale;
+
+		DOUBLE xProjection = cx - x1, yProjection = cy - y1;
+		DOUBLE rDotProduct = (xProjection * xHeading) + (yProjection * yHeading);
+
+		if(rDotProduct < 0.0)
+			rDotProduct = 0.0;
+		else if(rDotProduct > rMagnitude)
+			rDotProduct = rMagnitude;
+
+		*px = x1 + xHeading * rDotProduct;
+		*py = y1 + yHeading * rDotProduct;
+	}
 };

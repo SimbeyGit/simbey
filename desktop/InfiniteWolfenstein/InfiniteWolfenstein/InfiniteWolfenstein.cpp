@@ -15,7 +15,7 @@
 
 #define	TURN_RATE				3.0f
 #define	MOVE_RATE				0.1f
-#define	PLAYER_RADIUS			0.4f
+#define	PLAYER_RADIUS			0.4
 
 GLfloat LightAmbient[]=		{ 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat LightDiffuse[]=		{ 1.0f, 1.0f, 1.0f, 1.0f };
@@ -546,8 +546,8 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove)
 
 					// North Face
 					seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = -1.0f;
-					seg.ptA.x = xCell; seg.ptA.y = 0.0; seg.ptA.z = zCell;
-					seg.ptB.x = xCell + 1; seg.ptB.y = 0.0; seg.ptB.z = zCell;
+					seg.ptA.x = xCell + 1; seg.ptA.y = 0.0; seg.ptA.z = zCell;
+					seg.ptB.x = xCell; seg.ptB.y = 0.0; seg.ptB.z = zCell;
 					m_aSegments.Append(seg);
 
 					// West Face
@@ -579,32 +579,86 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove)
 	}
 
 	DOUBLE dblDirRadians = m_camera.m_dblDirRadians;
+	DPOINT dpCenter = m_camera.m_dblPoint;
+
+	/*
+	dpCenter.x += sin(dblDirRadians) * dblMove;
+	dpCenter.z -= cos(dblDirRadians) * dblMove;
+
+	for(;;)
+	{
+		for(sysint i = 0; i < m_aSegments.Length(); i++)
+		{
+			LINE_SEGMENT& seg = m_aSegments[i];
+
+			if(Geometry::LineSegmentIntersectsCircle(seg.ptA.x, seg.ptA.z, seg.ptB.x, seg.ptB.z,
+				dpCenter.x, dpCenter.z, PLAYER_RADIUS))
+			{
+				if(seg.ptA.x == seg.ptB.x)	// Vertical Line
+				{
+					if(dpCenter.z >= seg.ptA.z && dpCenter.z <= seg.ptB.z)
+					{
+						if(m_camera.m_dblPoint.x < dpCenter.x)
+							dpCenter.x = (seg.ptA.x - PLAYER_RADIUS) - 0.0005;
+						else
+							dpCenter.x = (seg.ptA.x + PLAYER_RADIUS) + 0.0005;
+					}
+					else if(dpCenter.z >= seg.ptB.z && dpCenter.z <= seg.ptA.z)
+					{
+						if(m_camera.m_dblPoint.x < dpCenter.x)
+							dpCenter.x = (seg.ptA.x - PLAYER_RADIUS) - 0.0005;
+						else
+							dpCenter.x = (seg.ptA.x + PLAYER_RADIUS) + 0.0005;
+					}
+				}
+				else						// Horizontal Line
+				{
+					if(dpCenter.x >= seg.ptA.x && dpCenter.x <= seg.ptB.x)
+					{
+						if(m_camera.m_dblPoint.z < dpCenter.z)
+							dpCenter.z = (seg.ptA.z - PLAYER_RADIUS) - 0.0005;
+						else
+							dpCenter.z = (seg.ptA.z + PLAYER_RADIUS) + 0.0005;
+					}
+					else if(dpCenter.x >= seg.ptB.x && dpCenter.x <= seg.ptA.x)
+					{
+						if(m_camera.m_dblPoint.z < dpCenter.z)
+							dpCenter.z = (seg.ptA.z - PLAYER_RADIUS) - 0.0005;
+						else
+							dpCenter.z = (seg.ptA.z + PLAYER_RADIUS) + 0.0005;
+					}
+				}
+
+				m_aSegments.Remove(i, NULL);
+				continue;
+			}
+		}
+
+		break;
+	}
+	*/
 
 	do
 	{
+		DPOINT dpTarget;
 		DOUBLE dblBestDistance = 2.0;
 		sysint idxBestSegment = -1;
 
-		DPOINT dpMove;
-		dpMove.x = sin(dblDirRadians) * (PLAYER_RADIUS + dblMove);
-		dpMove.z = -cos(dblDirRadians) * (PLAYER_RADIUS + dblMove);
+		dpTarget.x = dpCenter.x + sin(dblDirRadians) * (PLAYER_RADIUS + dblMove);
+		dpTarget.z = dpCenter.z - cos(dblDirRadians) * (PLAYER_RADIUS + dblMove);
 
 		for(sysint i = 0; i < m_aSegments.Length(); i++)
 		{
 			LINE_SEGMENT& seg = m_aSegments[i];
-			DPOINT dpTarget, dpInter;
-
-			dpTarget.x = m_camera.m_dblPoint.x + dpMove.x;
-			dpTarget.z = m_camera.m_dblPoint.z + dpMove.z;
+			DPOINT dpInter;
 
 			if(Geometry::GetLineIntersectionD(seg.ptA.x, seg.ptA.z, seg.ptB.x, seg.ptB.z,
-				m_camera.m_dblPoint.x, m_camera.m_dblPoint.z, dpTarget.x, dpTarget.z,
+				dpCenter.x, dpCenter.z, dpTarget.x, dpTarget.z,
 				&dpInter.x, &dpInter.z))
 			{
-				dpTarget.y = 0.0;
 				dpInter.y = 0.0;
 
-				DOUBLE dblDistance = Geometry::PointDistanceD(&dpTarget, &dpInter);
+				DOUBLE dblDistance = Geometry::PointDistanceD(&dpCenter, &dpInter);
 				if(dblDistance < dblBestDistance)
 				{
 					dblBestDistance = dblDistance;
@@ -615,21 +669,24 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove)
 
 		if(-1 == idxBestSegment)
 		{
-			m_camera.m_dblPoint.x += sin(dblDirRadians) * dblMove;
-			m_camera.m_dblPoint.z += -cos(dblDirRadians) * dblMove;
+			dpCenter.x += sin(dblDirRadians) * dblMove;
+			dpCenter.z += -cos(dblDirRadians) * dblMove;
 			break;
 		}
 
-		break; // TODO - This is broken!
+		break;	// TODO - This is broken!
 
 		dblBestDistance -= PLAYER_RADIUS;
-		m_camera.m_dblPoint.x += sin(dblDirRadians) * dblBestDistance;
-		m_camera.m_dblPoint.z += -cos(dblDirRadians) * dblBestDistance;
+		dpCenter.x += sin(dblDirRadians) * dblBestDistance;
+		dpCenter.z += -cos(dblDirRadians) * dblBestDistance;
 
 		dblDirRadians = Geometry::TDegreesToRadians<DOUBLE, DOUBLE>(Geometry::VertexAngle(m_aSegments[idxBestSegment].rNormal.x, -m_aSegments[idxBestSegment].rNormal.z));
 		dblMove -= dblBestDistance;
+
+		m_aSegments.Remove(idxBestSegment, NULL);
 	} while(0.0 != dblMove);
 
+	m_camera.m_dblPoint = dpCenter;
 	m_aSegments.Clear();
 }
 
