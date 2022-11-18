@@ -6,7 +6,8 @@
 #include "InfiniteWolfenstein.h"
 #include "Entities.h"
 
-CDoor::CDoor (CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType) :
+CDoor::CDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType) :
+	m_pLevel(pLevel),
 	m_fNorthSouth(fNorthSouth),
 	m_eState(None),
 	m_nTimer(0),
@@ -212,7 +213,13 @@ VOID CDoor::Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion)
 		break;
 	case Closing:
 		m_dblPosition -= (1.0 / 64.0);
-		if(++m_nTimer == 64)
+		if(m_pLevel->CheckCollisionsWithEntity(this))
+		{
+			m_nTimer = 64 - m_nTimer;
+			m_eState = Opening;
+			Update(pRenderer, pRegion);
+		}
+		else if(++m_nTimer == 64)
 		{
 			m_eState = None;
 			m_nTimer = 0;

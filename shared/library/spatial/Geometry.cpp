@@ -142,6 +142,11 @@ namespace Geometry
 		return (fabs(total_angles - 2.0f * rPI) <= 0.005) && (1 == _finite(total_angles));
 	}
 
+	BOOL WINAPI PointInSquare (DOUBLE x, DOUBLE y, DOUBLE xSquare, DOUBLE ySquare, DOUBLE dblSize)
+	{
+		return x >= xSquare - dblSize && y >= ySquare - dblSize && x < xSquare + dblSize && y < ySquare + dblSize;
+	}
+
 	VOID WINAPI RotatePoint (PFPOINT lpPoint, FLOAT fDegrees)
 	{
 		DOUBLE fRadius = sqrt(lpPoint->x * lpPoint->x + lpPoint->z * lpPoint->z);

@@ -14,8 +14,8 @@
 #define	GAME_TICK_MS			17
 
 #define	TURN_RATE				3.0f
-#define	MOVE_RATE				0.1f
-#define	PLAYER_RADIUS			0.4
+#define	MOVE_RATE				0.1
+#define	PLAYER_RADIUS			0.35
 
 GLfloat LightAmbient[]=		{ 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat LightDiffuse[]=		{ 1.0f, 1.0f, 1.0f, 1.0f };
@@ -214,6 +214,29 @@ VOID CLevelRenderer::ShowLockedDoorMessage (PCWSTR pcwzMessage, BYTE bRed, BYTE 
 	m_rgLockedDoorColor[1] = static_cast<FLOAT>(bGreen) / 255.0f;
 	m_rgLockedDoorColor[2] = static_cast<FLOAT>(bBlue) / 255.0f;
 	m_cDrawLockedDoorTicks = 200;
+}
+
+BOOL CLevelRenderer::CheckCollisionsWithEntity (CEntity* pEntity)
+{
+	BOOL fCollision = FALSE;
+	DPOINT dpCenter = m_camera.m_dblPoint;
+
+	pEntity->GetCollisionLines(&m_aSegments);
+
+	for(sysint i = 0; i < m_aSegments.Length(); i++)
+	{
+		LINE_SEGMENT& seg = m_aSegments[i];
+
+		if(Geometry::PointInSquare(seg.ptA.x, seg.ptA.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS) ||
+			Geometry::PointInSquare(seg.ptB.x, seg.ptB.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS))
+		{
+			fCollision = TRUE;
+			break;
+		}
+	}
+
+	m_aSegments.Clear();
+	return fCollision;
 }
 
 // IGameInterface
@@ -472,7 +495,7 @@ HRESULT CLevelRenderer::GetDungeonRegion (INT xRegion, INT zRegion, __deref_out 
 		CheckAlloc(pRegion);
 	}
 
-	Check(m_pGenerator->GenerateRegion(pRegion));
+	Check(m_pGenerator->GenerateRegion(pRegion, this));
 
 	RenderRegion(pRegion);
 
@@ -581,110 +604,108 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove)
 	DOUBLE dblDirRadians = m_camera.m_dblDirRadians;
 	DPOINT dpCenter = m_camera.m_dblPoint;
 
-	/*
 	dpCenter.x += sin(dblDirRadians) * dblMove;
 	dpCenter.z -= cos(dblDirRadians) * dblMove;
 
+	// Check sliding against wall sides
 	for(;;)
 	{
 		for(sysint i = 0; i < m_aSegments.Length(); i++)
 		{
 			LINE_SEGMENT& seg = m_aSegments[i];
 
-			if(Geometry::LineSegmentIntersectsCircle(seg.ptA.x, seg.ptA.z, seg.ptB.x, seg.ptB.z,
-				dpCenter.x, dpCenter.z, PLAYER_RADIUS))
+			if(seg.ptA.x == seg.ptB.x)	// Vertical Line
 			{
-				if(seg.ptA.x == seg.ptB.x)	// Vertical Line
-				{
-					if(dpCenter.z >= seg.ptA.z && dpCenter.z <= seg.ptB.z)
-					{
-						if(m_camera.m_dblPoint.x < dpCenter.x)
-							dpCenter.x = (seg.ptA.x - PLAYER_RADIUS) - 0.0005;
-						else
-							dpCenter.x = (seg.ptA.x + PLAYER_RADIUS) + 0.0005;
-					}
-					else if(dpCenter.z >= seg.ptB.z && dpCenter.z <= seg.ptA.z)
-					{
-						if(m_camera.m_dblPoint.x < dpCenter.x)
-							dpCenter.x = (seg.ptA.x - PLAYER_RADIUS) - 0.0005;
-						else
-							dpCenter.x = (seg.ptA.x + PLAYER_RADIUS) + 0.0005;
-					}
-				}
-				else						// Horizontal Line
-				{
-					if(dpCenter.x >= seg.ptA.x && dpCenter.x <= seg.ptB.x)
-					{
-						if(m_camera.m_dblPoint.z < dpCenter.z)
-							dpCenter.z = (seg.ptA.z - PLAYER_RADIUS) - 0.0005;
-						else
-							dpCenter.z = (seg.ptA.z + PLAYER_RADIUS) + 0.0005;
-					}
-					else if(dpCenter.x >= seg.ptB.x && dpCenter.x <= seg.ptA.x)
-					{
-						if(m_camera.m_dblPoint.z < dpCenter.z)
-							dpCenter.z = (seg.ptA.z - PLAYER_RADIUS) - 0.0005;
-						else
-							dpCenter.z = (seg.ptA.z + PLAYER_RADIUS) + 0.0005;
-					}
-				}
+				DOUBLE zMin = min(seg.ptA.z, seg.ptB.z);
+				DOUBLE zMax = max(seg.ptA.z, seg.ptB.z);
 
-				m_aSegments.Remove(i, NULL);
-				continue;
+				if(dpCenter.z >= zMin && dpCenter.z <= zMax)
+				{
+					if(dpCenter.x >= seg.ptA.x - PLAYER_RADIUS && dpCenter.x < seg.ptA.x)
+					{
+						dpCenter.x = (seg.ptA.x - PLAYER_RADIUS) - 0.001;
+						m_aSegments.Remove(i, NULL);
+						continue;
+					}
+					else if(dpCenter.x >= seg.ptA.x && dpCenter.x < seg.ptA.x + PLAYER_RADIUS)
+					{
+						dpCenter.x = (seg.ptA.x + PLAYER_RADIUS) + 0.001;
+						m_aSegments.Remove(i, NULL);
+						continue;
+					}
+				}
+			}
+			else
+			{
+				DOUBLE xMin = min(seg.ptA.x, seg.ptB.x);
+				DOUBLE xMax = max(seg.ptA.x, seg.ptB.x);
+
+				if(dpCenter.x >= xMin && dpCenter.x <= xMax)
+				{
+					if(dpCenter.z >= seg.ptA.z - PLAYER_RADIUS && dpCenter.z < seg.ptA.z)
+					{
+						dpCenter.z = (seg.ptA.z - PLAYER_RADIUS) - 0.001;
+						m_aSegments.Remove(i, NULL);
+						continue;
+					}
+					else if(dpCenter.z >= seg.ptA.z && dpCenter.z < seg.ptA.z + PLAYER_RADIUS)
+					{
+						dpCenter.z = (seg.ptA.z + PLAYER_RADIUS) + 0.001;
+						m_aSegments.Remove(i, NULL);
+						continue;
+					}
+				}
 			}
 		}
 
 		break;
 	}
-	*/
 
-	do
+	// Check sliding against the corners
+	for(;;)
 	{
-		DPOINT dpTarget;
-		DOUBLE dblBestDistance = 2.0;
-		sysint idxBestSegment = -1;
-
-		dpTarget.x = dpCenter.x + sin(dblDirRadians) * (PLAYER_RADIUS + dblMove);
-		dpTarget.z = dpCenter.z - cos(dblDirRadians) * (PLAYER_RADIUS + dblMove);
-
 		for(sysint i = 0; i < m_aSegments.Length(); i++)
 		{
 			LINE_SEGMENT& seg = m_aSegments[i];
-			DPOINT dpInter;
 
-			if(Geometry::GetLineIntersectionD(seg.ptA.x, seg.ptA.z, seg.ptB.x, seg.ptB.z,
-				dpCenter.x, dpCenter.z, dpTarget.x, dpTarget.z,
-				&dpInter.x, &dpInter.z))
+			if(seg.ptA.x == seg.ptB.x)	// Vertical Line
 			{
-				dpInter.y = 0.0;
-
-				DOUBLE dblDistance = Geometry::PointDistanceD(&dpCenter, &dpInter);
-				if(dblDistance < dblBestDistance)
+				if(Geometry::PointInSquare(seg.ptA.x, seg.ptA.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS) ||
+					Geometry::PointInSquare(seg.ptB.x, seg.ptB.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS))
 				{
-					dblBestDistance = dblDistance;
-					idxBestSegment = i;
+					DOUBLE zMin = min(seg.ptA.z, seg.ptB.z);
+					DOUBLE zMax = max(seg.ptA.z, seg.ptB.z);
+
+					if(m_camera.m_dblPoint.z < zMin)
+						dpCenter.z = zMin - (PLAYER_RADIUS + 0.001);
+					else if(m_camera.m_dblPoint.z > zMax)
+						dpCenter.z = zMax + (PLAYER_RADIUS + 0.001);
+
+					m_aSegments.Remove(i, NULL);
+					continue;
+				}
+			}
+			else
+			{
+				if(Geometry::PointInSquare(seg.ptA.x, seg.ptA.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS) ||
+					Geometry::PointInSquare(seg.ptB.x, seg.ptB.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS))
+				{
+					DOUBLE xMin = min(seg.ptA.x, seg.ptB.x);
+					DOUBLE xMax = max(seg.ptA.x, seg.ptB.x);
+
+					if(m_camera.m_dblPoint.x < xMin)
+						dpCenter.x = xMin - (PLAYER_RADIUS + 0.001);
+					else if(m_camera.m_dblPoint.x > xMax)
+						dpCenter.x = xMax + (PLAYER_RADIUS + 0.001);
+
+					m_aSegments.Remove(i, NULL);
+					continue;
 				}
 			}
 		}
 
-		if(-1 == idxBestSegment)
-		{
-			dpCenter.x += sin(dblDirRadians) * dblMove;
-			dpCenter.z += -cos(dblDirRadians) * dblMove;
-			break;
-		}
-
-		break;	// TODO - This is broken!
-
-		dblBestDistance -= PLAYER_RADIUS;
-		dpCenter.x += sin(dblDirRadians) * dblBestDistance;
-		dpCenter.z += -cos(dblDirRadians) * dblBestDistance;
-
-		dblDirRadians = Geometry::TDegreesToRadians<DOUBLE, DOUBLE>(Geometry::VertexAngle(m_aSegments[idxBestSegment].rNormal.x, -m_aSegments[idxBestSegment].rNormal.z));
-		dblMove -= dblBestDistance;
-
-		m_aSegments.Remove(idxBestSegment, NULL);
-	} while(0.0 != dblMove);
+		break;
+	}
 
 	m_camera.m_dblPoint = dpCenter;
 	m_aSegments.Clear();

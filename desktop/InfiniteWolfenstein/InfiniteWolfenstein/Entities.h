@@ -51,6 +51,8 @@ public:
 class CDoor : public CEntity
 {
 public:
+	CLevelRenderer* m_pLevel;
+
 	bool m_fNorthSouth;
 	FRECT m_rcTexture;
 
@@ -67,7 +69,7 @@ public:
 	INT m_nLockedType;
 
 public:
-	CDoor (CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType);
+	CDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType);
 
 	virtual VOID Draw (MODEL_LIST* pModels);
 	virtual VOID GetCollisionLines (TArray<LINE_SEGMENT>* paSegments);

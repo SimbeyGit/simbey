@@ -95,7 +95,7 @@ public:
 	VOID SetHellStart (INT xHellStart, INT zHellStart);
 	INT GetLevel (VOID) { return m_nLevel; }
 	RSTRING GetLevelName (VOID);
-	HRESULT GenerateRegion (CDungeonRegion* pRegion);
+	HRESULT GenerateRegion (CDungeonRegion* pRegion, CLevelRenderer* pRenderer);
 	CWallTextures* GetWalls (VOID) { return m_pWalls; }
 	CModels* GetModels (VOID) { return m_pModels; }
 	BOOL CheckElevatorConnection (CDungeonRegion* pRegion, INT xBlock, INT zBlock, INT nLevelOffset);
@@ -126,7 +126,7 @@ private:
 
 	VOID FillEmptyBlocks (CMersenneTwister& mt, CDungeonRegion* pRegion);
 	HRESULT AddElevatorSwitch (CDungeonRegion* pRegion, BLOCK_DATA* pBlock, INT x, INT z, sysint idxUp);
-	HRESULT SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegion);
+	HRESULT SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegion, CLevelRenderer* pRenderer);
 
 	template <typename TTheme, typename TItem>
 	TTheme* TPickRandomTheme (CMersenneTwister& mt, INT nMaxRandom, TItem* pItems, INT cItems)

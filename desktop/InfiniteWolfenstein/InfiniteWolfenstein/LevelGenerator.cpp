@@ -209,7 +209,7 @@ RSTRING CLevelGenerator::GetLevelName (VOID)
 	return m_pLevelDef ? m_pLevelDef->m_rstrLevelNameW : NULL;
 }
 
-HRESULT CLevelGenerator::GenerateRegion (CDungeonRegion* pRegion)
+HRESULT CLevelGenerator::GenerateRegion (CDungeonRegion* pRegion, CLevelRenderer* pRenderer)
 {
 	HRESULT hr;
 	CMersenneTwister mt;
@@ -278,7 +278,7 @@ HRESULT CLevelGenerator::GenerateRegion (CDungeonRegion* pRegion)
 		TraceTunnelFromConnector(pRegion, m_aConnectors[mt.Random(m_aConnectors.Length())]);
 
 	FillEmptyBlocks(mt, pRegion);
-	Check(SetupDoors(mt, pRegion));
+	Check(SetupDoors(mt, pRegion, pRenderer));
 
 Cleanup:
 	m_aRoomConnections.Clear();
@@ -896,7 +896,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CLevelGenerator::SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegion)
+HRESULT CLevelGenerator::SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegion, CLevelRenderer* pRenderer)
 {
 	HRESULT hr;
 	BLOCK_DATA* pbCell = pRegion->m_bRegion;
@@ -971,7 +971,7 @@ HRESULT CLevelGenerator::SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegi
 						pBlockA->idxSides[nTrackA] = pApplied->idxTrack;
 						pBlockB->idxSides[nTrackB] = pApplied->idxTrack;
 
-						CDoor* pDoor = __new CDoor(m_pWalls, fNorthSouth, pApplied->idxTexture, pbCell->idxBlock);
+						CDoor* pDoor = __new CDoor(pRenderer, m_pWalls, fNorthSouth, pApplied->idxTexture, pbCell->idxBlock);
 						CheckAlloc(pDoor);
 						pbCell->m_pEntities = pDoor;
 

@@ -72,6 +72,7 @@ public:
 	bool ConsumeGoldKey (VOID);
 	bool ConsumeSilverKey (VOID);
 	VOID ShowLockedDoorMessage (PCWSTR pcwzMessage, BYTE bRed, BYTE bGreen, BYTE bBlue);
+	BOOL CheckCollisionsWithEntity (CEntity* pEntity);
 
 	// IGameInterface
 	virtual VOID DrawFrame (VOID);
