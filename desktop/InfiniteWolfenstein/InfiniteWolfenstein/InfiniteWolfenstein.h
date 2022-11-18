@@ -152,6 +152,7 @@ private:
 
 public:
 	SIZE m_szWindow;
+	BOOL m_fTrackMouse;
 	ISimbeyInterchangeFileGLFont* m_pGLFont;
 
 public:

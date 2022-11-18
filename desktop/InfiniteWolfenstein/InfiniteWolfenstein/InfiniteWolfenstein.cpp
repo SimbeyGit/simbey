@@ -337,6 +337,23 @@ VOID CLevelRenderer::UpdateFrame (VOID)
 	for(sysint i = 0; i < m_aCache.Length(); i++)
 		m_aCache[i]->UpdateActiveEntities(this);
 
+	POINT pt;
+	if(m_pGame->m_fTrackMouse && GetCursorPos(&pt))
+	{
+		HWND hwnd;
+		if(SUCCEEDED(m_pGame->GetWindow(&hwnd)))
+		{
+			POINT ptCenter = { m_pGame->m_szWindow.cx / 2, m_pGame->m_szWindow.cy / 2 };
+			ClientToScreen(hwnd, &ptCenter);
+
+			if(pt.x != ptCenter.x)
+			{
+				m_camera.Turn(static_cast<FLOAT>(pt.x - ptCenter.x) / 3.0f);
+				SetCursorPos(ptCenter.x, ptCenter.y);
+			}
+		}
+	}
+
 	GetKeyboardState(bKeyState);
 
 	if(bKeyState[VK_LEFT] & 0x80)
@@ -992,6 +1009,7 @@ HRESULT CInfiniteWolfenstein::Register (HINSTANCE hInstance)
 CInfiniteWolfenstein::CInfiniteWolfenstein (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
 	m_fActive(FALSE),
+	m_fTrackMouse(TRUE),
 	m_rstrMusic(NULL),
 	m_pWalls(NULL),
 	m_pWallThemes(NULL),
@@ -1163,6 +1181,9 @@ VOID CInfiniteWolfenstein::Run (VOID)
 	MSG msg;
 	DWORD dwTimer = 0;
 
+	if(m_fTrackMouse)
+		ShowCursor(FALSE);
+
 	for(;;)
 	{
 		while(PeekMessage(&msg,NULL,0,0,PM_REMOVE))
@@ -1187,6 +1208,12 @@ VOID CInfiniteWolfenstein::Run (VOID)
 		}
 		else
 			WaitMessage();
+	}
+
+	if(m_fTrackMouse)
+	{
+		ShowCursor(TRUE);
+		m_fTrackMouse = FALSE;
 	}
 }
 
@@ -1297,6 +1324,19 @@ VOID CInfiniteWolfenstein::OnNotifyFinished (MIDI::CPlayer* pPlayer, BOOL fCompl
 
 BOOL CInfiniteWolfenstein::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
+	if(L'M' == wParam)
+	{
+		m_fTrackMouse = !m_fTrackMouse;
+		ShowCursor(!m_fTrackMouse);
+
+		if(m_fTrackMouse)
+		{
+			POINT ptCenter = { m_szWindow.cx / 2, m_szWindow.cy / 2 };
+			ClientToScreen(m_hwnd, &ptCenter);
+			SetCursorPos(ptCenter.x, ptCenter.y);
+		}
+	}
+
 	return m_pActive->OnKeyDown(uMsg, wParam, lParam, lResult);
 }
 
@@ -1315,6 +1355,14 @@ BOOL CInfiniteWolfenstein::OnSize (UINT uMsg, WPARAM wParam, LPARAM lParam, LRES
 {
 	m_szWindow.cx = LOWORD(lParam);
 	m_szWindow.cy = HIWORD(lParam);
+
+	if(m_fTrackMouse)
+	{
+		POINT ptCenter = { m_szWindow.cx / 2, m_szWindow.cy / 2 };
+		ClientToScreen(m_hwnd, &ptCenter);
+		SetCursorPos(ptCenter.x, ptCenter.y);
+	}
+
 	return FALSE;
 }
 
