@@ -82,7 +82,7 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 	m_xStats = xView / 2 - (rc.right - rc.left) / 2;
 	m_yStats = yView / 2 - (rc.bottom - rc.top) / 2;
 
-	Check(m_pCanvas->AddLayer(FALSE, FALSE, 0, &m_idxBackground));
+	Check(m_pCanvas->AddLayer(FALSE, LayerRender::Masked, 0, &m_idxBackground));
 
 	Check(sifCreateNew(&m_pGenerated));
 	Check(m_pGenerated->AddLayer(static_cast<WORD>(rc.right - rc.left), static_cast<WORD>(rc.bottom - rc.top), &srGenerated, NULL));
@@ -102,7 +102,7 @@ HRESULT CUnitStats::Initialize (IJSONObject* pDef, IJSONObject* pStats, INT nLev
 	Check(m_pCanvas->AddSprite(m_idxBackground, srSprite, &idxAbilities));
 	Check(RenderAbilities(pDef));
 
-	Check(static_cast<CInteractiveCanvas*>(m_pCanvas)->AddInteractiveLayer(TRUE, FALSE, 0, this, &m_pLayer));
+	Check(static_cast<CInteractiveCanvas*>(m_pCanvas)->AddInteractiveLayer(TRUE, LayerRender::Masked, 0, this, &m_pLayer));
 
 	if(pPortrait)
 	{

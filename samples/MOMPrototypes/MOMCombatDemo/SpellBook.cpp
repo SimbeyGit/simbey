@@ -322,7 +322,7 @@ HRESULT CSpellBook::Initialize (IJSONArray* pSpells)
 	m_xBook = xView / 2 - (rc.right - rc.left) / 2;
 	m_yBook = yView / 2 - (rc.bottom - rc.top) / 2;
 
-	Check(m_pCanvas->AddLayer(FALSE, FALSE, 0, &m_idxBackground));
+	Check(m_pCanvas->AddLayer(FALSE, LayerRender::Masked, 0, &m_idxBackground));
 	Check(sifCreateStaticSprite(srBackground, m_xBook, m_yBook, &srSprite));
 	Check(m_pCanvas->AddSprite(m_idxBackground, srSprite, &idxSpellBook));
 
@@ -333,7 +333,7 @@ HRESULT CSpellBook::Initialize (IJSONArray* pSpells)
 	Check(srCloseButton->GetPosition(&rc));
 	Check(sifCreateStaticSprite(srCloseButton, xClose, yClose, &m_pCloseButton));
 
-	Check(static_cast<CInteractiveCanvas*>(m_pCanvas)->AddInteractiveLayer(TRUE, FALSE, 0, this, &m_pLayer));
+	Check(static_cast<CInteractiveCanvas*>(m_pCanvas)->AddInteractiveLayer(TRUE, LayerRender::Masked, 0, this, &m_pLayer));
 
 	Check(BuildPageList(pSpells));
 

@@ -52,8 +52,8 @@ HRESULT CIntroScreen::Initialize (VOID)
 	Check(m_pPackage->OpenSIF(L"intro\\Intro.sif", &m_pIntro));
 
 	Check(m_pSurface->AddCanvas(NULL, TRUE, &m_pMain));
-	Check(m_pMain->AddLayer(FALSE, FALSE, 0xFF000000, NULL));
-	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(FALSE, FALSE, 0, this, &srFader));
+	Check(m_pMain->AddLayer(FALSE, LayerRender::Masked, 0xFF000000, NULL));
+	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(FALSE, LayerRender::Masked, 0, this, &srFader));
 
 	Check(m_pPackage->ReadFile(SLP(L"music\\MOM113.MID"), &stmMusic));
 	uliSize.QuadPart = stmMusic.DataRemaining();

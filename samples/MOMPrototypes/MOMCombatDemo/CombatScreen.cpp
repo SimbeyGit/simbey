@@ -253,6 +253,26 @@ const RECT c_rgButtons[] =
 	{ 272, 37, 272 + CBT_BUTTON_WIDTH, 37 + CBT_BUTTON_HEIGHT }
 };
 
+static SIF_LINE_OFFSET c_slTileOffsets[] =
+{
+	{ 14, 2 },
+	{ 12, 6 },
+	{ 10, 10 },
+	{ 8, 14 },
+	{ 6, 18 },
+	{ 4, 22 },
+	{ 2, 26 },
+	{ 0, 30 },
+	{ 0, 30 },
+	{ 2, 26 },
+	{ 4, 22 },
+	{ 6, 18 },
+	{ 8, 14 },
+	{ 10, 10 },
+	{ 12, 6 },
+	{ 14, 2 }
+};
+
 CProjectileData::CProjectileData (ISimbeyInterchangeAnimator* pAnimator, IJSONObject* pProjectile)
 {
 	SetInterface(m_pAnimator, pAnimator);
@@ -1061,7 +1081,7 @@ HRESULT CCombatBar::Load (ISimbeyInterchangeAnimator* pAnimator, ISimbeyIntercha
 	SetInterface(m_pUnitStats, pUnitStats);
 	SetInterface(m_pCombatBarFont, pCombatBarFont);
 
-	Check(static_cast<CInteractiveCanvas*>(m_pBar)->AddInteractiveLayer(FALSE, FALSE, 0, this, &pLayer));
+	Check(static_cast<CInteractiveCanvas*>(m_pBar)->AddInteractiveLayer(FALSE, LayerRender::Masked, 0, this, &pLayer));
 	m_nBaseLayer = pLayer->GetLayer();
 
 	Check(m_pCombatUI->CreateSprite(&srBar));
@@ -1088,7 +1108,7 @@ HRESULT CCombatBar::Load (ISimbeyInterchangeAnimator* pAnimator, ISimbeyIntercha
 	Check(m_pBar->AddSprite(m_nBaseLayer, srText, NULL));
 	srText.Release();
 
-	Check(m_pBar->AddLayer(TRUE, FALSE, 0, &m_nStatsLayer));
+	Check(m_pBar->AddLayer(TRUE, LayerRender::Masked, 0, &m_nStatsLayer));
 
 Cleanup:
 	SafeRelease(pLayer);
@@ -1320,7 +1340,7 @@ HRESULT CCombatScreen::Initialize (VOID)
 		{
 			sysint nLayer;
 			Check(m_pSurface->AddCanvas(&rc, FALSE, &m_pBackground));
-			Check(m_pBackground->AddLayer(FALSE, FALSE, 0, &nLayer));
+			Check(m_pBackground->AddLayer(FALSE, LayerRender::Masked, 0, &nLayer));
 		}
 	}
 
@@ -1335,7 +1355,7 @@ HRESULT CCombatScreen::Initialize (VOID)
 	Check(m_pCombatBar->Initialize(this, m_pSurface, &rc));
 
 	Check(m_pSurface->AddCanvas(NULL, FALSE, &m_pMouse));
-	Check(m_pMouse->AddLayer(FALSE, FALSE, 0, NULL));
+	Check(m_pMouse->AddLayer(FALSE, LayerRender::Masked, 0, NULL));
 
 	Check(m_pPackage->OpenSIF(L"graphics\\CombatBarFont.sif", &pSIF));
 	Check(sifCreateFontFromSIF(pSIF, TRUE, &m_pCombatBarFont));
@@ -1884,7 +1904,7 @@ HRESULT CCombatScreen::UpdateStatsPanel (INT xTile, INT yTile)
 		rcStats.right = 506;
 		rcStats.bottom = 110;
 		Check(m_pSurface->AddCanvas(&rcStats, FALSE, &m_pStats));
-		Check(m_pStats->AddLayer(FALSE, FALSE, 0x30000000 | RGB(0, 0, 0), &nLayer));
+		Check(m_pStats->AddLayer(FALSE, LayerRender::Masked, 0x30000000 | RGB(0, 0, 0), &nLayer));
 
 		Check(pMoving->GetObjectDef(&srDef));
 		Check(UpdateUnitStats(nLayer, srDef, pMoving->m_nLevel));
@@ -2550,12 +2570,15 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	INT xTileStart, yTileStart, xTileEnd, yTileEnd;
 	CInteractiveLayer* pLayer = NULL;
 
-	Check(m_pMain->AddLayer(FALSE, FALSE, 0, &nLayer));
+	Check(m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer));
 	Check(LoadAnimator(SLP(L"graphics\\Tiles.json"), L"combat\\terrain\\arcanus\\default\\standard\\terrain.sif", &srAnimator, FALSE));
 
 	if(m_pBackground)
 	{
 		TStackRef<ISimbeyInterchangeFile> srClouds, srWalls;
+		sysint nWallsLayer;
+
+		Check(m_pMain->AddLayer(FALSE, LayerRender::Masked, 0, &nWallsLayer));
 
 		Check(m_pPackage->OpenSIF(L"combat\\clouds\\background\\clouds.sif", &srClouds));
 		Check(m_pPackage->OpenSIF(L"combat\\clouds\\default\\walls.sif", &srWalls));
@@ -2586,14 +2609,14 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 				{
 					TStackRef<ISimbeyInterchangeSprite> srWall;
 					Check(ConfigureBackground(srWalls, 0, xTile, yTile + 8, &srWall));
-					Check(m_pMain->AddSprite(nLayer, srWall, NULL));
+					Check(m_pMain->AddSprite(nWallsLayer, srWall, NULL));
 				}
 
 				if(x == c_rcFloatingTiles.right)
 				{
 					TStackRef<ISimbeyInterchangeSprite> srWall;
 					Check(ConfigureBackground(srWalls, 1, xTile + 15, yTile + 8, &srWall));
-					Check(m_pMain->AddSprite(nLayer, srWall, NULL));
+					Check(m_pMain->AddSprite(nWallsLayer, srWall, NULL));
 				}
 			}
 		}
@@ -2631,14 +2654,14 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 
 	srAnimator.Release();
 
-	Check(m_pMain->AddLayer(TRUE, FALSE, 0, &m_nTileEffectsLayer));
+	Check(m_pMain->AddLayer(TRUE, LayerRender::Masked, 0, &m_nTileEffectsLayer));
 
 	Check(LoadAnimator(SLP(L"graphics\\MoveTo.json"), L"graphics\\MoveTo.sif", &srAnimator, FALSE));
 	Check(PlaceTile(m_pMain, MAP_WIDTH / 2, MAP_HEIGHT / 2, m_nTileEffectsLayer, srAnimator, 0, &m_pMoveTo));
 
 	srAnimator.Release();
 
-	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(TRUE, FALSE, 0, this, &pLayer));
+	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(TRUE, LayerRender::Blended, 0, this, &pLayer));
 	m_nUnitLayer = pLayer->GetLayer();
 
 	Check(PlaceUnitsAndBuildings(m_nUnitLayer));

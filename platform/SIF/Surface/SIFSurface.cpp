@@ -470,19 +470,44 @@ VOID CSIFCanvas::Tick (VOID)
 	}
 }
 
-HRESULT CSIFCanvas::AddLayer (BOOL fPerformTicks, BOOL fColorized, COLORREF crFill, __out_opt sysint* pnLayer)
+HRESULT CSIFCanvas::AddLayer (BOOL fPerformTicks, LayerRender::Type eRender, COLORREF crFill, __out_opt sysint* pnLayer)
 {
 	HRESULT hr;
-	LAYER* pLayer = __new LAYER;
+	LAYER* pLayer = NULL;
 
+	CheckIf(LayerRender::Tile == eRender, E_INVALIDARG);
+
+	pLayer = __new LAYER;
 	CheckAlloc(pLayer);
 
 	if(pnLayer)
 		*pnLayer = m_aLayers.Length();
 
 	pLayer->fPerformTicks = fPerformTicks;
-	pLayer->fColorized = fColorized;
+	pLayer->eRender = eRender;
 	pLayer->crFill = crFill;
+	pLayer->pslOffsets = NULL;
+	Check(m_aLayers.Append(pLayer));
+	pLayer = NULL;
+
+Cleanup:
+	__delete pLayer;
+	return hr;
+}
+
+HRESULT CSIFCanvas::AddTileLayer (BOOL fPerformTicks, SIF_LINE_OFFSET* pslOffsets, COLORREF crFill, __out_opt sysint* pnLayer)
+{
+	HRESULT hr;
+	LAYER* pLayer = __new LAYER;
+	CheckAlloc(pLayer);
+
+	if(pnLayer)
+		*pnLayer = m_aLayers.Length();
+
+	pLayer->fPerformTicks = fPerformTicks;
+	pLayer->eRender = LayerRender::Tile;
+	pLayer->crFill = crFill;
+	pLayer->pslOffsets = pslOffsets;
 	Check(m_aLayers.Append(pLayer));
 	pLayer = NULL;
 
@@ -741,7 +766,8 @@ Cleanup:
 
 VOID CSIFCanvas::DrawLayer (LAYER* pLayer)
 {
-	sysint cSprites = pLayer->aSprites.Length();
+	ISimbeyInterchangeSprite** ppSprites;
+	sysint cSprites;
 
 	if(pLayer->crFill)
 	{
@@ -749,15 +775,25 @@ VOID CSIFCanvas::DrawLayer (LAYER* pLayer)
 		DIBDrawing::AlphaFill24(m_sifSurface.pbSurface, m_sifSurface.xSize, m_sifSurface.ySize, m_sifSurface.lPitch, &rc, pLayer->crFill, pLayer->crFill >> 24);
 	}
 
-	if(pLayer->fColorized)
+	pLayer->aSprites.GetData(&ppSprites, &cSprites);
+	switch(pLayer->eRender)
 	{
+	case LayerRender::Masked:
 		for(sysint i = 0; i < cSprites; i++)
-			pLayer->aSprites[i]->DrawColorizedToDIB24(m_xScroll, m_yScroll, &m_sifSurface);
-	}
-	else
-	{
+			ppSprites[i]->DrawMaskedToDIB24(m_xScroll, m_yScroll, &m_sifSurface);
+		break;
+	case LayerRender::Tile:
 		for(sysint i = 0; i < cSprites; i++)
-			pLayer->aSprites[i]->DrawMaskedToDIB24(m_xScroll, m_yScroll, &m_sifSurface);
+			ppSprites[i]->DrawTileToDIB24(m_xScroll, m_yScroll, &m_sifSurface, pLayer->pslOffsets);
+		break;
+	case LayerRender::Colorized:
+		for(sysint i = 0; i < cSprites; i++)
+			ppSprites[i]->DrawColorizedToDIB24(m_xScroll, m_yScroll, &m_sifSurface);
+		break;
+	case LayerRender::Blended:
+		for(sysint i = 0; i < cSprites; i++)
+			ppSprites[i]->DrawBlendedToDIB24(m_xScroll, m_yScroll, &m_sifSurface);
+		break;
 	}
 }
 

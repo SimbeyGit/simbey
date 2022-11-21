@@ -5,12 +5,24 @@
 #include "Library\Util\RString.h"
 #include "..\Published\SIF.h"
 
+namespace LayerRender
+{
+	enum Type
+	{
+		Masked,
+		Tile,
+		Blended,
+		Colorized
+	};
+}
+
 struct LAYER
 {
 	BOOL fPerformTicks;
-	BOOL fColorized;
+	LayerRender::Type eRender;
 	COLORREF crFill;
 	TArray<ISimbeyInterchangeSprite*> aSprites;
+	SIF_LINE_OFFSET* pslOffsets;
 };
 
 struct REMOVE_LATER
@@ -185,7 +197,8 @@ public:
 
 	VOID Tick (VOID);
 
-	HRESULT AddLayer (BOOL fPerformTicks, BOOL fColorized, COLORREF crFill, __out_opt sysint* pnLayer);
+	HRESULT AddLayer (BOOL fPerformTicks, LayerRender::Type eRender, COLORREF crFill, __out_opt sysint* pnLayer);
+	HRESULT AddTileLayer (BOOL fPerformTicks, SIF_LINE_OFFSET* pslOffsets, COLORREF crFill, __out_opt sysint* pnLayer);
 	VOID ClearLayer (sysint nLayer);
 	HRESULT AddSprite (sysint nLayer, ISimbeyInterchangeSprite* pSprite, __out_opt sysint* pnSprite);
 	HRESULT AddSpriteBefore (sysint nLayer, ISimbeyInterchangeSprite* pSprite, ISimbeyInterchangeSprite* pInsertBefore, __out_opt sysint* pnSprite);

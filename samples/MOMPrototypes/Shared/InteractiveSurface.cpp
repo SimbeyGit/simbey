@@ -99,13 +99,13 @@ BOOL CInteractiveCanvas::ProcessKeyboardInput (LayerInput::Keyboard eType, WPARA
 	return FALSE;
 }
 
-HRESULT CInteractiveCanvas::AddInteractiveLayer (BOOL fPerformTicks, BOOL fColorized, COLORREF crFill, ILayerInputHandler* pHandler, __deref_out CInteractiveLayer** ppLayer)
+HRESULT CInteractiveCanvas::AddInteractiveLayer (BOOL fPerformTicks, LayerRender::Type eRender, COLORREF crFill, ILayerInputHandler* pHandler, __deref_out CInteractiveLayer** ppLayer)
 {
 	HRESULT hr;
 	sysint nLayer;
 	CInteractiveLayer* pLayer = NULL;
 
-	Check(AddLayer(fPerformTicks, fColorized, crFill, &nLayer));
+	Check(AddLayer(fPerformTicks, eRender, crFill, &nLayer));
 	pLayer = __new CInteractiveLayer(pHandler, this, nLayer);
 	CheckAlloc(pLayer);
 	Check(m_aInteractive.Append(pLayer));

@@ -121,14 +121,14 @@ HRESULT CWizardScreen::Initialize (VOID)
 	srSIF.Release();
 
 	Check(m_pSurface->AddCanvas(NULL, TRUE, &m_pMain));
-	Check(m_pMain->AddLayer(FALSE, FALSE, 0, NULL));						// Background
-	Check(m_pMain->AddLayer(TRUE, FALSE, 0, NULL));							// Portrait and picks
+	Check(m_pMain->AddLayer(FALSE, LayerRender::Masked, 0, NULL));			// Background
+	Check(m_pMain->AddLayer(TRUE, LayerRender::Masked, 0, NULL));			// Portrait and picks
 
 	pInteractive = static_cast<CInteractiveCanvas*>(m_pMain);
-	Check(pInteractive->AddInteractiveLayer(FALSE, FALSE, 0, this, NULL));	// Buttons
+	Check(pInteractive->AddInteractiveLayer(FALSE, LayerRender::Masked, 0, this, NULL));	// Buttons
 
 	Check(m_pSurface->AddCanvas(NULL, FALSE, &m_pMouse));
-	Check(m_pMouse->AddLayer(FALSE, FALSE, 0, NULL));
+	Check(m_pMouse->AddLayer(FALSE, LayerRender::Masked, 0, NULL));
 
 	Check(m_pPackage->ReadFile(SLP(L"music\\MOM105.MID"), &stmMusic));
 	uliSize.QuadPart = stmMusic.DataRemaining();

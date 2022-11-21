@@ -586,9 +586,9 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 	Check(LoadTerrain());
 
 	Check(m_pSurface->AddCanvas(NULL, TRUE, &m_pMain));
-	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(TRUE, FALSE, RGB(0, 0, 0), this, &m_pMapTileLayer));
-	Check(m_pMain->AddLayer(FALSE, FALSE, RGB(0, 0, 0), &m_nFeaturesLayer));
-	Check(m_pMain->AddLayer(FALSE, FALSE, RGB(0, 0, 0), &m_nCitiesLayer));
+	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(TRUE, LayerRender::Masked, RGB(0, 0, 0), this, &m_pMapTileLayer));
+	Check(m_pMain->AddLayer(FALSE, LayerRender::Masked, RGB(0, 0, 0), &m_nFeaturesLayer));
+	Check(m_pMain->AddLayer(FALSE, LayerRender::Masked, RGB(0, 0, 0), &m_nCitiesLayer));
 
 	Check(SetupMouse());
 
@@ -2097,7 +2097,7 @@ HRESULT CMOMWorldEditor::SetupMouse (VOID)
 	TStackRef<ISimbeyInterchangeFile> srMouse;
 	TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 
-	Check(m_pMain->AddLayer(FALSE, FALSE, RGB(0, 0, 0), &nMouseLayer));
+	Check(m_pMain->AddLayer(FALSE, LayerRender::Masked, RGB(0, 0, 0), &nMouseLayer));
 	Check(m_pPackage->OpenSIF(L"mouse\\mouse.sif", &srMouse));
 	Check(srMouse->GetLayerByIndex(0, &srLayer));
 	Check(sifCreateStaticSprite(srLayer, 0, 0, &m_pMouse));

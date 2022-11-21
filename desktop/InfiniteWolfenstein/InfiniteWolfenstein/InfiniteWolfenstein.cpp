@@ -404,31 +404,42 @@ BOOL CLevelRenderer::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT
 {
 	if(VK_SPACE == wParam)
 	{
-		TStackRef<CDungeonRegion> srRegion;
-		DOUBLE x = m_camera.m_dblPoint.x + sin(m_camera.m_dblDirRadians) * 0.8;
-		DOUBLE z = m_camera.m_dblPoint.z - cos(m_camera.m_dblDirRadians) * 0.8;
+		DOUBLE dblScan = 0.3;
 
-		INT xRegion = static_cast<INT>(x / REGION_WIDTH);
-		if(x < 0.0)
-			xRegion--;
-
-		INT zRegion = static_cast<INT>(z / REGION_WIDTH);
-		if(z < 0.0)
-			zRegion--;
-
-		if(SUCCEEDED(GetDungeonRegion(xRegion, zRegion, &srRegion)))
+		for(INT i = 0; i < 3; i++)
 		{
-			INT zBlock = static_cast<INT>(floor(z)) - (srRegion->m_zRegion * REGION_WIDTH);
-			INT xBlock = static_cast<INT>(floor(x)) - (srRegion->m_xRegion * REGION_WIDTH);
+			TStackRef<CDungeonRegion> srRegion;
+			DOUBLE x = m_camera.m_dblPoint.x + sin(m_camera.m_dblDirRadians) * dblScan;
+			DOUBLE z = m_camera.m_dblPoint.z - cos(m_camera.m_dblDirRadians) * dblScan;
 
-			BLOCK_DATA* pBlock = srRegion->m_bRegion + zBlock * REGION_WIDTH + xBlock;
+			INT xRegion = static_cast<INT>(x / REGION_WIDTH);
+			if(x < 0.0)
+				xRegion--;
 
-			CEntity* pEntity = pBlock->m_pEntities;
-			while(pEntity)
+			INT zRegion = static_cast<INT>(z / REGION_WIDTH);
+			if(z < 0.0)
+				zRegion--;
+
+			if(SUCCEEDED(GetDungeonRegion(xRegion, zRegion, &srRegion)))
 			{
-				pEntity->Activate(this, srRegion);
-				pEntity = pEntity->m_pNext;
+				INT zBlock = static_cast<INT>(floor(z)) - (srRegion->m_zRegion * REGION_WIDTH);
+				INT xBlock = static_cast<INT>(floor(x)) - (srRegion->m_xRegion * REGION_WIDTH);
+
+				BLOCK_DATA* pBlock = srRegion->m_bRegion + zBlock * REGION_WIDTH + xBlock;
+
+				CEntity* pEntity = pBlock->m_pEntities;
+				if(pEntity)
+				{
+					do
+					{
+						pEntity->Activate(this, srRegion);
+						pEntity = pEntity->m_pNext;
+					} while(pEntity);
+					break;
+				}
 			}
+
+			dblScan += 0.3;
 		}
 	}
 

@@ -80,7 +80,7 @@ public:
 	BOOL ProcessMouseInput (LayerInput::Mouse eType, WPARAM wParam, LPARAM lParam, INT xView, INT yView, LRESULT& lResult);
 	BOOL ProcessKeyboardInput (LayerInput::Keyboard eType, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 
-	HRESULT AddInteractiveLayer (BOOL fPerformTicks, BOOL fColorized, COLORREF crFill, ILayerInputHandler* pHandler, __deref_out CInteractiveLayer** ppLayer);
+	HRESULT AddInteractiveLayer (BOOL fPerformTicks, LayerRender::Type eRender, COLORREF crFill, ILayerInputHandler* pHandler, __deref_out CInteractiveLayer** ppLayer);
 	VOID UnlinkInteractiveLayers (VOID);
 };
 
