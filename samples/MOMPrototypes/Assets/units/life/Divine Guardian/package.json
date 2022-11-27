@@ -1,0 +1,69 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32,
+		clean_alpha: true
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png","summon.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Divine Guardian",
+			realm: "life",
+			figures: 1,
+			animation: "flying_unit",
+			upkeep:
+			[
+				{
+					type: "mana",
+					amount: 35
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "DrakeFly.mp3",
+						value: 2
+					}
+				],
+				melee:
+				{
+					stat: "normal melee",
+					name: "Drake",
+					value: 35
+				},
+				defense: 12,
+				resist: 12,
+				hits: 35
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 3 },
+				{ name: "Cause Fear", type: "ability" },
+				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
+				{ name: "Cold Breath", type: "breath", breath: "cold", value: 20,
+					abilities:
+					[
+						{ name: "Armor Piercing", type: "ability" }
+					]
+				},
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" }
+			]
+		}
+	}
+]
