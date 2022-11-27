@@ -109,7 +109,7 @@ HRESULT CSummonSpell::Start (VOID)
 	m_pScreen->PlaySound(pSummoning);
 
 	Check(m_pScreen->GetPackage()->OpenSIF(L"spells\\Summoning\\cast.sif", &srSIF));
-	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 12, FALSE, &srAnimator, NULL));
+	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 12, FALSE, TRUE /* premultiply */, &srAnimator, NULL));
 	Check(srAnimator->CreateSprite(&srSprite));
 	Check(srSprite->SelectAnimation(0));
 	Check(srSprite->SetAnimationCompletedCallback(this));
@@ -215,7 +215,7 @@ HRESULT CBaseIrreversibleDamageSpell::Start (VOID)
 	m_pScreen->PlaySound(pSound);
 
 	Check(m_pScreen->GetPackage()->OpenSIF(RStrToWide(rstrAnimation), &srSIF));
-	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 12, FALSE, &srAnimator, NULL));
+	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 12, FALSE, TRUE /* premultiply */, &srAnimator, NULL));
 	Check(srAnimator->CreateSprite(&srSprite));
 	Check(srSprite->SelectAnimation(0));
 	Check(srSprite->SetAnimationCompletedCallback(this));
@@ -379,7 +379,7 @@ HRESULT CHealingSpell::Start (VOID)
 	m_pScreen->PlaySound(pSound);
 
 	Check(m_pScreen->GetPackage()->OpenSIF(L"spells\\Healing\\cast.sif", &srSIF));
-	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 10, FALSE, &srAnimator, NULL));
+	Check(CBaseScreen::CreateDefaultAnimator(srSIF, TRUE, 10, FALSE, TRUE /* premultiply */, &srAnimator, NULL));
 	Check(srAnimator->CreateSprite(&srSprite));
 	Check(srSprite->SelectAnimation(0));
 	Check(srSprite->SetAnimationCompletedCallback(this));

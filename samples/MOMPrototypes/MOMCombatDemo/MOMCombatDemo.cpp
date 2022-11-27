@@ -170,10 +170,10 @@ VOID CMOMCombatDemo::Run (VOID)
 
 	for(;;)
 	{
-		if(PeekMessage(&msg,NULL,0,0,PM_REMOVE))
+		while(PeekMessage(&msg,NULL,0,0,PM_REMOVE))
 		{
 			if(msg.message == WM_QUIT)
-				break;
+				return;
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}

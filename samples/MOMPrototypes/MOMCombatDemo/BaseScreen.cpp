@@ -156,7 +156,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CBaseScreen::CreateDefaultAnimator (ISimbeyInterchangeFile* pSIF, BOOL fUsePositionAsOffset, INT nTickDelay, BOOL fRepeat, __deref_out ISimbeyInterchangeAnimator** ppAnimator, __out_opt INT* pcFrames)
+HRESULT CBaseScreen::CreateDefaultAnimator (ISimbeyInterchangeFile* pSIF, BOOL fUsePositionAsOffset, INT nTickDelay, BOOL fRepeat, BOOL fPremultiply, __deref_out ISimbeyInterchangeAnimator** ppAnimator, __out_opt INT* pcFrames)
 {
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
@@ -169,7 +169,7 @@ HRESULT CBaseScreen::CreateDefaultAnimator (ISimbeyInterchangeFile* pSIF, BOOL f
 		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 
 		Check(pSIF->GetLayerByIndex(i, &srLayer));
-		Check(srAnimator->SetImage(i, FALSE, srLayer, fUsePositionAsOffset));
+		Check(srAnimator->SetImage(i, fPremultiply, srLayer, fUsePositionAsOffset));
 		Check(srAnimator->AddFrame(0, nTickDelay, i, 0, 0));
 	}
 

@@ -33,5 +33,5 @@ public:
 
 	static HRESULT AddFramesToAnimation (ISimbeyInterchangeAnimator* pAnimator, INT nAnimation, IJSONArray* pFrames);
 
-	static HRESULT CreateDefaultAnimator (ISimbeyInterchangeFile* pSIF, BOOL fUsePositionAsOffset, INT nTickDelay, BOOL fRepeat, __deref_out ISimbeyInterchangeAnimator** ppAnimator, __out_opt INT* pcFrames);
+	static HRESULT CreateDefaultAnimator (ISimbeyInterchangeFile* pSIF, BOOL fUsePositionAsOffset, INT nTickDelay, BOOL fRepeat, BOOL fPremultiply, __deref_out ISimbeyInterchangeAnimator** ppAnimator, __out_opt INT* pcFrames);
 };
