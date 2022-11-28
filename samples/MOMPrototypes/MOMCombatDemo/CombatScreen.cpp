@@ -3325,16 +3325,16 @@ HRESULT CCombatScreen::PlaceUnitsAndBuildings (sysint nLayer)
 	HRESULT hr;
 	TStackRef<IJSONValue> srv, srvOpponent;
 	TStackRef<IJSONObject> srOpponent;
-	RSTRING rstrLeft = NULL, rstrRight = NULL;
-	RSTRING rstrPlayer = NULL;
+	RSTRING rstrPlayer = NULL, rstrOpponent = NULL;
+	RSTRING rstrSide = NULL;
 	COLORREF crColorize;
 	QuadooVM::QVARIANT qvArg; qvArg.eType = QuadooVM::Null;
 	QuadooVM::QVARIANT qvObject; qvObject.eType = QuadooVM::Null;
 	INT nResult;
 
 	Check(m_pPlacements->FindNonNullValueW(L"player", &srv));
-	Check(srv->GetString(&rstrPlayer));
-	Check(RStrCompareIW(rstrPlayer, L"defense", &nResult));
+	Check(srv->GetString(&rstrSide));
+	Check(RStrCompareIW(rstrSide, L"defense", &nResult));
 	srv.Release();
 
 	Check(JSONWrapObject(m_pPlacements, &srv));
@@ -3342,7 +3342,7 @@ HRESULT CCombatScreen::PlaceUnitsAndBuildings (sysint nLayer)
 	if(0 == nResult)
 	{
 		Check(JSONGetValue(srv, SLP(L"offense:name"), &srvOpponent));
-		Check(srvOpponent->GetString(&rstrRight));
+		Check(srvOpponent->GetString(&rstrOpponent));
 		srvOpponent.Release();
 
 		Check(JSONGetValue(srv, SLP(L"offense:def"), &srvOpponent));
@@ -3351,7 +3351,7 @@ HRESULT CCombatScreen::PlaceUnitsAndBuildings (sysint nLayer)
 	else
 	{
 		Check(JSONGetValue(srv, SLP(L"defense:name"), &srvOpponent));
-		Check(srvOpponent->GetString(&rstrRight));
+		Check(srvOpponent->GetString(&rstrOpponent));
 		srvOpponent.Release();
 
 		Check(JSONGetValue(srv, SLP(L"defense:def"), &srvOpponent));
@@ -3360,14 +3360,14 @@ HRESULT CCombatScreen::PlaceUnitsAndBuildings (sysint nLayer)
 	srv.Release();
 
 	Check(m_pWizard->FindNonNullValueW(L"name", &srv));
-	Check(srv->GetString(&rstrLeft));
+	Check(srv->GetString(&rstrPlayer));
 	srv.Release();
 
 	qvArg.pJSONObject = srOpponent;
 	qvArg.eType = QuadooVM::JSONObject;
 	Check(m_pHost->GetVM()->PushValue(&qvArg));
 
-	qvArg.rstrVal = rstrRight;
+	qvArg.rstrVal = rstrOpponent;
 	qvArg.eType = QuadooVM::String;
 	Check(m_pHost->GetVM()->PushValue(&qvArg));
 
@@ -3375,7 +3375,7 @@ HRESULT CCombatScreen::PlaceUnitsAndBuildings (sysint nLayer)
 	qvArg.eType = QuadooVM::JSONObject;
 	Check(m_pHost->GetVM()->PushValue(&qvArg));
 
-	qvArg.rstrVal = rstrLeft;
+	qvArg.rstrVal = rstrPlayer;
 	qvArg.eType = QuadooVM::String;
 	Check(m_pHost->GetVM()->PushValue(&qvArg));
 
@@ -3406,23 +3406,23 @@ HRESULT CCombatScreen::PlaceUnitsAndBuildings (sysint nLayer)
 	if(0 == nResult)
 	{
 		// Player on defense
-		Check(PlaceObjects(nLayer, L"defense", rstrLeft, c_rgDefense, 3, crColorize));
-		Check(PlaceObjects(nLayer, L"offense", rstrRight, c_rgOffense, 7, 0 /* No colorization for now */));
+		Check(PlaceObjects(nLayer, L"defense", rstrPlayer, c_rgDefense, 3, crColorize));
+		Check(PlaceObjects(nLayer, L"offense", rstrOpponent, c_rgOffense, 7, 0 /* No colorization for now */));
+		m_pCombatBar->SetNames(rstrPlayer, rstrOpponent);
 	}
 	else
 	{
 		// Player on offense
-		Check(PlaceObjects(nLayer, L"defense", rstrLeft, c_rgDefense, 3, 0 /* No colorization for now */));
-		Check(PlaceObjects(nLayer, L"offense", rstrRight, c_rgOffense, 7, crColorize));
+		Check(PlaceObjects(nLayer, L"defense", rstrOpponent, c_rgDefense, 3, 0 /* No colorization for now */));
+		Check(PlaceObjects(nLayer, L"offense", rstrPlayer, c_rgOffense, 7, crColorize));
+		m_pCombatBar->SetNames(rstrOpponent, rstrPlayer);
 	}
-
-	m_pCombatBar->SetNames(rstrLeft, rstrRight);
 
 Cleanup:
 	QVMClearVariant(&qvObject);
+	RStrRelease(rstrSide);
 	RStrRelease(rstrPlayer);
-	RStrRelease(rstrLeft);
-	RStrRelease(rstrRight);
+	RStrRelease(rstrOpponent);
 	return hr;
 }
 

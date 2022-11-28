@@ -20,7 +20,7 @@ INT WINAPI wWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	pApp = __new CMOMCombatDemo(hInstance);
 	CheckAlloc(pApp);
 
-	Check(pApp->Initialize((INT)DPI::Scale(512.0f), (INT)DPI::ScaleY(320.0f), nCmdShow));
+	Check(pApp->Initialize((INT)DPI::Scale(512.0f), (INT)DPI::ScaleY(320.0f), lpCmdLine, nCmdShow));
 	pApp->Run();
 
 Cleanup:

@@ -104,14 +104,10 @@ HRESULT CMOMCombatDemo::Unregister (HINSTANCE hInstance)
 	return UnregisterClass(c_wzSIFClass, hInstance);
 }
 
-HRESULT CMOMCombatDemo::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
+HRESULT CMOMCombatDemo::Initialize (INT nWidth, INT nHeight, PCWSTR pcwzCmdLine, INT nCmdShow)
 {
 	HRESULT hr;
-	PWSTR pwzJSON = NULL;
-	INT cchJSON;
 	RECT rect = { 0, 0, nWidth, nHeight };
-	TStackRef<IJSONObject> srData;
-	TStackRef<IJSONValue> srv;
 	ISimbeyInterchangeFile* pSIF = NULL;
 	CIntroScreen* pScreen = NULL;
 
@@ -119,12 +115,7 @@ HRESULT CMOMCombatDemo::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 	CheckAlloc(m_pSurface);
 	m_pSurface->EnableClear(RGB(255, 255, 255));
 
-	// Look for Placements.json first in the "Assets" folder and then in the current folder
-	if(FAILED(Text::LoadFromFile(L"Assets\\Placements.json", &pwzJSON, &cchJSON)))
-		Check(Text::LoadFromFile(L"Placements.json", &pwzJSON, &cchJSON));
-	Check(JSONParse(NULL, pwzJSON, cchJSON, &srv));
-	Check(srv->GetObject(&m_pPlacements));
-
+	Check(LoadPlacements(pcwzCmdLine));
 	Check(LoadPackage());
 
 	CheckIfGetLastError(!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE));
@@ -159,7 +150,6 @@ Cleanup:
 
 	SafeRelease(pScreen);
 	SafeRelease(pSIF);
-	SafeDeleteArray(pwzJSON);
 	return hr;
 }
 
@@ -407,6 +397,43 @@ VOID CMOMCombatDemo::OnNotifyFinished (MIDI::CPlayer* pPlayer, BOOL fCompleted)
 {
 	if(m_pScreen)
 		m_pScreen->OnNotifyFinished(fCompleted);
+}
+
+HRESULT CMOMCombatDemo::LoadPlacements (PCWSTR pcwzCmdLine)
+{
+	HRESULT hr;
+	WCHAR wzCustomPlacements[MAX_PATH];
+	PWSTR pwzJSON = NULL;
+	INT cchJSON;
+	TStackRef<IJSONValue> srv;
+
+	// The user can drop a "Placements.json" file onto the executable to load that file instead of the default.
+	if(L'\0' != *pcwzCmdLine)
+	{
+		if(L'"' == *pcwzCmdLine)
+		{
+			PCWSTR pcwzEnd = TStrChr(++pcwzCmdLine, L'"');
+			CheckIf(NULL == pcwzEnd, E_INVALIDARG);
+			Check(TStrCchCpyLen(wzCustomPlacements, ARRAYSIZE(wzCustomPlacements), pcwzCmdLine, static_cast<INT>(pcwzEnd - pcwzCmdLine), NULL));
+		}
+		else
+			Check(TStrCchCpy(wzCustomPlacements, ARRAYSIZE(wzCustomPlacements), pcwzCmdLine));
+	}
+
+	if(L'\0' != *pcwzCmdLine && INVALID_FILE_ATTRIBUTES != GetFileAttributes(wzCustomPlacements))
+		Check(Text::LoadFromFile(wzCustomPlacements, &pwzJSON, &cchJSON));
+	else
+	{
+		// Look for Placements.json first in the "Assets" folder and then in the current folder
+		if(FAILED(Text::LoadFromFile(L"Assets\\Placements.json", &pwzJSON, &cchJSON)))
+			Check(Text::LoadFromFile(L"Placements.json", &pwzJSON, &cchJSON));
+	}
+	Check(JSONParse(NULL, pwzJSON, cchJSON, &srv));
+	Check(srv->GetObject(&m_pPlacements));
+
+Cleanup:
+	SafeDeleteArray(pwzJSON);
+	return hr;
 }
 
 HRESULT CMOMCombatDemo::LoadPackage (VOID)

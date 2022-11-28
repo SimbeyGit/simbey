@@ -1,0 +1,222 @@
+{
+	player: "offense",
+	floating: false,
+	mana: 500,
+	spells:
+	[
+		{
+			group: "Summoning",
+			spells:
+			[
+				{
+					name: "Skeletons",
+					school: "death",
+					cost: 20,
+					spawn: "Skeletons"
+				},
+				{
+					name: "Ghouls",
+					school: "death",
+					cost: 80,
+					spawn: "Ghouls"
+				},
+				{
+					name: "Phantom Warriors",
+					school: "sorcery",
+					cost: 10,
+					spawn: "Phantom Warriors"
+				},
+				{
+					name: "Phantom Beast",
+					school: "sorcery",
+					cost: 35,
+					spawn: "Phantom Beast"
+				},
+				{
+					name: "Hell Hounds",
+					school: "chaos",
+					cost: 40,
+					spawn: "Hell Hounds"
+				},
+				{
+					name: "Fire Elemental",
+					school: "chaos",
+					cost: 20,
+					spawn: "Fire Elemental"
+				},
+				{
+					name: "Earth Elemental",
+					school: "nature",
+					cost: 60,
+					spawn: "Earth Elemental"
+				},
+				{
+					name: "War Bears",
+					school: "nature",
+					cost: 70,
+					spawn: "War Bears"
+				},
+				{
+					name: "Unicorns",
+					school: "life",
+					cost: 250,
+					spawn: "Unicorns"
+				}
+			]
+		},
+		{
+			group: "Combat Spells",
+			spells:
+			[
+				{
+					name: "Cracks Call",
+					school: "nature",
+					cost: 20
+				},
+				{
+					name: "Disintegrate",
+					school: "chaos",
+					cost: 50
+				},
+				{
+					name: "Healing",
+					school: "life",
+					cost: 15,
+					friendly: true
+				},
+				{
+					name: "Ice Bolt",
+					school: "nature",
+					cost: 10
+				},
+				{
+					name: "Fire Bolt",
+					school: "chaos",
+					cost: 5
+				},
+				{
+					name: "Doom Bolt",
+					school: "chaos",
+					cost: 40
+				}
+			]
+		}
+	],
+	defense:
+	{
+		name: "Guardians",
+		objects:
+		[
+			{
+				// Add the Ivory Tower A
+				type: "building",
+				x: 9,
+				y: 18,
+				object: 10
+			},
+			{
+				// Add the Ivory Tower B
+				type: "building",
+				x: 9,
+				y: 17,
+				object: 11
+			},
+			{
+				// Add the Ivory Tower C
+				type: "building",
+				x: 10,
+				y: 17,
+				object: 12
+			},
+			{
+				// Add the Ivory Tower D
+				type: "building",
+				x: 10,
+				y: 18,
+				object: 13
+			},
+			{
+				type: "unit",
+				name: "Divine Guardian",
+				level: 0
+			},
+			{
+				type: "unit",
+				name: "Divine Guardian",
+				level: 1
+			},
+			{
+				type: "unit",
+				name: "Divine Guardian",
+				level: 2
+			},
+			{
+				type: "unit",
+				name: "Divine Guardian",
+				level: 3
+			}
+		],
+		def:
+		{
+			// Anything here is passed to the combat script
+		}
+	},
+	offense:
+	{
+		objects:
+		[
+			{
+				type: "unit",
+				name: "Warrax",
+				level: 4
+			},
+			{
+				type: "unit",
+				name: "Torin",
+				level: 2
+			},
+			{
+				type: "unit",
+				name: "Mystic X",
+				level: 5
+			},
+			{
+				type: "unit",
+				name: "Zaldron",
+				level: 3
+			},
+			{
+				type: "unit",
+				name: "Ravashack",
+				level: 4
+			},
+			{
+				type: "unit",
+				name: "War Mammoths",
+				level: 1
+			},
+			{
+				type: "unit",
+				name: "Dragon Turtle",
+				enchanted: true,
+				level: 2
+			},
+			{
+				type: "unit",
+				name: "Doom Drakes",
+				level: 2
+			},
+			{
+				type: "unit",
+				name: "Paladins",
+				level: 3
+			},
+			{
+				type: "unit",
+				name: "Steam Cannon",
+				level: 4,
+				enchanted: true
+			}
+		]
+	}
+}

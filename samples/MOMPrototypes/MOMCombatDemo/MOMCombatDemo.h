@@ -73,7 +73,7 @@ public:
 	static HRESULT Register (HINSTANCE hInstance);
 	static HRESULT Unregister (HINSTANCE hInstance);
 
-	HRESULT Initialize (INT nWidth, INT nHeight, INT nCmdShow);
+	HRESULT Initialize (INT nWidth, INT nHeight, PCWSTR pcwzCmdLine, INT nCmdShow);
 
 	VOID Run (VOID);
 
@@ -111,6 +111,7 @@ protected:
 	// INotifyFinished
 	virtual VOID OnNotifyFinished (MIDI::CPlayer* pPlayer, BOOL fCompleted);
 
+	HRESULT LoadPlacements (PCWSTR pcwzCmdLine);
 	HRESULT LoadPackage (VOID);
 	HRESULT LoadSounds (VOID);
 	HRESULT LoadSoundFiles (PCWSTR pcwzSounds, INT cchSounds, TRStrMap<FMOD::Sound*>& mapSounds);
