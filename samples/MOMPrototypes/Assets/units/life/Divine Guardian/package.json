@@ -44,7 +44,7 @@
 				melee:
 				{
 					stat: "normal melee",
-					name: "Drake",
+					name: "Lion",
 					value: 35
 				},
 				defense: 12,

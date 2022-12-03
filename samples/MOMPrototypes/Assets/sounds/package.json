@@ -73,6 +73,10 @@
 	},
 	{
 		package: "sound",
+		name: "LionRoar.mp3"
+	},
+	{
+		package: "sound",
 		name: "MagicMissile.mp3"
 	},
 	{

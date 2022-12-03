@@ -34,6 +34,10 @@
 					sound: "DrakeAttack.mp3"
 				},
 				{
+					name: "Lion",
+					sound: "LionRoar.mp3"
+				},
+				{
 					name: "Sprites",
 					sound: "SpritesAttack.mp3"
 				},
