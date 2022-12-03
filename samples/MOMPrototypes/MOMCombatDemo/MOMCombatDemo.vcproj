@@ -418,6 +418,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\..\shared\library\util\Registry.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\util\Registry.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\..\shared\library\util\StreamHelpers.cpp"
 					>
 				</File>

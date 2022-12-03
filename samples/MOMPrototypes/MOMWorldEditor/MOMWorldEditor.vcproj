@@ -217,11 +217,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TileRules.h"
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath=".\TileRules.h"
 				>
 			</File>
 		</Filter>
@@ -459,6 +459,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\shared\library\util\Formatting.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\util\Registry.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\util\Registry.h"
 					>
 				</File>
 				<File

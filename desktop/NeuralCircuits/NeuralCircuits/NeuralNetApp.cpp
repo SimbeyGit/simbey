@@ -14,6 +14,7 @@
 #include "NeuralNetApp.h"
 
 const CHAR c_szWindowTitle[] = "Neural Circuits Simulator";
+const CHAR c_szAppKey[] = "Software\\Simbey\\NeuralNet";
 
 CNeuralNetApp::CNeuralNetApp (HINSTANCE hInstance)
 {
@@ -501,22 +502,7 @@ HRESULT WINAPI CNeuralNetApp::Exec (const GUID* lpguidCmdGroup, DWORD nCmdID, DW
 
 		if(hr != OLECMDERR_E_CANCELED)
 		{
-			WINDOWPLACEMENT wp = {0};
-			wp.length = sizeof(WINDOWPLACEMENT);
-			if(GetWindowPlacement(m_hwnd,&wp))
-			{
-				HKEY hKey;
-				if(SUCCEEDED(Registry::CreateKey(HKEY_CURRENT_USER, "Software\\Simbey\\NeuralNet", KEY_WRITE, &hKey)))
-				{
-					// Normalize the scaled window placement to 96 DPI
-					DPI::NormalizeScaledPoint(&wp.ptMaxPosition);
-					DPI::NormalizeScaledPoint(&wp.ptMinPosition);
-					DPI::NormalizeScaledRectSize(&wp.rcNormalPosition);
-
-					RegSetValueEx(hKey,"WindowPlacement",NULL,REG_BINARY,(LPBYTE)&wp,sizeof(WINDOWPLACEMENT));
-					RegCloseKey(hKey);
-				}
-			}
+			Registry::SaveWindowPosition(m_hwnd, c_szAppKey, "WindowPlacement");
 			PostQuitMessage(0);
 			hr = S_OK;
 		}
@@ -784,36 +770,7 @@ VOID CNeuralNetApp::OnFinalDestroy (HWND /*hwnd*/)
 
 HRESULT CNeuralNetApp::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
 {
-	BOOL fSuccess = FALSE;
-	HKEY hKey;
-	if(SUCCEEDED(Registry::CreateKey(HKEY_CURRENT_USER, "Software\\Simbey\\NeuralNet", KEY_READ, &hKey)))
-	{
-		WINDOWPLACEMENT wp;
-		DWORD cbSize = sizeof(WINDOWPLACEMENT);
-		if(RegQueryValueEx(hKey,"WindowPlacement",NULL,NULL,(LPBYTE)&wp,&cbSize) == ERROR_SUCCESS)
-		{
-			if(cbSize == sizeof(WINDOWPLACEMENT) && wp.rcNormalPosition.left < wp.rcNormalPosition.right && wp.rcNormalPosition.top < wp.rcNormalPosition.bottom)
-			{
-				wp.length = sizeof(WINDOWPLACEMENT);
-
-				// If the startup visibility option is uninteresting, use the saved option.
-				if(SW_SHOWDEFAULT == nCmdShow || SW_SHOWNORMAL == nCmdShow || SW_SHOW == nCmdShow)
-					nCmdShow = wp.showCmd;
-
-				// Call SetWindowPlacement() with SW_HIDE to avoid flashing the window white.
-				wp.showCmd = SW_HIDE;
-
-				// Normalize the scaled window placement from 96 DPI
-				DPI::ScaleNormalizedPoint(&wp.ptMaxPosition);
-				DPI::ScaleNormalizedPoint(&wp.ptMinPosition);
-				DPI::ScaleNormalizedRectSize(&wp.rcNormalPosition);
-
-				fSuccess = ::SetWindowPlacement(m_hwnd,&wp);
-			}
-		}
-		RegCloseKey(hKey);
-	}
-
+	Registry::LoadWindowPosition(m_hwnd, c_szAppKey, "WindowPlacement", &nCmdShow);
 	return CBaseWindow::FinalizeAndShow(dwStyle,nCmdShow);
 }
 

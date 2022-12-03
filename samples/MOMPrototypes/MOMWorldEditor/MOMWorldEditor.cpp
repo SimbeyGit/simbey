@@ -6,6 +6,7 @@
 #include "Library\Util\FileStream.h"
 #include "Library\Util\StreamHelpers.h"
 #include "Library\Util\TextHelpers.h"
+#include "Library\Util\Registry.h"
 #include "Library\Window\DialogHost.h"
 #include "Library\DPI.h"
 #include "Library\ChooseFile.h"
@@ -911,7 +912,7 @@ HRESULT CMOMWorldEditor::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
 
 	Check(m_pRibbon->Initialize(m_hwnd, this));
 	Check(m_pRibbon->SetModes(1));
-	LoadWindowPosition(m_hwnd, c_wzAppWindowPos);
+	Registry::LoadWindowPosition(m_hwnd, c_wzRegAppKey, c_wzAppWindowPos, &nCmdShow);
 	Check(m_pRibbon->UpdateProperty(ID_ARCANUS, &UI_PKEY_BooleanValue));
 	Check(__super::FinalizeAndShow(dwStyle, nCmdShow));
 
@@ -1019,7 +1020,7 @@ BOOL CMOMWorldEditor::OnSetCursor (UINT uMsg, WPARAM wParam, LPARAM lParam, LRES
 BOOL CMOMWorldEditor::OnDestroy (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
 	SafeDelete(m_pCommand);
-	SaveWindowPosition(m_hwnd, c_wzAppWindowPos);
+	Registry::SaveWindowPosition(m_hwnd, c_wzRegAppKey, c_wzAppWindowPos);
 	return FALSE;
 }
 
@@ -2282,82 +2283,5 @@ HRESULT CMOMWorldEditor::LoadKeyVariants (ISimbeyInterchangeFile* pSIF, CTileSet
 
 Cleanup:
 	RStrRelease(rstrFrame);
-	return hr;
-}
-
-HRESULT CMOMWorldEditor::SaveWindowPosition (HWND hwnd, PCWSTR pcwzValueName)
-{
-	HRESULT hr;
-
-	if(hwnd)
-	{
-		WINDOWPLACEMENT wp = {0};
-		wp.length = sizeof(WINDOWPLACEMENT);
-
-		if(GetWindowPlacement(hwnd, &wp))
-		{
-			HKEY hKey;
-
-			hr = HRESULT_FROM_WIN32(RegOpenKeyW(HKEY_CURRENT_USER, c_wzRegAppKey, &hKey));
-			if(FAILED(hr))
-				hr = HRESULT_FROM_WIN32(RegCreateKeyW(HKEY_CURRENT_USER, c_wzRegAppKey, &hKey));
-
-			if(SUCCEEDED(hr))
-			{
-				// Normalize the scaled window placement to 96 DPI
-				DPI::NormalizeScaledPoint(&wp.ptMaxPosition);
-				DPI::NormalizeScaledPoint(&wp.ptMinPosition);
-				DPI::NormalizeScaledRectSize(&wp.rcNormalPosition);
-
-				hr = HRESULT_FROM_WIN32(RegSetValueExW(hKey, pcwzValueName, NULL, REG_BINARY, (LPBYTE)&wp, sizeof(WINDOWPLACEMENT)));
-
-				RegCloseKey(hKey);
-			}
-		}
-		else
-			hr = HRESULT_FROM_WIN32(GetLastError());
-	}
-	else
-		hr = E_INVALIDARG;
-
-	return hr;
-}
-
-HRESULT CMOMWorldEditor::LoadWindowPosition (HWND hwnd, PCWSTR pcwzValueName)
-{
-	HRESULT hr;
-
-	if(hwnd)
-	{
-		HKEY hKey;
-
-		hr = HRESULT_FROM_WIN32(RegOpenKeyW(HKEY_CURRENT_USER, c_wzRegAppKey, &hKey));
-		if(SUCCEEDED(hr))
-		{
-			WINDOWPLACEMENT wp = {0};
-			DWORD cbData = sizeof(wp);
-
-			hr = HRESULT_FROM_WIN32(RegQueryValueExW(hKey, pcwzValueName, NULL, NULL, (LPBYTE)&wp, &cbData));
-			if(SUCCEEDED(hr))
-			{
-				wp.length = sizeof(WINDOWPLACEMENT);
-
-				// Normalize the scaled window placement from 96 DPI
-				DPI::ScaleNormalizedPoint(&wp.ptMaxPosition);
-				DPI::ScaleNormalizedPoint(&wp.ptMinPosition);
-				DPI::ScaleNormalizedRectSize(&wp.rcNormalPosition);
-
-				if(SetWindowPlacement(hwnd, &wp))
-					hr = S_OK;
-				else
-					hr = HRESULT_FROM_WIN32(GetLastError());
-			}
-
-			RegCloseKey(hKey);
-		}
-	}
-	else
-		hr = E_INVALIDARG;
-
 	return hr;
 }

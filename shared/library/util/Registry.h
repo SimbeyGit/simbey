@@ -17,5 +17,10 @@ namespace Registry
 	HRESULT WINAPI GetRegistryHiveByName (LPCTSTR pctzHive, __out HKEY* phKey);
 	BOOL WINAPI AdjustSubKeyForHive (LPCTSTR pctzSubKey, LPCTSTR* ppctzSubKey, __out HKEY* phKey);
 
+#ifndef REGISTRY_NO_DPI
+	HRESULT WINAPI SaveWindowPosition (HWND hwnd, LPCTSTR pctzAppKey, LPCTSTR pctzValueName);
+	HRESULT WINAPI LoadWindowPosition (HWND hwnd, LPCTSTR pctzAppKey, LPCTSTR pctzValueName, __inout INT* pnCmdShow);
+#endif
+
 	HRESULT WINAPI Install (LPCTSTR pctzScript, HKEY hKey = NULL);
 }

@@ -3,6 +3,7 @@
 #include "Library\Core\CoreDefs.h"
 #include "Library\Core\StringCore.h"
 #include "Library\Util\Options.h"
+#include "Library\Util\Registry.h"
 #include "Library\Window\DialogHost.h"
 #include "Library\ChooseFile.h"
 #include "Library\DPI.h"
@@ -17,6 +18,7 @@
 
 const WCHAR c_wzAppClassName[] = L"RoomEditorAppCls";
 const WCHAR c_wzAppTitle[] = L"Infinite Wolfenstein Room Editor";
+const WCHAR c_wzAppKey[] = L"Software\\Simbey\\InfiniteWolfenstein\\RoomEditor";
 
 #define	BALLOON_RADIUS		20
 
@@ -1371,6 +1373,7 @@ HRESULT CRoomEditorApp::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
 
 	Check(m_pRibbon->Initialize(m_hwnd, this));
 	Check(m_pRibbon->SetModes(1));
+	Registry::LoadWindowPosition(m_hwnd, c_wzAppKey, L"WindowPlacement", &nCmdShow);
 	Check(CBaseWindow::FinalizeAndShow(dwStyle, nCmdShow));
 
 Cleanup:
@@ -1413,6 +1416,9 @@ BOOL CRoomEditorApp::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		}
 		m_fInfoBalloon = TRUE;
 		InvalidateRect(m_hwnd, NULL, FALSE);
+		break;
+	case WM_CLOSE:
+		Registry::SaveWindowPosition(m_hwnd, c_wzAppKey, L"WindowPlacement");
 		break;
 	case WM_DESTROY:
 		if(m_pRibbon)

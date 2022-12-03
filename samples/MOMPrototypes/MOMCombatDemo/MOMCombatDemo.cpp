@@ -7,6 +7,7 @@
 #include "Library\Util\FileStream.h"
 #include "Library\Util\StreamHelpers.h"
 #include "Library\Util\TextHelpers.h"
+#include "Library\Util\Registry.h"
 #include "Published\JSON.h"
 #include "Published\QuadooParser.h"
 #include "IntroScreen.h"
@@ -18,6 +19,9 @@ const WCHAR c_wzSIFClass[] = L"MOMCombatDemoCls";
 const WCHAR c_wzSIFTitle[] = L"MOM Combat Demo";
 
 const WCHAR c_wzCombatScriptPath[] = L"Assets\\scripts\\combat.quadoo";
+
+const WCHAR c_wzRegAppKey[] = L"Software\\Simbey\\MOMCombatDemo";
+const WCHAR c_wzAppWindowPos[] = L"WindowPosition";
 
 class CParserStatus : public IQuadooCompilerStatus
 {
@@ -275,6 +279,8 @@ HINSTANCE CMOMCombatDemo::GetInstance (VOID)
 
 VOID CMOMCombatDemo::OnFinalDestroy (HWND hwnd)
 {
+	Registry::SaveWindowPosition(m_hwnd, c_wzRegAppKey, c_wzAppWindowPos);
+
 	if(m_pScreen)
 	{
 		m_pScreen->OnDestroy();
@@ -295,6 +301,7 @@ VOID CMOMCombatDemo::OnFinalDestroy (HWND hwnd)
 
 HRESULT CMOMCombatDemo::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
 {
+	Registry::LoadWindowPosition(m_hwnd, c_wzRegAppKey, c_wzAppWindowPos, &nCmdShow);
 	return __super::FinalizeAndShow(dwStyle, nCmdShow);
 }
 

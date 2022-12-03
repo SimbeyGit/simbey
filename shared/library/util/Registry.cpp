@@ -2,6 +2,9 @@
 #include <windows.h>
 #include "..\Core\CoreDefs.h"
 #include "..\Core\Stack.h"
+#ifndef REGISTRY_NO_DPI
+	#include "..\DPI.h"
+#endif
 #include "Formatting.h"
 #include "Registry.h"
 
@@ -425,6 +428,89 @@ namespace Registry
 
 		return fAdjusted;
 	}
+
+#ifndef REGISTRY_NO_DPI
+	HRESULT WINAPI SaveWindowPosition (HWND hwnd, LPCTSTR pctzAppKey, LPCTSTR pctzValueName)
+	{
+		HRESULT hr;
+
+		if(hwnd)
+		{
+			WINDOWPLACEMENT wp = {0};
+			wp.length = sizeof(WINDOWPLACEMENT);
+
+			if(GetWindowPlacement(hwnd, &wp))
+			{
+				HKEY hKey;
+
+				hr = Registry::CreateKey(HKEY_CURRENT_USER, pctzAppKey, KEY_WRITE, &hKey);
+				if(SUCCEEDED(hr))
+				{
+					// Normalize the scaled window placement to 96 DPI
+					DPI::NormalizeScaledPoint(&wp.ptMaxPosition);
+					DPI::NormalizeScaledPoint(&wp.ptMinPosition);
+					DPI::NormalizeScaledRectSize(&wp.rcNormalPosition);
+
+					hr = HRESULT_FROM_WIN32(RegSetValueEx(hKey, pctzValueName, NULL, REG_BINARY, (LPBYTE)&wp, sizeof(WINDOWPLACEMENT)));
+
+					RegCloseKey(hKey);
+				}
+			}
+			else
+				hr = HRESULT_FROM_WIN32(GetLastError());
+		}
+		else
+			hr = E_INVALIDARG;
+
+		return hr;
+	}
+
+	HRESULT WINAPI LoadWindowPosition (HWND hwnd, LPCTSTR pctzAppKey, LPCTSTR pctzValueName, __inout INT* pnCmdShow)
+	{
+		HRESULT hr;
+
+		if(hwnd)
+		{
+			HKEY hKey;
+
+			hr = HRESULT_FROM_WIN32(RegOpenKey(HKEY_CURRENT_USER, pctzAppKey, &hKey));
+			if(SUCCEEDED(hr))
+			{
+				WINDOWPLACEMENT wp;
+				DWORD cbData = sizeof(wp);
+
+				hr = HRESULT_FROM_WIN32(RegQueryValueEx(hKey, pctzValueName, NULL, NULL, (LPBYTE)&wp, &cbData));
+				if(SUCCEEDED(hr))
+				{
+					wp.length = sizeof(WINDOWPLACEMENT);
+
+					// Normalize the scaled window placement from 96 DPI
+					DPI::ScaleNormalizedPoint(&wp.ptMaxPosition);
+					DPI::ScaleNormalizedPoint(&wp.ptMinPosition);
+					DPI::ScaleNormalizedRectSize(&wp.rcNormalPosition);
+
+					// If the startup visibility option is uninteresting, use the saved option.
+					if(SW_SHOWDEFAULT == *pnCmdShow || SW_SHOWNORMAL == *pnCmdShow || SW_SHOW == *pnCmdShow)
+						*pnCmdShow = wp.showCmd;
+
+					// Call SetWindowPlacement() with SW_HIDE to avoid flashing the window white.
+					wp.showCmd = SW_HIDE;
+
+					if(SetWindowPlacement(hwnd, &wp))
+						hr = S_OK;
+					else
+						hr = HRESULT_FROM_WIN32(GetLastError());
+				}
+
+				RegCloseKey(hKey);
+			}
+		}
+		else
+			hr = E_INVALIDARG;
+
+		return hr;
+	}
+#endif
 
 	HRESULT WINAPI Install (LPCTSTR pctzScript, HKEY hKey)
 	{
