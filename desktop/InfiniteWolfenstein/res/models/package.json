@@ -70,6 +70,14 @@
 	},
 	{
 		package: "sif",
+		name: "Plant.SIF"
+	},
+	{
+		package: "model",
+		name: "Plant.SML"
+	},
+	{
+		package: "sif",
 		name: "Spear.SIF"
 	},
 	{
@@ -162,6 +170,13 @@
 					entity: "GoldBars.PNG",
 					pickup: "BlakeStoneGoldBars.wav",
 					points: 50
+				},
+				{
+					name: "Plant",
+					type: "obstacle",
+					sif: "Plant.SIF",
+					model: "Plant.SML",
+					entity: "Plant.PNG"
 				},
 				{
 					name: "Spear",
