@@ -87,7 +87,7 @@ private:
 	HRESULT GetDungeonRegion (INT xRegion, INT zRegion, __deref_out CDungeonRegion** ppRegion);
 	HRESULT GetCurrentRegionMusic (RSTRING* prstrMusicW);
 	HRESULT UpdateKeysLabel (VOID);
-	VOID MoveCamera (DOUBLE dblMove);
+	VOID MoveCamera (DOUBLE dblMove, DOUBLE dblDirRadians);
 	VOID CheckItemPickup (VOID);
 	VOID RenderFloor (FLOAT x, FLOAT y, FLOAT z, sysint idxFloor);
 	VOID RenderCeiling (FLOAT x, FLOAT y, FLOAT z, sysint idxCeiling);
@@ -169,6 +169,7 @@ public:
 		HANDLE_WM(WM_ACTIVATE, OnActivate)
 		HANDLE_WM(WM_SIZE, OnSize)
 		HANDLE_WM(WM_CLOSE, OnClose)
+		HANDLE_WM(WM_SYSCOMMAND, OnSysCommand)
 		HANDLE_WM(m_msgNotifyFinished, OnNotifyFinishedMsg)
 		DELEGATE_PARENT(__super)
 	END_WM_MAP
@@ -207,6 +208,7 @@ protected:
 	DECL_WM_HANDLER(OnActivate);
 	DECL_WM_HANDLER(OnSize);
 	DECL_WM_HANDLER(OnClose);
+	DECL_WM_HANDLER(OnSysCommand);
 	DECL_WM_HANDLER(OnNotifyFinishedMsg);
 
 	HRESULT LoadPackage (PCWSTR pcwzPackage, BOOL fRequireAll);

@@ -330,6 +330,9 @@ VOID CLevelRenderer::UpdateFrame (VOID)
 	BYTE bKeyState[256];
 	bool fUpdate = false;
 	bool fCheckItemPickup = false;
+	DOUBLE dblStrafe = 0.0;
+
+	GetKeyboardState(bKeyState);
 
 	if(0 < m_cDrawLockedDoorTicks)
 		m_cDrawLockedDoorTicks--;
@@ -348,39 +351,71 @@ VOID CLevelRenderer::UpdateFrame (VOID)
 
 			if(pt.x != ptCenter.x)
 			{
-				m_camera.Turn(static_cast<FLOAT>(pt.x - ptCenter.x) / 3.0f);
+				if(bKeyState[VK_MENU] & 0x80)
+				{
+					dblStrafe = static_cast<DOUBLE>(pt.x - ptCenter.x) / 2.0;
+					if(dblStrafe < -MOVE_RATE)
+						dblStrafe = -MOVE_RATE;
+					else if(dblStrafe > MOVE_RATE)
+						dblStrafe = MOVE_RATE;
+				}
+				else
+					m_camera.Turn(static_cast<FLOAT>(pt.x - ptCenter.x) / 3.5f);
 				SetCursorPos(ptCenter.x, ptCenter.y);
+				fUpdate = true;
 			}
 		}
 	}
 
-	GetKeyboardState(bKeyState);
-
 	if(bKeyState[VK_LEFT] & 0x80)
 	{
-		m_camera.Turn(-TURN_RATE);
+		if(bKeyState[VK_MENU] & 0x80)
+		{
+			if(dblStrafe <= 0.0)
+				dblStrafe = -MOVE_RATE;
+			else
+				dblStrafe -= MOVE_RATE;
+		}
+		else
+			m_camera.Turn(-TURN_RATE);
 		fUpdate = true;
 	}
 	if(bKeyState[VK_RIGHT] & 0x80)
 	{
-		m_camera.Turn(TURN_RATE);
+		if(bKeyState[VK_MENU] & 0x80)
+		{
+			if(dblStrafe >= 0.0)
+				dblStrafe = MOVE_RATE;
+			else
+				dblStrafe += MOVE_RATE;
+		}
+		else
+			m_camera.Turn(TURN_RATE);
 		fUpdate = true;
 	}
 	if(bKeyState[VK_UP] & 0x80)
 	{
-		MoveCamera(MOVE_RATE);
+		MoveCamera(MOVE_RATE, m_camera.m_dblDirRadians);
 		fUpdate = true;
 		fCheckItemPickup = true;
 	}
 	if(bKeyState[VK_DOWN] & 0x80)
 	{
-		MoveCamera(-MOVE_RATE);
+		MoveCamera(-MOVE_RATE, m_camera.m_dblDirRadians);
 		fUpdate = true;
 		fCheckItemPickup = true;
 	}
 
 	if(fUpdate)
 	{
+		if(dblStrafe)
+		{
+			DOUBLE dblStrafeDir = m_camera.m_dblDirRadians + Geometry::dPI / 2.0;
+			if(dblStrafeDir >= Geometry::dPI * 2.0)
+				dblStrafeDir -= Geometry::dPI * 2.0;
+			MoveCamera(dblStrafe, dblStrafeDir);
+		}
+
 		UpdateViewingTiles();
 		if(fCheckItemPickup)
 			CheckItemPickup();
@@ -555,7 +590,7 @@ HRESULT CLevelRenderer::UpdateKeysLabel (VOID)
 	return Formatting::TPrintF(m_wzKeysLabel, ARRAYSIZE(m_wzKeysLabel), NULL, L"%d GOLD KEYS   %d SILVER KEYS", m_cGoldKeys, m_cSilverKeys);
 }
 
-VOID CLevelRenderer::MoveCamera (DOUBLE dblMove)
+VOID CLevelRenderer::MoveCamera (DOUBLE dblMove, DOUBLE dblDirRadians)
 {
 	DOUBLE xCenter, yCenter, zCenter;
 	INT xRegion, zRegion;
@@ -629,7 +664,6 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove)
 		}
 	}
 
-	DOUBLE dblDirRadians = m_camera.m_dblDirRadians;
 	DPOINT dpCenter = m_camera.m_dblPoint;
 
 	dpCenter.x += sin(dblDirRadians) * dblMove;
@@ -1379,6 +1413,16 @@ BOOL CInfiniteWolfenstein::OnSize (UINT uMsg, WPARAM wParam, LPARAM lParam, LRES
 
 BOOL CInfiniteWolfenstein::OnClose (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
+	return FALSE;
+}
+
+BOOL CInfiniteWolfenstein::OnSysCommand (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+{
+	if(SC_KEYMENU == wParam)
+	{
+		lResult = FALSE;
+		return TRUE;
+	}
 	return FALSE;
 }
 

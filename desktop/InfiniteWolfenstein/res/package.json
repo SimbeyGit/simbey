@@ -21,7 +21,7 @@
 				{
 					name: "WoodPanel",
 					walls: ["iw.0007.png"],
-					decorations: ["iw.0008.png", "iw.0009.png", "iw.0010.png"]
+					decorations: ["iw.0008.png", "iw.0009.png", "iw.0010.png", "iw.0180.png"]
 				},
 				{
 					name: "RedBricks1",
