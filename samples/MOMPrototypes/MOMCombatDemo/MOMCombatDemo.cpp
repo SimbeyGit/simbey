@@ -279,7 +279,7 @@ HINSTANCE CMOMCombatDemo::GetInstance (VOID)
 
 VOID CMOMCombatDemo::OnFinalDestroy (HWND hwnd)
 {
-	Registry::SaveWindowPosition(m_hwnd, c_wzRegAppKey, c_wzAppWindowPos);
+	Registry::SaveWindowPosition(hwnd, c_wzRegAppKey, c_wzAppWindowPos);
 
 	if(m_pScreen)
 	{
