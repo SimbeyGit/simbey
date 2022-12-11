@@ -7,5 +7,9 @@
 		package: "json",
 		name: "Intro.json",
 		file: "Intro.json"
+	},
+	{
+		package: "midi",
+		name: "Intro.MID"
 	}
 ]

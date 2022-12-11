@@ -445,10 +445,6 @@
 	},
 	{
 		package: "midi",
-		name: "MOM113.MID"
-	},
-	{
-		package: "midi",
 		name: "MOM114.MID"
 	},
 	{

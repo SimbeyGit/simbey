@@ -55,7 +55,7 @@ HRESULT CIntroScreen::Initialize (VOID)
 	Check(m_pMain->AddLayer(FALSE, LayerRender::Masked, 0xFF000000, NULL));
 	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(FALSE, LayerRender::Masked, 0, this, &srFader));
 
-	Check(m_pPackage->ReadFile(SLP(L"music\\MOM113.MID"), &stmMusic));
+	Check(m_pPackage->ReadFile(SLP(L"intro\\Intro.MID"), &stmMusic));
 	uliSize.QuadPart = stmMusic.DataRemaining();
 	Check(m_pHost->LoadMIDI(&stmMusic, &uliSize, &m_midiFile));
 	Check(m_pHost->PlayMIDI(&m_midiFile));
