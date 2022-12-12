@@ -1,14 +1,6 @@
 [
 	{
-		package: "ttf",
-		name: "Aclonica.ttf"
-	},
-	{
-		package: "ttf",
-		name: "DreamOrphanage.ttf"
-	},
-	{
-		package: "ttf",
-		name: "KingthingsPetrock.ttf"
+		package: "import",
+		import: "..\\..\\..\\..\\resources\\MoM\\fonts"
 	}
 ]
