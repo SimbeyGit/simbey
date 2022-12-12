@@ -1,15 +1,6 @@
 [
 	{
-		package: "sif",
-		name: "Intro.sif"
-	},
-	{
-		package: "json",
-		name: "Intro.json",
-		file: "Intro.json"
-	},
-	{
-		package: "midi",
-		name: "Intro.MID"
+		package: "import",
+		import: "..\\..\\..\\..\\resources\\MoM\\intro"
 	}
 ]
