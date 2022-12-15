@@ -45,17 +45,17 @@ HRESULT CIntroScreen::Initialize (VOID)
 	m_x = (xView - 320) / 2;
 	m_y = (yView - 200) / 2;
 
-	Check(m_pPackage->GetJSONData(SLP(L"intro\\Intro.json"), &srv));
+	Check(m_pPackage->GetJSONData(SLP(L"intro\\Animation.json"), &srv));
 	Check(LoadIntroEvents(srv));
 	m_nEventPtr = 0;
 
-	Check(m_pPackage->OpenSIF(L"intro\\Intro.sif", &m_pIntro));
+	Check(m_pPackage->OpenSIF(L"intro\\Animation.sif", &m_pIntro));
 
 	Check(m_pSurface->AddCanvas(NULL, TRUE, &m_pMain));
 	Check(m_pMain->AddLayer(FALSE, LayerRender::Masked, 0xFF000000, NULL));
 	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(FALSE, LayerRender::Masked, 0, this, &srFader));
 
-	Check(m_pPackage->ReadFile(SLP(L"intro\\Intro.MID"), &stmMusic));
+	Check(m_pPackage->ReadFile(SLP(L"intro\\Animation.MID"), &stmMusic));
 	uliSize.QuadPart = stmMusic.DataRemaining();
 	Check(m_pHost->LoadMIDI(&stmMusic, &uliSize, &m_midiFile));
 	Check(m_pHost->PlayMIDI(&m_midiFile));

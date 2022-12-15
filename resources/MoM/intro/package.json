@@ -1,15 +1,15 @@
 [
 	{
 		package: "sif",
-		name: "Intro.sif"
+		name: "Animation.sif"
 	},
 	{
 		package: "json",
-		name: "Intro.json",
-		file: "Intro.json"
+		name: "Animation.json",
+		file: "Animation.json"
 	},
 	{
 		package: "midi",
-		name: "Intro.MID"
+		name: "Animation.MID"
 	}
 ]
