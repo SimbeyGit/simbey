@@ -3,5 +3,9 @@
 		package: "buildsif",
 		name: "title.sif",
 		files: ["*.png"]
+	},
+	{
+		package: "midi",
+		name: "title.MID"
 	}
 ]

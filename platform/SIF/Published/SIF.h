@@ -104,7 +104,8 @@ interface __declspec(uuid("4CC1DB43-C86A-4150-BD01-DC1390CCA42A")) ISimbeyInterc
 {
 	virtual DWORD GetLayerID (VOID) = 0;
 
-	virtual HRESULT GetPosition (RECT* prcPosition) = 0;
+	virtual HRESULT GetSize (__out SIZE* pSize) = 0;
+	virtual HRESULT GetPosition (__out RECT* prcPosition) = 0;
 	virtual VOID SetPosition (LONG x, LONG y) = 0;
 
 	// Z Index is based on the position in the array of layers.
