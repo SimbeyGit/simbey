@@ -105,6 +105,9 @@ namespace Geometry
 
 	BOOL WINAPI LineSegmentIntersectsCircle (DOUBLE x1, DOUBLE y1, DOUBLE x2, DOUBLE y2, DOUBLE cx, DOUBLE cy, DOUBLE r);
 	VOID WINAPI FindNearestPointOnLineSegment (DOUBLE x1, DOUBLE y1, DOUBLE x2, DOUBLE y2, DOUBLE cx, DOUBLE cy, __out DOUBLE* px, __out DOUBLE* py);
+
+	BOOL WINAPI IsDblRectEmpty (const DBLRECT* pdblRect);
+	BOOL WINAPI IntersectDblRect (__out PDBLRECT pdblRect, const DBLRECT* pdblSrc1, const DBLRECT* pdblSrc2);
 };
 
 #endif

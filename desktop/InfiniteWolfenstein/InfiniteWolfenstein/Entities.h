@@ -11,13 +11,6 @@ class CModelEntity;
 
 struct BLOCK_DATA;
 
-struct LINE_SEGMENT
-{
-	DPOINT ptA;
-	DPOINT ptB;
-	FPOINT rNormal;
-};
-
 struct MODEL_LIST
 {
 	DPOINT dpCamera;
@@ -43,7 +36,7 @@ public:
 	virtual bool DoPickup (CLevelRenderer* pRenderer) { return false; }
 	virtual bool IsSpear (VOID) { return false; }
 	virtual VOID Draw (MODEL_LIST* pModels) = 0;
-	virtual VOID GetCollisionLines (TArray<LINE_SEGMENT>* paSegments) = 0;
+	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids) = 0;
 	virtual VOID Activate (CLevelRenderer* pRenderer, CDungeonRegion* pRegion) = 0;
 	virtual VOID Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion) = 0;
 };
@@ -72,7 +65,7 @@ public:
 	CDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType);
 
 	virtual VOID Draw (MODEL_LIST* pModels);
-	virtual VOID GetCollisionLines (TArray<LINE_SEGMENT>* paSegments);
+	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids);
 	virtual VOID Activate (CLevelRenderer* pRenderer, CDungeonRegion* pRegion);
 	virtual VOID Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion);
 
@@ -92,7 +85,7 @@ public:
 	CElevatorSwitch (BLOCK_DATA* pBlock, INT x, INT z, sysint idxUp);
 
 	virtual VOID Draw (MODEL_LIST* pModels);
-	virtual VOID GetCollisionLines (TArray<LINE_SEGMENT>* paSegments) { }
+	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids) { }
 	virtual VOID Activate (CLevelRenderer* pRenderer, CDungeonRegion* pRegion);
 	virtual VOID Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion);
 };
@@ -119,7 +112,7 @@ public:
 	CModelObstacle (CModel* pModel);
 	~CModelObstacle ();
 
-	virtual VOID GetCollisionLines (TArray<LINE_SEGMENT>* paSegments);
+	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids);
 };
 
 class CModelItem : public CModelEntity
@@ -130,5 +123,5 @@ public:
 
 	virtual bool DoPickup (CLevelRenderer* pRenderer);
 	virtual bool IsSpear (VOID);
-	virtual VOID GetCollisionLines (TArray<LINE_SEGMENT>* paSegments) { }
+	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids) { }
 };

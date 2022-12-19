@@ -400,4 +400,35 @@ namespace Geometry
 		*px = x1 + xHeading * rDotProduct;
 		*py = y1 + yHeading * rDotProduct;
 	}
+
+	BOOL WINAPI IsDblRectEmpty (const DBLRECT* pdblRect)
+	{
+		return NULL == pdblRect || (pdblRect->left >= pdblRect->right) || (pdblRect->top >= pdblRect->bottom);
+	}
+
+	BOOL WINAPI IntersectDblRect (__out PDBLRECT pdblRect, const DBLRECT* pdblSrc1, const DBLRECT* pdblSrc2)
+	{
+		if(NULL == pdblRect)
+			return FALSE;
+
+		if(IsDblRectEmpty(pdblSrc1) || IsDblRectEmpty(pdblSrc2) ||
+			pdblSrc1->left >= pdblSrc2->right ||
+			pdblSrc2->left >= pdblSrc1->right ||
+			pdblSrc1->top >= pdblSrc2->bottom ||
+			pdblSrc2->top >= pdblSrc1->bottom)
+		{
+			pdblRect->left = 0.0;
+			pdblRect->top = 0.0;
+			pdblRect->right = 0.0;
+			pdblRect->bottom = 0.0;
+			return FALSE;
+		}
+
+		pdblRect->left = max(pdblSrc1->left, pdblSrc2->left);
+		pdblRect->right = min(pdblSrc1->right, pdblSrc2->right);
+		pdblRect->top = max(pdblSrc1->top, pdblSrc2->top);
+		pdblRect->bottom = min(pdblSrc1->bottom, pdblSrc2->bottom);
+
+		return TRUE;
+	}
 };

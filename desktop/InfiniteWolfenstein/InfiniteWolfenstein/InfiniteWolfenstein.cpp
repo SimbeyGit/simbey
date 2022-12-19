@@ -220,22 +220,23 @@ BOOL CLevelRenderer::CheckCollisionsWithEntity (CEntity* pEntity)
 {
 	BOOL fCollision = FALSE;
 	DPOINT dpCenter = m_camera.m_dblPoint;
+	DBLRECT rcPlayer = { dpCenter.x - PLAYER_RADIUS, dpCenter.z - PLAYER_RADIUS, dpCenter.x + PLAYER_RADIUS, dpCenter.z + PLAYER_RADIUS };
 
-	pEntity->GetCollisionLines(&m_aSegments);
+	pEntity->GetCollisionSolids(&m_aSolids);
 
-	for(sysint i = 0; i < m_aSegments.Length(); i++)
+	for(sysint i = 0; i < m_aSolids.Length(); i++)
 	{
-		LINE_SEGMENT& seg = m_aSegments[i];
+		DBLRECT& rect = m_aSolids[i];
+		DBLRECT rcInter;
 
-		if(Geometry::PointInSquare(seg.ptA.x, seg.ptA.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS) ||
-			Geometry::PointInSquare(seg.ptB.x, seg.ptB.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS))
+		if(Geometry::IntersectDblRect(&rcInter, &rect, &rcPlayer))
 		{
 			fCollision = TRUE;
 			break;
 		}
 	}
 
-	m_aSegments.Clear();
+	m_aSolids.Clear();
 	return fCollision;
 }
 
@@ -628,36 +629,26 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove, DOUBLE dblDirRadians)
 
 				if(TYPE_ANY_FLOOR != pBlock->idxBlock)
 				{
-					LINE_SEGMENT seg;
+					DBLRECT rect;
 
 					// North Face
-					seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = -1.0f;
-					seg.ptA.x = xCell + 1; seg.ptA.y = 0.0; seg.ptA.z = zCell;
-					seg.ptB.x = xCell; seg.ptB.y = 0.0; seg.ptB.z = zCell;
-					m_aSegments.Append(seg);
+					rect.top = zCell;
 
 					// West Face
-					seg.rNormal.x = -1.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 0.0f;
-					seg.ptA.x = xCell; seg.ptA.y = 0.0; seg.ptA.z = zCell;
-					seg.ptB.x = xCell; seg.ptB.y = 0.0; seg.ptB.z = zCell + 1.0;
-					m_aSegments.Append(seg);
+					rect.left = xCell;
 
 					// South Face
-					seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 1.0f;
-					seg.ptA.x = xCell; seg.ptA.y = 0.0; seg.ptA.z = zCell + 1.0;
-					seg.ptB.x = xCell + 1.0; seg.ptB.y = 0.0; seg.ptB.z = zCell + 1.0;
-					m_aSegments.Append(seg);
+					rect.bottom = zCell + 1.0;
 
 					// East Face
-					seg.rNormal.x = 1.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 0.0f;
-					seg.ptA.x = xCell + 1.0; seg.ptA.y = 0.0; seg.ptA.z = zCell + 1.0;
-					seg.ptB.x = xCell + 1.0; seg.ptB.y = 0.0; seg.ptB.z = zCell;
-					m_aSegments.Append(seg);
+					rect.right = xCell + 1.0;
+
+					m_aSolids.Append(rect);
 				}
 
 				while(pEntity)
 				{
-					pEntity->GetCollisionLines(&m_aSegments);
+					pEntity->GetCollisionSolids(&m_aSolids);
 					pEntity = pEntity->m_pNext;
 				}
 			}
@@ -669,92 +660,37 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove, DOUBLE dblDirRadians)
 	dpCenter.x += sin(dblDirRadians) * dblMove;
 	dpCenter.z -= cos(dblDirRadians) * dblMove;
 
-	// Check sliding against wall sides
-	for(sysint i = 0; i < m_aSegments.Length(); i++)
+	// Check sliding against solids
+	for(sysint i = 0; i < m_aSolids.Length(); i++)
 	{
-		LINE_SEGMENT& seg = m_aSegments[i];
+		DBLRECT& rect = m_aSolids[i];
+		DBLRECT rcInter;
+		DBLRECT rcPlayer = { dpCenter.x - PLAYER_RADIUS, dpCenter.z - PLAYER_RADIUS, dpCenter.x + PLAYER_RADIUS, dpCenter.z + PLAYER_RADIUS };
 
-		if(seg.ptA.x == seg.ptB.x)	// Vertical Line
+		if(Geometry::IntersectDblRect(&rcInter, &rect, &rcPlayer))
 		{
-			DOUBLE zMin = min(seg.ptA.z, seg.ptB.z);
-			DOUBLE zMax = max(seg.ptA.z, seg.ptB.z);
+			DOUBLE xDelta = abs(rcInter.right - rcInter.left);
+			DOUBLE zDelta = abs(rcInter.bottom - rcInter.top);
 
-			if(dpCenter.z >= zMin && dpCenter.z <= zMax)
+			if(xDelta < zDelta)
 			{
-				if(dpCenter.x > seg.ptA.x - PLAYER_RADIUS && dpCenter.x < seg.ptA.x)
-					dpCenter.x = seg.ptA.x - (PLAYER_RADIUS + 0.001);
-				else if(dpCenter.x < seg.ptA.x + PLAYER_RADIUS && dpCenter.x > seg.ptA.x)
-					dpCenter.x = seg.ptA.x + (PLAYER_RADIUS + 0.001);
+				if(m_camera.m_dblPoint.x < rect.left)
+					dpCenter.x = rect.left - (PLAYER_RADIUS + 0.001);
+				else
+					dpCenter.x = rect.right + (PLAYER_RADIUS + 0.001);
 			}
-		}
-		else
-		{
-			DOUBLE xMin = min(seg.ptA.x, seg.ptB.x);
-			DOUBLE xMax = max(seg.ptA.x, seg.ptB.x);
-
-			if(dpCenter.x >= xMin && dpCenter.x <= xMax)
+			else
 			{
-				if(dpCenter.z > seg.ptA.z - PLAYER_RADIUS && dpCenter.z < seg.ptA.z)
-					dpCenter.z = seg.ptA.z - (PLAYER_RADIUS + 0.001);
-				else if(dpCenter.z < seg.ptA.z + PLAYER_RADIUS && dpCenter.z > seg.ptA.z)
-					dpCenter.z = seg.ptA.z + (PLAYER_RADIUS + 0.001);
-			}
-		}
-	}
-
-	// Check sliding against the corners
-	for(sysint i = 0; i < m_aSegments.Length(); i++)
-	{
-		LINE_SEGMENT& seg = m_aSegments[i];
-
-		if(seg.ptA.x == seg.ptB.x)	// Vertical Line
-		{
-			if(Geometry::PointInSquare(seg.ptA.x, seg.ptA.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS) ||
-				Geometry::PointInSquare(seg.ptB.x, seg.ptB.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS))
-			{
-				DOUBLE zMin = min(seg.ptA.z, seg.ptB.z);
-				DOUBLE zMax = max(seg.ptA.z, seg.ptB.z);
-
-				if(m_camera.m_dblPoint.z < zMin)
-				{
-					DOUBLE zAdjust = zMin - (PLAYER_RADIUS + 0.001);
-					if(m_camera.m_dblPoint.z - zAdjust <= dblMove)
-						dpCenter.z = zAdjust;
-				}
-				else if(m_camera.m_dblPoint.z > zMax)
-				{
-					DOUBLE zAdjust = zMax + (PLAYER_RADIUS + 0.001);
-					if(zAdjust - m_camera.m_dblPoint.z <= dblMove)
-						dpCenter.z = zAdjust;
-				}
-			}
-		}
-		else
-		{
-			if(Geometry::PointInSquare(seg.ptA.x, seg.ptA.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS) ||
-				Geometry::PointInSquare(seg.ptB.x, seg.ptB.z, dpCenter.x, dpCenter.z, PLAYER_RADIUS))
-			{
-				DOUBLE xMin = min(seg.ptA.x, seg.ptB.x);
-				DOUBLE xMax = max(seg.ptA.x, seg.ptB.x);
-
-				if(m_camera.m_dblPoint.x < xMin)
-				{
-					DOUBLE xAdjust = xMin - (PLAYER_RADIUS + 0.001);
-					if(m_camera.m_dblPoint.x - xAdjust <= dblMove)
-						dpCenter.x = xAdjust;
-				}
-				else if(m_camera.m_dblPoint.x > xMax)
-				{
-					DOUBLE xAdjust = xMax + (PLAYER_RADIUS + 0.001);
-					if(xAdjust - m_camera.m_dblPoint.x <= dblMove)
-						dpCenter.x = xAdjust;
-				}
+				if(m_camera.m_dblPoint.z < rect.top)
+					dpCenter.z = rect.top - (PLAYER_RADIUS + 0.001);
+				else
+					dpCenter.z = rect.bottom + (PLAYER_RADIUS + 0.001);
 			}
 		}
 	}
 
 	m_camera.m_dblPoint = dpCenter;
-	m_aSegments.Clear();
+	m_aSolids.Clear();
 }
 
 VOID CLevelRenderer::CheckItemPickup (VOID)

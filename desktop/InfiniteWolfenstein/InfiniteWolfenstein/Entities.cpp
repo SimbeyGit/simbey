@@ -94,9 +94,9 @@ VOID CDoor::Draw (MODEL_LIST* pModels)
 	}
 }
 
-VOID CDoor::GetCollisionLines (TArray<LINE_SEGMENT>* paSegments)
+VOID CDoor::GetCollisionSolids (TArray<DBLRECT>* paSolids)
 {
-	LINE_SEGMENT seg;
+	DBLRECT rect;
 	DOUBLE x = m_dp.x;
 	DOUBLE z = m_dp.z;
 
@@ -109,55 +109,39 @@ VOID CDoor::GetCollisionLines (TArray<LINE_SEGMENT>* paSegments)
 		DOUBLE xEast = x + 0.06;
 
 		// West Face
-		seg.rNormal.x = -1.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 0.0f;
-		seg.ptA.x = xWest; seg.ptA.y = 0.0; seg.ptA.z = z;
-		seg.ptB.x = xWest; seg.ptB.y = 0.0; seg.ptB.z = z + 1.0;
-		paSegments->Append(seg);
+		rect.left = xWest;
 
 		// East Face
-		seg.rNormal.x = 1.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 0.0f;
-		seg.ptA.x = xEast; seg.ptA.y = 0.0; seg.ptA.z = z + 1.0;
-		seg.ptB.x = xEast; seg.ptB.y = 0.0; seg.ptB.z = z;
-		paSegments->Append(seg);
+		rect.right = xEast;
 
-		if(m_dblPosition > 0.0)
-		{
-			// North Face
-			seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = -1.0f;
-			seg.ptA.x = xEast; seg.ptA.y = 0.0; seg.ptA.z = z;
-			seg.ptB.x = xWest; seg.ptB.y = 0.0; seg.ptB.z = z;
-			paSegments->Append(seg);
-		}
+		// North Face (Edge of Door)
+		rect.top = z;
+
+		// South Face (In The Wall)
+		rect.bottom = m_dp.z + 0.5;
 	}
 	else
 	{
-		x -= 0.5f;
-		x += m_dblPosition;
+		x += 0.5f;
+		x -= m_dblPosition;
 
 		DOUBLE zNorth = z - 0.06;
 		DOUBLE zSouth = z + 0.06;
 
 		// North Face
-		seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = -1.0f;
-		seg.ptA.x = x + 1.0; seg.ptA.y = 0.0; seg.ptA.z = zNorth;
-		seg.ptB.x = x; seg.ptB.y = 0.0; seg.ptB.z = zNorth;
-		paSegments->Append(seg);
+		rect.top = zNorth;
 
 		// South Face
-		seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 1.0f;
-		seg.ptA.x = x; seg.ptA.y = 0.0; seg.ptA.z = zSouth;
-		seg.ptB.x = x + 1.0; seg.ptB.y = 0.0; seg.ptB.z = zSouth;
-		paSegments->Append(seg);
+		rect.bottom = zSouth;
 
-		if(m_dblPosition > 0.0)
-		{
-			// East Face
-			seg.rNormal.x = 1.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 0.0f;
-			seg.ptA.x = x; seg.ptA.y = 0.0; seg.ptA.z = zNorth;
-			seg.ptB.x = x; seg.ptB.y = 0.0; seg.ptB.z = zSouth;
-			paSegments->Append(seg);
-		}
+		// East Face (Edge of Door)
+		rect.right = x;
+
+		// West Face (In The Wall)
+		rect.left = m_dp.x - 0.5;
 	}
+
+	paSolids->Append(rect);
 }
 
 VOID CDoor::Activate (CLevelRenderer* pRenderer, CDungeonRegion* pRegion)
@@ -215,7 +199,7 @@ VOID CDoor::Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion)
 		m_dblPosition -= (1.0 / 64.0);
 		if(m_pLevel->CheckCollisionsWithEntity(this))
 		{
-			m_nTimer = 64 - m_nTimer;
+			m_nTimer = 63 - m_nTimer;
 			m_eState = Opening;
 			Update(pRenderer, pRegion);
 		}
@@ -310,35 +294,25 @@ CModelObstacle::~CModelObstacle ()
 {
 }
 
-VOID CModelObstacle::GetCollisionLines (TArray<LINE_SEGMENT>* paSegments)
+VOID CModelObstacle::GetCollisionSolids (TArray<DBLRECT>* paSolids)
 {
-	LINE_SEGMENT seg;
+	DBLRECT rect;
 	DOUBLE xCell = m_dp.x - 0.5;
 	DOUBLE zCell = m_dp.z - 0.5;
 
 	// North Face
-	seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = -1.0f;
-	seg.ptA.x = xCell + 1; seg.ptA.y = 0.0; seg.ptA.z = zCell;
-	seg.ptB.x = xCell; seg.ptB.y = 0.0; seg.ptB.z = zCell;
-	paSegments->Append(seg);
+	rect.top = zCell;
 
 	// West Face
-	seg.rNormal.x = -1.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 0.0f;
-	seg.ptA.x = xCell; seg.ptA.y = 0.0; seg.ptA.z = zCell;
-	seg.ptB.x = xCell; seg.ptB.y = 0.0; seg.ptB.z = zCell + 1.0;
-	paSegments->Append(seg);
+	rect.left = xCell;
 
 	// South Face
-	seg.rNormal.x = 0.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 1.0f;
-	seg.ptA.x = xCell; seg.ptA.y = 0.0; seg.ptA.z = zCell + 1.0;
-	seg.ptB.x = xCell + 1.0; seg.ptB.y = 0.0; seg.ptB.z = zCell + 1.0;
-	paSegments->Append(seg);
+	rect.bottom = zCell + 1.0;
 
 	// East Face
-	seg.rNormal.x = 1.0f; seg.rNormal.y = 0.0f; seg.rNormal.z = 0.0f;
-	seg.ptA.x = xCell + 1.0; seg.ptA.y = 0.0; seg.ptA.z = zCell + 1.0;
-	seg.ptB.x = xCell + 1.0; seg.ptB.y = 0.0; seg.ptB.z = zCell;
-	paSegments->Append(seg);
+	rect.right = xCell + 1.0;
+
+	paSolids->Append(rect);
 }
 
 CModelItem::CModelItem (CModel* pModel) :

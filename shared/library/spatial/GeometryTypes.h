@@ -71,3 +71,11 @@ typedef struct
 	FLOAT blue;
 	FLOAT alpha;
 } FCOLOR4, *PFCOLOR4;
+
+typedef struct
+{
+	DOUBLE left;
+	DOUBLE top;
+	DOUBLE right;
+	DOUBLE bottom;
+} DBLRECT, *PDBLRECT;

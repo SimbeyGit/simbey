@@ -40,7 +40,7 @@ private:
 	CFrustum m_frustum;
 	CCamera m_camera;
 
-	TArray<LINE_SEGMENT> m_aSegments;	// Temporary Cache
+	TArray<DBLRECT> m_aSolids;			// Temporary Cache
 	TArray<CModelEntity*> m_aModels;	// Temporary Cache
 
 	WCHAR m_wzLevelLabel[32];
