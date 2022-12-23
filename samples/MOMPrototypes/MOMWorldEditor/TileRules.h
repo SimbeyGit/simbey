@@ -3,6 +3,62 @@
 #include "Library\Core\RStrMap.h"
 #include "Published\JSON.h"
 
+class CSmoothingCondition
+{
+private:
+	INT* m_pnDirections;
+	INT m_cDirections;
+	INT m_cRepetitions;
+	INT m_nValue;
+
+public:
+	CSmoothingCondition ();
+	~CSmoothingCondition ();
+
+	HRESULT Initialize (IJSONObject* pCondition);
+};
+
+class CSmoothingSet
+{
+private:
+	INT m_nDirection;
+	INT m_nValue;
+
+public:
+	CSmoothingSet ();
+	~CSmoothingSet ();
+
+	HRESULT Initialize (IJSONObject* pSet);
+};
+
+class CSmoothingReduction
+{
+private:
+	RSTRING m_rstrDescription;
+	TArray<CSmoothingCondition*> m_aConditions;
+	TArray<CSmoothingSet*> m_aSets;
+
+public:
+	CSmoothingReduction ();
+	~CSmoothingReduction ();
+
+	HRESULT Initialize (IJSONObject* pReduction);
+};
+
+class CSmoothingSystem
+{
+private:
+	RSTRING m_rstrDescription;
+	INT m_nMaxValueEachDirection;
+	TArray<CSmoothingReduction*> m_aReductions;
+
+public:
+	CSmoothingSystem ();
+	~CSmoothingSystem ();
+
+	HRESULT Initialize (IJSONObject* pSystem);
+};
+
 class CTileRuleSet
 {
 private:
@@ -13,11 +69,13 @@ private:
 	IJSONArray* m_pAltTiles;
 	RSTRING m_rstrTransition;
 
+	CSmoothingSystem* m_pSmoothingSystem;
+
 public:
 	CTileRuleSet ();
 	~CTileRuleSet ();
 
-	HRESULT Initialize (IJSONValue* pvRuleSet);
+	HRESULT Initialize (TRStrMap<CSmoothingSystem*>& mapSmoothingSystems, IJSONValue* pvRuleSet);
 	bool IsSameTile (RSTRING rstrTile);
 	bool IsBorderTile (RSTRING rstrTile);
 	bool IsSpecialTile (RSTRING rstrTile);
@@ -37,6 +95,6 @@ public:
 	CTileRules ();
 	~CTileRules ();
 
-	HRESULT Initialize (IJSONValue* pvRules);
+	HRESULT Initialize (TRStrMap<CSmoothingSystem*>& mapSmoothingSystems, IJSONValue* pvRules);
 	HRESULT GetTileRuleSet (RSTRING rstrTile, __deref_out CTileRuleSet** ppTileRuleSet);
 };

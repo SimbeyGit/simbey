@@ -1,13 +1,190 @@
 #include <windows.h>
 #include "TileRules.h"
 
+template <typename T>
+HRESULT TLoadSmoothingObjects (TArray<T*>& aObjects, IJSONValue* pvArray)
+{
+	HRESULT hr;
+	TStackRef<IJSONArray> srArray;
+	T* pObject = NULL;
+
+	Check(pvArray->GetArray(&srArray));
+
+	for(sysint i = 0; i < srArray->Count(); i++)
+	{
+		TStackRef<IJSONObject> srObjectData;
+
+		Check(srArray->GetObject(i, &srObjectData));
+
+		pObject = __new T;
+		CheckAlloc(pObject);
+		Check(pObject->Initialize(srObjectData));
+		Check(aObjects.Append(pObject));
+		pObject = NULL;
+	}
+
+Cleanup:
+	__delete pObject;
+	return hr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CSmoothingCondition
+///////////////////////////////////////////////////////////////////////////////
+
+CSmoothingCondition::CSmoothingCondition () :
+	m_pnDirections(NULL),
+	m_cDirections(0)
+{
+}
+
+CSmoothingCondition::~CSmoothingCondition ()
+{
+	__delete_array m_pnDirections;
+}
+
+HRESULT CSmoothingCondition::Initialize (IJSONObject* pCondition)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONArray> srDirections;
+
+	Check(pCondition->FindNonNullValueW(L"repetitions", &srv));
+	Check(srv->GetInteger(&m_cRepetitions));
+	srv.Release();
+
+	Check(pCondition->FindNonNullValueW(L"value", &srv));
+	Check(srv->GetInteger(&m_nValue));
+	srv.Release();
+
+	Check(pCondition->FindNonNullValueW(L"directions", &srv));
+	Check(srv->GetArray(&srDirections));
+
+	m_cDirections = srDirections->Count();
+	m_pnDirections = __new INT[m_cDirections];
+	CheckAlloc(m_pnDirections);
+	for(sysint i = 0; i < m_cDirections; i++)
+	{
+		srv.Release();
+		Check(srDirections->GetValue(i, &srv));
+		Check(srv->GetInteger(m_pnDirections + i));
+	}
+
+Cleanup:
+	return hr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CSmoothingSet
+///////////////////////////////////////////////////////////////////////////////
+
+CSmoothingSet::CSmoothingSet ()
+{
+}
+
+CSmoothingSet::~CSmoothingSet ()
+{
+}
+
+HRESULT CSmoothingSet::Initialize (IJSONObject* pSet)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+
+	Check(pSet->FindNonNullValueW(L"direction", &srv));
+	Check(srv->GetInteger(&m_nDirection));
+	srv.Release();
+
+	Check(pSet->FindNonNullValueW(L"value", &srv));
+	Check(srv->GetInteger(&m_nValue));
+
+Cleanup:
+	return hr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CSmoothingReduction
+///////////////////////////////////////////////////////////////////////////////
+
+CSmoothingReduction::CSmoothingReduction () :
+	m_rstrDescription(NULL)
+{
+}
+
+CSmoothingReduction::~CSmoothingReduction ()
+{
+	m_aConditions.DeleteAll();
+	m_aSets.DeleteAll();
+	RStrRelease(m_rstrDescription);
+}
+
+HRESULT CSmoothingReduction::Initialize (IJSONObject* pReduction)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+
+	Check(pReduction->FindNonNullValueW(L"description", &srv));
+	Check(srv->GetString(&m_rstrDescription));
+	srv.Release();
+
+	Check(pReduction->FindNonNullValueW(L"conditions", &srv));
+	Check(TLoadSmoothingObjects(m_aConditions, srv));
+	srv.Release();
+
+	Check(pReduction->FindNonNullValueW(L"set", &srv));
+	Check(TLoadSmoothingObjects(m_aSets, srv));
+
+Cleanup:
+	return hr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CSmoothingSystem
+///////////////////////////////////////////////////////////////////////////////
+
+CSmoothingSystem::CSmoothingSystem () :
+	m_rstrDescription(NULL),
+	m_nMaxValueEachDirection(NULL)
+{
+}
+
+CSmoothingSystem::~CSmoothingSystem ()
+{
+	m_aReductions.DeleteAll();
+	RStrRelease(m_rstrDescription);
+}
+
+HRESULT CSmoothingSystem::Initialize (IJSONObject* pSystem)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONArray> srReductions;
+	CSmoothingReduction* pReduction = NULL;
+
+	Check(pSystem->FindNonNullValueW(L"description", &srv));
+	Check(srv->GetString(&m_rstrDescription));
+	srv.Release();
+
+	Check(pSystem->FindNonNullValueW(L"maxValueEachDirection", &srv));
+	Check(srv->GetInteger(&m_nMaxValueEachDirection));
+	srv.Release();
+
+	if(SUCCEEDED(pSystem->FindNonNullValueW(L"reductions", &srv)))
+		Check(TLoadSmoothingObjects(m_aReductions, srv));
+
+Cleanup:
+	__delete pReduction;
+	return hr;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // CTileRuleSet
 ///////////////////////////////////////////////////////////////////////////////
 
 CTileRuleSet::CTileRuleSet () :
 	m_pSame(NULL), m_pBorder(NULL), m_pSpecial(NULL),
-	m_pAltTiles(NULL), m_rstrTransition(NULL)
+	m_pAltTiles(NULL), m_rstrTransition(NULL),
+	m_pSmoothingSystem(NULL)
 {
 }
 
@@ -20,13 +197,20 @@ CTileRuleSet::~CTileRuleSet ()
 	RStrRelease(m_rstrTransition);
 }
 
-HRESULT CTileRuleSet::Initialize (IJSONValue* pvRuleSet)
+HRESULT CTileRuleSet::Initialize (TRStrMap<CSmoothingSystem*>& mapSmoothingSystems, IJSONValue* pvRuleSet)
 {
 	HRESULT hr;
 	TStackRef<IJSONObject> srRuleSet;
 	TStackRef<IJSONValue> srv;
+	RSTRING rstrSmoothing = NULL;
 
 	Check(pvRuleSet->GetObject(&srRuleSet));
+
+	Check(srRuleSet->FindNonNullValueW(L"smoothing", &srv));
+	Check(srv->GetString(&rstrSmoothing));
+	srv.Release();
+
+	Check(mapSmoothingSystems.Find(rstrSmoothing, &m_pSmoothingSystem));
 
 	Check(srRuleSet->FindNonNullValueW(L"same", &srv));
 	Check(srv->GetArray(&m_pSame));
@@ -54,6 +238,7 @@ HRESULT CTileRuleSet::Initialize (IJSONValue* pvRuleSet)
 		Check(srv->GetString(&m_rstrTransition));
 
 Cleanup:
+	RStrRelease(rstrSmoothing);
 	return hr;
 }
 
@@ -105,7 +290,7 @@ CTileRules::~CTileRules ()
 	m_mapTiles.DeleteAll();
 }
 
-HRESULT CTileRules::Initialize (IJSONValue* pvRules)
+HRESULT CTileRules::Initialize (TRStrMap<CSmoothingSystem*>& mapSmoothingSystems, IJSONValue* pvRules)
 {
 	HRESULT hr;
 	TStackRef<IJSONObject> srRules;
@@ -122,7 +307,7 @@ HRESULT CTileRules::Initialize (IJSONValue* pvRules)
 
 		pRuleSet = __new CTileRuleSet;
 		CheckAlloc(pRuleSet);
-		Check(pRuleSet->Initialize(srv));
+		Check(pRuleSet->Initialize(mapSmoothingSystems, srv));
 		Check(m_mapTiles.Add(rstrName, pRuleSet));
 		pRuleSet = NULL;
 

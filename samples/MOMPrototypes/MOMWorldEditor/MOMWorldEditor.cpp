@@ -523,6 +523,8 @@ CMOMWorldEditor::~CMOMWorldEditor ()
 	SafeRelease(m_pFeatures);
 	SafeDelete(m_pTileRules);
 
+	m_mapSmoothingSystems.DeleteAll();
+
 	SafeRelease(m_pSurface);
 	SafeRelease(m_pPackage);
 	SafeRelease(m_pRibbon);
@@ -555,8 +557,8 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 {
 	HRESULT hr;
 	RECT rect = { 0, 0, nWidth, nHeight };
-	TStackRef<IJSONObject> srData;
-	TStackRef<IJSONValue> srvRules;
+	TStackRef<IJSONObject> srData, srSmoothing;
+	TStackRef<IJSONValue> srvRules, srvSmoothing;
 	ISimbeyInterchangeFile* pSIF = NULL;
 
 	Check(CSIFRibbon::Create(DPI::Scale, &m_pRibbon));
@@ -567,11 +569,15 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 
 	Check(LoadPackage());
 
+	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\smoothing.json"), &srvSmoothing));
+	Check(srvSmoothing->GetObject(&srSmoothing));
+	Check(LoadSmoothing(srSmoothing));
+
 	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\rules.json"), &srvRules));
 
 	m_pTileRules = __new CTileRules;
 	CheckAlloc(m_pTileRules);
-	Check(m_pTileRules->Initialize(srvRules));
+	Check(m_pTileRules->Initialize(m_mapSmoothingSystems, srvRules));
 
 	Check(m_pPackage->OpenSIF(L"overland\\features\\features.sif", &pSIF));
 	m_pFeatures = __new CTerrainGallery(m_pRibbon, pSIF);
@@ -1701,12 +1707,14 @@ HRESULT CMOMWorldEditor::PlaceSelectedTile (INT x, INT y)
 
 	CheckIf(NULL == m_pCommand, E_FAIL);
 	Check(m_pCommand->Execute(this, xTile, yTile));
+	if(S_OK == hr)
+	{
+		m_fPainting = m_pCommand->ContinuePainting();
+		if(!m_fPainting)
+			SafeDelete(m_pCommand);
 
-	m_fPainting = m_pCommand->ContinuePainting();
-	if(!m_fPainting)
-		SafeDelete(m_pCommand);
-
-	Check(UpdateVisibleTiles());
+		Check(UpdateVisibleTiles());
+	}
 
 Cleanup:
 	return hr;
@@ -1933,6 +1941,37 @@ Cleanup:
 		if(SUCCEEDED(Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Could not load Assets.pkg due to error: 0x%.8X!", hr)))
 			MessageBox(GetDesktopWindow(), wzError, L"Data Package Error", MB_ICONERROR | MB_OK);
 	}
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::LoadSmoothing (IJSONObject* pSmoothing)
+{
+	HRESULT hr;
+	CSmoothingSystem* pSystem = NULL;
+	RSTRING rstrSystem = NULL;
+
+	for(sysint i = 0; i < pSmoothing->Count(); i++)
+	{
+		TStackRef<IJSONValue> srv;
+		TStackRef<IJSONObject> srSystem;
+
+		Check(pSmoothing->GetValueByIndex(i, &srv));
+		Check(srv->GetObject(&srSystem));
+
+		pSystem = __new CSmoothingSystem;
+		CheckAlloc(pSystem);
+		Check(pSystem->Initialize(srSystem));
+
+		Check(pSmoothing->GetValueName(i, &rstrSystem));
+		Check(m_mapSmoothingSystems.Add(rstrSystem, pSystem));
+		pSystem = NULL;
+
+		RStrRelease(rstrSystem); rstrSystem = NULL;
+	}
+
+Cleanup:
+	RStrRelease(rstrSystem);
+	__delete pSystem;
 	return hr;
 }
 

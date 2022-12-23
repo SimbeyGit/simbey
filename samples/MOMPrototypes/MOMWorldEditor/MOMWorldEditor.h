@@ -14,6 +14,7 @@ interface IJSONValue;
 interface IJSONObject;
 interface IJSONArray;
 
+class CSmoothingSystem;
 class CTileRules;
 
 class CTile
@@ -240,6 +241,7 @@ protected:
 
 	bool m_fKeys[256];
 
+	TRStrMap<CSmoothingSystem*> m_mapSmoothingSystems;
 	CTileRules* m_pTileRules;
 
 	TRStrMap<CTileSet*> m_mapArcanus, m_mapMyrror;
@@ -377,6 +379,7 @@ public:
 
 protected:
 	HRESULT LoadPackage (VOID);
+	HRESULT LoadSmoothing (IJSONObject* pSmoothing);
 
 	HRESULT LoadFeatures (ISimbeyInterchangeFile* pFeatures);
 	HRESULT LoadCityTiles (ISimbeyInterchangeFile* pCityTiles);
