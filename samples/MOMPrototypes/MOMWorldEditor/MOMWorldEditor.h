@@ -59,6 +59,15 @@ private:
 	HRESULT EnsureTilesArray (RSTRING rstrKey, __deref_out TArray<CTile*>** ppTiles);
 };
 
+struct MAPTILE
+{
+	CTile* pTile;
+	RSTRING rstrFeature;
+	IJSONObject* pData;
+	IJSONObject* pCity;
+	IJSONObject* pStack;
+};
+
 class CPlaceItem
 {
 public:
@@ -68,10 +77,14 @@ public:
 	WCHAR m_wzKey[12];
 	CTile* m_pTile;
 
+	INT m_xTile;
 	INT m_x, m_y;	// Adjusted tile coordinates
 
 public:
-	CPlaceItem (CTileRules* pTileRules, CTile* pTile, INT x, INT y);
+	static HRESULT CreatePlaceItem (CTileRules* pTileRules, MAPTILE* pWorld, INT xWorld, INT yWorld, INT x, INT y, __deref_out CPlaceItem** ppItem);
+
+public:
+	CPlaceItem (CTileRules* pTileRules, CTile* pTile, INT xTile, INT x, INT y);
 	~CPlaceItem ();
 
 	bool IsSameTile (RSTRING rstrTile);
@@ -79,11 +92,8 @@ public:
 	bool IsSpecialTile (RSTRING rstrTile);
 
 	VOID SetTileOnly (RSTRING rstrTile);
-	HRESULT SetTileKey (TRStrMap<CTileSet*>* pmapTileSets, Dir::Value eDir, WCHAR wchValue);
 	HRESULT GetTransitionTile (__in_opt RSTRING rstrTile, __out RSTRING* prstrTile);
-	HRESULT SetNewKey (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey, WCHAR wchHint = L'\0');
-
-	static HRESULT SmoothTile (CTileSet* pTileSet, PWSTR pwzKey, WCHAR wchValue, TArray<CTile*>** ppTiles);
+	HRESULT SetNewKey (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey);
 
 private:
 	HRESULT SetAltTile (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey);
@@ -131,15 +141,6 @@ namespace World
 		Myrror
 	};
 }
-
-struct MAPTILE
-{
-	CTile* pTile;
-	RSTRING rstrFeature;
-	IJSONObject* pData;
-	IJSONObject* pCity;
-	IJSONObject* pStack;
-};
 
 struct CITYTILE
 {
@@ -367,8 +368,8 @@ protected:
 
 	HRESULT ReplaceCommand (CBaseGalleryCommand* pCommand);
 
-	HRESULT BuildPlaceGrid (MAPTILE* pWorld, INT xTile, INT yTile, __out_ecount(9) CPlaceItem** ppPlaceItems);
-	VOID GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, __in_ecount_opt(cPlaceItems) CPlaceItem** ppPlaceItems, INT cPlaceItems, PWSTR pwzKey);
+	VOID GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, TArray<CPlaceItem*>& aItems, PWSTR pwzKey);
+	CPlaceItem* FindItem (TArray<CPlaceItem*>& aItems, INT xTile, INT yTile);
 
 public:
 	HRESULT ClearTile (INT x, INT y, BOOL fActiveWorld);

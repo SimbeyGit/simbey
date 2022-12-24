@@ -16,6 +16,7 @@ public:
 	~CSmoothingCondition ();
 
 	HRESULT Initialize (IJSONObject* pCondition);
+	BOOL Match (PCWSTR pcwzKey);
 };
 
 class CSmoothingSet
@@ -29,6 +30,7 @@ public:
 	~CSmoothingSet ();
 
 	HRESULT Initialize (IJSONObject* pSet);
+	VOID Apply (PWSTR pwzKey);
 };
 
 class CSmoothingReduction
@@ -43,6 +45,7 @@ public:
 	~CSmoothingReduction ();
 
 	HRESULT Initialize (IJSONObject* pReduction);
+	BOOL Execute (PWSTR pwzKey);
 };
 
 class CSmoothingSystem
@@ -57,6 +60,7 @@ public:
 	~CSmoothingSystem ();
 
 	HRESULT Initialize (IJSONObject* pSystem);
+	HRESULT Smooth (PWSTR pwzKey);
 };
 
 class CTileRuleSet
@@ -81,9 +85,10 @@ public:
 	bool IsSpecialTile (RSTRING rstrTile);
 	HRESULT GetAltTile (RSTRING rstrKey, __deref_out RSTRING* prstrTile);
 	inline RSTRING GetTransition (VOID) { return m_rstrTransition; }
+	HRESULT Smooth (PWSTR pwzKey);
 
 private:
-	bool IsCompatibleTile (__in_opt IJSONArray* pArray, RSTRING rstrTile);
+	static bool IsCompatibleTile (__in_opt IJSONArray* pArray, RSTRING rstrTile);
 };
 
 class CTileRules

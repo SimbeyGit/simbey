@@ -164,9 +164,28 @@ Cleanup:
 // CPlaceItem
 ///////////////////////////////////////////////////////////////////////////////
 
-CPlaceItem::CPlaceItem (CTileRules* pTileRules, CTile* pTile, INT x, INT y) :
+HRESULT CPlaceItem::CreatePlaceItem (CTileRules* pTileRules, MAPTILE* pWorld, INT xWorld, INT yWorld, INT x, INT y, __deref_out CPlaceItem** ppItem)
+{
+	INT xTile = x;
+	CTile* pOther = NULL;
+
+	// Wrap the sides of the world.
+	if(x < 0)
+		x = xWorld - 1;
+	else if(x >= xWorld)
+		x -= xWorld;
+
+	if(y >= 0 && y < yWorld)
+		pOther = pWorld[y * xWorld + x].pTile;
+
+	*ppItem = __new CPlaceItem(pTileRules, pOther, xTile, x, y);
+	return *ppItem ? S_OK : E_OUTOFMEMORY;
+}
+
+CPlaceItem::CPlaceItem (CTileRules* pTileRules, CTile* pTile, INT xTile, INT x, INT y) :
 	m_pTileRules(pTileRules),
 	m_pTile(pTile),
+	m_xTile(xTile),
 	m_x(x), m_y(y)
 {
 	if(m_pTile)
@@ -209,21 +228,6 @@ VOID CPlaceItem::SetTileOnly (RSTRING rstrTile)
 	RStrReplace(&m_rstrTile, rstrTile);
 }
 
-HRESULT CPlaceItem::SetTileKey (TRStrMap<CTileSet*>* pmapTileSets, Dir::Value eDir, WCHAR wchValue)
-{
-	HRESULT hr;
-	WCHAR wzNewKey[12];
-
-	CheckIfIgnore(m_wzKey[eDir] == wchValue, S_FALSE);
-	Check(TStrCchCpy(wzNewKey, ARRAYSIZE(wzNewKey), m_wzKey));
-
-	wzNewKey[eDir] = wchValue;
-	Check(SetNewKey(pmapTileSets, wzNewKey, wchValue));
-
-Cleanup:
-	return hr;
-}
-
 HRESULT CPlaceItem::GetTransitionTile (__in_opt RSTRING rstrTile, __out RSTRING* prstrTile)
 {
 	HRESULT hr;
@@ -238,7 +242,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CPlaceItem::SetNewKey (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey, WCHAR wchHint)
+HRESULT CPlaceItem::SetNewKey (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey)
 {
 	HRESULT hr;
 	CTileSet* pTileSet;
@@ -248,14 +252,15 @@ HRESULT CPlaceItem::SetNewKey (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey
 	hr = pTileSet->FindFromKey(RSTRING_CAST(pcwzKey), &paTiles);
 	if(FAILED(hr))
 	{
-		if(L'\0' != wchHint)
-		{
-			WCHAR wzSmooth[12];
-			Check(TStrCchCpy(wzSmooth, ARRAYSIZE(wzSmooth), pcwzKey));
-			hr = SmoothTile(pTileSet, wzSmooth, wchHint, &paTiles);
-			if(SUCCEEDED(hr))
-				Check(TStrCchCpy(m_wzKey, ARRAYSIZE(m_wzKey), wzSmooth));
-		}
+		CTileRuleSet* pTileRuleSet;
+		WCHAR wzSmooth[12];
+
+		Check(TStrCchCpy(wzSmooth, ARRAYSIZE(wzSmooth), pcwzKey));
+		Check(m_pTileRules->GetTileRuleSet(m_rstrTile, &pTileRuleSet));
+
+		hr = pTileRuleSet->Smooth(wzSmooth);
+		if(SUCCEEDED(hr))
+			Check(TStrCchCpy(m_wzKey, ARRAYSIZE(m_wzKey), wzSmooth));
 
 		if(FAILED(hr))
 		{
@@ -278,23 +283,6 @@ HRESULT CPlaceItem::SetNewKey (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey
 
 Cleanup:
 	return hr;
-}
-
-HRESULT CPlaceItem::SmoothTile (CTileSet* pTileSet, PWSTR pwzKey, WCHAR wchValue, TArray<CTile*>** ppTiles)
-{
-	if(pwzKey[Dir::WEST] == wchValue && pwzKey[Dir::NORTH] == wchValue)
-		pwzKey[Dir::NORTH_WEST] = wchValue;
-
-	if(pwzKey[Dir::WEST] == wchValue && pwzKey[Dir::SOUTH] == wchValue)
-		pwzKey[Dir::SOUTH_WEST] = wchValue;
-
-	if(pwzKey[Dir::EAST] == wchValue && pwzKey[Dir::NORTH] == wchValue)
-		pwzKey[Dir::NORTH_EAST] = wchValue;
-
-	if(pwzKey[Dir::EAST] == wchValue && pwzKey[Dir::SOUTH] == wchValue)
-		pwzKey[Dir::SOUTH_EAST] = wchValue;
-
-	return pTileSet->FindFromKey(RSTRING_CAST(pwzKey), ppTiles);
 }
 
 HRESULT CPlaceItem::SetAltTile (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey)
@@ -1603,39 +1591,18 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CMOMWorldEditor::BuildPlaceGrid (MAPTILE* pWorld, INT xTile, INT yTile, __out_ecount(9) CPlaceItem** ppPlaceItems)
+CPlaceItem* CMOMWorldEditor::FindItem (TArray<CPlaceItem*>& aItems, INT xTile, INT yTile)
 {
-	HRESULT hr = S_OK;
-
-	// Fill in the surrounding tiles.  These might be changed.
-	for(INT i = 0; i < ARRAYSIZE(c_rgDirections); i++)
+	for(sysint i = 0; i < aItems.Length(); i++)
 	{
-		CTile* pOther = NULL;
-		INT x = xTile + c_rgDirections[i].x;
-		INT y = yTile + c_rgDirections[i].y;
-
-		// Wrap the sides of the world.
-		if(x < 0)
-			x = m_xWorld - 1;
-		else if(x >= m_xWorld)
-			x -= m_xWorld;
-
-		if(y >= 0 && y < m_yWorld)
-			pOther = pWorld[y * m_xWorld + x].pTile;
-
-		ppPlaceItems[i] = __new CPlaceItem(m_pTileRules, pOther, x, y);
-		CheckAlloc(ppPlaceItems[i]);
+		CPlaceItem* pItem = aItems[i];
+		if(pItem->m_xTile == xTile && pItem->m_y == yTile)
+			return pItem;
 	}
-
-	// Set the "center" tile (at the end of the array), which is the primary placement tile.
-	ppPlaceItems[ARRAYSIZE(c_rgDirections)] = __new CPlaceItem(m_pTileRules, pWorld[yTile * m_xWorld + xTile].pTile, xTile, yTile);
-	CheckAlloc(ppPlaceItems[ARRAYSIZE(c_rgDirections)]);
-
-Cleanup:
-	return hr;
+	return NULL;
 }
 
-VOID CMOMWorldEditor::GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, __in_ecount_opt(cPlaceItems) CPlaceItem** ppPlaceItems, INT cPlaceItems, PWSTR pwzKey)
+VOID CMOMWorldEditor::GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, TArray<CPlaceItem*>& aItems, PWSTR pwzKey)
 {
 	for(INT i = 0; i < ARRAYSIZE(c_rgDirections); i++)
 	{
@@ -1643,26 +1610,21 @@ VOID CMOMWorldEditor::GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, __in_ecoun
 		INT y = pItem->m_y + c_rgDirections[i].y;
 		RSTRING rstrOther = NULL;
 
-		// Wrap the sides of the world.
-		if(x < 0)
-			x = m_xWorld - 1;
-		else if(x >= m_xWorld)
-			x -= m_xWorld;
-
 		if(y >= 0 && y < m_yWorld)
 		{
-			for(INT n = 0; n < cPlaceItems; n++)
+			CPlaceItem* pOther = FindItem(aItems, x, y);
+			if(pOther)
+				rstrOther = pOther->m_rstrTile;
+			else
 			{
-				CPlaceItem* pOther = ppPlaceItems[n];
-				if(pOther->m_x == x && pOther->m_y == y)
-				{
-					rstrOther = pOther->m_rstrTile;
-					break;
-				}
-			}
+				// Wrap the sides of the world.
+				if(x < 0)
+					x = m_xWorld - 1;
+				else if(x >= m_xWorld)
+					x -= m_xWorld;
 
-			if(NULL == rstrOther)
 				rstrOther = pWorld[m_xWorld * y + x].pTile->GetTileSet();
+			}
 
 			if(pItem->IsSameTile(rstrOther))
 				pwzKey[i] = L'0';
@@ -1723,142 +1685,87 @@ Cleanup:
 HRESULT CMOMWorldEditor::PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStrMap<CTileSet*>* pmapTileSets, RSTRING rstrTile, BOOL fActiveWorld)
 {
 	HRESULT hr;
-	WCHAR wzKey[12] = {0};
-	CPlaceItem* rgpPlaceItems[9] = {0};
+	TArray<CPlaceItem*> aAffected, aTransitions;
+	CPlaceItem* pItem = NULL;
 	CPlaceItem* pPlaced;
 	RSTRING rstrTransition = NULL;
 
-	Check(BuildPlaceGrid(pWorld, xTile, yTile, rgpPlaceItems));
-	pPlaced = rgpPlaceItems[ARRAYSIZE(rgpPlaceItems) - 1];
+	Check(CPlaceItem::CreatePlaceItem(m_pTileRules, pWorld, m_xWorld, m_yWorld, xTile, yTile, &pItem));
 
 	// Set the new tile onto the placed tile without actually picking a new tile sprite.
-	pPlaced->SetTileOnly(rstrTile);
+	pItem->SetTileOnly(rstrTile);
 
+	// Add the placed tile to the affected array.
+	Check(aAffected.Append(pItem));
+	pPlaced = pItem;
+	pItem = NULL;
+
+	// Check the immediately surrounding items for transition changes.
 	for(INT i = 0; i < ARRAYSIZE(c_rgDirections); i++)
 	{
-		CPlaceItem* pItem = rgpPlaceItems[i];
+		INT x = xTile + c_rgDirections[i].x;
+		INT y = yTile + c_rgDirections[i].y;
 
-		// If the other tile is the same type, then match up their keys.
-		if(pItem->IsSameTile(rstrTile))
-		{
-			// Set the other tile's key to match back to this tile.
-			if(SUCCEEDED(pItem->SetTileKey(pmapTileSets, ~static_cast<Dir::Value>(i), L'0')))
-			{
-				// This direction to the other tile is the same tile type.
-				wzKey[i] = L'0';
-			}
-			else
-			{
-				// This direction to the other tile doesn't have a connecting tile.
-				wzKey[i] = L'1';
-			}
-		}
-		else if(pItem->IsSpecialTile(pPlaced->m_rstrTile))
-		{
-			// This direction might be able to use the special '2' connecting tile.
-			if(SUCCEEDED(pItem->SetTileKey(pmapTileSets, ~static_cast<Dir::Value>(i), L'2')))
-			{
-				// The placed tile now connects as if it's the "same" tile.
-				wzKey[i] = L'0';
-			}
-			else
-			{
-				// The special tile connection isn't available for that direction.
-				wzKey[i] = L'1';
-			}
-		}
-		else if(pPlaced->IsBorderTile(pItem->m_rstrTile))
-		{
-			// The placed tile supports a border against the adjacent tile.
-			wzKey[i] = L'1';
-		}
-		else if(pItem->IsBorderTile(pPlaced->m_rstrTile))
-		{
-			// Set the other tile's key to border against the placed tile.
-			if(SUCCEEDED(pItem->SetTileKey(pmapTileSets, ~static_cast<Dir::Value>(i), L'1')))
-			{
-				// The placed tile can use its '1' direction since the other tile will border correctly to it.
-				wzKey[i] = L'1';
-			}
-			else
-			{
-				// We'll set a border tile anyway and try to make it work later.
-				wzKey[i] = L'1';
-			}
-		}
-		else
+		Check(CPlaceItem::CreatePlaceItem(m_pTileRules, pWorld, m_xWorld, m_yWorld, x, y, &pItem));
+
+		if(!pItem->IsSameTile(rstrTile) &&
+			!pItem->IsSpecialTile(pPlaced->m_rstrTile) &&
+			!pPlaced->IsBorderTile(pItem->m_rstrTile) &&
+			!pItem->IsBorderTile(pPlaced->m_rstrTile))
 		{
 			Check(pPlaced->GetTransitionTile(rstrTile, &rstrTransition));
-
-			if(pPlaced->IsSameTile(rstrTransition))
-				wzKey[i] = L'0';
-			else
-				wzKey[i] = L'1';
 
 			pItem->SetTileOnly(rstrTransition);
 
 			RStrRelease(rstrTransition);
 			rstrTransition = NULL;
+
+			// Add the item to another temporary array so they can be processed after checking all the transition tiles.
+			Check(aTransitions.Append(pItem));
+		}
+
+		Check(aAffected.Append(pItem));
+		pItem = NULL;
+	}
+
+	// Add the tiles that surround the transition tiles.
+	for(sysint n = 0; n < aTransitions.Length(); n++)
+	{
+		CPlaceItem* pTransition = aTransitions[n];
+
+		for(INT i = 0; i < ARRAYSIZE(c_rgDirections); i++)
+		{
+			INT x = pTransition->m_x + c_rgDirections[i].x;
+			INT y = pTransition->m_y + c_rgDirections[i].y;
+
+			if(NULL == FindItem(aAffected, x, y))
+			{
+				Check(CPlaceItem::CreatePlaceItem(m_pTileRules, pWorld, m_xWorld, m_yWorld, x, y, &pItem));
+				Check(aAffected.Append(pItem));
+				pItem = NULL;
+			}
 		}
 	}
 
 	// Update the tile for every grid item.
-	for(INT i = 0; i < ARRAYSIZE(c_rgDirections); i++)
+	for(sysint i = 0; i < aAffected.Length(); i++)
 	{
-		CPlaceItem* pItem = rgpPlaceItems[i];
-		if(pItem->m_pTile)
+		pPlaced = aAffected[i];
+		if(pPlaced->m_pTile)
 		{
 			WCHAR wzAdjacent[12];
-			Dir::Value eDir = static_cast<Dir::Value>(i);
 
-			GetTileKey(pWorld, pItem, rgpPlaceItems, ARRAYSIZE(rgpPlaceItems), wzAdjacent);
+			GetTileKey(pWorld, pPlaced, aAffected, wzAdjacent);
+			Check(pPlaced->SetNewKey(pmapTileSets, wzAdjacent));
 
-			hr = pItem->SetNewKey(pmapTileSets, wzAdjacent);
-			if(SUCCEEDED(hr))
-			{
-				if(wzAdjacent[~eDir] == L'2')
-					wzKey[eDir] = L'0';
-			}
-			else
-			{
-				wzAdjacent[~eDir] = L'1';
-				if(SUCCEEDED(pItem->SetNewKey(pmapTileSets, wzAdjacent, L'1')))
-				{
-					// We've set the border for the adjacent tile.  Set the border for the placed tile.
-					wzKey[eDir] = L'1';
-				}
-				else
-				{
-					// If the original key already has a '1', then try to set the tile with the original key.
-					CheckIf(L'1' != pItem->m_wzKey[~eDir], E_FAIL);
-					Check(pItem->SetNewKey(pmapTileSets, pItem->m_wzKey));
-				}
-			}
-		}
-	}
-
-	// Update the placed tile.
-	{
-		CPlaceItem* pItem = rgpPlaceItems[ARRAYSIZE(c_rgDirections)];
-		hr = pItem->SetNewKey(pmapTileSets, wzKey);
-		if(FAILED(hr))
-			Check(pItem->SetNewKey(pmapTileSets, wzKey, L'0'));
-	}
-
-	for(INT i = 0; i < ARRAYSIZE(rgpPlaceItems); i++)
-	{
-		CPlaceItem* pItem = rgpPlaceItems[i];
-		if(pItem->m_pTile)
-		{
-			pWorld[pItem->m_y * m_xWorld + pItem->m_x].pTile = pItem->m_pTile;
-			ClearTile(pItem->m_x, pItem->m_y, fActiveWorld);
+			pWorld[pPlaced->m_y * m_xWorld + pPlaced->m_x].pTile = pPlaced->m_pTile;
+			ClearTile(pPlaced->m_x, pPlaced->m_y, fActiveWorld);
 		}
 	}
 
 Cleanup:
-	RStrRelease(rstrTransition);
-	for(INT i = 0; i < ARRAYSIZE(rgpPlaceItems); i++)
-		__delete rgpPlaceItems[i];
+	aAffected.DeleteAll();
+	__delete pItem;
 	return hr;
 }
 

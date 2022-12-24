@@ -74,6 +74,20 @@ Cleanup:
 	return hr;
 }
 
+BOOL CSmoothingCondition::Match (PCWSTR pcwzKey)
+{
+	INT nCount = 0;
+	WCHAR wchMatch = m_nValue + L'0';
+
+	for(INT i = 0; i < m_cDirections; i++)
+	{
+		if(pcwzKey[m_pnDirections[i] - 1] == wchMatch)
+			nCount++;
+	}
+
+	return nCount == m_cRepetitions;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // CSmoothingSet
 ///////////////////////////////////////////////////////////////////////////////
@@ -100,6 +114,11 @@ HRESULT CSmoothingSet::Initialize (IJSONObject* pSet)
 
 Cleanup:
 	return hr;
+}
+
+VOID CSmoothingSet::Apply (PWSTR pwzKey)
+{
+	pwzKey[m_nDirection - 1] = L'0' + m_nValue;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,6 +155,20 @@ HRESULT CSmoothingReduction::Initialize (IJSONObject* pReduction)
 
 Cleanup:
 	return hr;
+}
+
+BOOL CSmoothingReduction::Execute (PWSTR pwzKey)
+{
+	for(sysint i = 0; i < m_aConditions.Length(); i++)
+	{
+		if(!m_aConditions[i]->Match(pwzKey))
+			return FALSE;
+	}
+
+	for(sysint i = 0; i < m_aSets.Length(); i++)
+		m_aSets[i]->Apply(pwzKey);
+
+	return TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,6 +208,19 @@ HRESULT CSmoothingSystem::Initialize (IJSONObject* pSystem)
 Cleanup:
 	__delete pReduction;
 	return hr;
+}
+
+HRESULT CSmoothingSystem::Smooth (PWSTR pwzKey)
+{
+	INT cSmoothed = 0;
+
+	for(sysint i = 0; i < m_aReductions.Length(); i++)
+	{
+		if(m_aReductions[i]->Execute(pwzKey))
+			cSmoothed++;
+	}
+
+	return 0 < cSmoothed ? S_OK : E_FAIL;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -270,6 +316,11 @@ HRESULT CTileRuleSet::GetAltTile (RSTRING rstrKey, __deref_out RSTRING* prstrTil
 
 Cleanup:
 	return hr;
+}
+
+HRESULT CTileRuleSet::Smooth (PWSTR pwzKey)
+{
+	return m_pSmoothingSystem->Smooth(pwzKey);
 }
 
 bool CTileRuleSet::IsCompatibleTile (__in_opt IJSONArray* pArray, RSTRING rstrTile)
