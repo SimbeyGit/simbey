@@ -259,10 +259,12 @@ HRESULT CPlaceItem::SetNewKey (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey
 		Check(m_pTileRules->GetTileRuleSet(m_rstrTile, &pTileRuleSet));
 
 		hr = pTileRuleSet->Smooth(wzSmooth);
+		if(FAILED(hr) || FAILED(pTileSet->FindFromKey(RSTRING_CAST(wzSmooth), &paTiles)))
+			hr = SmoothTile(pTileSet, wzSmooth, &paTiles);
+
 		if(SUCCEEDED(hr))
 			Check(TStrCchCpy(m_wzKey, ARRAYSIZE(m_wzKey), wzSmooth));
-
-		if(FAILED(hr))
+		else
 		{
 			hr = SetAltTile(pmapTileSets, pcwzKey);
 			if(FAILED(hr))
@@ -282,6 +284,31 @@ HRESULT CPlaceItem::SetNewKey (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKey
 	m_pTile = (*paTiles)[rand() % paTiles->Length()];
 
 Cleanup:
+	return hr;
+}
+
+HRESULT CPlaceItem::SmoothTile (CTileSet* pTileSet, PWSTR pwzKey, TArray<CTile*>** ppTiles)
+{
+	HRESULT hr;
+	RSTRING rstrKey = NULL;
+
+	if(pwzKey[Dir::WEST] != L'0' && pwzKey[Dir::NORTH] != L'0')
+		pwzKey[Dir::NORTH_WEST] = L'1';
+
+	if(pwzKey[Dir::WEST] != L'0' && pwzKey[Dir::SOUTH] != L'0')
+		pwzKey[Dir::SOUTH_WEST] = L'1';
+
+	if(pwzKey[Dir::EAST] != L'0' && pwzKey[Dir::NORTH] != L'0')
+		pwzKey[Dir::NORTH_EAST] = L'1';
+
+	if(pwzKey[Dir::EAST] != L'0' && pwzKey[Dir::SOUTH] != L'0')
+		pwzKey[Dir::SOUTH_EAST] = L'1';
+
+	Check(RStrCreateW(8, pwzKey, &rstrKey));
+	CheckNoTrace(pTileSet->FindFromKey(rstrKey, ppTiles));
+
+Cleanup:
+	RStrRelease(rstrKey);
 	return hr;
 }
 

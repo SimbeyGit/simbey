@@ -191,7 +191,8 @@
 				smoothing: "SS16",
 				same:
 				[
-					"river"
+					"river",
+					"shore"
 				],
 				border:
 				[
@@ -202,7 +203,6 @@
 					"mountains",
 					"natureNode",
 					"sorceryNode",
-					"shore",
 					"swamp",
 					"tundra",
 					"volcano"
