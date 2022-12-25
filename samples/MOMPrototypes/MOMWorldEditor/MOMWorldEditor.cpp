@@ -171,7 +171,7 @@ HRESULT CPlaceItem::CreatePlaceItem (CTileRules* pTileRules, MAPTILE* pWorld, IN
 
 	// Wrap the sides of the world.
 	if(x < 0)
-		x = xWorld - 1;
+		x += xWorld;
 	else if(x >= xWorld)
 		x -= xWorld;
 
@@ -1646,7 +1646,7 @@ VOID CMOMWorldEditor::GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, TArray<CPl
 			{
 				// Wrap the sides of the world.
 				if(x < 0)
-					x = m_xWorld - 1;
+					x += m_xWorld;
 				else if(x >= m_xWorld)
 					x -= m_xWorld;
 
@@ -1762,7 +1762,8 @@ HRESULT CMOMWorldEditor::PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStr
 
 		for(INT i = 0; i < ARRAYSIZE(c_rgDirections); i++)
 		{
-			INT x = pTransition->m_x + c_rgDirections[i].x;
+			// Use the unadjusted x-tile coordinate for finding the item.
+			INT x = pTransition->m_xTile + c_rgDirections[i].x;
 			INT y = pTransition->m_y + c_rgDirections[i].y;
 
 			if(NULL == FindItem(aAffected, x, y))
