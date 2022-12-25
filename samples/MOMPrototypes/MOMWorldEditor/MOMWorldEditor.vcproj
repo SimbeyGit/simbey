@@ -195,6 +195,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TileSet.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -222,6 +226,10 @@
 			</File>
 			<File
 				RelativePath=".\TileRules.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TileSet.h"
 				>
 			</File>
 		</Filter>
