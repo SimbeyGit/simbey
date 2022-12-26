@@ -12,6 +12,11 @@
             <Button CommandName="ID_NEW" LabelTitle="New" LargeBitmap="auto" />
             <Button CommandName="ID_OPEN" LabelTitle="Open" LargeBitmap="auto" />
             <Button CommandName="ID_SAVE" LabelTitle="Save" LargeBitmap="auto" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="ID_RANDOM" LabelTitle="Random" LargeBitmap="auto" />
+          </MenuGroup>
+          <MenuGroup>
             <Button CommandName="ID_EXIT" LabelTitle="Exit" LargeBitmap="auto" />
           </MenuGroup>
         </ApplicationMenu>

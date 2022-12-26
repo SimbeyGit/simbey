@@ -16,6 +16,7 @@
 #include "TileRules.h"
 #include "NewWorldDlg.h"
 #include "CityDlg.h"
+#include "HeightMapGenerator.h"
 #include "MOMWorldEditor.h"
 
 #define	GAME_TICK_MS		33
@@ -32,6 +33,30 @@ const WCHAR c_wzAppWindowPos[] = L"WindowPosition";
 const WCHAR c_wzAppTitle[] = L"MOM World Editor";
 
 const WCHAR c_wzFilter[] = L"Master of Magic JSON Map (*.json)\0*.json\0\0";
+
+///////////////////////////////////////////////////////////////////////////////
+// CSimpleRNG
+///////////////////////////////////////////////////////////////////////////////
+
+class CSimpleRNG : public IRandomNumber
+{
+public:
+	CSimpleRNG (DWORD dwSeed)
+	{
+		srand(dwSeed);
+	}
+
+	// IRandomNumber
+	virtual INT Next (VOID)
+	{
+		return rand();
+	}
+
+	virtual INT Next (INT nMax)
+	{
+		return rand() % nMax;
+	}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // CTerrainGallery
@@ -462,6 +487,9 @@ HRESULT STDMETHODCALLTYPE CMOMWorldEditor::Execute (UINT32 commandId, UI_EXECUTI
 			break;
 		case ID_NEW:
 			Check(PromptForNewMap());
+			break;
+		case ID_RANDOM:
+			Check(GenerateRandomWorlds());
 			break;
 		case ID_EXIT:
 			PostMessage(m_hwnd, WM_CLOSE, 0, 0);
@@ -933,6 +961,40 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
+{
+	HRESULT hr;
+	MAPTILE* prgWorlds[2] = { m_pArcanusWorld, m_pMyrrorWorld };
+	TRStrMap<CTileSet*>* pmapTileSets[2] = { &m_mapArcanus, &m_mapMyrror };
+	COORD_SYSTEM coords;
+	CSimpleRNG rng(GetTickCount());
+	CHeightMapGenerator HeightMap(&rng, m_xWorld, m_yWorld, 2);
+
+	coords.nWidth = m_xWorld;
+	coords.nHeight = m_yWorld;
+	coords.fWrapsLeftToRight = TRUE;
+	coords.fWrapsTopToBottom = FALSE;
+
+	Check(HeightMap.Initialize(coords));
+
+	m_pMapTileLayer->Clear();
+	m_pMain->ClearLayer(m_nFeaturesLayer);
+	m_pMain->ClearLayer(m_nCitiesLayer);
+
+	for(INT nPlane = 0; nPlane < ARRAYSIZE(prgWorlds); nPlane++)
+	{
+		Check(ResetWorldTiles(prgWorlds[nPlane], m_xWorld, m_yWorld, *(pmapTileSets[nPlane])));
+		Check(HeightMap.GenerateHeightMap());
+
+		// TODO - Set the tiles
+	}
+
+	Check(UpdateVisibleTiles());
+
+Cleanup:
+	return hr;
+}
+
 VOID CMOMWorldEditor::DeleteWorld (MAPTILE*& pWorld)
 {
 	if(pWorld)
@@ -975,6 +1037,7 @@ HRESULT CMOMWorldEditor::ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorl
 				if(nNext != nPrev)
 					break;
 			}
+			ClearTileData(pWorldPtr);
 			pWorldPtr->pTile = (*pTiles)[nNext];
 			pWorldPtr++;
 			nPrev = nNext;
@@ -1310,6 +1373,19 @@ Cleanup:
 	return hr;
 }
 
+VOID CMOMWorldEditor::ClearTileData (MAPTILE* pTile)
+{
+	if(pTile->rstrFeature)
+	{
+		RStrRelease(pTile->rstrFeature);
+		pTile->rstrFeature = NULL;
+	}
+
+	SafeRelease(pTile->pCity);
+	SafeRelease(pTile->pData);
+	SafeRelease(pTile->pStack);
+}
+
 HRESULT CMOMWorldEditor::ClearTile (INT x, INT y, BOOL fActiveWorld)
 {
 	HRESULT hr;
@@ -1363,7 +1439,10 @@ HRESULT CMOMWorldEditor::PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStr
 	Check(painter.Commit(pmapTileSets, &aTiles));
 
 	for(sysint i = 0; i < aTiles.Length(); i++)
+	{
+		ClearTileData(pWorld + (aTiles[i].y * m_xWorld + aTiles[i].x));
 		ClearTile(aTiles[i].x, aTiles[i].y, fActiveWorld);
+	}
 
 Cleanup:
 	return hr;

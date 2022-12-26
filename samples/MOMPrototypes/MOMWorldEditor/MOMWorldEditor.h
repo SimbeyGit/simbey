@@ -274,6 +274,7 @@ protected:
 	HRESULT LoadFrom (PCWSTR pcwzFile);
 	HRESULT SaveTo (PCWSTR pcwzFile);
 	HRESULT PromptForNewMap (VOID);
+	HRESULT GenerateRandomWorlds (VOID);
 
 	VOID DeleteWorld (MAPTILE*& pWorld);
 	HRESULT ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorld, TRStrMap<CTileSet*>& mapTiles);
@@ -288,6 +289,7 @@ protected:
 	HRESULT ReplaceCommand (CBaseGalleryCommand* pCommand);
 
 public:
+	VOID ClearTileData (MAPTILE* pTile);
 	HRESULT ClearTile (INT x, INT y, BOOL fActiveWorld);
 	HRESULT PlaceSelectedTile (INT x, INT y);
 	HRESULT PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStrMap<CTileSet*>* pmapTileSets, RSTRING rstrTile, BOOL fActiveWorld);

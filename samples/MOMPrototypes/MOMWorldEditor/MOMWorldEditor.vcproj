@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HeightMapGenerator.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MOMWorldEditor.cpp"
 				>
 			</File>
@@ -210,6 +214,10 @@
 			>
 			<File
 				RelativePath=".\CityDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HeightMapGenerator.h"
 				>
 			</File>
 			<File
