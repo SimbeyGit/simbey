@@ -965,10 +965,13 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 {
 	HRESULT hr;
 	MAPTILE* prgWorlds[2] = { m_pArcanusWorld, m_pMyrrorWorld };
-	TRStrMap<CTileSet*>* pmapTileSets[2] = { &m_mapArcanus, &m_mapMyrror };
+	TRStrMap<CTileSet*>* prgmapTileSets[2] = { &m_mapArcanus, &m_mapMyrror };
 	COORD_SYSTEM coords;
 	CSimpleRNG rng(GetTickCount());
 	CHeightMapGenerator HeightMap(&rng, m_xWorld, m_yWorld, 2);
+	INT nPercentageOfMapIsLand = 55;
+	INT nPercentageOfLandIsHills = 45;
+	INT nPercentageOfHillsAreMountains = 35;
 
 	coords.nWidth = m_xWorld;
 	coords.nHeight = m_yWorld;
@@ -981,15 +984,70 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	m_pMain->ClearLayer(m_nFeaturesLayer);
 	m_pMain->ClearLayer(m_nCitiesLayer);
 
+	DOUBLE dblLandTileCountTimes100 = (DOUBLE)(coords.nWidth * coords.nHeight * nPercentageOfMapIsLand);
+
 	for(INT nPlane = 0; nPlane < ARRAYSIZE(prgWorlds); nPlane++)
 	{
-		Check(ResetWorldTiles(prgWorlds[nPlane], m_xWorld, m_yWorld, *(pmapTileSets[nPlane])));
+		TRStrMap<CTileSet*>* pmapTileSet = prgmapTileSets[nPlane];
+		BOOL fActiveWorld = static_cast<World::Type>(nPlane) == m_eType;
+		MAPTILE* pWorld = prgWorlds[nPlane];
+
+		Check(ResetWorldTiles(pWorld, m_xWorld, m_yWorld, *(prgmapTileSets[nPlane]), FALSE));
 		Check(HeightMap.GenerateHeightMap());
 
-		// TODO - Set the tiles
+		Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"grasslands"), (INT)(dblLandTileCountTimes100 / 100.0 + 0.5), fActiveWorld));
+		Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"hills"), (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentageOfLandIsHills / 10000.0 + 0.5), fActiveWorld));
+		Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"mountains"), (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentageOfLandIsHills * (DOUBLE)nPercentageOfHillsAreMountains / 1000000.0 + 0.5), fActiveWorld));
+
+		Check(MakeTundra(pmapTileSet, pWorld, m_xWorld, m_yWorld, fActiveWorld));
+
+		// TODO - Place blobs of desert, swamp, and forest
 	}
 
 	Check(UpdateVisibleTiles());
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::SetHighestTiles (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CHeightMapGenerator& heightMap, PCWSTR pcwzTile, INT cchTile, INT nDesiredTileCount, BOOL fActiveWorld)
+{
+	HRESULT hr;
+	TArray<POINT> aTiles;
+	RSTRING rstrTile = NULL;
+
+	Check(heightMap.SetHighestTiles(nDesiredTileCount, &aTiles));
+	Check(RStrCreateW(cchTile, pcwzTile, &rstrTile));
+
+	for(sysint i = 0; i < aTiles.Length(); i++)
+	{
+		POINT& pt = aTiles[i];
+		Check(PlaceTile(pWorld, pt.x, pt.y, pmapTileSets, rstrTile, fActiveWorld));
+	}
+
+Cleanup:
+	RStrRelease(rstrTile);
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT xWorld, INT yWorld, BOOL fActiveWorld)
+{
+	HRESULT hr;
+	CTileSet* pTundra;
+
+	Check(pmapTileSets->Find(RSTRING_CAST(L"tundra"), &pTundra));
+
+	for(INT x = 0; x < xWorld; x++)
+	{
+		Check(PlaceTile(pWorld, x, 0, pmapTileSets, pTundra->m_rstrName, fActiveWorld));
+		Check(PlaceTile(pWorld, x, yWorld - 1, pmapTileSets, pTundra->m_rstrName, fActiveWorld));
+
+		if(rand() % 10 >= 4)
+		{
+			Check(PlaceTile(pWorld, x, 1, pmapTileSets, pTundra->m_rstrName, fActiveWorld));
+			Check(PlaceTile(pWorld, x, yWorld - 2, pmapTileSets, pTundra->m_rstrName, fActiveWorld));
+		}
+	}
 
 Cleanup:
 	return hr;
@@ -1011,18 +1069,16 @@ VOID CMOMWorldEditor::DeleteWorld (MAPTILE*& pWorld)
 	}
 }
 
-HRESULT CMOMWorldEditor::ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorld, TRStrMap<CTileSet*>& mapTiles)
+HRESULT CMOMWorldEditor::ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorld, TRStrMap<CTileSet*>& mapTiles, BOOL fAddRandomTundra)
 {
 	HRESULT hr;
 	MAPTILE* pWorldPtr = pWorld;
-	CTileSet* pOcean, *pTundra;
+	CTileSet* pOcean;
 	TArray<CTile*>* pTiles;
 	sysint cVariants;
 	INT nPrev = -1;
 
 	Check(mapTiles.Find(RSTRING_CAST(L"ocean"), &pOcean));
-	Check(mapTiles.Find(RSTRING_CAST(L"tundra"), &pTundra));
-
 	Check(pOcean->FindFromKey(RSTRING_CAST(L"00000000"), &pTiles));
 
 	cVariants = pTiles->Length();
@@ -1044,17 +1100,8 @@ HRESULT CMOMWorldEditor::ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorl
 		}
 	}
 
-	for(INT x = 0; x < xWorld; x++)
-	{
-		Check(PlaceTile(pWorld, x, 0, &mapTiles, pTundra->m_rstrName, FALSE));
-		Check(PlaceTile(pWorld, x, yWorld - 1, &mapTiles, pTundra->m_rstrName, FALSE));
-
-		if(rand() % 10 >= 4)
-		{
-			Check(PlaceTile(pWorld, x, 1, &mapTiles, pTundra->m_rstrName, FALSE));
-			Check(PlaceTile(pWorld, x, yWorld - 2, &mapTiles, pTundra->m_rstrName, FALSE));
-		}
-	}
+	if(fAddRandomTundra)
+		Check(MakeTundra(&mapTiles, pWorld, xWorld, yWorld, FALSE));
 
 Cleanup:
 	return hr;
@@ -1214,8 +1261,8 @@ HRESULT CMOMWorldEditor::SetupMap (INT xWorld, INT yWorld)
 	CheckAlloc(m_pMyrrorWorld);
 	ZeroMemory(m_pMyrrorWorld, sizeof(MAPTILE) * nWorldCells);
 
-	Check(ResetWorldTiles(m_pArcanusWorld, m_xWorld, m_yWorld, m_mapArcanus));
-	Check(ResetWorldTiles(m_pMyrrorWorld, m_xWorld, m_yWorld, m_mapMyrror));
+	Check(ResetWorldTiles(m_pArcanusWorld, m_xWorld, m_yWorld, m_mapArcanus, TRUE));
+	Check(ResetWorldTiles(m_pMyrrorWorld, m_xWorld, m_yWorld, m_mapMyrror, TRUE));
 
 Cleanup:
 	if(FAILED(hr))

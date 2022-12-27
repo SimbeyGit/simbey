@@ -15,6 +15,7 @@ interface IJSONValue;
 interface IJSONObject;
 interface IJSONArray;
 
+class CHeightMapGenerator;
 class CSmoothingSystem;
 class CTileRules;
 
@@ -276,8 +277,11 @@ protected:
 	HRESULT PromptForNewMap (VOID);
 	HRESULT GenerateRandomWorlds (VOID);
 
+	HRESULT SetHighestTiles (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CHeightMapGenerator& heightMap, PCWSTR pcwzTile, INT cchTile, INT nDesiredTileCount, BOOL fActiveWorld);
+	HRESULT MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT xWorld, INT yWorld, BOOL fActiveWorld);
+
 	VOID DeleteWorld (MAPTILE*& pWorld);
-	HRESULT ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorld, TRStrMap<CTileSet*>& mapTiles);
+	HRESULT ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorld, TRStrMap<CTileSet*>& mapTiles, BOOL fAddRandomTundra);
 
 	HRESULT UpdateVisibleTiles (VOID);
 	VOID Scroll (INT x, INT y);
