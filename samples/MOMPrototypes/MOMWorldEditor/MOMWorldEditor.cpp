@@ -1078,7 +1078,7 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	TStackRef<IJSONObject> srGenerator, srProportion, srZone, srTowers;
 	TStackRef<IJSONValue> srv;
 	TStackRef<IJSONArray> srBlobs;
-	INT nDepth, nZoneWidth, nZoneHeight, nTundraRowCount;
+	INT nDepth, nZoneWidth, nZoneHeight, nTundraRowCount, cRivers;
 	INT nPercentageOfMapIsLand, nPercentageOfLandIsHills, nPercentageOfHillsAreMountains;
 	RSTRING rstrTile = NULL;
 
@@ -1107,6 +1107,10 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 
 	Check(srZone->FindNonNullValueW(L"height", &srv));
 	Check(srv->GetInteger(&nZoneHeight));
+	srv.Release();
+
+	Check(srGenerator->FindNonNullValueW(L"rivers", &srv));
+	Check(srv->GetInteger(&cRivers));
 	srv.Release();
 
 	Check(srGenerator->FindNonNullValueW(L"towers", &srv));
@@ -1191,6 +1195,8 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 				Check(PlaceBlob(&rng, pmapTileSet, pWorld, rstrTile, (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentage / 10000.0 + 0.5), nEachAreaTileCount));
 				RStrRelease(rstrTile); rstrTile = NULL;
 			}
+
+			Check(MakeRivers(&rng, pmapTileSet, pWorld, cRivers));
 		}
 
 		Check(PlaceTowersOfWizardry(&rng, prgmapTileSets, prgWorlds, srTowers));
@@ -1428,6 +1434,86 @@ Cleanup:
 	RStrRelease(rstrGrass);
 	RStrRelease(rstrTower);
 	return hr;
+}
+
+HRESULT CMOMWorldEditor::MakeRivers (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT cRivers)
+{
+	HRESULT hr;
+	POINT pt;
+	CTileSet* pShore, *pGrass, *pRiver;
+	TArray<RIVER_DIR> aRivers;
+
+	Check(pmapTileSets->Find(RSTRING_CAST(L"shore"), &pShore));
+	Check(pmapTileSets->Find(RSTRING_CAST(L"grasslands"), &pGrass));
+	Check(pmapTileSets->Find(RSTRING_CAST(L"river"), &pRiver));
+
+	MAPTILE* pWorldPtr = pWorld;
+	for(pt.y = 0; pt.y < m_yWorld; pt.y++)
+	{
+		for(pt.x = 0; pt.x < m_xWorld; pt.x++)
+		{
+			CTile* pTile = pWorldPtr[pt.x].pTile;
+			if(pTile->GetTileSet() == pShore)
+				Check(AddRiverStarts(pWorld, pt, pTile, pGrass, aRivers));
+		}
+
+		pWorldPtr += m_xWorld;
+	}
+
+	for(INT i = 0; i < cRivers; i++)
+	{
+		RIVER_DIR river;
+
+		if(0 == aRivers.Length())
+			break;
+
+		Check(aRivers.RemoveChecked(pRand->Next(aRivers.Length()), &river));
+		Check(ProcessRiver(pRand, river, pmapTileSets, pWorld, pRiver));
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::AddRiverStarts (MAPTILE* pWorld, const POINT& ptShore, CTile* pShoreTile, CTileSet* pGrass, TArray<RIVER_DIR>& aRivers)
+{
+	HRESULT hr = S_FALSE;
+
+	for(INT n = 0; n < ARRAYSIZE(c_rgDirections); n++)
+	{
+		RIVER_DIR river;
+
+		river.ptStart.x = ptShore.x + c_rgDirections[n].x;
+		river.ptStart.y = ptShore.y + c_rgDirections[n].y;
+
+		if(river.ptStart.x < 0)
+			river.ptStart.x += m_xWorld;
+		else if(river.ptStart.x >= m_xWorld)
+			river.ptStart.x -= m_xWorld;
+
+		if(pWorld[river.ptStart.y * m_xWorld + river.ptStart.x].pTile->GetTileSet() == pGrass)
+		{
+			TArray<CTile*>* paTiles;
+			WCHAR wzKey[12];
+
+			river.eDir = static_cast<Dir::Value>(n);
+
+			Check(RStrCopyToW(pShoreTile->GetKey(), ARRAYSIZE(wzKey), wzKey, NULL));
+			wzKey[river.eDir] = L'2';
+
+			if(SUCCEEDED(pShoreTile->GetTileSet()->FindFromKey(RSTRING_CAST(wzKey), &paTiles)))
+				Check(aRivers.Append(river));
+		}
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::ProcessRiver (IRandomNumber* pRand, __inout RIVER_DIR& river, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CTileSet* pRiver)
+{
+	// TODO
+	return PlaceTile(pWorld, river.ptStart.x, river.ptStart.y, pmapTileSets, pRiver->GetName(), FALSE);
 }
 
 HRESULT CMOMWorldEditor::MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT xWorld, INT yWorld, BOOL fActiveWorld)

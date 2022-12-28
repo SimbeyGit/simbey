@@ -22,6 +22,12 @@ class CHeightMapGenerator;
 class CSmoothingSystem;
 class CTileRules;
 
+struct RIVER_DIR
+{
+	POINT ptStart;
+	Dir::Value eDir;
+};
+
 class CMapArea
 {
 private:
@@ -359,6 +365,9 @@ protected:
 	HRESULT PlaceBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, RSTRING rstrTile, INT nDesiredTileCount, INT nEachAreaTileCount);
 	HRESULT PlaceSingleBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, CTileSet* pReplace, CTileSet* pPlace, MAPTILE* pWorld, RSTRING rstrTile, INT nEachAreaTileCount, __out INT* pcTilesPlaced);
 	HRESULT PlaceTowersOfWizardry (IRandomNumber* pRand, TRStrMap<CTileSet*>** prgmapTileSets, MAPTILE** prgWorlds, IJSONObject* pTowers);
+	HRESULT MakeRivers (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT cRivers);
+	HRESULT AddRiverStarts (MAPTILE* pWorld, const POINT& ptShore, CTile* pShoreTile, CTileSet* pGrass, TArray<RIVER_DIR>& aRivers);
+	HRESULT ProcessRiver (IRandomNumber* pRand, __inout RIVER_DIR& river, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CTileSet* pRiver);
 	HRESULT MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT xWorld, INT yWorld, BOOL fActiveWorld);
 
 	VOID DeleteWorld (MAPTILE*& pWorld);

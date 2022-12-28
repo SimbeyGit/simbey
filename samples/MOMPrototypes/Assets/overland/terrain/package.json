@@ -348,8 +348,8 @@
 				depth: 2,
 				zone:
 				{
-					width: 4,
-					height: 4
+					width: 3,
+					height: 3
 				},
 				lairs:
 				{
@@ -376,8 +376,8 @@
 				depth: 2,
 				zone:
 				{
-					width: 7,
-					height: 7
+					width: 5,
+					height: 4
 				},
 				lairs:
 				{
@@ -404,8 +404,8 @@
 				depth: 2,
 				zone:
 				{
-					width: 10,
-					height: 10
+					width: 6,
+					height: 5
 				},
 				lairs:
 				{
@@ -432,8 +432,8 @@
 				depth: 2,
 				zone:
 				{
-					width: 14,
-					height: 14
+					width: 8,
+					height: 6
 				},
 				lairs:
 				{
@@ -460,8 +460,8 @@
 				depth: 2,
 				zone:
 				{
-					width: 18,
-					height: 18
+					width: 10,
+					height: 7
 				},
 				lairs:
 				{
@@ -488,8 +488,8 @@
 				depth: 2,
 				zone:
 				{
-					width: 24,
-					height: 24
+					width: 12,
+					height: 9
 				},
 				lairs:
 				{
@@ -516,8 +516,8 @@
 				depth: 2,
 				zone:
 				{
-					width: 32,
-					height: 32
+					width: 14,
+					height: 10
 				},
 				lairs:
 				{
