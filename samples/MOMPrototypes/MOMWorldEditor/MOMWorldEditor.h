@@ -2,6 +2,7 @@
 
 #include <SIFRibbon.h>
 #include <SIFRibbonItem.h>
+#include <StringGalleryItem.h>
 #include "Library\Core\BaseUnknown.h"
 #include "Library\Core\RStrMap.h"
 #include "Library\Window\BaseWindow.h"
@@ -18,6 +19,39 @@ interface IJSONArray;
 class CHeightMapGenerator;
 class CSmoothingSystem;
 class CTileRules;
+
+class CGeneratorGallery :
+	public CBaseUnknown,
+	public IUICollection
+{
+private:
+	CSIFRibbon* m_pRibbon;
+	UINT m_idxSelection;
+	IJSONArray* m_pGenerators;
+
+public:
+	IMP_BASE_UNKNOWN
+
+	BEGIN_UNK_MAP
+		UNK_INTERFACE(IUICollection)
+	END_UNK_MAP
+
+public:
+	CGeneratorGallery (CSIFRibbon* pRibbon, IJSONArray* pGenerators);
+	~CGeneratorGallery ();
+
+	UINT GetSelection (VOID);
+	VOID SetSelection (UINT idxSelection);
+
+	// IUICollection
+	virtual HRESULT STDMETHODCALLTYPE GetCount (__out UINT32* pcItems);
+	virtual HRESULT STDMETHODCALLTYPE GetItem (UINT32 index, __deref_out_opt IUnknown** item);
+	virtual HRESULT STDMETHODCALLTYPE Add (IUnknown* item);
+	virtual HRESULT STDMETHODCALLTYPE Insert (UINT32 index, IUnknown* item);
+	virtual HRESULT STDMETHODCALLTYPE RemoveAt (UINT32 index);
+	virtual HRESULT STDMETHODCALLTYPE Replace (UINT32 indexReplaced, IUnknown* itemReplaceWith);
+	virtual HRESULT STDMETHODCALLTYPE Clear (VOID);
+};
 
 class CTerrainGallery :
 	public CBaseUnknown,
@@ -165,6 +199,10 @@ protected:
 	TRStrMap<CSmoothingSystem*> m_mapSmoothingSystems;
 	CTileRules* m_pTileRules;
 
+	IJSONArray* m_pGenerators;
+	IJSONArray* m_pProportions;
+	CGeneratorGallery* m_pGeneratorGallery;
+
 	TRStrMap<CTileSet*> m_mapArcanus, m_mapMyrror;
 	CTerrainGallery* m_pArcanusTerrain;
 	CTerrainGallery* m_pMyrrorTerrain;
@@ -286,7 +324,7 @@ protected:
 	HRESULT UpdateVisibleTiles (VOID);
 	VOID Scroll (INT x, INT y);
 
-	HRESULT SetupMap (INT xWorld, INT yWorld);
+	HRESULT SetupMap (INT xWorld, INT yWorld, BOOL fAddRandomTundra);
 	HRESULT LoadWorldFromJSON (TRStrMap<CTileSet*>& mapTileSet, IJSONObject* pMap, PCWSTR pcwzWorld, INT xWorld, INT yWorld, MAPTILE** ppWorld);
 	HRESULT SaveWorldToJSON (IJSONObject* pMap, PCWSTR pcwzWorld, INT xWorld, INT yWorld, MAPTILE* pWorld);
 

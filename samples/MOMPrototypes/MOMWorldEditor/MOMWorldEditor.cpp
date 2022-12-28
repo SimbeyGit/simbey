@@ -59,6 +59,90 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// CGeneratorGallery
+///////////////////////////////////////////////////////////////////////////////
+
+CGeneratorGallery::CGeneratorGallery (CSIFRibbon* pRibbon, IJSONArray* pGenerators) :
+	m_pRibbon(pRibbon),
+	m_pGenerators(pGenerators),
+	m_idxSelection(0)
+{
+	m_pRibbon->AddRef();
+	m_pGenerators->AddRef();
+}
+
+CGeneratorGallery::~CGeneratorGallery ()
+{
+	m_pGenerators->Release();
+	m_pRibbon->Release();
+}
+
+UINT CGeneratorGallery::GetSelection (VOID)
+{
+	return m_idxSelection;
+}
+
+VOID CGeneratorGallery::SetSelection (UINT idxSelection)
+{
+	m_idxSelection = idxSelection;
+}
+
+// IUICollection
+
+HRESULT STDMETHODCALLTYPE CGeneratorGallery::GetCount (__out UINT32* pcItems)
+{
+	*pcItems = m_pGenerators->Count();
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CGeneratorGallery::GetItem (UINT32 index, __deref_out_opt IUnknown** item)
+{
+	HRESULT hr;
+	TStackRef<IJSONObject> srGenerator;
+	TStackRef<IJSONValue> srv;
+	TStackRef<CStringGalleryItem> srItem;
+	RSTRING rstrName = NULL;
+
+	Check(m_pGenerators->GetObject(index, &srGenerator));
+	Check(srGenerator->FindNonNullValueW(L"name", &srv));
+	Check(srv->GetString(&rstrName));
+	Check(CStringGalleryItem::Create(m_pRibbon, &srItem));
+	srItem->SetObject(srGenerator);
+	Check(srItem->SetItemText(RStrToWide(rstrName)));
+	srItem->SetItemIcon(ID_RANDOM);
+	*item = static_cast<IUISimplePropertySet*>(srItem.Detach());
+
+Cleanup:
+	RStrRelease(rstrName);
+	return hr;
+}
+
+HRESULT STDMETHODCALLTYPE CGeneratorGallery::Add (IUnknown* item)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT STDMETHODCALLTYPE CGeneratorGallery::Insert (UINT32 index, IUnknown* item)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT STDMETHODCALLTYPE CGeneratorGallery::RemoveAt (UINT32 index)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT STDMETHODCALLTYPE CGeneratorGallery::Replace (UINT32 indexReplaced, IUnknown* itemReplaceWith)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT STDMETHODCALLTYPE CGeneratorGallery::Clear (VOID)
+{
+	return E_NOTIMPL;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // CTerrainGallery
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -214,6 +298,9 @@ CMOMWorldEditor::CMOMWorldEditor (HINSTANCE hInstance) :
 	m_pSurface(NULL),
 	m_fActive(FALSE),
 	m_pTileRules(NULL),
+	m_pGenerators(NULL),
+	m_pProportions(NULL),
+	m_pGeneratorGallery(NULL),
 	m_pArcanusTerrain(NULL),
 	m_pMyrrorTerrain(NULL),
 	m_pFeatures(NULL),
@@ -253,6 +340,9 @@ CMOMWorldEditor::~CMOMWorldEditor ()
 		(*m_mapFeatures.GetValuePtr(i))->Release();
 
 	SafeRelease(m_pFeatures);
+	SafeRelease(m_pGeneratorGallery);
+	SafeRelease(m_pProportions);
+	SafeRelease(m_pGenerators);
 	SafeDelete(m_pTileRules);
 
 	m_mapSmoothingSystems.DeleteAll();
@@ -290,7 +380,7 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 	HRESULT hr;
 	RECT rect = { 0, 0, nWidth, nHeight };
 	TStackRef<IJSONObject> srData, srSmoothing;
-	TStackRef<IJSONValue> srvRules, srvSmoothing;
+	TStackRef<IJSONValue> srvRules, srvSmoothing, srvGenerators, srvProportions;
 	ISimbeyInterchangeFile* pSIF = NULL;
 
 	Check(CSIFRibbon::Create(DPI::Scale, &m_pRibbon));
@@ -310,6 +400,15 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 	m_pTileRules = __new CTileRules;
 	CheckAlloc(m_pTileRules);
 	Check(m_pTileRules->Initialize(m_mapSmoothingSystems, srvRules));
+
+	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\generators.json"), &srvGenerators));
+	Check(srvGenerators->GetArray(&m_pGenerators));
+
+	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\proportions.json"), &srvProportions));
+	Check(srvProportions->GetArray(&m_pProportions));
+
+	m_pGeneratorGallery = __new CGeneratorGallery(m_pRibbon, m_pGenerators);
+	CheckAlloc(m_pGeneratorGallery);
 
 	Check(m_pPackage->OpenSIF(L"overland\\features\\features.sif", &pSIF));
 	m_pFeatures = __new CTerrainGallery(m_pRibbon, pSIF);
@@ -331,7 +430,7 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 
 	Check(SetupMouse());
 
-	Check(SetupMap(64, 48));
+	Check(SetupMap(64, 48, TRUE));
 
 	m_pMain->SetScroll((m_xWorld * TILE_WIDTH) / 2 - SURFACE_WIDTH / 2,
 		(m_yWorld * TILE_HEIGHT) / 2 - SURFACE_HEIGHT / 2);
@@ -455,7 +554,7 @@ HRESULT STDMETHODCALLTYPE CMOMWorldEditor::OnCreateUICommand (UINT32 commandId, 
 
 	if(typeID == UI_COMMANDTYPE_COLLECTION || typeID == UI_COMMANDTYPE_COMMANDCOLLECTION) 
 	{
-		CheckIf(ID_TERRAIN != commandId && ID_FEATURES != commandId, E_NOTIMPL);
+		CheckIf(ID_TERRAIN != commandId && ID_FEATURES != commandId && ID_RANDOM != commandId, E_NOTIMPL);
 	}
 
 	*commandHandler = this;
@@ -489,6 +588,7 @@ HRESULT STDMETHODCALLTYPE CMOMWorldEditor::Execute (UINT32 commandId, UI_EXECUTI
 			Check(PromptForNewMap());
 			break;
 		case ID_RANDOM:
+			m_pGeneratorGallery->SetSelection(currentValue->uintVal);
 			Check(GenerateRandomWorlds());
 			break;
 		case ID_EXIT:
@@ -587,6 +687,12 @@ HRESULT STDMETHODCALLTYPE CMOMWorldEditor::UpdateProperty (UINT32 commandId, REF
 			newValue->vt = VT_UI4;
 			hr = S_OK;
 		}
+		else if(ID_RANDOM == commandId)
+		{
+			newValue->uintVal = m_pGeneratorGallery->GetSelection();
+			newValue->vt = VT_UI4;
+			hr = S_OK;
+		}
 	}
 	else if(UI_PKEY_ItemsSource == key)
 	{
@@ -599,6 +705,8 @@ HRESULT STDMETHODCALLTYPE CMOMWorldEditor::UpdateProperty (UINT32 commandId, REF
 
 		if(ID_FEATURES == commandId)
 			srSource = m_pFeatures;
+		else if(ID_RANDOM == commandId)
+			srSource = m_pGeneratorGallery;
 		else if(World::Arcanus == m_eType)
 			srSource = m_pArcanusTerrain;
 		else if(World::Myrror == m_eType)
@@ -951,7 +1059,7 @@ HRESULT CMOMWorldEditor::PromptForNewMap (VOID)
 	DeleteWorld(m_pArcanusWorld);
 	DeleteWorld(m_pMyrrorWorld);
 
-	Check(SetupMap(dlgNewWorld.m_nWidth, dlgNewWorld.m_nHeight));
+	Check(SetupMap(dlgNewWorld.m_nWidth, dlgNewWorld.m_nHeight, TRUE));
 
 	m_pMain->SetScroll((m_xWorld * TILE_WIDTH) / 2 - SURFACE_WIDTH / 2,
 		(m_yWorld * TILE_HEIGHT) / 2 - SURFACE_HEIGHT / 2);
@@ -964,44 +1072,95 @@ Cleanup:
 HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 {
 	HRESULT hr;
-	MAPTILE* prgWorlds[2] = { m_pArcanusWorld, m_pMyrrorWorld };
 	TRStrMap<CTileSet*>* prgmapTileSets[2] = { &m_mapArcanus, &m_mapMyrror };
 	COORD_SYSTEM coords;
 	CSimpleRNG rng(GetTickCount());
-	CHeightMapGenerator HeightMap(&rng, m_xWorld, m_yWorld, 2);
-	INT nPercentageOfMapIsLand = 55;
-	INT nPercentageOfLandIsHills = 45;
-	INT nPercentageOfHillsAreMountains = 35;
+	TStackRef<IJSONObject> srGenerator, srProportion, srZone;
+	TStackRef<IJSONValue> srv;
+	INT nDepth, nZoneWidth, nZoneHeight, nTundraRowCount;
+	INT nPercentageOfMapIsLand, nPercentageOfLandIsHills, nPercentageOfHillsAreMountains;
 
-	coords.nWidth = m_xWorld;
-	coords.nHeight = m_yWorld;
+	Check(m_pGenerators->GetObject(m_pGeneratorGallery->GetSelection(), &srGenerator));
+	Check(m_pProportions->GetObject(rng.Next(m_pProportions->Count()), &srProportion));
+
+	Check(srGenerator->FindNonNullValueW(L"width", &srv));
+	Check(srv->GetInteger(&coords.nWidth));
+	srv.Release();
+
+	Check(srGenerator->FindNonNullValueW(L"height", &srv));
+	Check(srv->GetInteger(&coords.nHeight));
+	srv.Release();
+
+	Check(srGenerator->FindNonNullValueW(L"depth", &srv));
+	Check(srv->GetInteger(&nDepth));
+	srv.Release();
+
+	Check(srGenerator->FindNonNullValueW(L"zone", &srv));
+	Check(srv->GetObject(&srZone));
+	srv.Release();
+
+	Check(srZone->FindNonNullValueW(L"width", &srv));
+	Check(srv->GetInteger(&nZoneWidth));
+	srv.Release();
+
+	Check(srZone->FindNonNullValueW(L"height", &srv));
+	Check(srv->GetInteger(&nZoneHeight));
+	srv.Release();
+
+	Check(srProportion->FindNonNullValueW(L"tundraRowCount", &srv));
+	Check(srv->GetInteger(&nTundraRowCount));
+	srv.Release();
+
+	Check(srProportion->FindNonNullValueW(L"percentageOfMapIsLand", &srv));
+	Check(srv->GetInteger(&nPercentageOfMapIsLand));
+	srv.Release();
+
+	Check(srProportion->FindNonNullValueW(L"percentageOfLandIsHills", &srv));
+	Check(srv->GetInteger(&nPercentageOfLandIsHills));
+	srv.Release();
+
+	Check(srProportion->FindNonNullValueW(L"percentageOfHillsAreMountains", &srv));
+	Check(srv->GetInteger(&nPercentageOfHillsAreMountains));
+	srv.Release();
+
+	DeleteWorld(m_pArcanusWorld);
+	DeleteWorld(m_pMyrrorWorld);
+
 	coords.fWrapsLeftToRight = TRUE;
 	coords.fWrapsTopToBottom = FALSE;
+	Check(SetupMap(coords.nWidth, coords.nHeight, FALSE));
 
-	Check(HeightMap.Initialize(coords));
+	m_pMain->SetScroll((m_xWorld * TILE_WIDTH) / 2 - SURFACE_WIDTH / 2,
+		(m_yWorld * TILE_HEIGHT) / 2 - SURFACE_HEIGHT / 2);
 
-	m_pMapTileLayer->Clear();
-	m_pMain->ClearLayer(m_nFeaturesLayer);
-	m_pMain->ClearLayer(m_nCitiesLayer);
-
-	DOUBLE dblLandTileCountTimes100 = (DOUBLE)(coords.nWidth * coords.nHeight * nPercentageOfMapIsLand);
-
-	for(INT nPlane = 0; nPlane < ARRAYSIZE(prgWorlds); nPlane++)
 	{
-		TRStrMap<CTileSet*>* pmapTileSet = prgmapTileSets[nPlane];
-		BOOL fActiveWorld = static_cast<World::Type>(nPlane) == m_eType;
-		MAPTILE* pWorld = prgWorlds[nPlane];
+		MAPTILE* prgWorlds[2] = { m_pArcanusWorld, m_pMyrrorWorld };
+		CHeightMapGenerator HeightMap(&rng, nZoneWidth, nZoneHeight, nTundraRowCount);
 
-		Check(ResetWorldTiles(pWorld, m_xWorld, m_yWorld, *(prgmapTileSets[nPlane]), FALSE));
-		Check(HeightMap.GenerateHeightMap());
+		Check(HeightMap.Initialize(coords));
 
-		Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"grasslands"), (INT)(dblLandTileCountTimes100 / 100.0 + 0.5), fActiveWorld));
-		Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"hills"), (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentageOfLandIsHills / 10000.0 + 0.5), fActiveWorld));
-		Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"mountains"), (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentageOfLandIsHills * (DOUBLE)nPercentageOfHillsAreMountains / 1000000.0 + 0.5), fActiveWorld));
+		m_pMapTileLayer->Clear();
+		m_pMain->ClearLayer(m_nFeaturesLayer);
+		m_pMain->ClearLayer(m_nCitiesLayer);
 
-		Check(MakeTundra(pmapTileSet, pWorld, m_xWorld, m_yWorld, fActiveWorld));
+		DOUBLE dblLandTileCountTimes100 = (DOUBLE)(coords.nWidth * coords.nHeight * nPercentageOfMapIsLand);
 
-		// TODO - Place blobs of desert, swamp, and forest
+		for(INT nPlane = 0; nPlane < ARRAYSIZE(prgWorlds); nPlane++)
+		{
+			TRStrMap<CTileSet*>* pmapTileSet = prgmapTileSets[nPlane];
+			BOOL fActiveWorld = static_cast<World::Type>(nPlane) == m_eType;
+			MAPTILE* pWorld = prgWorlds[nPlane];
+
+			Check(HeightMap.GenerateHeightMap());
+
+			Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"grasslands"), (INT)(dblLandTileCountTimes100 / 100.0 + 0.5), fActiveWorld));
+			Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"hills"), (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentageOfLandIsHills / 10000.0 + 0.5), fActiveWorld));
+			Check(SetHighestTiles(pmapTileSet, pWorld, HeightMap, SLP(L"mountains"), (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentageOfLandIsHills * (DOUBLE)nPercentageOfHillsAreMountains / 1000000.0 + 0.5), fActiveWorld));
+
+			Check(MakeTundra(pmapTileSet, pWorld, m_xWorld, m_yWorld, fActiveWorld));
+
+			// TODO - Place blobs of desert, swamp, and forest
+		}
 	}
 
 	Check(UpdateVisibleTiles());
@@ -1244,7 +1403,7 @@ VOID CMOMWorldEditor::Scroll (INT x, INT y)
 	UpdateVisibleTiles();
 }
 
-HRESULT CMOMWorldEditor::SetupMap (INT xWorld, INT yWorld)
+HRESULT CMOMWorldEditor::SetupMap (INT xWorld, INT yWorld, BOOL fAddRandomTundra)
 {
 	HRESULT hr;
 
@@ -1261,8 +1420,8 @@ HRESULT CMOMWorldEditor::SetupMap (INT xWorld, INT yWorld)
 	CheckAlloc(m_pMyrrorWorld);
 	ZeroMemory(m_pMyrrorWorld, sizeof(MAPTILE) * nWorldCells);
 
-	Check(ResetWorldTiles(m_pArcanusWorld, m_xWorld, m_yWorld, m_mapArcanus, TRUE));
-	Check(ResetWorldTiles(m_pMyrrorWorld, m_xWorld, m_yWorld, m_mapMyrror, TRUE));
+	Check(ResetWorldTiles(m_pArcanusWorld, m_xWorld, m_yWorld, m_mapArcanus, fAddRandomTundra));
+	Check(ResetWorldTiles(m_pMyrrorWorld, m_xWorld, m_yWorld, m_mapMyrror, fAddRandomTundra));
 
 Cleanup:
 	if(FAILED(hr))

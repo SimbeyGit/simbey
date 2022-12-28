@@ -14,18 +14,20 @@
             <Button CommandName="ID_SAVE" LabelTitle="Save" LargeBitmap="auto" />
           </MenuGroup>
           <MenuGroup>
-            <Button CommandName="ID_RANDOM" LabelTitle="Random" LargeBitmap="auto" />
-          </MenuGroup>
-          <MenuGroup>
             <Button CommandName="ID_EXIT" LabelTitle="Exit" LargeBitmap="auto" />
           </MenuGroup>
         </ApplicationMenu>
       </Ribbon.ApplicationMenu>
       <Ribbon.Tabs>
         <Tab CommandName="ID_TAB_MAIN" LabelTitle="Main">
-          <Group CommandName="ID_GROUP_WORLD" LabelTitle="World" SizeDefinition="TwoButtons">
+          <Group CommandName="ID_GROUP_WORLD" LabelTitle="World" SizeDefinition="ThreeButtons">
             <ToggleButton CommandName="ID_ARCANUS" LabelTitle="Arcanus" LargeBitmap="auto" />
             <ToggleButton CommandName="ID_MYRROR" LabelTitle="Myrror" LargeBitmap="auto" />
+            <DropDownGallery CommandName="ID_RANDOM" Type="Items" LabelTitle="Random" LargeBitmap="auto" >
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1" Rows="10" Gripper="None" />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
           </Group>
           <Group CommandName="ID_GROUP_TERRAIN" LabelTitle="Terrain" SizeDefinition="OneInRibbonGallery">
             <InRibbonGallery CommandName="ID_TERRAIN" ItemWidth="20" ItemHeight="18" Type="Items" MaxRows="4" MinColumnsLarge="4" MinColumnsMedium="3" TextPosition="Bottom">

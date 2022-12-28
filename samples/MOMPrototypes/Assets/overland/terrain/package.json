@@ -338,6 +338,244 @@
 	},
 	{
 		package: "json",
+		name: "generators.json",
+		data:
+		[
+			{
+				name: "Tiny",
+				width: 32,
+				height: 24,
+				depth: 2,
+				zone:
+				{
+					width: 4,
+					height: 4
+				},
+				lairs:
+				{
+					normal: 6,
+					weak: 8
+				},
+				towers:
+				{
+					count: 2,
+					separation: 10
+				},
+				cities:
+				{
+					separation: 3,
+					raiders: 5
+				},
+				rivers: 8,
+				nodes: [4, 3]
+			},
+			{
+				name: "Small",
+				width: 48,
+				height: 36,
+				depth: 2,
+				zone:
+				{
+					width: 7,
+					height: 7
+				},
+				lairs:
+				{
+					normal: 14,
+					weak: 18
+				},
+				towers:
+				{
+					count: 4,
+					separation: 10
+				},
+				cities:
+				{
+					separation: 3,
+					raiders: 10
+				},
+				rivers: 12,
+				nodes: [9, 8]
+			},
+			{
+				name: "Standard",
+				width: 64,
+				height: 48,
+				depth: 2,
+				zone:
+				{
+					width: 10,
+					height: 10
+				},
+				lairs:
+				{
+					normal: 25,
+					weak: 32
+				},
+				towers:
+				{
+					count: 6,
+					separation: 10
+				},
+				cities:
+				{
+					separation: 3,
+					raiders: 15
+				},
+				rivers: 20,
+				nodes: [16, 14]
+			},
+			{
+				name: "Large",
+				width: 80,
+				height: 60,
+				depth: 2,
+				zone:
+				{
+					width: 14,
+					height: 14
+				},
+				lairs:
+				{
+					normal: 40,
+					weak: 50
+				},
+				towers:
+				{
+					count: 9,
+					separation: 10
+				},
+				cities:
+				{
+					separation: 3,
+					raiders: 25
+				},
+				rivers: 30,
+				nodes: [25, 22]
+			},
+			{
+				name: "Huge",
+				width: 96,
+				height: 72,
+				depth: 2,
+				zone:
+				{
+					width: 18,
+					height: 18
+				},
+				lairs:
+				{
+					normal: 55,
+					weak: 70
+				},
+				towers:
+				{
+					count: 12,
+					separation: 10
+				},
+				cities:
+				{
+					separation: 3,
+					raiders: 35
+				},
+				rivers: 40,
+				nodes: [36, 32]
+			},
+			{
+				name: "Gigantic",
+				width: 120,
+				height: 90,
+				depth: 2,
+				zone:
+				{
+					width: 24,
+					height: 24
+				},
+				lairs:
+				{
+					normal: 75,
+					weak: 100
+				},
+				towers:
+				{
+					count: 16,
+					separation: 10
+				},
+				cities:
+				{
+					separation: 3,
+					raiders: 45
+				},
+				rivers: 40,
+				nodes: [50, 42]
+			},
+			{
+				name: "Epic",
+				width: 144,
+				height: 108,
+				depth: 2,
+				zone:
+				{
+					width: 32,
+					height: 32
+				},
+				lairs:
+				{
+					normal: 80,
+					weak: 110
+				},
+				towers:
+				{
+					count: 20,
+					separation: 10
+				},
+				cities:
+				{
+					separation: 3,
+					raiders: 50
+				},
+				rivers: 60,
+				nodes: [60, 50]
+			}
+		]
+	},
+	{
+		package: "json",
+		name: "proportions.json",
+		data:
+		[
+			{
+				name: "Small",
+				percentageOfMapIsLand: 15,
+				percentageOfLandIsHills: 25,
+				percentageOfHillsAreMountains: 45,
+				tundraRowCount: 7
+			},
+			{
+				name: "Medium",
+				percentageOfMapIsLand: 20,
+				percentageOfLandIsHills: 25,
+				percentageOfHillsAreMountains: 45,
+				tundraRowCount: 7
+			},
+			{
+				name: "Large",
+				percentageOfMapIsLand: 30,
+				percentageOfLandIsHills: 25,
+				percentageOfHillsAreMountains: 45,
+				tundraRowCount: 7
+			},
+			{
+				name: "Huge",
+				percentageOfMapIsLand: 45,
+				percentageOfLandIsHills: 25,
+				percentageOfHillsAreMountains: 45,
+				tundraRowCount: 7
+			}
+		]
+	},
+	{
+		package: "json",
 		name: "smoothing.json",
 		data:
 		{

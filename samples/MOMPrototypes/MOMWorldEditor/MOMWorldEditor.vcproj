@@ -561,6 +561,14 @@
 					RelativePath="..\..\..\tools\ribbon\inc\SIFRibbonItem.h"
 					>
 				</File>
+				<File
+					RelativePath="..\..\..\tools\ribbon\StringGalleryItem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\tools\ribbon\inc\StringGalleryItem.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
