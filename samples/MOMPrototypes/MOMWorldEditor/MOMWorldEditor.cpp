@@ -249,7 +249,7 @@ HRESULT CTerrainCommand::Execute (class CMOMWorldEditor* pEditor, INT xTile, INT
 	INT nResult;
 
 	Check(m_pGallery->GetSelectedTile(&rstrTile));
-	Check(RStrCompareRStr(m_pWorld[yTile * m_xWorld + xTile].pTile->GetTileSet(), rstrTile, &nResult));
+	Check(RStrCompareRStr(m_pWorld[yTile * m_xWorld + xTile].pTile->GetTileSet()->GetName(), rstrTile, &nResult));
 	CheckIfIgnore(0 == nResult, S_FALSE);
 
 	Check(pEditor->PlaceTile(m_pWorld, xTile, yTile, m_pmapTileSets, rstrTile, TRUE));
@@ -1077,8 +1077,10 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	CSimpleRNG rng(GetTickCount());
 	TStackRef<IJSONObject> srGenerator, srProportion, srZone;
 	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONArray> srBlobs;
 	INT nDepth, nZoneWidth, nZoneHeight, nTundraRowCount;
 	INT nPercentageOfMapIsLand, nPercentageOfLandIsHills, nPercentageOfHillsAreMountains;
+	RSTRING rstrTile = NULL;
 
 	Check(m_pGenerators->GetObject(m_pGeneratorGallery->GetSelection(), &srGenerator));
 	Check(m_pProportions->GetObject(rng.Next(m_pProportions->Count()), &srProportion));
@@ -1123,6 +1125,10 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	Check(srv->GetInteger(&nPercentageOfHillsAreMountains));
 	srv.Release();
 
+	Check(srProportion->FindNonNullValueW(L"blobs", &srv));
+	Check(srv->GetArray(&srBlobs));
+	srv.Release();
+
 	DeleteWorld(m_pArcanusWorld);
 	DeleteWorld(m_pMyrrorWorld);
 
@@ -1159,13 +1165,35 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 
 			Check(MakeTundra(pmapTileSet, pWorld, m_xWorld, m_yWorld, fActiveWorld));
 
-			// TODO - Place blobs of desert, swamp, and forest
+			for(sysint i = 0; i < srBlobs->Count(); i++)
+			{
+				TStackRef<IJSONObject> srBlob;
+				INT nPercentage, nEachAreaTileCount;
+
+				Check(srBlobs->GetObject(i, &srBlob));
+
+				Check(srBlob->FindNonNullValueW(L"percentage", &srv));
+				Check(srv->GetInteger(&nPercentage));
+				srv.Release();
+
+				Check(srBlob->FindNonNullValueW(L"eachAreaTileCount", &srv));
+				Check(srv->GetInteger(&nEachAreaTileCount));
+				srv.Release();
+
+				Check(srBlob->FindNonNullValueW(L"tile", &srv));
+				Check(srv->GetString(&rstrTile));
+				srv.Release();
+
+				Check(PlaceBlob(&rng, pmapTileSet, pWorld, rstrTile, (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentage / 10000.0 + 0.5), nEachAreaTileCount));
+				RStrRelease(rstrTile); rstrTile = NULL;
+			}
 		}
 	}
 
 	Check(UpdateVisibleTiles());
 
 Cleanup:
+	RStrRelease(rstrTile);
 	return hr;
 }
 
@@ -1186,6 +1214,108 @@ HRESULT CMOMWorldEditor::SetHighestTiles (TRStrMap<CTileSet*>* pmapTileSets, MAP
 
 Cleanup:
 	RStrRelease(rstrTile);
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::PlaceBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, RSTRING rstrTile, INT nDesiredTileCount, INT nEachAreaTileCount)
+{
+	HRESULT hr;
+	INT cTotalTilesPlaced = 0;
+	CTileSet* pGrass, *pPlace;
+
+	Check(pmapTileSets->Find(RSTRING_CAST(L"grasslands"), &pGrass));
+	Check(pmapTileSets->Find(rstrTile, &pPlace));
+
+	while(cTotalTilesPlaced < nDesiredTileCount)
+	{
+		INT cTilesPlaced;
+
+		Check(PlaceSingleBlob(pRand, pmapTileSets, pGrass, pPlace, pWorld, rstrTile, nEachAreaTileCount, &cTilesPlaced));
+		if(0 == cTilesPlaced)
+			break;
+
+		cTotalTilesPlaced += cTilesPlaced;
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::PlaceSingleBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, CTileSet* pReplace, CTileSet* pPlace, MAPTILE* pWorld, RSTRING rstrTile, INT nEachAreaTileCount, __out INT* pcTilesPlaced)
+{
+	HRESULT hr;
+	CMapArea mapStarting;
+	MAPTILE* pWorldPtr = pWorld;
+	POINT pt;
+	INT cTilesPlaced = 0;
+
+	// Make a list of all the possible start locations
+	for(pt.y = 0; pt.y < m_yWorld; pt.y++)
+	{
+		for(pt.x = 0; pt.x < m_xWorld; pt.x++)
+		{
+			if(pReplace == pWorldPtr[pt.x].pTile->GetTileSet())
+				Check(mapStarting.Add(pt));
+		}
+
+		pWorldPtr += m_xWorld;
+	}
+
+	// Pick a random start location
+	CheckIf(0 == mapStarting.Length(), S_FALSE);
+	pt = mapStarting[pRand->Next(mapStarting.Length())];
+
+	// Work out how big we'll aim to make this blob, this will be +/- 50% of the average size
+	INT nBlobSize = pRand->Next(nEachAreaTileCount) + (nEachAreaTileCount / 2);
+
+	{
+		// Create an area to keep track of the tiles in this blob
+		CMapArea thisBlob, mapEnlarged;
+
+		// Always set one tile (regardless of nBlobSize)
+		for(;;)
+		{
+			// Set this tile
+			Check(PlaceTile(pWorld, pt.x, pt.y, pmapTileSets, pPlace->GetName(), FALSE));
+			Check(thisBlob.Add(pt));
+			cTilesPlaced++;
+			nBlobSize--;
+
+			// Look for a neighboring tile
+			if(0 == nBlobSize)
+				break;
+
+			// Create a ring around the current blob, i.e. this will tell us all the possible cells we could expand the blob into
+			for(sysint i = 0; i < thisBlob.Length(); i++)
+			{
+				POINT ptItem = thisBlob[i];
+
+				for(INT n = 0; n < ARRAYSIZE(c_rgDirections); n++)
+				{
+					pt.y = ptItem.y + c_rgDirections[n].y;
+					if(pt.y >= 0 && pt.y < m_yWorld)
+					{
+						pt.x = ptItem.x + c_rgDirections[n].x;
+						if(pt.x < 0)
+							pt.x += m_xWorld;
+						else if(pt.x >= m_xWorld)
+							pt.x -= m_xWorld;
+
+						if(!thisBlob.Has(pt) && mapStarting.Has(pt))
+							Check(mapEnlarged.Add(pt));
+					}
+				}
+			}
+
+			if(0 == mapEnlarged.Length())
+				break;
+			pt = mapEnlarged[pRand->Next(mapEnlarged.Length())];
+			mapEnlarged.Clear();
+		}
+	}
+
+Cleanup:
+	*pcTilesPlaced = cTilesPlaced;
 	return hr;
 }
 
@@ -1517,7 +1647,7 @@ HRESULT CMOMWorldEditor::SaveWorldToJSON (IJSONObject* pMap, PCWSTR pcwzWorld, I
 
 		Check(JSONCreateObject(&srCell));
 
-		Check(JSONCreateString(pCell->pTile->GetTileSet(), &srv));
+		Check(JSONCreateString(pCell->pTile->GetTileSet()->GetName(), &srv));
 		Check(srCell->AddValueW(L"tile", srv));
 		srv.Release();
 

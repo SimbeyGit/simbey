@@ -549,28 +549,100 @@
 				percentageOfMapIsLand: 15,
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
-				tundraRowCount: 7
+				tundraRowCount: 7,
+				blobs:
+				[
+					{
+						tile: "forest",
+						percentage: 17,
+						eachAreaTileCount: 15
+					},
+					{
+						tile: "desert",
+						percentage: 11,
+						eachAreaTileCount: 13
+					},
+					{
+						tile: "swamp",
+						percentage: 5,
+						eachAreaTileCount: 7
+					}
+				]
 			},
 			{
 				name: "Medium",
 				percentageOfMapIsLand: 20,
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
-				tundraRowCount: 7
+				tundraRowCount: 7,
+				blobs:
+				[
+					{
+						tile: "forest",
+						percentage: 17,
+						eachAreaTileCount: 15
+					},
+					{
+						tile: "desert",
+						percentage: 11,
+						eachAreaTileCount: 13
+					},
+					{
+						tile: "swamp",
+						percentage: 5,
+						eachAreaTileCount: 7
+					}
+				]
 			},
 			{
 				name: "Large",
 				percentageOfMapIsLand: 30,
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
-				tundraRowCount: 7
+				tundraRowCount: 7,
+				blobs:
+				[
+					{
+						tile: "forest",
+						percentage: 17,
+						eachAreaTileCount: 15
+					},
+					{
+						tile: "desert",
+						percentage: 11,
+						eachAreaTileCount: 13
+					},
+					{
+						tile: "swamp",
+						percentage: 5,
+						eachAreaTileCount: 7
+					}
+				]
 			},
 			{
 				name: "Huge",
 				percentageOfMapIsLand: 45,
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
-				tundraRowCount: 7
+				tundraRowCount: 7,
+				blobs:
+				[
+					{
+						tile: "forest",
+						percentage: 17,
+						eachAreaTileCount: 15
+					},
+					{
+						tile: "desert",
+						percentage: 11,
+						eachAreaTileCount: 13
+					},
+					{
+						tile: "swamp",
+						percentage: 5,
+						eachAreaTileCount: 7
+					}
+				]
 			}
 		]
 	},

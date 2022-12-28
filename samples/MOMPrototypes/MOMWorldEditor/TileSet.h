@@ -9,11 +9,12 @@ interface IJSONArray;
 
 class CSmoothingSystem;
 class CTileRules;
+class CTileSet;
 
 class CTile
 {
 private:
-	RSTRING m_rstrTileSet;
+	CTileSet* m_pTileSet;
 	RSTRING m_rstrKey;
 	union
 	{
@@ -23,11 +24,11 @@ private:
 	bool m_fIsSprite;
 
 public:
-	CTile (RSTRING rstrTileSet, RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite);
-	CTile (RSTRING rstrTileSet, RSTRING rstrKey, ISimbeyInterchangeAnimator* pAnimator);
+	CTile (CTileSet* pTileSet, RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite);
+	CTile (CTileSet* pTileSet, RSTRING rstrKey, ISimbeyInterchangeAnimator* pAnimator);
 	~CTile ();
 
-	inline RSTRING GetTileSet (VOID) { return m_rstrTileSet; }
+	inline CTileSet* GetTileSet (VOID) { return m_pTileSet; }
 	inline RSTRING GetKey (VOID) { return m_rstrKey; }
 
 	HRESULT CreateSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
@@ -42,6 +43,8 @@ public:
 public:
 	CTileSet (RSTRING rstrName);
 	~CTileSet ();
+
+	inline RSTRING GetName (VOID) { return m_rstrName; }
 
 	HRESULT AddVariant (RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite);
 	HRESULT AddVariant (RSTRING rstrKey, ISimbeyInterchangeAnimator* pAnimator);

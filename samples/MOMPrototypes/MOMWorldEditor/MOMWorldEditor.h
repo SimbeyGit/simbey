@@ -16,9 +16,49 @@ interface IJSONValue;
 interface IJSONObject;
 interface IJSONArray;
 
+interface IRandomNumber;
+
 class CHeightMapGenerator;
 class CSmoothingSystem;
 class CTileRules;
+
+class CMapArea
+{
+private:
+	TArray<POINT> m_aPoints;
+
+public:
+	inline const POINT& operator[] (sysint n) const
+	{
+		return m_aPoints[n];
+	}
+
+	inline sysint Length (VOID)
+	{
+		return m_aPoints.Length();
+	}
+
+	inline HRESULT Add (const POINT& pt)
+	{
+		return m_aPoints.Append(pt);
+	}
+
+	inline VOID Clear (VOID)
+	{
+		m_aPoints.Clear();
+	}
+
+	BOOL Has (const POINT& pt)
+	{
+		for(sysint i = 0; i < m_aPoints.Length(); i++)
+		{
+			POINT& ptItem = m_aPoints[i];
+			if(ptItem.x == pt.x && ptItem.y == pt.y)
+				return TRUE;
+		}
+		return FALSE;
+	}
+};
 
 class CGeneratorGallery :
 	public CBaseUnknown,
@@ -316,6 +356,8 @@ protected:
 	HRESULT GenerateRandomWorlds (VOID);
 
 	HRESULT SetHighestTiles (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CHeightMapGenerator& heightMap, PCWSTR pcwzTile, INT cchTile, INT nDesiredTileCount, BOOL fActiveWorld);
+	HRESULT PlaceBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, RSTRING rstrTile, INT nDesiredTileCount, INT nEachAreaTileCount);
+	HRESULT PlaceSingleBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, CTileSet* pReplace, CTileSet* pPlace, MAPTILE* pWorld, RSTRING rstrTile, INT nEachAreaTileCount, __out INT* pcTilesPlaced);
 	HRESULT MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT xWorld, INT yWorld, BOOL fActiveWorld);
 
 	VOID DeleteWorld (MAPTILE*& pWorld);

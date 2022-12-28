@@ -13,20 +13,20 @@
 // CTile
 ///////////////////////////////////////////////////////////////////////////////
 
-CTile::CTile (RSTRING rstrTileSet, RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite) :
+CTile::CTile (CTileSet* pTileSet, RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite) :
+	m_pTileSet(pTileSet),
 	m_pSprite(pSprite),
 	m_fIsSprite(true)
 {
-	RStrSet(m_rstrTileSet, rstrTileSet);
 	RStrSet(m_rstrKey, rstrKey);
 	m_pSprite->AddRef();
 }
 
-CTile::CTile (RSTRING rstrTileSet, RSTRING rstrKey, ISimbeyInterchangeAnimator* pAnimator) :
+CTile::CTile (CTileSet* pTileSet, RSTRING rstrKey, ISimbeyInterchangeAnimator* pAnimator) :
+	m_pTileSet(pTileSet),
 	m_pAnimator(pAnimator),
 	m_fIsSprite(false)
 {
-	RStrSet(m_rstrTileSet, rstrTileSet);
 	RStrSet(m_rstrKey, rstrKey);
 	m_pAnimator->AddRef();
 }
@@ -38,7 +38,6 @@ CTile::~CTile ()
 	else
 		m_pAnimator->Release();
 	RStrRelease(m_rstrKey);
-	RStrRelease(m_rstrTileSet);
 }
 
 HRESULT CTile::CreateSprite (__deref_out ISimbeyInterchangeSprite** ppSprite)
@@ -88,7 +87,7 @@ HRESULT CTileSet::AddVariant (RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite
 
 	Check(EnsureTilesArray(rstrKey, &pTiles));
 
-	pTile = __new CTile(m_rstrName, rstrKey, pSprite);
+	pTile = __new CTile(this, rstrKey, pSprite);
 	CheckAlloc(pTile);
 	Check(pTiles->Append(pTile));
 
@@ -104,7 +103,7 @@ HRESULT CTileSet::AddVariant (RSTRING rstrKey, ISimbeyInterchangeAnimator* pAnim
 
 	Check(EnsureTilesArray(rstrKey, &pTiles));
 
-	pTile = __new CTile(m_rstrName, rstrKey, pAnimator);
+	pTile = __new CTile(this, rstrKey, pAnimator);
 	CheckAlloc(pTile);
 	Check(pTiles->Append(pTile));
 
@@ -166,7 +165,7 @@ CPlaceItem::CPlaceItem (CTileRules* pTileRules, CTile* pTile, INT xTile, INT x, 
 {
 	if(m_pTile)
 	{
-		RStrSet(m_rstrTile, m_pTile->GetTileSet());
+		RStrSet(m_rstrTile, m_pTile->GetTileSet()->GetName());
 		SideAssertHr(RStrCopyToW(m_pTile->GetKey(), ARRAYSIZE(m_wzKey), m_wzKey, NULL));
 	}
 	else
@@ -475,7 +474,7 @@ VOID CMapPainter::GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, TArray<CPlaceI
 				else if(x >= m_xWorld)
 					x -= m_xWorld;
 
-				rstrOther = pWorld[m_xWorld * y + x].pTile->GetTileSet();
+				rstrOther = pWorld[m_xWorld * y + x].pTile->GetTileSet()->GetName();
 			}
 
 			if(pItem->IsSameTile(rstrOther))
