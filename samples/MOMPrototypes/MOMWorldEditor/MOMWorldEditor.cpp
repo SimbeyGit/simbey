@@ -1301,7 +1301,8 @@ HRESULT CMOMWorldEditor::PlaceSingleBlob (IRandomNumber* pRand, TRStrMap<CTileSe
 						else if(pt.x >= m_xWorld)
 							pt.x -= m_xWorld;
 
-						if(!thisBlob.Has(pt) && mapStarting.Has(pt))
+						// Not already in the blob, not already in the ring, and is a valid candidate for expansion.
+						if(!thisBlob.Has(pt) && !mapEnlarged.Has(pt) && mapStarting.Has(pt))
 							Check(mapEnlarged.Add(pt));
 					}
 				}
