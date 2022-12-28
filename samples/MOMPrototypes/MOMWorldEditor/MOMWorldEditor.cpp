@@ -1075,7 +1075,7 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	TRStrMap<CTileSet*>* prgmapTileSets[2] = { &m_mapArcanus, &m_mapMyrror };
 	COORD_SYSTEM coords;
 	CSimpleRNG rng(GetTickCount());
-	TStackRef<IJSONObject> srGenerator, srProportion, srZone;
+	TStackRef<IJSONObject> srGenerator, srProportion, srZone, srTowers;
 	TStackRef<IJSONValue> srv;
 	TStackRef<IJSONArray> srBlobs;
 	INT nDepth, nZoneWidth, nZoneHeight, nTundraRowCount;
@@ -1107,6 +1107,10 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 
 	Check(srZone->FindNonNullValueW(L"height", &srv));
 	Check(srv->GetInteger(&nZoneHeight));
+	srv.Release();
+
+	Check(srGenerator->FindNonNullValueW(L"towers", &srv));
+	Check(srv->GetObject(&srTowers));
 	srv.Release();
 
 	Check(srProportion->FindNonNullValueW(L"tundraRowCount", &srv));
@@ -1188,6 +1192,8 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 				RStrRelease(rstrTile); rstrTile = NULL;
 			}
 		}
+
+		Check(PlaceTowersOfWizardry(&rng, prgmapTileSets, prgWorlds, srTowers));
 	}
 
 	Check(UpdateVisibleTiles());
@@ -1317,6 +1323,110 @@ HRESULT CMOMWorldEditor::PlaceSingleBlob (IRandomNumber* pRand, TRStrMap<CTileSe
 
 Cleanup:
 	*pcTilesPlaced = cTilesPlaced;
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::PlaceTowersOfWizardry (IRandomNumber* pRand, TRStrMap<CTileSet*>** prgmapTileSets, MAPTILE** prgWorlds, IJSONObject* pTowers)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+	TArray<POINT> aTowers;
+	INT nSeparation, nCount;
+	CMapArea mapArea;
+	RSTRING rstrTower = NULL;
+	RSTRING rstrGrass = NULL;
+
+	Check(RStrCreateW(LSP(L"towerOfWizardry-uncleared"), &rstrTower));
+	Check(RStrCreateW(LSP(L"grasslands"), &rstrGrass));
+
+	Check(pTowers->FindNonNullValueW(L"separation", &srv));
+	Check(srv->GetInteger(&nSeparation));
+	srv.Release();
+
+	Check(pTowers->FindNonNullValueW(L"count", &srv));
+	Check(srv->GetInteger(&nCount));
+
+	for(INT nTower = 0; nTower < nCount; nTower++)
+	{
+		for(;;)
+		{
+			INT nWorldPtr = 0;
+			POINT pt;
+
+			// Build initial list of suitable locations - we do this on each loop because we may reduce the separation
+			// Avoid map cells which are tundra on either plane - this avoids putting towers too close to the top or bottom
+			mapArea.Clear();
+			for(pt.y = 0; pt.y < m_yWorld; pt.y++)
+			{
+				for(pt.x = 0; pt.x < m_xWorld; pt.x++)
+				{
+					BOOL fPossible = TRUE;
+
+					for(INT nPlane = 0; nPlane < 2; nPlane++)
+					{
+						MAPTILE* pWorld = prgWorlds[nPlane];
+
+						if(pWorld[nWorldPtr + pt.x].pTile->GetTileSet()->IsTileSet(L"tundra"))
+						{
+							fPossible = FALSE;
+							break;
+						}
+					}
+
+					if(fPossible)
+					{
+						for(sysint i = 0; i < aTowers.Length(); i++)
+						{
+							POINT& ptTower = aTowers[i];
+
+							if(abs(pt.y - ptTower.y) <= nSeparation)
+							{
+								if(abs(pt.x - ptTower.x) <= nSeparation ||
+									abs(pt.x - (ptTower.x + m_xWorld)) <= nSeparation ||
+									abs(pt.x - (ptTower.x - m_xWorld)) <= nSeparation)
+								{
+									fPossible = FALSE;
+									break;
+								}
+							}
+						}
+
+						if(fPossible)
+							Check(mapArea.Add(pt));
+					}
+				}
+
+				nWorldPtr += m_xWorld;
+			}
+
+			if(0 == mapArea.Length())
+			{
+				// Reduce the separation distance.
+				CheckIf(0 == --nSeparation, E_FAIL);
+			}
+			else
+			{
+				pt = mapArea[pRand->Next(mapArea.Length())];
+				Check(aTowers.Append(pt));
+
+				for(INT nPlane = 0; nPlane < 2; nPlane++)
+				{
+					MAPTILE* pWorld = prgWorlds[nPlane];
+					MAPTILE* pCell = pWorld + pt.y * m_xWorld + pt.x;
+					CTileSet* pTileSet = pCell->pTile->GetTileSet();
+
+					if(pTileSet->IsTileSet(L"ocean") || pTileSet->IsTileSet(L"shore"))
+						Check(PlaceTile(pWorld, pt.x, pt.y, prgmapTileSets[nPlane], rstrGrass, FALSE));
+					RStrReplace(&pCell->rstrFeature, rstrTower);
+				}
+				break;
+			}
+		}
+	}
+
+Cleanup:
+	RStrRelease(rstrGrass);
+	RStrRelease(rstrTower);
 	return hr;
 }
 

@@ -46,6 +46,8 @@ public:
 
 	inline RSTRING GetName (VOID) { return m_rstrName; }
 
+	BOOL IsTileSet (PCWSTR pcwzTileSet);
+
 	HRESULT AddVariant (RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite);
 	HRESULT AddVariant (RSTRING rstrKey, ISimbeyInterchangeAnimator* pAnimator);
 

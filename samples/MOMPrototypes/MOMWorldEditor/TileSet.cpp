@@ -79,6 +79,12 @@ CTileSet::~CTileSet ()
 	RStrRelease(m_rstrName);
 }
 
+BOOL CTileSet::IsTileSet (PCWSTR pcwzTileSet)
+{
+	INT nResult;
+	return SUCCEEDED(RStrCompareW(m_rstrName, pcwzTileSet, &nResult)) && 0 == nResult;
+}
+
 HRESULT CTileSet::AddVariant (RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite)
 {
 	HRESULT hr;
