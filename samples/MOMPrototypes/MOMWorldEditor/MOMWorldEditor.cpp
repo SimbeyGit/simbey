@@ -34,6 +34,8 @@ const WCHAR c_wzAppTitle[] = L"MOM World Editor";
 
 const WCHAR c_wzFilter[] = L"Master of Magic JSON Map (*.json)\0*.json\0\0";
 
+const Dir::Value c_rgDir[] = { Dir::NORTH, Dir::EAST, Dir::SOUTH, Dir::WEST };
+
 ///////////////////////////////////////////////////////////////////////////////
 // CSimpleRNG
 ///////////////////////////////////////////////////////////////////////////////
@@ -345,6 +347,9 @@ CMOMWorldEditor::~CMOMWorldEditor ()
 	SafeRelease(m_pGenerators);
 	SafeDelete(m_pTileRules);
 
+	for(sysint i = 0; i < m_mapFeatureChances.Length(); i++)
+		(*m_mapFeatureChances.GetValuePtr(i))->Release();
+
 	m_mapSmoothingSystems.DeleteAll();
 
 	SafeRelease(m_pSurface);
@@ -379,8 +384,8 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 {
 	HRESULT hr;
 	RECT rect = { 0, 0, nWidth, nHeight };
-	TStackRef<IJSONObject> srData, srSmoothing;
-	TStackRef<IJSONValue> srvRules, srvSmoothing, srvGenerators, srvProportions;
+	TStackRef<IJSONObject> srData, srSmoothing, srFeatures;
+	TStackRef<IJSONValue> srvRules, srvSmoothing, srvGenerators, srvProportions, srvFeatures;
 	ISimbeyInterchangeFile* pSIF = NULL;
 
 	Check(CSIFRibbon::Create(DPI::Scale, &m_pRibbon));
@@ -406,6 +411,10 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 
 	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\proportions.json"), &srvProportions));
 	Check(srvProportions->GetArray(&m_pProportions));
+
+	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\features.json"), &srvFeatures));
+	Check(srvFeatures->GetObject(&srFeatures));
+	Check(LoadMapFeatureChances(srFeatures));
 
 	m_pGeneratorGallery = __new CGeneratorGallery(m_pRibbon, m_pGenerators);
 	CheckAlloc(m_pGeneratorGallery);
@@ -1077,7 +1086,7 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	CSimpleRNG rng(GetTickCount());
 	TStackRef<IJSONObject> srGenerator, srProportion, srZone, srTowers;
 	TStackRef<IJSONValue> srv;
-	TStackRef<IJSONArray> srBlobs;
+	TStackRef<IJSONArray> srFeatureChance, srBlobs;
 	INT nDepth, nZoneWidth, nZoneHeight, nTundraRowCount, cRivers;
 	INT nPercentageOfMapIsLand, nPercentageOfLandIsHills, nPercentageOfHillsAreMountains;
 	RSTRING rstrTile = NULL;
@@ -1131,6 +1140,10 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 
 	Check(srProportion->FindNonNullValueW(L"percentageOfHillsAreMountains", &srv));
 	Check(srv->GetInteger(&nPercentageOfHillsAreMountains));
+	srv.Release();
+
+	Check(srProportion->FindNonNullValueW(L"featureChance", &srv));
+	Check(srv->GetArray(&srFeatureChance));
 	srv.Release();
 
 	Check(srProportion->FindNonNullValueW(L"blobs", &srv));
@@ -1200,6 +1213,18 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 		}
 
 		Check(PlaceTowersOfWizardry(&rng, prgmapTileSets, prgWorlds, srTowers));
+
+		for(INT nPlane = 0; nPlane < ARRAYSIZE(prgWorlds); nPlane++)
+		{
+			MAPTILE* pWorld = prgWorlds[nPlane];
+			INT nChance;
+
+			Check(srFeatureChance->GetValue(nPlane, &srv));
+			Check(srv->GetInteger(&nChance));
+			srv.Release();
+
+			Check(PlaceMapFeatures(&rng, pWorld, nPlane, nChance));
+		}
 	}
 
 	Check(UpdateVisibleTiles());
@@ -1468,7 +1493,7 @@ HRESULT CMOMWorldEditor::MakeRivers (IRandomNumber* pRand, TRStrMap<CTileSet*>* 
 			break;
 
 		Check(aRivers.RemoveChecked(pRand->Next(aRivers.Length()), &river));
-		Check(ProcessRiver(pRand, river, pmapTileSets, pWorld, pRiver));
+		Check(ProcessRiver(pRand, river, pmapTileSets, pWorld, pRiver, pGrass));
 	}
 
 Cleanup:
@@ -1491,7 +1516,9 @@ HRESULT CMOMWorldEditor::AddRiverStarts (MAPTILE* pWorld, const POINT& ptShore, 
 		else if(river.ptStart.x >= m_xWorld)
 			river.ptStart.x -= m_xWorld;
 
-		if(pWorld[river.ptStart.y * m_xWorld + river.ptStart.x].pTile->GetTileSet() == pGrass)
+		if(RiverStartNotAdjacentToOthers(aRivers, river.ptStart) &&
+			pWorld[river.ptStart.y * m_xWorld + river.ptStart.x].pTile->GetTileSet() == pGrass &&
+			CountAdjacentTiles(pWorld, river.ptStart, pGrass) >= 2)
 		{
 			TArray<CTile*>* paTiles;
 			WCHAR wzKey[12];
@@ -1510,10 +1537,57 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CMOMWorldEditor::ProcessRiver (IRandomNumber* pRand, __inout RIVER_DIR& river, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CTileSet* pRiver)
+BOOL CMOMWorldEditor::RiverStartNotAdjacentToOthers (TArray<RIVER_DIR>& aRivers, const POINT& pt)
 {
-	// TODO
-	return PlaceTile(pWorld, river.ptStart.x, river.ptStart.y, pmapTileSets, pRiver->GetName(), FALSE);
+	for(sysint i = 0; i < aRivers.Length(); i++)
+	{
+		if(abs(aRivers[i].ptStart.x - pt.x) <= 3 && abs(aRivers[i].ptStart.y - pt.y) <= 3)
+			return FALSE;
+	}
+
+	return TRUE;
+}
+
+HRESULT CMOMWorldEditor::ProcessRiver (IRandomNumber* pRand, __inout RIVER_DIR& river, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CTileSet* pRiver, CTileSet* pGrass)
+{
+	HRESULT hr;
+	Dir::Value eAvoid = ~river.eDir;
+
+	for(;;)
+	{
+		POINT ptOptions[3];
+		INT idxOption = 0;
+
+		Check(PlaceTile(pWorld, river.ptStart.x, river.ptStart.y, pmapTileSets, pRiver->GetName(), FALSE));
+
+		for(INT n = 0; n < ARRAYSIZE(c_rgDir); n++)
+		{
+			if(c_rgDir[n] != eAvoid)
+			{
+				POINT& pt = ptOptions[idxOption];
+
+				pt.x = river.ptStart.x + c_rgDirections[c_rgDir[n]].x;
+				pt.y = river.ptStart.y + c_rgDirections[c_rgDir[n]].y;
+
+				if(pt.x < 0)
+					pt.x += m_xWorld;
+				else if(pt.x >= m_xWorld)
+					pt.x -= m_xWorld;
+
+				if(pWorld[pt.y * m_xWorld + pt.x].pTile->GetTileSet() == pGrass)
+					idxOption++;
+			}
+		}
+
+		if(0 == idxOption)
+			break;
+
+		// Randomly select the next tile to place a river tile.
+		river.ptStart = ptOptions[pRand->Next(idxOption)];
+	}
+
+Cleanup:
+	return hr;
 }
 
 HRESULT CMOMWorldEditor::MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT xWorld, INT yWorld, BOOL fActiveWorld)
@@ -1532,6 +1606,99 @@ HRESULT CMOMWorldEditor::MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE*
 		{
 			Check(PlaceTile(pWorld, x, 1, pmapTileSets, pTundra->m_rstrName, fActiveWorld));
 			Check(PlaceTile(pWorld, x, yWorld - 2, pmapTileSets, pTundra->m_rstrName, fActiveWorld));
+		}
+	}
+
+Cleanup:
+	return hr;
+}
+
+INT CMOMWorldEditor::CountAdjacentTiles (MAPTILE* pWorld, const POINT& ptAround, CTileSet* pTileSet)
+{
+	INT cMatches = 0;
+
+	for(INT n = 0; n < ARRAYSIZE(c_rgDir); n++)
+	{
+		POINT pt;
+
+		pt.x = ptAround.x + c_rgDirections[c_rgDir[n]].x;
+		pt.y = ptAround.y + c_rgDirections[c_rgDir[n]].y;
+
+		if(pt.x < 0)
+			pt.x += m_xWorld;
+		else if(pt.x >= m_xWorld)
+			pt.x -= m_xWorld;
+
+		if(pWorld[pt.y * m_xWorld + pt.x].pTile->GetTileSet() == pTileSet)
+			cMatches++;
+	}
+
+	return cMatches;
+}
+
+struct FEATURE_CHANCE
+{
+	RSTRING rstrFeature;
+	INT nChance;
+};
+
+HRESULT CMOMWorldEditor::PlaceMapFeatures (IRandomNumber* pRand, MAPTILE* pWorld, INT nPlane, INT nChance)
+{
+	HRESULT hr = S_FALSE;
+
+	for(INT y = 0; y < m_yWorld; y++)
+	{
+		for(INT x = 0; x < m_xWorld; x++)
+		{
+			IJSONObject* pChances;
+
+			if(NULL == pWorld->rstrFeature && SUCCEEDED(m_mapFeatureChances.Find(pWorld->pTile->GetTileSet()->GetName(), &pChances)) &&
+				0 == pRand->Next(nChance))
+			{
+				sysint cChances = pChances->Count();
+				TArray<FEATURE_CHANCE> aFeatures;
+				INT nTotalChance = 0, nSelected;
+
+				for(sysint i = 0; i < cChances; i++)
+				{
+					TStackRef<IJSONValue> srv;
+					TStackRef<IJSONArray> srSet;
+					FEATURE_CHANCE chance;
+
+					Check(pChances->GetValueByIndex(i, &srv));
+					Check(srv->GetArray(&srSet));
+					srv.Release();
+
+					Check(srSet->GetValue(nPlane, &srv));
+					Check(srv->GetInteger(&chance.nChance));
+
+					if(0 < chance.nChance)
+					{
+						Check(pChances->GetValueName(i, &chance.rstrFeature));
+						Check(aFeatures.Append(chance));
+						nTotalChance += chance.nChance;
+					}
+				}
+
+				nSelected = pRand->Next(nTotalChance);
+
+				for(sysint i = 0; i < aFeatures.Length(); i++)
+				{
+					FEATURE_CHANCE& chance = aFeatures[i];
+					if(nSelected < chance.nChance)
+					{
+						pWorld->rstrFeature = chance.rstrFeature;
+						chance.rstrFeature = NULL;
+						break;
+					}
+					nSelected -= chance.nChance;
+				}
+
+				for(sysint i = 0; i < aFeatures.Length(); i++)
+					RStrRelease(aFeatures[i].rstrFeature);
+			}
+
+			pWorld++;
 		}
 	}
 
@@ -2091,6 +2258,30 @@ HRESULT CMOMWorldEditor::LoadSmoothing (IJSONObject* pSmoothing)
 Cleanup:
 	RStrRelease(rstrSystem);
 	__delete pSystem;
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::LoadMapFeatureChances (IJSONObject* pFeatures)
+{
+	HRESULT hr = S_FALSE;
+	RSTRING rstrFeature = NULL;
+
+	for(sysint i = 0; i < pFeatures->Count(); i++)
+	{
+		TStackRef<IJSONValue> srv;
+		TStackRef<IJSONObject> srFeature;
+
+		Check(pFeatures->GetValueName(i, &rstrFeature));
+		Check(pFeatures->GetValueByIndex(i, &srv));
+		Check(srv->GetObject(&srFeature));
+		Check(m_mapFeatureChances.Add(rstrFeature, srFeature));
+		srFeature.Detach();	// Owned by m_mapFeatureChances
+
+		RStrRelease(rstrFeature); rstrFeature = NULL;
+	}
+
+Cleanup:
+	RStrRelease(rstrFeature);
 	return hr;
 }
 

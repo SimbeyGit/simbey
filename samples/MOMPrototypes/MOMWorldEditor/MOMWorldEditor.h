@@ -242,6 +242,7 @@ protected:
 
 	bool m_fKeys[256];
 
+	TRStrMap<IJSONObject*> m_mapFeatureChances;
 	TRStrMap<CSmoothingSystem*> m_mapSmoothingSystems;
 	CTileRules* m_pTileRules;
 
@@ -367,8 +368,11 @@ protected:
 	HRESULT PlaceTowersOfWizardry (IRandomNumber* pRand, TRStrMap<CTileSet*>** prgmapTileSets, MAPTILE** prgWorlds, IJSONObject* pTowers);
 	HRESULT MakeRivers (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT cRivers);
 	HRESULT AddRiverStarts (MAPTILE* pWorld, const POINT& ptShore, CTile* pShoreTile, CTileSet* pGrass, TArray<RIVER_DIR>& aRivers);
-	HRESULT ProcessRiver (IRandomNumber* pRand, __inout RIVER_DIR& river, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CTileSet* pRiver);
+	BOOL RiverStartNotAdjacentToOthers (TArray<RIVER_DIR>& aRivers, const POINT& pt);
+	HRESULT ProcessRiver (IRandomNumber* pRand, __inout RIVER_DIR& river, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CTileSet* pRiver, CTileSet* pGrass);
 	HRESULT MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT xWorld, INT yWorld, BOOL fActiveWorld);
+	INT CountAdjacentTiles (MAPTILE* pWorld, const POINT& ptAround, CTileSet* pTileSet);
+	HRESULT PlaceMapFeatures (IRandomNumber* pRand, MAPTILE* pWorld, INT nPlane, INT nChance);
 
 	VOID DeleteWorld (MAPTILE*& pWorld);
 	HRESULT ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorld, TRStrMap<CTileSet*>& mapTiles, BOOL fAddRandomTundra);
@@ -393,6 +397,7 @@ public:
 protected:
 	HRESULT LoadPackage (VOID);
 	HRESULT LoadSmoothing (IJSONObject* pSmoothing);
+	HRESULT LoadMapFeatureChances (IJSONObject* pFeatures);
 
 	HRESULT LoadFeatures (ISimbeyInterchangeFile* pFeatures);
 	HRESULT LoadCityTiles (ISimbeyInterchangeFile* pCityTiles);
