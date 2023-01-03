@@ -128,6 +128,7 @@ HRESULT JSONAPI JSONCreateDouble (double dblValue, __deref_out IJSONValue** ppvD
 HRESULT JSONAPI JSONFindArrayObjectIndirect (IJSONValue* pvArray, RSTRING rstrField, RSTRING rstrValue, __deref_out IJSONObject** ppObject, __out_opt sysint* pnIndex);
 HRESULT JSONAPI JSONFindArrayObject (IJSONArray* pArray, RSTRING rstrField, RSTRING rstrValue, __deref_out IJSONObject** ppObject, __out_opt sysint* pnIndex);
 HRESULT JSONAPI JSONFindArrayString (IJSONArray* pArray, RSTRING rstrValue, __out_opt sysint* pidxString);
+HRESULT JSONAPI JSONCreateBool (bool fValue, __deref_out IJSONValue** ppvBool);
 HRESULT JSONAPI JSONMergeObject (IJSONObject* pTarget, IJSONObject* pSource);
 HRESULT JSONAPI JSONAddFromObject (IJSONObject* pTarget, RSTRING rstrTarget, IJSONObject* pSource, RSTRING rstrSource, AddFromObject::Options eOptions);
 HRESULT JSONAPI JSONAddStringWToObject (IJSONObject* pTarget, RSTRING rstrField, PCWSTR pcwzText, INT cchText);

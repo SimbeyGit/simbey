@@ -1072,6 +1072,10 @@ HRESULT CMOMWorldEditor::PromptForNewMap (VOID)
 
 	m_pMain->SetScroll((m_xWorld * TILE_WIDTH) / 2 - SURFACE_WIDTH / 2,
 		(m_yWorld * TILE_HEIGHT) / 2 - SURFACE_HEIGHT / 2);
+
+	m_pMapTileLayer->Clear();
+	m_pMain->ClearLayer(m_nFeaturesLayer);
+	m_pMain->ClearLayer(m_nCitiesLayer);
 	UpdateVisibleTiles();
 
 Cleanup:
@@ -1089,7 +1093,6 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	TStackRef<IJSONArray> srFeatureChance, srBlobs;
 	INT nDepth, nZoneWidth, nZoneHeight, nTundraRowCount, cRivers;
 	INT nPercentageOfMapIsLand, nPercentageOfLandIsHills, nPercentageOfHillsAreMountains;
-	RSTRING rstrTile = NULL;
 
 	Check(m_pGenerators->GetObject(m_pGeneratorGallery->GetSelection(), &srGenerator));
 	Check(m_pProportions->GetObject(rng.Next(m_pProportions->Count()), &srProportion));
@@ -1201,12 +1204,7 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 				Check(srv->GetInteger(&nEachAreaTileCount));
 				srv.Release();
 
-				Check(srBlob->FindNonNullValueW(L"tile", &srv));
-				Check(srv->GetString(&rstrTile));
-				srv.Release();
-
-				Check(PlaceBlob(&rng, pmapTileSet, pWorld, rstrTile, (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentage / 10000.0 + 0.5), nEachAreaTileCount));
-				RStrRelease(rstrTile); rstrTile = NULL;
+				Check(PlaceBlob(&rng, pmapTileSet, pWorld, srBlob, (INT)(dblLandTileCountTimes100 * (DOUBLE)nPercentage / 10000.0 + 0.5), nEachAreaTileCount));
 			}
 
 			Check(MakeRivers(&rng, pmapTileSet, pWorld, cRivers));
@@ -1230,7 +1228,6 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	Check(UpdateVisibleTiles());
 
 Cleanup:
-	RStrRelease(rstrTile);
 	return hr;
 }
 
@@ -1254,20 +1251,45 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CMOMWorldEditor::PlaceBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, RSTRING rstrTile, INT nDesiredTileCount, INT nEachAreaTileCount)
+HRESULT CMOMWorldEditor::PlaceBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, IJSONObject* pData, INT nDesiredTileCount, INT nEachAreaTileCount)
 {
 	HRESULT hr;
 	INT cTotalTilesPlaced = 0;
-	CTileSet* pGrass, *pPlace;
+	CTileSet* pGrass, *pBlob, *pAltBlob;
+	TStackRef<IJSONValue> srv;
+	RSTRING rstrTile = NULL, rstrAltTile = NULL;
+	INT nAltChance = 0;
+
+	Check(pData->FindNonNullValueW(L"tile", &srv));
+	Check(srv->GetString(&rstrTile));
+	srv.Release();
 
 	Check(pmapTileSets->Find(RSTRING_CAST(L"grasslands"), &pGrass));
-	Check(pmapTileSets->Find(rstrTile, &pPlace));
+	Check(pmapTileSets->Find(rstrTile, &pBlob));
+
+	if(SUCCEEDED(pData->FindNonNullValueW(L"altChance", &srv)))
+	{
+		Check(srv->GetInteger(&nAltChance));
+		srv.Release();
+
+		Check(pData->FindNonNullValueW(L"altTile", &srv));
+		Check(srv->GetString(&rstrAltTile));
+		Check(pmapTileSets->Find(rstrAltTile, &pAltBlob));
+	}
 
 	while(cTotalTilesPlaced < nDesiredTileCount)
 	{
 		INT cTilesPlaced;
+		RSTRING rstrPlaceTile = rstrTile;
+		CTileSet* pPlace = pBlob;
 
-		Check(PlaceSingleBlob(pRand, pmapTileSets, pGrass, pPlace, pWorld, rstrTile, nEachAreaTileCount, &cTilesPlaced));
+		if(0 < nAltChance && 0 == pRand->Next(nAltChance))
+		{
+			rstrPlaceTile = rstrAltTile;
+			pPlace = pAltBlob;
+		}
+
+		Check(PlaceSingleBlob(pRand, pmapTileSets, pGrass, pPlace, pWorld, rstrPlaceTile, nEachAreaTileCount, &cTilesPlaced));
 		if(0 == cTilesPlaced)
 			break;
 
@@ -1275,6 +1297,8 @@ HRESULT CMOMWorldEditor::PlaceBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* p
 	}
 
 Cleanup:
+	RStrRelease(rstrAltTile);
+	RStrRelease(rstrTile);
 	return hr;
 }
 

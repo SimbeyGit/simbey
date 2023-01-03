@@ -51,7 +51,7 @@ HRESULT CTile::CreateSprite (__deref_out ISimbeyInterchangeSprite** ppSprite)
 		TStackRef<ISimbeyInterchangeSprite> srSprite;
 
 		Check(m_pAnimator->CreateSprite(&srSprite));
-		Check(srSprite->SelectAnimation(0));
+		Check(srSprite->SelectAnimation(0, rand() % m_pAnimator->GetImageCount()));
 		*ppSprite = srSprite.Detach();
 	}
 

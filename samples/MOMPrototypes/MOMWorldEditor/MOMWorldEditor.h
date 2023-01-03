@@ -363,7 +363,7 @@ protected:
 	HRESULT GenerateRandomWorlds (VOID);
 
 	HRESULT SetHighestTiles (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, CHeightMapGenerator& heightMap, PCWSTR pcwzTile, INT cchTile, INT nDesiredTileCount, BOOL fActiveWorld);
-	HRESULT PlaceBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, RSTRING rstrTile, INT nDesiredTileCount, INT nEachAreaTileCount);
+	HRESULT PlaceBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, IJSONObject* pData, INT nDesiredTileCount, INT nEachAreaTileCount);
 	HRESULT PlaceSingleBlob (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, CTileSet* pReplace, CTileSet* pPlace, MAPTILE* pWorld, RSTRING rstrTile, INT nEachAreaTileCount, __out INT* pcTilesPlaced);
 	HRESULT PlaceTowersOfWizardry (IRandomNumber* pRand, TRStrMap<CTileSet*>** prgmapTileSets, MAPTILE** prgWorlds, IJSONObject* pTowers);
 	HRESULT MakeRivers (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT cRivers);
