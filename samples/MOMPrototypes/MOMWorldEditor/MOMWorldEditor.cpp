@@ -1088,9 +1088,9 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	TRStrMap<CTileSet*>* prgmapTileSets[2] = { &m_mapArcanus, &m_mapMyrror };
 	COORD_SYSTEM coords;
 	CSimpleRNG rng(GetTickCount());
-	TStackRef<IJSONObject> srGenerator, srProportion, srZone, srTowers;
+	TStackRef<IJSONObject> srGenerator, srProportion, srZone, srTowers, srLairs;
 	TStackRef<IJSONValue> srv;
-	TStackRef<IJSONArray> srFeatureChance, srBlobs;
+	TStackRef<IJSONArray> srNodes, srFeatureChance, srBlobs;
 	INT nDepth, nZoneWidth, nZoneHeight, nTundraRowCount, cRivers;
 	INT nPercentageOfMapIsLand, nPercentageOfLandIsHills, nPercentageOfHillsAreMountains;
 
@@ -1127,6 +1127,14 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 
 	Check(srGenerator->FindNonNullValueW(L"towers", &srv));
 	Check(srv->GetObject(&srTowers));
+	srv.Release();
+
+	Check(srGenerator->FindNonNullValueW(L"nodes", &srv));
+	Check(srv->GetArray(&srNodes));
+	srv.Release();
+
+	Check(srGenerator->FindNonNullValueW(L"lairs", &srv));
+	Check(srv->GetObject(&srLairs));
 	srv.Release();
 
 	Check(srProportion->FindNonNullValueW(L"tundraRowCount", &srv));
@@ -1215,13 +1223,20 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 		for(INT nPlane = 0; nPlane < ARRAYSIZE(prgWorlds); nPlane++)
 		{
 			MAPTILE* pWorld = prgWorlds[nPlane];
-			INT nChance;
+			INT nChance, cNodes;
 
 			Check(srFeatureChance->GetValue(nPlane, &srv));
 			Check(srv->GetInteger(&nChance));
 			srv.Release();
 
 			Check(PlaceMapFeatures(&rng, pWorld, nPlane, nChance));
+
+			Check(srNodes->GetValue(nPlane, &srv));
+			Check(srv->GetInteger(&cNodes));
+			srv.Release();
+
+			Check(PlaceNodes(&rng, prgmapTileSets[nPlane], pWorld, cNodes));
+			Check(PlaceLairs(&rng, prgmapTileSets[nPlane], pWorld, srLairs, nPlane));
 		}
 	}
 
@@ -1723,6 +1738,114 @@ HRESULT CMOMWorldEditor::PlaceMapFeatures (IRandomNumber* pRand, MAPTILE* pWorld
 			}
 
 			pWorld++;
+		}
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::PlaceNodes (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT cNodes)
+{
+	HRESULT hr;
+	CTileSet* pGrass;
+	MAPTILE* pWorldPtr = pWorld;
+	POINT pt;
+	CMapArea mapPlaced;
+	TArray<POINT> aPossible;
+	PCWSTR rgNodes[] = { L"chaosNode", L"natureNode", L"sorceryNode" };
+	RSTRING rstrNode = NULL;
+
+	Check(pmapTileSets->Find(RSTRING_CAST(L"grasslands"), &pGrass));
+
+	for(pt.y = 0; pt.y < m_yWorld; pt.y++)
+	{
+		for(pt.x = 0; pt.x < m_xWorld; pt.x++)
+		{
+			if(pWorldPtr->pTile->GetTileSet() == pGrass && NULL == pWorldPtr->rstrFeature)
+				Check(aPossible.Append(pt));
+			pWorldPtr++;
+		}
+	}
+
+	for(sysint i = 0; i < cNodes; i++)
+	{
+		for(sysint n = 0; n < 50; n++)
+		{
+			sysint cPossible = aPossible.Length();
+			CheckIf(0 == cPossible, S_FALSE);
+
+			Check(aPossible.RemoveChecked(pRand->Next(cPossible), &pt));
+			if(!mapPlaced.HasWithin(pt, 10))
+			{
+				PCWSTR pcwzNode = rgNodes[pRand->Next(ARRAYSIZE(rgNodes))];
+
+				Check(mapPlaced.Add(pt));
+				Check(RStrCreateW(TStrLenAssert(pcwzNode), pcwzNode, &rstrNode));
+				Check(PlaceTile(pWorld, pt.x, pt.y, pmapTileSets, rstrNode, FALSE));
+				RStrRelease(rstrNode); rstrNode = NULL;
+				break;
+			}
+		}
+	}
+
+Cleanup:
+	RStrRelease(rstrNode);
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::PlaceLairs (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, IJSONObject* pLairs, INT nPlane)
+{
+	HRESULT hr;
+	CTileSet* pOcean, *pShore, *pTundra;
+	MAPTILE* pWorldPtr = pWorld;
+	POINT pt;
+	TStackRef<IJSONValue> srv;
+	CMapArea mapPlaced;
+	TArray<POINT> aPossible;
+	INT cNormal, cWeak, cTotal;
+	PCWSTR rgLairs[] = { L"ancientTemple", L"fallenTemple", L"keep", L"lair", L"ruins" };
+
+	Check(pmapTileSets->Find(RSTRING_CAST(L"ocean"), &pOcean));
+	Check(pmapTileSets->Find(RSTRING_CAST(L"shore"), &pShore));
+	Check(pmapTileSets->Find(RSTRING_CAST(L"tundra"), &pTundra));
+
+	Check(pLairs->FindNonNullValueW(L"normal", &srv));
+	Check(srv->GetInteger(&cNormal));
+	srv.Release();
+
+	Check(pLairs->FindNonNullValueW(L"weak", &srv));
+	Check(srv->GetInteger(&cWeak));
+
+	cTotal = cNormal / 2 + cWeak / 2;
+
+	for(pt.y = 0; pt.y < m_yWorld; pt.y++)
+	{
+		for(pt.x = 0; pt.x < m_xWorld; pt.x++)
+		{
+			CTileSet* pTileSet = pWorldPtr->pTile->GetTileSet();
+			if((pTileSet != pOcean && pTileSet != pShore && pTileSet != pTundra) && NULL == pWorldPtr->rstrFeature)
+				Check(aPossible.Append(pt));
+			pWorldPtr++;
+		}
+	}
+
+	for(INT i = 0; i < cTotal; i++)
+	{
+		for(sysint n = 0; n < 50; n++)
+		{
+			sysint cPossible = aPossible.Length();
+			CheckIf(0 == cPossible, S_FALSE);
+
+			Check(aPossible.RemoveChecked(pRand->Next(cPossible), &pt));
+			if(!mapPlaced.HasWithin(pt, 5))
+			{
+				PCWSTR pcwzLair = rgLairs[pRand->Next(ARRAYSIZE(rgLairs))];
+
+				Check(mapPlaced.Add(pt));
+				Check(RStrCreateW(TStrLenAssert(pcwzLair), pcwzLair, &pWorld[pt.y * m_xWorld + pt.x].rstrFeature));
+				break;
+			}
 		}
 	}
 

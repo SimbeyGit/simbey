@@ -64,6 +64,17 @@ public:
 		}
 		return FALSE;
 	}
+
+	BOOL HasWithin (const POINT& pt, INT nRadius)
+	{
+		for(sysint i = 0; i < m_aPoints.Length(); i++)
+		{
+			POINT& ptItem = m_aPoints[i];
+			if(abs(ptItem.x - pt.x) <= nRadius && abs(ptItem.y - pt.y) <= nRadius)
+				return TRUE;
+		}
+		return FALSE;
+	}
 };
 
 class CGeneratorGallery :
@@ -373,6 +384,8 @@ protected:
 	HRESULT MakeTundra (TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT xWorld, INT yWorld, BOOL fActiveWorld);
 	INT CountAdjacentTiles (MAPTILE* pWorld, const POINT& ptAround, CTileSet* pTileSet);
 	HRESULT PlaceMapFeatures (IRandomNumber* pRand, MAPTILE* pWorld, INT nPlane, INT nChance);
+	HRESULT PlaceNodes (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, INT cNodes);
+	HRESULT PlaceLairs (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, IJSONObject* pLairs, INT nPlane);
 
 	VOID DeleteWorld (MAPTILE*& pWorld);
 	HRESULT ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorld, TRStrMap<CTileSet*>& mapTiles, BOOL fAddRandomTundra);
