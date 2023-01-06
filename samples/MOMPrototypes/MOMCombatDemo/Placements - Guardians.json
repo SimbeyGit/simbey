@@ -1,5 +1,6 @@
 {
 	player: "offense",
+	generator: "forest",
 	floating: false,
 	mana: 500,
 	spells:

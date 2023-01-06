@@ -1,5 +1,6 @@
 {
 	player: "defense",
+	generator: "desert",
 	floating: false,
 	mana: 500,
 	spells:

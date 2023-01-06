@@ -224,14 +224,6 @@
 				RelativePath=".\resource.h"
 				>
 			</File>
-			<File
-				RelativePath=".\TileRules.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TileSet.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -567,6 +559,10 @@
 			Name="Shared"
 			>
 			<File
+				RelativePath="..\Shared\Dir.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Shared\InteractiveSurface.cpp"
 				>
 			</File>
@@ -580,6 +576,14 @@
 			</File>
 			<File
 				RelativePath="..\Shared\TileRules.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\TileSet.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\TileSet.h"
 				>
 			</File>
 		</Filter>

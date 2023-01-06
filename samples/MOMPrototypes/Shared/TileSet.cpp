@@ -1,5 +1,4 @@
 #include <windows.h>
-#include "resource.h"
 #include "Library\Core\CoreDefs.h"
 #include "Library\Core\MemoryStream.h"
 #include "Library\Util\Formatting.h"

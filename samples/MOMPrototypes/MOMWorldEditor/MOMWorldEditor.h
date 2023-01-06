@@ -9,8 +9,8 @@
 #include "Library\MIDIPlayer.h"
 #include "Package\SIFPackage.h"
 #include "..\Shared\InteractiveSurface.h"
-#include "Dir.h"
-#include "TileSet.h"
+#include "..\Shared\Dir.h"
+#include "..\Shared\TileSet.h"
 
 interface IJSONValue;
 interface IJSONObject;
@@ -157,6 +157,42 @@ struct CITYTILE
 {
 	ISimbeyInterchangeSprite* pNormal[17];
 	ISimbeyInterchangeSprite* pWalled[17];
+};
+
+class CMapData
+{
+public:
+	RSTRING m_rstrFeature;
+	IJSONObject* m_pData;
+	IJSONObject* m_pCity;
+	IJSONObject* m_pStack;
+
+public:
+	CMapData () :
+		m_rstrFeature(NULL),
+		m_pData(NULL),
+		m_pCity(NULL),
+		m_pStack(NULL)
+	{
+	}
+
+	~CMapData ()
+	{
+		Clear();
+	}
+
+	VOID Clear (VOID)
+	{
+		if(m_rstrFeature)
+		{
+			RStrRelease(m_rstrFeature);
+			m_rstrFeature = NULL;
+		}
+
+		SafeRelease(m_pData);
+		SafeRelease(m_pCity);
+		SafeRelease(m_pStack);
+	}
 };
 
 class CBaseGalleryCommand
@@ -394,13 +430,13 @@ protected:
 	VOID Scroll (INT x, INT y);
 
 	HRESULT SetupMap (INT xWorld, INT yWorld, BOOL fAddRandomTundra);
+	HRESULT AllocateWorld (INT nWorldCells, __deref_out MAPTILE** ppWorld);
 	HRESULT LoadWorldFromJSON (TRStrMap<CTileSet*>& mapTileSet, IJSONObject* pMap, PCWSTR pcwzWorld, INT xWorld, INT yWorld, MAPTILE** ppWorld);
 	HRESULT SaveWorldToJSON (IJSONObject* pMap, PCWSTR pcwzWorld, INT xWorld, INT yWorld, MAPTILE* pWorld);
 
 	HRESULT ReplaceCommand (CBaseGalleryCommand* pCommand);
 
 public:
-	VOID ClearTileData (MAPTILE* pTile);
 	HRESULT ClearTile (INT x, INT y, BOOL fActiveWorld);
 	HRESULT PlaceSelectedTile (INT x, INT y);
 	HRESULT PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStrMap<CTileSet*>* pmapTileSets, RSTRING rstrTile, BOOL fActiveWorld);

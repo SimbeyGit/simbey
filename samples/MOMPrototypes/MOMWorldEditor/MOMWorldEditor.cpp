@@ -268,7 +268,7 @@ HRESULT CFeaturesCommand::Execute (class CMOMWorldEditor* pEditor, INT xTile, IN
 
 	Check(m_pGallery->GetSelectedTile(&rstrTile));
 
-	RStrReplace(&m_pWorld[yTile * m_xWorld + xTile].rstrFeature, rstrTile);
+	RStrReplace(&m_pWorld[yTile * m_xWorld + xTile].pData->m_rstrFeature, rstrTile);
 	pEditor->ClearTile(xTile, yTile, TRUE);
 
 Cleanup:
@@ -278,8 +278,8 @@ Cleanup:
 
 HRESULT CClearFeatureCommand::Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile)
 {
-	SafeRelease(m_pWorld[yTile * m_xWorld + xTile].pData);
-	RStrReplace(&m_pWorld[yTile * m_xWorld + xTile].rstrFeature, NULL);
+	SafeRelease(m_pWorld[yTile * m_xWorld + xTile].pData->m_pData);
+	RStrReplace(&m_pWorld[yTile * m_xWorld + xTile].pData->m_rstrFeature, NULL);
 	pEditor->ClearTile(xTile, yTile, TRUE);
 	return S_OK;
 }
@@ -1487,7 +1487,7 @@ HRESULT CMOMWorldEditor::PlaceTowersOfWizardry (IRandomNumber* pRand, TRStrMap<C
 
 					if(pTileSet->IsTileSet(L"ocean") || pTileSet->IsTileSet(L"shore"))
 						Check(PlaceTile(pWorld, pt.x, pt.y, prgmapTileSets[nPlane], rstrGrass, FALSE));
-					RStrReplace(&pCell->rstrFeature, rstrTower);
+					RStrReplace(&pCell->pData->m_rstrFeature, rstrTower);
 				}
 				break;
 			}
@@ -1691,7 +1691,7 @@ HRESULT CMOMWorldEditor::PlaceMapFeatures (IRandomNumber* pRand, MAPTILE* pWorld
 		{
 			IJSONObject* pChances;
 
-			if(NULL == pWorld->rstrFeature && SUCCEEDED(m_mapFeatureChances.Find(pWorld->pTile->GetTileSet()->GetName(), &pChances)) &&
+			if(NULL == pWorld->pData->m_rstrFeature && SUCCEEDED(m_mapFeatureChances.Find(pWorld->pTile->GetTileSet()->GetName(), &pChances)) &&
 				0 == pRand->Next(nChance))
 			{
 				sysint cChances = pChances->Count();
@@ -1726,7 +1726,7 @@ HRESULT CMOMWorldEditor::PlaceMapFeatures (IRandomNumber* pRand, MAPTILE* pWorld
 					FEATURE_CHANCE& chance = aFeatures[i];
 					if(nSelected < chance.nChance)
 					{
-						pWorld->rstrFeature = chance.rstrFeature;
+						pWorld->pData->m_rstrFeature = chance.rstrFeature;
 						chance.rstrFeature = NULL;
 						break;
 					}
@@ -1762,7 +1762,7 @@ HRESULT CMOMWorldEditor::PlaceNodes (IRandomNumber* pRand, TRStrMap<CTileSet*>* 
 	{
 		for(pt.x = 0; pt.x < m_xWorld; pt.x++)
 		{
-			if(pWorldPtr->pTile->GetTileSet() == pGrass && NULL == pWorldPtr->rstrFeature)
+			if(pWorldPtr->pTile->GetTileSet() == pGrass && NULL == pWorldPtr->pData->m_rstrFeature)
 				Check(aPossible.Append(pt));
 			pWorldPtr++;
 		}
@@ -1824,7 +1824,7 @@ HRESULT CMOMWorldEditor::PlaceLairs (IRandomNumber* pRand, TRStrMap<CTileSet*>* 
 		for(pt.x = 0; pt.x < m_xWorld; pt.x++)
 		{
 			CTileSet* pTileSet = pWorldPtr->pTile->GetTileSet();
-			if((pTileSet != pOcean && pTileSet != pShore && pTileSet != pTundra) && NULL == pWorldPtr->rstrFeature)
+			if((pTileSet != pOcean && pTileSet != pShore && pTileSet != pTundra) && NULL == pWorldPtr->pData->m_rstrFeature)
 				Check(aPossible.Append(pt));
 			pWorldPtr++;
 		}
@@ -1843,7 +1843,7 @@ HRESULT CMOMWorldEditor::PlaceLairs (IRandomNumber* pRand, TRStrMap<CTileSet*>* 
 				PCWSTR pcwzLair = rgLairs[pRand->Next(ARRAYSIZE(rgLairs))];
 
 				Check(mapPlaced.Add(pt));
-				Check(RStrCreateW(TStrLenAssert(pcwzLair), pcwzLair, &pWorld[pt.y * m_xWorld + pt.x].rstrFeature));
+				Check(RStrCreateW(TStrLenAssert(pcwzLair), pcwzLair, &pWorld[pt.y * m_xWorld + pt.x].pData->m_rstrFeature));
 				break;
 			}
 		}
@@ -1859,12 +1859,7 @@ VOID CMOMWorldEditor::DeleteWorld (MAPTILE*& pWorld)
 	{
 		INT nWorldCells = m_xWorld * m_yWorld;
 		for(INT i = 0; i < nWorldCells; i++)
-		{
-			RStrRelease(pWorld[i].rstrFeature);
-			SafeRelease(pWorld[i].pData);
-			SafeRelease(pWorld[i].pCity);
-			SafeRelease(pWorld[i].pStack);
-		}
+			SafeDelete(pWorld[i].pData);
 		SafeDeleteArray(pWorld);
 	}
 }
@@ -1893,7 +1888,7 @@ HRESULT CMOMWorldEditor::ResetWorldTiles (MAPTILE* pWorld, INT xWorld, INT yWorl
 				if(nNext != nPrev)
 					break;
 			}
-			ClearTileData(pWorldPtr);
+			pWorldPtr->pData->Clear();
 			pWorldPtr->pTile = (*pTiles)[nNext];
 			pWorldPtr++;
 			nPrev = nNext;
@@ -1965,11 +1960,11 @@ HRESULT CMOMWorldEditor::UpdateVisibleTiles (VOID)
 				srSprite->SetPosition(x, y);
 				Check(m_pMain->AddSprite(nMapTileLayer, srSprite, NULL));
 
-				if(pMapTile->rstrFeature)
+				if(pMapTile->pData->m_rstrFeature)
 				{
 					ISimbeyInterchangeSprite* pFeature;
 
-					Check(m_mapFeatures.Find(pMapTile->rstrFeature, &pFeature));
+					Check(m_mapFeatures.Find(pMapTile->pData->m_rstrFeature, &pFeature));
 
 					srSprite.Release();
 					Check(pFeature->Clone(&srSprite));
@@ -1978,13 +1973,13 @@ HRESULT CMOMWorldEditor::UpdateVisibleTiles (VOID)
 					Check(m_pMain->AddSprite(m_nFeaturesLayer, srSprite, NULL));
 				}
 
-				if(pMapTile->pCity)
+				if(pMapTile->pData->m_pCity)
 				{
 					TStackRef<IJSONValue> srv;
 					INT nPopulation, nTile, nFlag;
 					bool fWall;
 
-					Check(pMapTile->pCity->FindNonNullValueW(L"population", &srv));
+					Check(pMapTile->pData->m_pCity->FindNonNullValueW(L"population", &srv));
 					Check(srv->GetInteger(&nPopulation));
 					srv.Release();
 
@@ -2001,7 +1996,7 @@ HRESULT CMOMWorldEditor::UpdateVisibleTiles (VOID)
 							nTile = m_aCityTiles.Length() - 1;
 					}
 
-					if(SUCCEEDED(pMapTile->pCity->FindNonNullValueW(L"flag", &srv)))
+					if(SUCCEEDED(pMapTile->pData->m_pCity->FindNonNullValueW(L"flag", &srv)))
 					{
 						Check(srv->GetInteger(&nFlag));
 						srv.Release();
@@ -2010,7 +2005,7 @@ HRESULT CMOMWorldEditor::UpdateVisibleTiles (VOID)
 						nFlag = 0;
 
 					srSprite.Release();
-					if(SUCCEEDED(pMapTile->pCity->FindNonNullValueW(L"wall", &srv)) && SUCCEEDED(srv->GetBoolean(&fWall)) && fWall)
+					if(SUCCEEDED(pMapTile->pData->m_pCity->FindNonNullValueW(L"wall", &srv)) && SUCCEEDED(srv->GetBoolean(&fWall)) && fWall)
 						Check(m_aCityTiles[nTile].pWalled[nFlag]->Clone(&srSprite));
 					else
 						Check(m_aCityTiles[nTile].pNormal[nFlag]->Clone(&srSprite));
@@ -2053,13 +2048,8 @@ HRESULT CMOMWorldEditor::SetupMap (INT xWorld, INT yWorld, BOOL fAddRandomTundra
 
 	INT nWorldCells = m_xWorld * m_yWorld;
 
-	m_pArcanusWorld = __new MAPTILE[nWorldCells];
-	CheckAlloc(m_pArcanusWorld);
-	ZeroMemory(m_pArcanusWorld, sizeof(MAPTILE) * nWorldCells);
-
-	m_pMyrrorWorld = __new MAPTILE[nWorldCells];
-	CheckAlloc(m_pMyrrorWorld);
-	ZeroMemory(m_pMyrrorWorld, sizeof(MAPTILE) * nWorldCells);
+	Check(AllocateWorld(nWorldCells, &m_pArcanusWorld));
+	Check(AllocateWorld(nWorldCells, &m_pMyrrorWorld));
 
 	Check(ResetWorldTiles(m_pArcanusWorld, m_xWorld, m_yWorld, m_mapArcanus, fAddRandomTundra));
 	Check(ResetWorldTiles(m_pMyrrorWorld, m_xWorld, m_yWorld, m_mapMyrror, fAddRandomTundra));
@@ -2073,6 +2063,27 @@ Cleanup:
 		m_xWorld = 0;
 		m_yWorld = 0;
 	}
+	return hr;
+}
+
+HRESULT CMOMWorldEditor::AllocateWorld (INT nWorldCells, __deref_out MAPTILE** ppWorld)
+{
+	HRESULT hr;
+	MAPTILE* pWorld = __new MAPTILE[nWorldCells];
+
+	CheckAlloc(pWorld);
+	ZeroMemory(pWorld, sizeof(MAPTILE) * nWorldCells);
+
+	for(INT i = 0; i < nWorldCells; i++)
+	{
+		pWorld[i].pData = __new CMapData;
+		CheckAlloc(pWorld[i].pData);
+	}
+
+	*ppWorld = pWorld;
+	hr = S_OK;
+
+Cleanup:
 	return hr;
 }
 
@@ -2116,19 +2127,19 @@ HRESULT CMOMWorldEditor::LoadWorldFromJSON (TRStrMap<CTileSet*>& mapTileSet, IJS
 
 		srv.Release();
 		if(SUCCEEDED(srCell->FindNonNullValueW(L"feature", &srv)))
-			Check(srv->GetString(&pCell->rstrFeature));
+			Check(srv->GetString(&pCell->pData->m_rstrFeature));
 
 		srv.Release();
 		if(SUCCEEDED(srCell->FindNonNullValueW(L"data", &srv)))
-			Check(srv->GetObject(&pCell->pData));
+			Check(srv->GetObject(&pCell->pData->m_pData));
 
 		srv.Release();
 		if(SUCCEEDED(srCell->FindNonNullValueW(L"city", &srv)))
-			Check(srv->GetObject(&pCell->pCity));
+			Check(srv->GetObject(&pCell->pData->m_pCity));
 
 		srv.Release();
 		if(SUCCEEDED(srCell->FindNonNullValueW(L"stack", &srv)))
-			Check(srv->GetObject(&pCell->pStack));
+			Check(srv->GetObject(&pCell->pData->m_pStack));
 
 		RStrRelease(rstrTile); rstrTile = NULL;
 		RStrRelease(rstrKey); rstrKey = NULL;
@@ -2166,30 +2177,30 @@ HRESULT CMOMWorldEditor::SaveWorldToJSON (IJSONObject* pMap, PCWSTR pcwzWorld, I
 		Check(srCell->AddValueW(L"key", srv));
 		srv.Release();
 
-		if(pCell->rstrFeature)
+		if(pCell->pData->m_rstrFeature)
 		{
-			Check(JSONCreateString(pCell->rstrFeature, &srv));
+			Check(JSONCreateString(pCell->pData->m_rstrFeature, &srv));
 			Check(srCell->AddValueW(L"feature", srv));
 			srv.Release();
 		}
 
-		if(pCell->pData)
+		if(pCell->pData->m_pData)
 		{
-			Check(JSONWrapObject(pCell->pData, &srv));
+			Check(JSONWrapObject(pCell->pData->m_pData, &srv));
 			Check(srCell->AddValueW(L"data", srv));
 			srv.Release();
 		}
 
-		if(pCell->pCity)
+		if(pCell->pData->m_pCity)
 		{
-			Check(JSONWrapObject(pCell->pCity, &srv));
+			Check(JSONWrapObject(pCell->pData->m_pCity, &srv));
 			Check(srCell->AddValueW(L"city", srv));
 			srv.Release();
 		}
 
-		if(pCell->pStack)
+		if(pCell->pData->m_pStack)
 		{
-			Check(JSONWrapObject(pCell->pStack, &srv));
+			Check(JSONWrapObject(pCell->pData->m_pStack, &srv));
 			Check(srCell->AddValueW(L"stack", srv));
 			srv.Release();
 		}
@@ -2218,19 +2229,6 @@ HRESULT CMOMWorldEditor::ReplaceCommand (CBaseGalleryCommand* pCommand)
 
 Cleanup:
 	return hr;
-}
-
-VOID CMOMWorldEditor::ClearTileData (MAPTILE* pTile)
-{
-	if(pTile->rstrFeature)
-	{
-		RStrRelease(pTile->rstrFeature);
-		pTile->rstrFeature = NULL;
-	}
-
-	SafeRelease(pTile->pCity);
-	SafeRelease(pTile->pData);
-	SafeRelease(pTile->pStack);
 }
 
 HRESULT CMOMWorldEditor::ClearTile (INT x, INT y, BOOL fActiveWorld)
@@ -2287,7 +2285,7 @@ HRESULT CMOMWorldEditor::PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStr
 
 	for(sysint i = 0; i < aTiles.Length(); i++)
 	{
-		ClearTileData(pWorld + (aTiles[i].y * m_xWorld + aTiles[i].x));
+		pWorld[aTiles[i].y * m_xWorld + aTiles[i].x].pData->Clear();
 		ClearTile(aTiles[i].x, aTiles[i].y, fActiveWorld);
 	}
 
@@ -2300,7 +2298,7 @@ HRESULT CMOMWorldEditor::PlaceOrModifyCity (MAPTILE* pWorld, INT xTile, INT yTil
 	HRESULT hr;
 	MAPTILE* pTile = pWorld + yTile * m_xWorld + xTile;
 	TStackRef<ISimbeyInterchangeSprite> srSprite;
-	TStackRef<IJSONObject> srCity(pTile->pCity);
+	TStackRef<IJSONObject> srCity(pTile->pData->m_pCity);
 	CDialogHost host(m_hInstance);
 	CCityDlg* pdlgCity = NULL;
 
@@ -2314,11 +2312,11 @@ HRESULT CMOMWorldEditor::PlaceOrModifyCity (MAPTILE* pWorld, INT xTile, INT yTil
 	switch(host.GetReturnValue())
 	{
 	case IDOK:
-		ReplaceInterface<IJSONObject>(pTile->pCity, srCity);
+		ReplaceInterface<IJSONObject>(pTile->pData->m_pCity, srCity);
 		__fallthrough;
 	case IDC_DELETE:
 		if(IDC_DELETE == host.GetReturnValue())
-			SafeRelease(pTile->pCity);
+			SafeRelease(pTile->pData->m_pCity);
 		if(SUCCEEDED(m_pMain->FindSpriteAt(m_pMapTileLayer->GetLayer(), xTile * TILE_WIDTH, yTile * TILE_HEIGHT, &srSprite)))
 		{
 			m_pMain->RemoveSprite(m_pMapTileLayer->GetLayer(), srSprite);

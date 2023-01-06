@@ -10,6 +10,7 @@ interface IJSONArray;
 class CSmoothingSystem;
 class CTileRules;
 class CTileSet;
+class CMapData;
 
 class CTile
 {
@@ -60,10 +61,7 @@ private:
 struct MAPTILE
 {
 	CTile* pTile;
-	RSTRING rstrFeature;
-	IJSONObject* pData;
-	IJSONObject* pCity;
-	IJSONObject* pStack;
+	CMapData* pData;
 };
 
 class CPlaceItem

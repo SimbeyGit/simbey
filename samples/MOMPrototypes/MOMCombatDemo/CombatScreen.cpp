@@ -2589,13 +2589,27 @@ Cleanup:
 HRESULT CCombatScreen::LoadSprites (VOID)
 {
 	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONObject> srGenerator;
 	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
 	sysint nLayer;
 	INT xTileStart, yTileStart, xTileEnd, yTileEnd;
 	CInteractiveLayer* pLayer = NULL;
+	RSTRING rstrGenerator = NULL, rstrTiles = NULL;
+	WCHAR wzStandardTiles[MAX_PATH];
+
+	Check(m_pPlacements->FindNonNullValueW(L"generator", &srv));
+	Check(srv->GetString(&rstrGenerator));
+	srv.Release();
+
+	Check(JSONFindArrayObject(m_pGenerators, RSTRING_CAST(L"name"), rstrGenerator, &srGenerator, NULL));
+	Check(srGenerator->FindNonNullValueW(L"tiles", &srv));
+	Check(srv->GetString(&rstrTiles));
+
+	Check(Formatting::TPrintF(wzStandardTiles, ARRAYSIZE(wzStandardTiles), NULL, L"combat\\terrain\\arcanus\\%r\\standard\\tiles.sif", rstrTiles));
 
 	Check(m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer));
-	Check(LoadAnimator(SLP(L"graphics\\Tiles.json"), L"combat\\terrain\\arcanus\\default\\standard\\tiles.sif", &srAnimator, FALSE));
+	Check(LoadAnimator(SLP(L"graphics\\Tiles.json"), wzStandardTiles, &srAnimator, FALSE));
 
 	if(m_pBackground)
 	{
@@ -2704,6 +2718,8 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 
 Cleanup:
 	SafeRelease(pLayer);
+	RStrRelease(rstrTiles);
+	RStrRelease(rstrGenerator);
 	return hr;
 }
 

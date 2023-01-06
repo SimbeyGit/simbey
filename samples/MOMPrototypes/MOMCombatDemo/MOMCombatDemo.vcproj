@@ -483,6 +483,10 @@
 			Name="Shared"
 			>
 			<File
+				RelativePath="..\Shared\Dir.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Shared\InteractiveSurface.cpp"
 				>
 			</File>
@@ -496,6 +500,14 @@
 			</File>
 			<File
 				RelativePath="..\Shared\TileRules.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\TileSet.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\TileSet.h"
 				>
 			</File>
 		</Filter>
