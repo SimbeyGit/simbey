@@ -130,7 +130,7 @@ HRESULT CWizardScreen::Initialize (VOID)
 	Check(m_pSurface->AddCanvas(NULL, FALSE, &m_pMouse));
 	Check(m_pMouse->AddLayer(FALSE, LayerRender::Masked, 0, NULL));
 
-	Check(m_pPackage->ReadFile(SLP(L"music\\MOM105.MID"), &stmMusic));
+	Check(m_pPackage->ReadFile(SLP(L"title\\title.MID"), &stmMusic));
 	uliSize.QuadPart = stmMusic.DataRemaining();
 	Check(m_pHost->LoadMIDI(&stmMusic, &uliSize, &m_midiFile));
 	Check(m_pHost->PlayMIDI(&m_midiFile));

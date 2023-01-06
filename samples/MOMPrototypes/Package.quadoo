@@ -75,7 +75,12 @@ function BuildTileSet (strWorld, strTileSet, oTileSet)
 		mapTiles.Remove(strTile);
 	}
 
-	Host.WriteTextFile((string)FormatSifPackage("tiles.sif", "*.png", false, 32, "tiles.json", oData), oTileSet.GetPathOf("package.json"));
+	return FormatSifPackage("tiles.sif", "*.png", false, 32, "tiles.json", oData);
+}
+
+function WriteTileSet (strWorld, strTileSet, oTileSet)
+{
+	Host.WriteTextFile((string)BuildTileSet(strWorld, strTileSet, oTileSet), oTileSet.GetPathOf("package.json"));
 }
 
 function BuildTerrainAnimators (oTerrain)
@@ -91,7 +96,37 @@ function BuildTerrainAnimators (oTerrain)
 			do
 			{
 				if(oTileSet.IsFolder)
-					BuildTileSet(strWorld, oTileSet.Name, oTileSet.OpenFolder());
+					WriteTileSet(strWorld, oTileSet.Name, oTileSet.OpenFolder());
+			} while(oTileSet.Next());
+		}
+	} while(oEnum.Next());
+}
+
+function BuildCombatTileSet (strWorld, strStyle, strTileSet, oTileSet)
+{
+	var aPackage = BuildTileSet(strWorld, strTileSet, oTileSet);
+	var oData = aPackage[1];
+
+	oData.style = strStyle;
+
+	Host.WriteTextFile((string)aPackage, oTileSet.GetPathOf("package.json"));
+}
+
+function BuildCombatAnimators (oTerrain, strWorld)
+{
+	var oWorld = oTerrain.OpenFolder(strWorld);
+	var oEnum = oWorld.Find("*");
+	do
+	{
+		if(oEnum.IsFolder)
+		{
+			var strStyle = oEnum.Name;
+			var oStyle = oEnum.OpenFolder();
+			var oTileSet = oStyle.Find("*");
+			do
+			{
+				if(oTileSet.IsFolder)
+					BuildCombatTileSet(strWorld, strStyle, oTileSet.Name, oTileSet.OpenFolder());
 			} while(oTileSet.Next());
 		}
 	} while(oEnum.Next());
@@ -106,10 +141,13 @@ function main ()
 	{
 		Host.WriteBinaryFile(oScript, "Assets\\scripts\\combat.qbc");
 
-		println("Building terrain animators...");
+		println("Building overland terrain animators...");
 		BuildTerrainAnimators(Host.OpenFolder("Assets\\overland\\terrain"));
 
-		var oPackager = Host.CreateProcess("..\\..\\bin\\SIFPackage.exe", "Assets Assets.pkg");
+		println("Building combat terrain animators (Arcanus)...");
+		BuildCombatAnimators(Host.OpenFolder("Assets\\combat\\terrain"), "Arcanus");
+
+		var oPackager = Host.CreateProcess("..\\..\\target\\release\\SIFPackage.exe", "Assets Assets.pkg");
 		oPackager.Wait();
 
 		var nResult = oPackager.GetExitCode();

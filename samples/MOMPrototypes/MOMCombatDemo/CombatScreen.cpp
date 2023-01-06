@@ -2571,7 +2571,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	CInteractiveLayer* pLayer = NULL;
 
 	Check(m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer));
-	Check(LoadAnimator(SLP(L"graphics\\Tiles.json"), L"combat\\terrain\\arcanus\\default\\standard\\terrain.sif", &srAnimator, FALSE));
+	Check(LoadAnimator(SLP(L"graphics\\Tiles.json"), L"combat\\terrain\\arcanus\\default\\standard\\tiles.sif", &srAnimator, FALSE));
 
 	if(m_pBackground)
 	{
