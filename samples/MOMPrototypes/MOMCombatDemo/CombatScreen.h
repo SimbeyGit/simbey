@@ -12,6 +12,9 @@ interface IJSONValue;
 interface IJSONObject;
 interface IJSONArray;
 
+class CSmoothingSystem;
+class CTileRules;
+
 class CCombatScreen;
 class CSpellBook;
 class CCastSpell;
@@ -318,6 +321,10 @@ protected:
 	CSIFCanvas* m_pMain;
 	CSIFCanvas* m_pMouse;
 	CSIFCanvas* m_pStats;
+
+	TRStrMap<CSmoothingSystem*> m_mapSmoothingSystems;
+	CTileRules* m_pTileRules;
+	IJSONArray* m_pGenerators;
 
 	CIsometricTranslator m_Isometric;
 

@@ -56,6 +56,8 @@ private:
 	TArray<CSmoothingReduction*> m_aReductions;
 
 public:
+	static HRESULT LoadFromJSON (IJSONObject* pSmoothing, TRStrMap<CSmoothingSystem*>& mapSmoothingSystems);
+
 	CSmoothingSystem ();
 	~CSmoothingSystem ();
 

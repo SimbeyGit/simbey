@@ -195,14 +195,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TileRules.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TileSet.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -580,6 +572,14 @@
 			</File>
 			<File
 				RelativePath="..\Shared\InteractiveSurface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\TileRules.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\TileRules.h"
 				>
 			</File>
 		</Filter>

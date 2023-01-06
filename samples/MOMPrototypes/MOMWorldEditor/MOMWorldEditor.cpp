@@ -13,7 +13,7 @@
 #include "Published\JSON.h"
 #include "Ribbon.h"
 #include "RibbonMappings.h"
-#include "TileRules.h"
+#include "..\Shared\TileRules.h"
 #include "NewWorldDlg.h"
 #include "CityDlg.h"
 #include "HeightMapGenerator.h"
@@ -398,7 +398,7 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 
 	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\smoothing.json"), &srvSmoothing));
 	Check(srvSmoothing->GetObject(&srSmoothing));
-	Check(LoadSmoothing(srSmoothing));
+	Check(CSmoothingSystem::LoadFromJSON(srSmoothing, m_mapSmoothingSystems));
 
 	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\rules.json"), &srvRules));
 
@@ -2374,37 +2374,6 @@ Cleanup:
 		if(SUCCEEDED(Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Could not load Assets.pkg due to error: 0x%.8X!", hr)))
 			MessageBox(GetDesktopWindow(), wzError, L"Data Package Error", MB_ICONERROR | MB_OK);
 	}
-	return hr;
-}
-
-HRESULT CMOMWorldEditor::LoadSmoothing (IJSONObject* pSmoothing)
-{
-	HRESULT hr;
-	CSmoothingSystem* pSystem = NULL;
-	RSTRING rstrSystem = NULL;
-
-	for(sysint i = 0; i < pSmoothing->Count(); i++)
-	{
-		TStackRef<IJSONValue> srv;
-		TStackRef<IJSONObject> srSystem;
-
-		Check(pSmoothing->GetValueByIndex(i, &srv));
-		Check(srv->GetObject(&srSystem));
-
-		pSystem = __new CSmoothingSystem;
-		CheckAlloc(pSystem);
-		Check(pSystem->Initialize(srSystem));
-
-		Check(pSmoothing->GetValueName(i, &rstrSystem));
-		Check(m_mapSmoothingSystems.Add(rstrSystem, pSystem));
-		pSystem = NULL;
-
-		RStrRelease(rstrSystem); rstrSystem = NULL;
-	}
-
-Cleanup:
-	RStrRelease(rstrSystem);
-	__delete pSystem;
 	return hr;
 }
 

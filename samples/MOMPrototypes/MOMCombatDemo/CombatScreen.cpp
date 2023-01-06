@@ -4,6 +4,7 @@
 #include "Library\Util\Formatting.h"
 #include "Library\Util\StreamHelpers.h"
 #include "Published\JSON.h"
+#include "..\Shared\TileRules.h"
 #include "CombatScreen.h"
 #include "CombatSpells.h"
 #include "SpellBook.h"
@@ -1256,6 +1257,8 @@ CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface,
 	m_pMain(NULL),
 	m_pMouse(NULL),
 	m_pStats(NULL),
+	m_pTileRules(NULL),
+	m_pGenerators(NULL),
 	m_Isometric(TILE_WIDTH, TILE_HEIGHT),
 	m_pCombat(NULL),
 	m_pMoveTo(NULL),
@@ -1302,6 +1305,10 @@ CCombatScreen::~CCombatScreen ()
 	Assert(NULL == m_pCastSpell);
 	Assert(0 == m_aViews.Length());
 
+	SafeRelease(m_pGenerators);
+	SafeDelete(m_pTileRules);
+	m_mapSmoothingSystems.DeleteAll();
+
 	SafeRelease(m_pFonts);
 	SafeRelease(m_pCombatBarFont);
 	SafeRelease(m_pSmallYellowFont);
@@ -1315,6 +1322,7 @@ HRESULT CCombatScreen::Initialize (VOID)
 {
 	HRESULT hr;
 	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONObject> srSmoothing;
 	ISimbeyInterchangeFile* pSIF = NULL;
 	TStackRef<IPersistedFile> srFont;
 	ULARGE_INTEGER uliFont;
@@ -1335,6 +1343,7 @@ HRESULT CCombatScreen::Initialize (VOID)
 		bool fFloating;
 
 		Check(srv->GetBoolean(&fFloating));
+		srv.Release();
 
 		if(fFloating)
 		{
@@ -1384,6 +1393,21 @@ HRESULT CCombatScreen::Initialize (VOID)
 
 	Check(m_pHost->GetVM()->FindFunction(L"GetLiveHeads", &m_idxGetLiveHeads, &cParams));
 	CheckIf(2 != cParams, E_UNEXPECTED);
+
+	Check(m_pPackage->GetJSONData(SLP(L"combat\\terrain\\smoothing.json"), &srv));
+	Check(srv->GetObject(&srSmoothing));
+	srv.Release();
+	Check(CSmoothingSystem::LoadFromJSON(srSmoothing, m_mapSmoothingSystems));
+
+	Check(m_pPackage->GetJSONData(SLP(L"combat\\terrain\\rules.json"), &srv));
+
+	m_pTileRules = __new CTileRules;
+	CheckAlloc(m_pTileRules);
+	Check(m_pTileRules->Initialize(m_mapSmoothingSystems, srv));
+	srv.Release();
+
+	Check(m_pPackage->GetJSONData(SLP(L"combat\\terrain\\generators.json"), &srv));
+	Check(srv->GetArray(&m_pGenerators));
 
 	Check(LoadData());
 	Check(LoadProjectiles());

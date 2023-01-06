@@ -409,7 +409,6 @@ public:
 
 protected:
 	HRESULT LoadPackage (VOID);
-	HRESULT LoadSmoothing (IJSONObject* pSmoothing);
 	HRESULT LoadMapFeatureChances (IJSONObject* pFeatures);
 
 	HRESULT LoadFeatures (ISimbeyInterchangeFile* pFeatures);

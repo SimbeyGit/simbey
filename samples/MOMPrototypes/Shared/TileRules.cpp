@@ -175,6 +175,37 @@ BOOL CSmoothingReduction::Execute (PWSTR pwzKey)
 // CSmoothingSystem
 ///////////////////////////////////////////////////////////////////////////////
 
+HRESULT CSmoothingSystem::LoadFromJSON (IJSONObject* pSmoothing, TRStrMap<CSmoothingSystem*>& mapSmoothingSystems)
+{
+	HRESULT hr = S_FALSE;
+	CSmoothingSystem* pSystem = NULL;
+	RSTRING rstrSystem = NULL;
+
+	for(sysint i = 0; i < pSmoothing->Count(); i++)
+	{
+		TStackRef<IJSONValue> srv;
+		TStackRef<IJSONObject> srSystem;
+
+		Check(pSmoothing->GetValueByIndex(i, &srv));
+		Check(srv->GetObject(&srSystem));
+
+		pSystem = __new CSmoothingSystem;
+		CheckAlloc(pSystem);
+		Check(pSystem->Initialize(srSystem));
+
+		Check(pSmoothing->GetValueName(i, &rstrSystem));
+		Check(mapSmoothingSystems.Add(rstrSystem, pSystem));
+		pSystem = NULL;
+
+		RStrRelease(rstrSystem); rstrSystem = NULL;
+	}
+
+Cleanup:
+	RStrRelease(rstrSystem);
+	__delete pSystem;
+	return hr;
+}
+
 CSmoothingSystem::CSmoothingSystem () :
 	m_rstrDescription(NULL),
 	m_nMaxValueEachDirection(NULL)
