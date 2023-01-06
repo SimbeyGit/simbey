@@ -1,10 +1,7 @@
 #include <windows.h>
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
-#include "Library\Core\MemoryStream.h"
 #include "Library\Util\Formatting.h"
-#include "Library\Util\FileStream.h"
-#include "Library\Util\StreamHelpers.h"
 #include "Library\Util\TextHelpers.h"
 #include "Library\Util\Registry.h"
 #include "Library\Window\DialogHost.h"
@@ -13,10 +10,10 @@
 #include "Published\JSON.h"
 #include "Ribbon.h"
 #include "RibbonMappings.h"
+#include "..\Shared\HeightMapGenerator.h"
 #include "..\Shared\TileRules.h"
 #include "NewWorldDlg.h"
 #include "CityDlg.h"
-#include "HeightMapGenerator.h"
 #include "MOMWorldEditor.h"
 
 #define	GAME_TICK_MS		33

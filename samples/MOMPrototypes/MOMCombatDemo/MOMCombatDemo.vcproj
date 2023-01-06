@@ -487,6 +487,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Shared\HeightMapGenerator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\HeightMapGenerator.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Shared\InteractiveSurface.cpp"
 				>
 			</File>
