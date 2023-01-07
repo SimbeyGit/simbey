@@ -48,11 +48,11 @@ public:
 class CMapData
 {
 public:
-	INT m_idxFeature;
+	CTile* m_pFeature;
 
 public:
 	CMapData () :
-		m_idxFeature(-1)
+		m_pFeature(NULL)
 	{
 	}
 
@@ -1297,7 +1297,6 @@ CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface,
 	m_pStats(NULL),
 	m_pTileRules(NULL),
 	m_pGenerators(NULL),
-	m_pFeatures(NULL),
 	m_Isometric(TILE_WIDTH, TILE_HEIGHT),
 	m_pCombat(NULL),
 	m_pMoveTo(NULL),
@@ -1343,12 +1342,6 @@ CCombatScreen::~CCombatScreen ()
 	Assert(NULL == m_pCombatBar);
 	Assert(NULL == m_pCastSpell);
 	Assert(0 == m_aViews.Length());
-
-	if(m_pFeatures)
-	{
-		m_pFeatures->Close();
-		SafeRelease(m_pFeatures);
-	}
 
 	m_mapCombatTiles.DeleteAll();
 	SafeRelease(m_pGenerators);
@@ -2637,14 +2630,13 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	HRESULT hr;
 	TStackRef<IJSONValue> srv;
 	TStackRef<IJSONObject> srGenerator;
-	TStackRef<CSIFPackage> srTileSets, srFeaturesDir;
+	TStackRef<CSIFPackage> srTileSets;
 	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
 	sysint nLayer;
 	INT xTileStart, yTileStart, xTileEnd, yTileEnd, cchTileSets;
 	CInteractiveLayer* pLayer = NULL;
 	RSTRING rstrGenerator = NULL, rstrWorld = NULL, rstrTiles = NULL;
 	WCHAR wzTileSets[MAX_PATH];
-	PCWSTR rgNames[] = { L"darkened", L"ridge", L"standard" };
 	MAPTILE* pWorld = NULL;
 
 	Check(m_pPlacements->FindNonNullValueW(L"generator", &srv));
@@ -2661,10 +2653,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 
 	Check(Formatting::TPrintF(wzTileSets, ARRAYSIZE(wzTileSets), &cchTileSets, L"combat\\terrain\\%r\\%r", rstrWorld, rstrTiles));
 	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
-	Check(TileSetLoader::LoadNamedTileSets(srTileSets, rgNames, ARRAYSIZE(rgNames), m_mapCombatTiles));
-
-	Check(srTileSets->OpenDirectory(SLP(L"feature"), &srFeaturesDir));
-	Check(srFeaturesDir->OpenSIF(L"tiles.sif", &m_pFeatures));
+	Check(TileSetLoader::LoadTileSets(srTileSets, m_mapCombatTiles));
 
 	Check(AllocateCombatWorld(&pWorld));
 	Check(GenerateCombatWorld(pWorld, srGenerator));
@@ -2747,20 +2736,20 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 				{
 					MAPTILE* pMapPtr = pWorld + (y * MAP_WIDTH + x);
 					PlaceTile(m_pMain, x, y, nLayer, pMapPtr->pTile, NULL);
-					if(0 <= pMapPtr->pData->m_idxFeature)
+					if(pMapPtr->pData->m_pFeature)
 					{
 						TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 						TStackRef<ISimbeyInterchangeSprite> srSprite;
 						INT xIso, yIso, xPlace, yPlace;
-						RECT rcLayer;
+						INT xSize, ySize;
 
-						Check(m_pFeatures->GetLayerByIndex(pMapPtr->pData->m_idxFeature, &srLayer));
-						Check(srLayer->GetPosition(&rcLayer));
+						Check(pMapPtr->pData->m_pFeature->CreateSprite(&srSprite));
+						srSprite->GetCurrentFrameSize(&xSize, &ySize);
 
 						m_Isometric.TileToView(x, y, &xIso, &yIso);
 						m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xPlace, &yPlace);
 
-						Check(sifCreateStaticSprite(srLayer, xPlace + (TILE_WIDTH / 2) - (rcLayer.right - rcLayer.left) / 2, yPlace + (TILE_HEIGHT / 2) - (rcLayer.bottom - rcLayer.top) / 2, &srSprite));
+						srSprite->SetPosition(xPlace + (TILE_WIDTH / 2) - xSize / 2, yPlace + (TILE_HEIGHT / 2) - ySize / 2);
 						Check(m_pMain->AddSprite(m_nUnitLayer, srSprite, NULL));
 					}
 				}
@@ -2937,6 +2926,8 @@ HRESULT CCombatScreen::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGener
 	INT cTiles;
 	TArray<POINT> aTiles;
 	RSTRING rstrDarkened = NULL, rstrRidge = NULL;
+	CTileSet* pFeatures;
+	TArray<CTile*>* paFeatures;
 
 	coords.nWidth = MAP_WIDTH;
 	coords.nHeight = MAP_HEIGHT;
@@ -2989,13 +2980,16 @@ HRESULT CCombatScreen::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGener
 		}
 	}
 
+	Check(m_mapCombatTiles.Find(RSTRING_CAST(L"feature"), &pFeatures));
+	Check(pFeatures->FindFromKey(RSTRING_CAST(L"00000000"), &paFeatures));
+
 	for(INT i = 0; i < cTiles; i++)
 	{
 		INT idxTile = rng.Next(aTiles.Length());
 		POINT pt;
 
 		Check(aTiles.RemoveChecked(idxTile, &pt));
-		pWorld[pt.y * MAP_WIDTH + pt.x].pData->m_idxFeature = rng.Next(m_pFeatures->GetLayerCount());
+		pWorld[pt.y * MAP_WIDTH + pt.x].pData->m_pFeature = (*paFeatures)[rng.Next(paFeatures->Length())];
 	}
 
 Cleanup:

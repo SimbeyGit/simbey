@@ -5,28 +5,6 @@
 
 namespace TileSetLoader
 {
-	HRESULT LoadNamedTileSets (CSIFPackage* pPackage, PCWSTR* pcrgTileSets, INT cTileSets, __out TRStrMap<CTileSet*>& mapTiles)
-	{
-		HRESULT hr = S_FALSE;
-		RSTRING rstrNameW = NULL;
-
-		for(INT i = 0; i < cTileSets; i++)
-		{
-			TStackRef<CSIFPackage> srTileSet;
-			PCWSTR pcwzName = pcrgTileSets[i];
-
-			Check(RStrCreateW(TStrLenAssert(pcwzName), pcwzName, &rstrNameW));
-			Check(pPackage->OpenDirectory(pcwzName, RStrLen(rstrNameW), &srTileSet));
-			Check(LoadTileSet(srTileSet, rstrNameW, mapTiles));
-
-			RStrRelease(rstrNameW); rstrNameW = NULL;
-		}
-
-	Cleanup:
-		RStrRelease(rstrNameW);
-		return hr;
-	}
-
 	HRESULT LoadTileSets (CSIFPackage* pPackage, __out TRStrMap<CTileSet*>& mapTiles)
 	{
 		HRESULT hr;

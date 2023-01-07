@@ -328,7 +328,6 @@ protected:
 	CTileRules* m_pTileRules;
 	IJSONArray* m_pGenerators;
 	TRStrMap<CTileSet*> m_mapCombatTiles;
-	ISimbeyInterchangeFile* m_pFeatures;
 
 	CIsometricTranslator m_Isometric;
 
