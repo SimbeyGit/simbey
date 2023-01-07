@@ -5,6 +5,7 @@
 #include "Library\Core\RefArray.h"
 #include "Library\Spatial\AStar2D.h"
 #include "Published\QuadooVM.h"
+#include "..\Shared\TileSet.h"
 #include "BaseScreen.h"
 #include "PopupHost.h"
 
@@ -14,6 +15,7 @@ interface IJSONArray;
 
 class CSmoothingSystem;
 class CTileRules;
+class CTileSet;
 
 class CCombatScreen;
 class CSpellBook;
@@ -325,6 +327,7 @@ protected:
 	TRStrMap<CSmoothingSystem*> m_mapSmoothingSystems;
 	CTileRules* m_pTileRules;
 	IJSONArray* m_pGenerators;
+	TRStrMap<CTileSet*> m_mapCombatTiles;
 
 	CIsometricTranslator m_Isometric;
 
@@ -445,7 +448,9 @@ protected:
 	HRESULT LoadCombatStats (VOID);
 	HRESULT LoadMusic (VOID);
 
+	HRESULT AllocateCombatWorld (__deref_out MAPTILE** ppWorld);
 	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
+	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, CTile* pTile, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
 	HRESULT AddStaticObject (INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation);
 	HRESULT AddMovingObject (IJSONObject* pDef, CSIFPackage* pPackage, RSTRING rstrOwner, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nDirection, INT nLevel, INT (*pfnBaseAnimation)(INT), FMOD::Sound* pMove, FMOD::Sound* pMelee, FMOD::Sound* pRange, __deref_opt_out CMovingObject** ppObject = NULL);
 	HRESULT UpdatePositionInJSON (CMovingObject* pObject);

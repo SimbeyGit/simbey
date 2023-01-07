@@ -586,6 +586,14 @@
 				RelativePath="..\Shared\TileSet.h"
 				>
 			</File>
+			<File
+				RelativePath="..\Shared\TileSetLoader.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\TileSetLoader.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

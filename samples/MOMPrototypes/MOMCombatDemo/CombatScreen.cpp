@@ -5,6 +5,7 @@
 #include "Library\Util\StreamHelpers.h"
 #include "Published\JSON.h"
 #include "..\Shared\TileRules.h"
+#include "..\Shared\TileSetLoader.h"
 #include "CombatScreen.h"
 #include "CombatSpells.h"
 #include "SpellBook.h"
@@ -1305,6 +1306,7 @@ CCombatScreen::~CCombatScreen ()
 	Assert(NULL == m_pCastSpell);
 	Assert(0 == m_aViews.Length());
 
+	m_mapCombatTiles.DeleteAll();
 	SafeRelease(m_pGenerators);
 	SafeDelete(m_pTileRules);
 	m_mapSmoothingSystems.DeleteAll();
@@ -2591,12 +2593,15 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	HRESULT hr;
 	TStackRef<IJSONValue> srv;
 	TStackRef<IJSONObject> srGenerator;
+	TStackRef<CSIFPackage> srTileSets;
 	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
 	sysint nLayer;
-	INT xTileStart, yTileStart, xTileEnd, yTileEnd;
+	INT xTileStart, yTileStart, xTileEnd, yTileEnd, cchTileSets;
 	CInteractiveLayer* pLayer = NULL;
 	RSTRING rstrGenerator = NULL, rstrTiles = NULL;
-	WCHAR wzStandardTiles[MAX_PATH];
+	WCHAR wzTileSets[MAX_PATH];
+	PCWSTR rgNames[] = { L"darkened", L"ridge", L"standard" };
+	MAPTILE* pWorld = NULL;
 
 	Check(m_pPlacements->FindNonNullValueW(L"generator", &srv));
 	Check(srv->GetString(&rstrGenerator));
@@ -2606,10 +2611,13 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	Check(srGenerator->FindNonNullValueW(L"tiles", &srv));
 	Check(srv->GetString(&rstrTiles));
 
-	Check(Formatting::TPrintF(wzStandardTiles, ARRAYSIZE(wzStandardTiles), NULL, L"combat\\terrain\\arcanus\\%r\\standard\\tiles.sif", rstrTiles));
+	Check(Formatting::TPrintF(wzTileSets, ARRAYSIZE(wzTileSets), &cchTileSets, L"combat\\terrain\\arcanus\\%r", rstrTiles));
+	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
+	Check(TileSetLoader::LoadNamedTileSets(srTileSets, rgNames, ARRAYSIZE(rgNames), m_mapCombatTiles));
+
+	Check(AllocateCombatWorld(&pWorld));
 
 	Check(m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer));
-	Check(LoadAnimator(SLP(L"graphics\\Tiles.json"), wzStandardTiles, &srAnimator, FALSE));
 
 	if(m_pBackground)
 	{
@@ -2640,7 +2648,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 				TStackRef<ISimbeyInterchangeSprite> srTile;
 				INT xTile, yTile;
 
-				PlaceTile(m_pMain, x, y, nLayer, srAnimator, rand() % 4, &srTile);
+				PlaceTile(m_pMain, x, y, nLayer, pWorld[y * MAP_WIDTH + x].pTile, &srTile);
 				srTile->GetPosition(xTile, yTile);
 
 				if(y == c_rcFloatingTiles.bottom)
@@ -2680,7 +2688,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 				if(MAP_WIDTH < xEnd)
 					xEnd = MAP_WIDTH;
 				for(INT x = xStart; x < xEnd; x++)
-					PlaceTile(m_pMain, x, y, nLayer, srAnimator, rand() % 4, NULL);
+					PlaceTile(m_pMain, x, y, nLayer, pWorld[y * MAP_WIDTH + x].pTile, NULL);
 			}
 
 			if(y < yMid)
@@ -2720,6 +2728,7 @@ Cleanup:
 	SafeRelease(pLayer);
 	RStrRelease(rstrTiles);
 	RStrRelease(rstrGenerator);
+	__delete_array pWorld;
 	return hr;
 }
 
@@ -2816,6 +2825,31 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CCombatScreen::AllocateCombatWorld (__deref_out MAPTILE** ppWorld)
+{
+	HRESULT hr;
+	CTileSet* pStandardSet;
+	TArray<CTile*>* paTiles;
+	MAPTILE* pWorld = NULL;
+
+	Check(m_mapCombatTiles.Find(RSTRING_CAST(L"standard"), &pStandardSet));
+	Check(pStandardSet->FindFromKey(RSTRING_CAST(L"00000000"), &paTiles));
+
+	pWorld = __new MAPTILE[MAP_WIDTH * MAP_HEIGHT];
+	CheckAlloc(pWorld);
+
+	for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
+	{
+		pWorld[i].pTile = (*paTiles)[rand() % paTiles->Length()];
+		pWorld[i].pData = NULL;
+	}
+
+	*ppWorld = pWorld;
+
+Cleanup:
+	return hr;
+}
+
 HRESULT CCombatScreen::PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation, __deref_out_opt ISimbeyInterchangeSprite** ppSprite)
 {
 	HRESULT hr;
@@ -2827,6 +2861,26 @@ HRESULT CCombatScreen::PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sys
 
 	Check(pAnimator->CreateSprite(&srSprite));
 	Check(srSprite->SelectAnimation(nAnimation));
+	srSprite->SetPosition(x, y);
+	Check(pCanvas->AddSprite(nLayer, srSprite, NULL));
+
+	if(ppSprite)
+		*ppSprite = srSprite.Detach();
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CCombatScreen::PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, CTile* pTile, __deref_out_opt ISimbeyInterchangeSprite** ppSprite)
+{
+	HRESULT hr;
+	TStackRef<ISimbeyInterchangeSprite> srSprite;
+	INT xIso, yIso, x, y;
+
+	m_Isometric.TileToView(xTile, yTile, &xIso, &yIso);
+	m_Isometric.IsometricToView(m_pMain, xIso, yIso, &x, &y);
+
+	Check(pTile->CreateSprite(&srSprite));
 	srSprite->SetPosition(x, y);
 	Check(pCanvas->AddSprite(nLayer, srSprite, NULL));
 
