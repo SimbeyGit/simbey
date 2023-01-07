@@ -1,6 +1,6 @@
 {
 	player: "defense",
-	generator: "desert",
+	generator: "grasslands",
 	floating: false,
 	mana: 500,
 	spells:

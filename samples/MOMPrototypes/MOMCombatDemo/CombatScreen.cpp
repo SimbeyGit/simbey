@@ -4,6 +4,7 @@
 #include "Library\Util\Formatting.h"
 #include "Library\Util\StreamHelpers.h"
 #include "Published\JSON.h"
+#include "..\Shared\HeightMapGenerator.h"
 #include "..\Shared\TileRules.h"
 #include "..\Shared\TileSetLoader.h"
 #include "CombatScreen.h"
@@ -23,6 +24,42 @@
 #define	CBT_BUTTON_HEIGHT	16
 
 #define	ATTACK_ANI_TICKS	55
+
+class CSimpleRNG : public IRandomNumber
+{
+public:
+	CSimpleRNG (DWORD dwSeed)
+	{
+		srand(dwSeed);
+	}
+
+	// IRandomNumber
+	virtual INT Next (VOID)
+	{
+		return rand();
+	}
+
+	virtual INT Next (INT nMax)
+	{
+		return rand() % nMax;
+	}
+};
+
+class CMapData
+{
+public:
+	INT m_idxFeature;
+
+public:
+	CMapData () :
+		m_idxFeature(-1)
+	{
+	}
+
+	~CMapData ()
+	{
+	}
+};
 
 const POINT c_ptMoveOffset[8][8] =
 {
@@ -1260,6 +1297,7 @@ CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface,
 	m_pStats(NULL),
 	m_pTileRules(NULL),
 	m_pGenerators(NULL),
+	m_pFeatures(NULL),
 	m_Isometric(TILE_WIDTH, TILE_HEIGHT),
 	m_pCombat(NULL),
 	m_pMoveTo(NULL),
@@ -1305,6 +1343,12 @@ CCombatScreen::~CCombatScreen ()
 	Assert(NULL == m_pCombatBar);
 	Assert(NULL == m_pCastSpell);
 	Assert(0 == m_aViews.Length());
+
+	if(m_pFeatures)
+	{
+		m_pFeatures->Close();
+		SafeRelease(m_pFeatures);
+	}
 
 	m_mapCombatTiles.DeleteAll();
 	SafeRelease(m_pGenerators);
@@ -2593,7 +2637,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	HRESULT hr;
 	TStackRef<IJSONValue> srv;
 	TStackRef<IJSONObject> srGenerator;
-	TStackRef<CSIFPackage> srTileSets;
+	TStackRef<CSIFPackage> srTileSets, srFeaturesDir;
 	TStackRef<ISimbeyInterchangeAnimator> srAnimator;
 	sysint nLayer;
 	INT xTileStart, yTileStart, xTileEnd, yTileEnd, cchTileSets;
@@ -2615,9 +2659,17 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
 	Check(TileSetLoader::LoadNamedTileSets(srTileSets, rgNames, ARRAYSIZE(rgNames), m_mapCombatTiles));
 
+	Check(srTileSets->OpenDirectory(SLP(L"feature"), &srFeaturesDir));
+	Check(srFeaturesDir->OpenSIF(L"tiles.sif", &m_pFeatures));
+
 	Check(AllocateCombatWorld(&pWorld));
+	Check(GenerateCombatWorld(pWorld, srGenerator));
 
 	Check(m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer));
+	Check(m_pMain->AddLayer(TRUE, LayerRender::Masked, 0, &m_nTileEffectsLayer));
+
+	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(TRUE, LayerRender::Blended, 0, this, &pLayer));
+	m_nUnitLayer = pLayer->GetLayer();
 
 	if(m_pBackground)
 	{
@@ -2688,7 +2740,26 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 				if(MAP_WIDTH < xEnd)
 					xEnd = MAP_WIDTH;
 				for(INT x = xStart; x < xEnd; x++)
-					PlaceTile(m_pMain, x, y, nLayer, pWorld[y * MAP_WIDTH + x].pTile, NULL);
+				{
+					MAPTILE* pMapPtr = pWorld + (y * MAP_WIDTH + x);
+					PlaceTile(m_pMain, x, y, nLayer, pMapPtr->pTile, NULL);
+					if(0 <= pMapPtr->pData->m_idxFeature)
+					{
+						TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+						TStackRef<ISimbeyInterchangeSprite> srSprite;
+						INT xIso, yIso, xPlace, yPlace;
+						RECT rcLayer;
+
+						Check(m_pFeatures->GetLayerByIndex(pMapPtr->pData->m_idxFeature, &srLayer));
+						Check(srLayer->GetPosition(&rcLayer));
+
+						m_Isometric.TileToView(x, y, &xIso, &yIso);
+						m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xPlace, &yPlace);
+
+						Check(sifCreateStaticSprite(srLayer, xPlace + (TILE_WIDTH / 2) - (rcLayer.right - rcLayer.left) / 2, yPlace + (TILE_HEIGHT / 2) - (rcLayer.bottom - rcLayer.top) / 2, &srSprite));
+						Check(m_pMain->AddSprite(m_nUnitLayer, srSprite, NULL));
+					}
+				}
 			}
 
 			if(y < yMid)
@@ -2700,15 +2771,9 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 
 	srAnimator.Release();
 
-	Check(m_pMain->AddLayer(TRUE, LayerRender::Masked, 0, &m_nTileEffectsLayer));
-
 	Check(LoadAnimator(SLP(L"graphics\\MoveTo.json"), L"graphics\\MoveTo.sif", &srAnimator, FALSE));
 	Check(PlaceTile(m_pMain, MAP_WIDTH / 2, MAP_HEIGHT / 2, m_nTileEffectsLayer, srAnimator, 0, &m_pMoveTo));
-
 	srAnimator.Release();
-
-	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(TRUE, LayerRender::Blended, 0, this, &pLayer));
-	m_nUnitLayer = pLayer->GetLayer();
 
 	Check(PlaceUnitsAndBuildings(m_nUnitLayer));
 	m_Isometric.SortIsometricLayer(m_pMain, m_nUnitLayer);
@@ -2728,7 +2793,12 @@ Cleanup:
 	SafeRelease(pLayer);
 	RStrRelease(rstrTiles);
 	RStrRelease(rstrGenerator);
-	__delete_array pWorld;
+	if(pWorld)
+	{
+		for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
+			__delete pWorld[i].pData;
+		__delete_array pWorld;
+	}
 	return hr;
 }
 
@@ -2841,12 +2911,91 @@ HRESULT CCombatScreen::AllocateCombatWorld (__deref_out MAPTILE** ppWorld)
 	for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
 	{
 		pWorld[i].pTile = (*paTiles)[rand() % paTiles->Length()];
-		pWorld[i].pData = NULL;
+		pWorld[i].pData = __new CMapData;
+		CheckAlloc(pWorld[i].pData);
 	}
 
 	*ppWorld = pWorld;
 
 Cleanup:
+	return hr;
+}
+
+HRESULT CCombatScreen::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGenerator)
+{
+	HRESULT hr;
+	CMapPainter painter(m_pTileRules, pWorld, MAP_WIDTH, MAP_HEIGHT);
+	COORD_SYSTEM coords;
+	CSimpleRNG rng(GetTickCount());
+	CHeightMapGenerator HeightMap(&rng, rng.Next(5) + 2, rng.Next(5) + 2, 0);
+	TStackRef<IJSONValue> srv;
+	INT cTiles;
+	TArray<POINT> aTiles;
+	RSTRING rstrDarkened = NULL, rstrRidge = NULL;
+
+	coords.nWidth = MAP_WIDTH;
+	coords.nHeight = MAP_HEIGHT;
+	coords.fWrapsLeftToRight = FALSE;
+	coords.fWrapsTopToBottom = FALSE;
+
+	Check(HeightMap.Initialize(coords));
+	Check(HeightMap.GenerateHeightMap());
+
+	Check(RStrCreateW(LSP(L"darkened"), &rstrDarkened));
+	Check(RStrCreateW(LSP(L"ridge"), &rstrRidge));
+
+	Check(pGenerator->FindNonNullValueW(L"dark", &srv));
+	Check(srv->GetInteger(&cTiles));
+	srv.Release();
+
+	Check(HeightMap.SetLowestTiles(cTiles, &aTiles));
+	for(sysint i = 0; i < aTiles.Length(); i++)
+	{
+		POINT& pt = aTiles[i];
+		Check(painter.PaintTile(pt.x, pt.y, rstrDarkened));
+		Check(painter.CheckTransitions(pt.x, pt.y, rstrDarkened));
+		Check(painter.Commit(&m_mapCombatTiles, NULL));
+	}
+	aTiles.Clear();
+
+	Check(pGenerator->FindNonNullValueW(L"ridge", &srv));
+	Check(srv->GetInteger(&cTiles));
+	srv.Release();
+
+	Check(HeightMap.SetHighestTiles(cTiles, &aTiles));
+	for(sysint i = 0; i < aTiles.Length(); i++)
+	{
+		POINT& pt = aTiles[i];
+		Check(painter.PaintTile(pt.x, pt.y, rstrRidge));
+		Check(painter.CheckTransitions(pt.x, pt.y, rstrRidge));
+		Check(painter.Commit(&m_mapCombatTiles, NULL));
+	}
+	aTiles.Clear();
+
+	Check(pGenerator->FindNonNullValueW(L"features", &srv));
+	Check(srv->GetInteger(&cTiles));
+
+	for(INT y = 0; y < MAP_HEIGHT; y++)
+	{
+		for(INT x = 0; x < MAP_WIDTH; x++)
+		{
+			POINT pt = { x, y };
+			Check(aTiles.Append(pt));
+		}
+	}
+
+	for(INT i = 0; i < cTiles; i++)
+	{
+		INT idxTile = rng.Next(aTiles.Length());
+		POINT pt;
+
+		Check(aTiles.RemoveChecked(idxTile, &pt));
+		pWorld[pt.y * MAP_WIDTH + pt.x].pData->m_idxFeature = rng.Next(m_pFeatures->GetLayerCount());
+	}
+
+Cleanup:
+	RStrRelease(rstrDarkened);
+	RStrRelease(rstrRidge);
 	return hr;
 }
 

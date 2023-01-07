@@ -328,6 +328,7 @@ protected:
 	CTileRules* m_pTileRules;
 	IJSONArray* m_pGenerators;
 	TRStrMap<CTileSet*> m_mapCombatTiles;
+	ISimbeyInterchangeFile* m_pFeatures;
 
 	CIsometricTranslator m_Isometric;
 
@@ -449,6 +450,8 @@ protected:
 	HRESULT LoadMusic (VOID);
 
 	HRESULT AllocateCombatWorld (__deref_out MAPTILE** ppWorld);
+	HRESULT GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGenerator);
+
 	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
 	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, CTile* pTile, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
 	HRESULT AddStaticObject (INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation);
