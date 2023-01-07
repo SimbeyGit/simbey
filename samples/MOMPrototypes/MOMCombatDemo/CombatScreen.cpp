@@ -2642,7 +2642,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	sysint nLayer;
 	INT xTileStart, yTileStart, xTileEnd, yTileEnd, cchTileSets;
 	CInteractiveLayer* pLayer = NULL;
-	RSTRING rstrGenerator = NULL, rstrTiles = NULL;
+	RSTRING rstrGenerator = NULL, rstrWorld = NULL, rstrTiles = NULL;
 	WCHAR wzTileSets[MAX_PATH];
 	PCWSTR rgNames[] = { L"darkened", L"ridge", L"standard" };
 	MAPTILE* pWorld = NULL;
@@ -2651,11 +2651,15 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	Check(srv->GetString(&rstrGenerator));
 	srv.Release();
 
+	Check(m_pPlacements->FindNonNullValueW(L"world", &srv));
+	Check(srv->GetString(&rstrWorld));
+	srv.Release();
+
 	Check(JSONFindArrayObject(m_pGenerators, RSTRING_CAST(L"name"), rstrGenerator, &srGenerator, NULL));
 	Check(srGenerator->FindNonNullValueW(L"tiles", &srv));
 	Check(srv->GetString(&rstrTiles));
 
-	Check(Formatting::TPrintF(wzTileSets, ARRAYSIZE(wzTileSets), &cchTileSets, L"combat\\terrain\\arcanus\\%r", rstrTiles));
+	Check(Formatting::TPrintF(wzTileSets, ARRAYSIZE(wzTileSets), &cchTileSets, L"combat\\terrain\\%r\\%r", rstrWorld, rstrTiles));
 	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
 	Check(TileSetLoader::LoadNamedTileSets(srTileSets, rgNames, ARRAYSIZE(rgNames), m_mapCombatTiles));
 
@@ -2792,6 +2796,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 Cleanup:
 	SafeRelease(pLayer);
 	RStrRelease(rstrTiles);
+	RStrRelease(rstrWorld);
 	RStrRelease(rstrGenerator);
 	if(pWorld)
 	{

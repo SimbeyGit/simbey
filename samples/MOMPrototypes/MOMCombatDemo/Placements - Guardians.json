@@ -1,6 +1,7 @@
 {
 	player: "offense",
 	generator: "forest",
+	world: "myrror",
 	floating: false,
 	mana: 500,
 	spells:

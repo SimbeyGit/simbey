@@ -1,6 +1,7 @@
 {
 	player: "defense",
 	generator: "grasslands",
+	world: "arcanus",
 	floating: true,
 	mana: 500,
 	spells:

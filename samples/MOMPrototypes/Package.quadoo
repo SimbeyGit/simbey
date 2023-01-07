@@ -149,6 +149,9 @@ function main ()
 		println("Building combat terrain animators (Arcanus)...");
 		BuildCombatAnimators(Host.OpenFolder("Assets\\combat\\terrain"), "Arcanus");
 
+		println("Building combat terrain animators (Myrror)...");
+		BuildCombatAnimators(Host.OpenFolder("Assets\\combat\\terrain"), "Myrror");
+
 		var oPackager = Host.CreateProcess("..\\..\\target\\release\\SIFPackage.exe", "Assets Assets.pkg");
 		oPackager.Wait();
 
