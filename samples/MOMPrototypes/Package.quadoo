@@ -109,7 +109,13 @@ function BuildCombatTileSet (strWorld, strStyle, strTileSet, oTileSet)
 
 	oData.style = strStyle;
 	if(strTileSet == "feature")
+	{
 		aPackage[0].trim = true;
+
+		var aKeys = oData.data.keys;
+		for(int i = 0; i < len(aKeys); i++)
+			set(aKeys[i], "auto-offset", true);
+	}
 
 	Host.WriteTextFile((string)aPackage, oTileSet.GetPathOf("package.json"));
 }

@@ -2741,15 +2741,15 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 						TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 						TStackRef<ISimbeyInterchangeSprite> srSprite;
 						INT xIso, yIso, xPlace, yPlace;
-						INT xSize, ySize;
 
 						Check(pMapPtr->pData->m_pFeature->CreateSprite(&srSprite));
-						srSprite->GetCurrentFrameSize(&xSize, &ySize);
 
 						m_Isometric.TileToView(x, y, &xIso, &yIso);
 						m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xPlace, &yPlace);
 
-						srSprite->SetPosition(xPlace + (TILE_WIDTH / 2) - xSize / 2, yPlace + (TILE_HEIGHT / 2) - ySize / 2);
+						// The terrain features are supposed to be positioned using the
+						// bottom center, not counting rows only containing shadow pixels.
+						srSprite->SetPosition(xPlace + (TILE_WIDTH / 2), yPlace + TILE_HEIGHT / 2);
 						Check(m_pMain->AddSprite(m_nUnitLayer, srSprite, NULL));
 					}
 				}
