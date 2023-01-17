@@ -7,7 +7,8 @@ function main ()
 	var oEnum = oSource.Find("*");
 	do
 	{
-		if(0 != strcmpi(oEnum.Ext, "quadoo"))
+		var strExt = oEnum.Ext;
+		if(0 != strcmpi(strExt, "quadoo") && 0 != strcmpi(strExt, "cmd"))
 		{
 			var strName = oEnum.Name;
 
