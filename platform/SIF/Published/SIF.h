@@ -127,6 +127,9 @@ interface __declspec(uuid("4CC1DB43-C86A-4150-BD01-DC1390CCA42A")) ISimbeyInterc
 	virtual HRESULT DrawToDIB32 (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
 	virtual HRESULT DrawToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest) = 0;
 
+	virtual HRESULT DrawClippedToDIB32 (SIF_SURFACE* psifSurface32, INT xDest, INT yDest, const RECT& rcClip) = 0;
+	virtual HRESULT DrawClippedToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest, const RECT& rcClip) = 0;
+
 	virtual HRESULT DrawGrayToDIB32 (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
 	virtual HRESULT DrawGrayToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest) = 0;
 
