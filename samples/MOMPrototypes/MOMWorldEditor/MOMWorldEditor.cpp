@@ -1,6 +1,7 @@
 #include <windows.h>
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
+#include "Library\Core\Map.h"
 #include "Library\Util\Formatting.h"
 #include "Library\Util\TextHelpers.h"
 #include "Library\Util\Registry.h"
@@ -1795,7 +1796,6 @@ Cleanup:
 HRESULT CMOMWorldEditor::PlaceLairs (IRandomNumber* pRand, TRStrMap<CTileSet*>* pmapTileSets, MAPTILE* pWorld, IJSONObject* pLairs, INT nPlane)
 {
 	HRESULT hr;
-	CTileSet* pOcean, *pShore, *pTundra;
 	MAPTILE* pWorldPtr = pWorld;
 	POINT pt;
 	TStackRef<IJSONValue> srv;
@@ -1803,10 +1803,26 @@ HRESULT CMOMWorldEditor::PlaceLairs (IRandomNumber* pRand, TRStrMap<CTileSet*>* 
 	TArray<POINT> aPossible;
 	INT cNormal, cWeak, cTotal;
 	PCWSTR rgLairs[] = { L"ancientTemple", L"fallenTemple", L"keep", L"lair", L"ruins" };
+	PCWSTR rgwzDenied[] = { L"ocean", L"shore", L"tundra" };
+	TMap<CTileSet*, PCWSTR> mapDenied;
 
-	Check(pmapTileSets->Find(RSTRING_CAST(L"ocean"), &pOcean));
-	Check(pmapTileSets->Find(RSTRING_CAST(L"shore"), &pShore));
-	Check(pmapTileSets->Find(RSTRING_CAST(L"tundra"), &pTundra));
+	// Load the ocean, shore, and tundra tile sets into the denied list
+	for(INT i = 0; i < ARRAYSIZE(rgwzDenied); i++)
+	{
+		CTileSet* pDenied;
+		Check(pmapTileSets->Find(RSTRING_CAST(rgwzDenied[i]), &pDenied));
+		Check(mapDenied.Add(pDenied, rgwzDenied[i]));
+	}
+
+	// Also deny any tile set whose name ends in "NODE"
+	for(sysint i = 0; i < pmapTileSets->Length(); i++)
+	{
+		RSTRING rstrKey = pmapTileSets->GetKey(i);
+		INT cchKey = RStrLen(rstrKey);
+
+		if(4 <= cchKey && 0 == TStrCmpIAssert(RStrToWide(rstrKey) + cchKey - 4, L"NODE"))
+			Check(mapDenied.Add(*pmapTileSets->GetValuePtr(i), RStrToWide(rstrKey)));
+	}
 
 	Check(pLairs->FindNonNullValueW(L"normal", &srv));
 	Check(srv->GetInteger(&cNormal));
@@ -1822,7 +1838,7 @@ HRESULT CMOMWorldEditor::PlaceLairs (IRandomNumber* pRand, TRStrMap<CTileSet*>* 
 		for(pt.x = 0; pt.x < m_xWorld; pt.x++)
 		{
 			CTileSet* pTileSet = pWorldPtr->pTile->GetTileSet();
-			if((pTileSet != pOcean && pTileSet != pShore && pTileSet != pTundra) && NULL == pWorldPtr->pData->m_rstrFeature)
+			if(!mapDenied.HasItem(pTileSet) && NULL == pWorldPtr->pData->m_rstrFeature)
 				Check(aPossible.Append(pt));
 			pWorldPtr++;
 		}
