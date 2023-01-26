@@ -61,8 +61,11 @@ namespace TileSetLoader
 			Check(srTileSets->GetObject(i, &srTileSetDir));
 			Check(srTileSetDir->FindValueW(L"name", &srvName));
 			Check(srvName->GetString(&rstrName));
-			Check(pPackage->OpenDirectory(RStrToWide(rstrName), RStrLen(rstrName), &srTileSet));
-			Check(LoadTileSet(srTileSet, rstrName, mapTiles));
+			if(!mapTiles.HasItem(rstrName))
+			{
+				Check(pPackage->OpenDirectory(RStrToWide(rstrName), RStrLen(rstrName), &srTileSet));
+				Check(LoadTileSet(srTileSet, rstrName, mapTiles));
+			}
 
 			RStrRelease(rstrName); rstrName = NULL;
 		}

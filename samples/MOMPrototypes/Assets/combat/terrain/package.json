@@ -52,7 +52,7 @@
 		[
 			{
 				name: "darkForest",
-				tiles: "default",
+				tiles: "darkForest",
 				dark: 40,
 				ridge: 30,
 				features: 70

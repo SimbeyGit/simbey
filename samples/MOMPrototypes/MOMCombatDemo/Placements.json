@@ -1,7 +1,7 @@
 {
 	player: "defense",
-	generator: "grasslands",
-	world: "arcanus",
+	generator: "darkForest",
+	world: "myrror",
 	floating: false,
 	mana: 500,
 	spells:

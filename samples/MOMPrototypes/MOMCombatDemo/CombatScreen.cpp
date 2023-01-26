@@ -2651,7 +2651,14 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	Check(srGenerator->FindNonNullValueW(L"tiles", &srv));
 	Check(srv->GetString(&rstrTiles));
 
+	// Load the tile-specific graphics for the combat terrain tiles.
 	Check(Formatting::TPrintF(wzTileSets, ARRAYSIZE(wzTileSets), &cchTileSets, L"combat\\terrain\\%r\\%r", rstrWorld, rstrTiles));
+	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
+	Check(TileSetLoader::LoadTileSets(srTileSets, m_mapCombatTiles));
+	srTileSets.Release();
+
+	// Load the default graphics for any missing combat terrain tiles.
+	Check(Formatting::TPrintF(wzTileSets, ARRAYSIZE(wzTileSets), &cchTileSets, L"combat\\terrain\\%r\\default", rstrWorld));
 	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
 	Check(TileSetLoader::LoadTileSets(srTileSets, m_mapCombatTiles));
 
