@@ -19,7 +19,37 @@ function FormatSifPackage (strPackage, strFiles, fTrim, nCanvas, strDataName, oD
 	return aPackage;
 }
 
-function BuildTileSet (strWorld, strTileSet, oTileSet)
+function ReadPngSize (strPngPath, nOutWidth, nOutHeight)
+{
+	var oPng = Host.ReadBinaryFile(strPngPath);
+	var oBytes = oPng.Lock();
+	var cbImage = oBytes.Size;
+
+	if(cbImage > 8 && oBytes[0] == 0x89 && oBytes[1] == 'P' && oBytes[2] == 'N' && oBytes[3] == 'G')
+	{
+		var i = 8, cbChunk;
+
+		while(i + 12 < cbImage)
+		{
+			cbChunk = (oBytes[i] << 24) + (oBytes[i + 1] << 16) + (oBytes[i + 2] << 8) + oBytes[i + 3];
+			if(oBytes[i + 4] == 'I' && oBytes[i + 5] == 'H' && oBytes[i + 6] == 'D' && oBytes[i + 7] == 'R')
+			{
+				if(cbChunk == 13 && i + 25 < cbImage)
+				{
+					nOutWidth = (oBytes[i + 8] << 24) + (oBytes[i + 9] << 16) + (oBytes[i + 10] << 8) + oBytes[i + 11];
+					nOutHeight = (oBytes[i + 12] << 24) + (oBytes[i + 13] << 16) + (oBytes[i + 14] << 8) + oBytes[i + 15];
+					return true;
+				}
+				break;
+			}
+			i += cbChunk + 12;
+		}
+	}
+
+	return false;
+}
+
+function BuildTileSet (strWorld, strTileSet, oTileSet, fBuildSizes)
 {
 	var oData = JSONCreateObject();
 	oData.world = strWorld;
@@ -51,6 +81,8 @@ function BuildTileSet (strWorld, strTileSet, oTileSet)
 			oKey = JSONCreateObject();
 			oKey.key = strKey;
 			oKey.variants = JSONCreateArray();
+			if(fBuildSizes)
+				oKey.sizes = JSONCreateArray();
 			aKeys.Append(oKey);
 		}
 		var aVariants = oKey.variants;
@@ -72,6 +104,29 @@ function BuildTileSet (strWorld, strTileSet, oTileSet)
 
 		aFrames.Append(strTile);
 
+		if(fBuildSizes)
+		{
+			var aSizes = oKey.sizes, nWidth, nHeight, aImage;
+			if(!ReadPngSize(oTileSet.GetPathOf(strTile), ref nWidth, ref nHeight))
+				throw "Unable to read image size from: " + strTile;
+
+			if(idxVariant == len(aSizes))
+			{
+				aImage = JSONCreateArray();
+				aSizes.Append(aImage);
+
+				// Add the sizes to the image array
+				aImage.Append(nWidth);
+				aImage.Append(nHeight);
+			}
+			else
+			{
+				aImage = aSizes[idxVariant];
+				if(nWidth != aImage[0] || nHeight != aImage[1])
+					throw strTile + " has a different image size than the other frames!";
+			}
+		}
+
 		mapTiles.Remove(strTile);
 	}
 
@@ -80,7 +135,7 @@ function BuildTileSet (strWorld, strTileSet, oTileSet)
 
 function WriteTileSet (strWorld, strTileSet, oTileSet)
 {
-	Host.WriteTextFile((string)BuildTileSet(strWorld, strTileSet, oTileSet), oTileSet.GetPathOf("package.json"));
+	Host.WriteTextFile((string)BuildTileSet(strWorld, strTileSet, oTileSet, false), oTileSet.GetPathOf("package.json"));
 }
 
 function BuildTerrainAnimators (oTerrain)
@@ -104,7 +159,7 @@ function BuildTerrainAnimators (oTerrain)
 
 function BuildCombatTileSet (strWorld, strStyle, strTileSet, oTileSet)
 {
-	var aPackage = BuildTileSet(strWorld, strTileSet, oTileSet);
+	var aPackage = BuildTileSet(strWorld, strTileSet, oTileSet, true);
 	var oData = aPackage[1];
 
 	oData.style = strStyle;

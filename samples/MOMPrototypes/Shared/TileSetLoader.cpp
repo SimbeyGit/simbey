@@ -102,7 +102,7 @@ namespace TileSetLoader
 		for(sysint i = 0; i < cKeys; i++)
 		{
 			TStackRef<IJSONObject> srKey;
-			TStackRef<IJSONArray> srVariants;
+			TStackRef<IJSONArray> srVariants, srSizes;
 			bool fAutoOffset = false;
 
 			Check(srKeys->GetObject(i, &srKey));
@@ -117,9 +117,17 @@ namespace TileSetLoader
 
 			srv.Release();
 			if(SUCCEEDED(srKey->FindNonNullValueW(L"auto-offset", &srv)))
+			{
 				Check(srv->GetBoolean(&fAutoOffset));
+				if(fAutoOffset)
+				{
+					srv.Release();
+					Check(srKey->FindNonNullValueW(L"sizes", &srv));
+					Check(srv->GetArray(&srSizes));
+				}
+			}
 
-			Check(LoadKeyVariants(srSIF, pTileSet, rstrKey, srVariants, fAutoOffset));
+			Check(LoadKeyVariants(srSIF, pTileSet, rstrKey, srVariants, srSizes));
 
 			RStrRelease(rstrKey); rstrKey = NULL;
 		}
@@ -135,7 +143,7 @@ namespace TileSetLoader
 		return hr;
 	}
 
-	HRESULT LoadKeyVariants (ISimbeyInterchangeFile* pSIF, CTileSet* pTileSet, RSTRING rstrKey, IJSONArray* pVariants, bool fAutoOffset)
+	HRESULT LoadKeyVariants (ISimbeyInterchangeFile* pSIF, CTileSet* pTileSet, RSTRING rstrKey, IJSONArray* pVariants, __in_opt IJSONArray* pSizes)
 	{
 		HRESULT hr;
 		sysint cVariants = pVariants->Count();
@@ -150,6 +158,23 @@ namespace TileSetLoader
 			TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 			sysint cFrames;
 			INT xOffset = 0, yOffset = 0;
+			SIZE szImage = {0};
+
+			if(pSizes)
+			{
+				TStackRef<IJSONArray> srImage;
+				Check(pSizes->GetValue(i, &srv));
+				Check(srv->GetArray(&srImage));
+				srv.Release();
+
+				Check(srImage->GetValue(0, &srv));
+				Check(srv->GetInteger(reinterpret_cast<INT*>(&szImage.cx)));
+				srv.Release();
+
+				Check(srImage->GetValue(1, &srv));
+				Check(srv->GetInteger(reinterpret_cast<INT*>(&szImage.cy)));
+				srv.Release();
+			}
 
 			Check(pVariants->GetValue(i, &srv));
 			Check(srv->GetArray(&srFrames));
@@ -163,12 +188,13 @@ namespace TileSetLoader
 				Check(srFrames->GetString(0, &rstrFrame));
 				Check(pSIF->FindLayer(RStrToWide(rstrFrame), &srLayer, NULL));
 
-				if(fAutoOffset)
+				if(pSizes)
 				{
-					SIZE size;
-					SideAssertHr(srLayer->GetSize(&size));
-					xOffset = size.cx / -2;
-					yOffset = CountShadowRows(srLayer) - size.cy;
+					RECT rc;
+
+					SideAssertHr(srLayer->GetPosition(&rc));
+					xOffset = rc.left - szImage.cx / 2;
+					yOffset = CountShadowRows(srLayer) - (szImage.cy - rc.top);
 				}
 
 				Check(sifCreateStaticSprite(srLayer, xOffset, yOffset, &srSprite));
@@ -186,12 +212,13 @@ namespace TileSetLoader
 					Check(srFrames->GetString(n, &rstrFrame));
 					Check(pSIF->FindLayer(RStrToWide(rstrFrame), &srLayer, NULL));
 
-					if(fAutoOffset)
+					if(pSizes)
 					{
-						SIZE size;
-						SideAssertHr(srLayer->GetSize(&size));
-						xOffset = size.cx / -2;
-						yOffset = CountShadowRows(srLayer) - size.cy;
+						RECT rc;
+
+						SideAssertHr(srLayer->GetPosition(&rc));
+						xOffset = rc.left - szImage.cx / 2;
+						yOffset = CountShadowRows(srLayer) - (szImage.cy - rc.top);
 					}
 
 					Check(srAnimator->AddFrame(0, 8, n, xOffset, yOffset));

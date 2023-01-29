@@ -2745,7 +2745,6 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 					PlaceTile(m_pMain, x, y, nLayer, pMapPtr->pTile, NULL);
 					if(pMapPtr->pData->m_pFeature)
 					{
-						TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 						TStackRef<ISimbeyInterchangeSprite> srSprite;
 						INT xIso, yIso, xPlace, yPlace;
 
