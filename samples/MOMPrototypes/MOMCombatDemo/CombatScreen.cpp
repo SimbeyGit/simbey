@@ -2981,8 +2981,15 @@ HRESULT CCombatScreen::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGener
 	{
 		for(INT x = 0; x < MAP_WIDTH; x++)
 		{
-			POINT pt = { x, y };
-			Check(aTiles.Append(pt));
+			if(((x >= 7 && x <= 13) || (x >= 19 && x <= 25)) && (y >= 15 && y <= 21))
+			{
+				// No terrain features are placed on these tiles.
+			}
+			else
+			{
+				POINT pt = { x, y };
+				Check(aTiles.Append(pt));
+			}
 		}
 	}
 
