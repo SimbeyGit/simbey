@@ -115,10 +115,10 @@
 			},
 			{
 				name: "swamp",
-				tiles: "default",
+				tiles: "swamp",
 				dark: 250,
 				ridge: 8,
-				features: 15
+				features: 30
 			},
 			{
 				name: "tundra",

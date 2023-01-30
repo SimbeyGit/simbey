@@ -1,6 +1,6 @@
 {
 	player: "defense",
-	generator: "darkForest",
+	generator: "swamp",
 	world: "arcanus",
 	floating: false,
 	mana: 500,
