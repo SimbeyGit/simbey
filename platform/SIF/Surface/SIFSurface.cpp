@@ -710,15 +710,10 @@ HRESULT CSIFCanvas::RemoveHiddenSprites (sysint nLayer)
 	paSprites = &m_aLayers[nLayer]->aSprites;
 	for(sysint i = paSprites->Length() - 1; i >= 0; i--)
 	{
-		INT x, y, xOffset, yOffset, xSize, ySize;
+		INT x, y, xSize, ySize;
 		ISimbeyInterchangeSprite* pSprite = (*paSprites)[i];
 
 		pSprite->GetPosition(x, y);
-		pSprite->GetFrameOffset(xOffset, yOffset);
-
-		x -= xOffset;
-		y -= yOffset;
-
 		pSprite->GetCurrentFrameSize(&xSize, &ySize);
 
 		x -= m_xScroll;

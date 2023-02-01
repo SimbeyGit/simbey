@@ -229,6 +229,7 @@ HRESULT CBaseWindow::DetachSubclassHandler (ISubclassedHandler* lpSubclass)
 				m_paSubclasses = NULL;
 			}
 			lpSubclass->OnDetached(this);
+			hr = S_OK;
 		}
 	}
 
