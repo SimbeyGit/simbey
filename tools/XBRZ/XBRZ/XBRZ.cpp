@@ -371,7 +371,7 @@ public:
 	}
 };
 
-HRESULT ScaleImageUsingConfig (const CScalerCfg& cfg, const INT* pcnImage, const SIZE* pcszImage, INT nScaleSize, __deref_out INT** ppnOutput)
+HRESULT ScaleImageUsingConfig (const CScalerCfg& cfg, const INT* pcnImage, const SIZE* pcszImage, INT nScaleSize, __deref_out INT** ppnOutput, __out SIZE* pszOutput)
 {
 	HRESULT hr;
 	INT* pnOutput = NULL;
@@ -384,8 +384,12 @@ HRESULT ScaleImageUsingConfig (const CScalerCfg& cfg, const INT* pcnImage, const
 
 		CheckIf(NULL == pcnImage, E_INVALIDARG);
 		CheckIf(NULL == pcszImage, E_INVALIDARG);
+		CheckIf(NULL == pszOutput, E_INVALIDARG);
 
-		INT cpEnlarged = pcszImage->cx * pcszImage->cy * nScaleFactor * nScaleFactor;
+		pszOutput->cx = pcszImage->cx * nScaleFactor;
+		pszOutput->cy = pcszImage->cy * nScaleFactor;
+
+		INT cpEnlarged = pszOutput->cx * pszOutput->cy;
 		pnOutput = __new INT[cpEnlarged];
 		CheckAlloc(pnOutput);
 
@@ -400,17 +404,17 @@ Cleanup:
 	return hr;
 }
 
-HRESULT XBRZScaleImage (__in_opt const SCALER_CONFIG* pcConfig, const INT* pcnImage, const SIZE* pcszImage, INT nScaleSize, __deref_out INT** ppnOutput)
+HRESULT XBRZScaleImage (__in_opt const SCALER_CONFIG* pcConfig, const INT* pcnImage, const SIZE* pcszImage, INT nScaleSize, __deref_out INT** ppnOutput, __out SIZE* pszOutput)
 {
 	if(pcConfig)
 	{
 		CScalerCfg cfgUser(pcConfig);
-		return ScaleImageUsingConfig(cfgUser, pcnImage, pcszImage, nScaleSize, ppnOutput);
+		return ScaleImageUsingConfig(cfgUser, pcnImage, pcszImage, nScaleSize, ppnOutput, pszOutput);
 	}
 	else
 	{
 		CScalerCfg cfgDefault;
-		return ScaleImageUsingConfig(cfgDefault, pcnImage, pcszImage, nScaleSize, ppnOutput);
+		return ScaleImageUsingConfig(cfgDefault, pcnImage, pcszImage, nScaleSize, ppnOutput, pszOutput);
 	}
 }
 

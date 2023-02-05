@@ -23,7 +23,8 @@ struct SCALER_CONFIG
 //   pcszImage (required) - SIZE (pixels) of pcnImage.
 //   nScaleSize (required) - Pass one of the XBRZ_SCALE_#X constants.
 //   ppnOutput (required) - Receives the upscaled image, use XBRZFreeImage() to free this memory.
-HRESULT XBRZScaleImage (__in_opt const SCALER_CONFIG* pcConfig, const INT* pcnImage, const SIZE* pcszImage, INT nScaleSize, __deref_out INT** ppnOutput);
+//   pszOutput (required) - Receives the size of the upscaled image, in pixels.
+HRESULT XBRZScaleImage (__in_opt const SCALER_CONFIG* pcConfig, const INT* pcnImage, const SIZE* pcszImage, INT nScaleSize, __deref_out INT** ppnOutput, __out SIZE* pszOutput);
 
 // XBRZFreeImage()
 // Parameters:
