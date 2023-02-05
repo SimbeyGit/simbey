@@ -5,3 +5,4 @@ DESCRIPTION	'XBRZ Scaler'
 EXPORTS
 			XBRZScaleImage				@5
 			XBRZFreeImage				@6
+			XBRZGetDefaults				@7

@@ -422,3 +422,15 @@ VOID XBRZFreeImage (__in_opt INT* pnImage)
 {
 	__delete_array pnImage;
 }
+
+VOID XBRZGetDefaults (__out SCALER_CONFIG* pConfig)
+{
+	if(pConfig)
+	{
+		CScalerCfg cfgDefault;
+		pConfig->DominantDirectionThreshold = cfgDefault.DominantDirectionThreshold;
+		pConfig->EqualColorTolerance = cfgDefault.EqualColorTolerance;
+		pConfig->LuminanceWeight = cfgDefault.LuminanceWeight;
+		pConfig->SteepDirectionThreshold = cfgDefault.SteepDirectionThreshold;
+	}
+}

@@ -30,3 +30,8 @@ HRESULT XBRZScaleImage (__in_opt const SCALER_CONFIG* pcConfig, const INT* pcnIm
 // Parameters:
 //   pnImage (optional) - Frees memory allocated by XBRZScaleImage(), does nothing if pnImage is NULL.
 VOID XBRZFreeImage (__in_opt INT* pnImage);
+
+// XBRZGetDefaults()
+// Parameters:
+//   pConfig (required) - Retrieves the default configuration.
+VOID XBRZGetDefaults (__out SCALER_CONFIG* pConfig);
