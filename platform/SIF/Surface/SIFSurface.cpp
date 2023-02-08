@@ -270,11 +270,12 @@ BOOL CDrawPattern::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psi
 	CalculateView(psifSurface24, &pbView, xOffset, yOffset, xView, yView, xTile, yTile);
 
 	PBYTE pbTile = m_pbTile;
+	LONG lTilePitch = xTile * sizeof(DWORD);
 	for(INT y = yOffset; y < yView; y += yTile)
 	{
 		for(INT x = xOffset; x < xView; x += xTile)
 		{
-			sifDrawMaskedBits32ToDIB24Pitch(pbView, x, y, xView, yView, psifSurface24->lPitch, pbTile, xTile, yTile);
+			sifDrawMaskedBits32ToDIB24Pitch(pbView, x, y, xView, yView, psifSurface24->lPitch, pbTile, xTile, yTile, lTilePitch);
 		}
 	}
 
@@ -298,11 +299,12 @@ BOOL CDrawPattern::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* 
 	CalculateView(psifSurface24, &pbView, xOffset, yOffset, xView, yView, xTile, yTile);
 
 	PBYTE pbTile = m_pbTile;
+	LONG lTilePitch = xTile * sizeof(DWORD);
 	for(INT y = yOffset; y < yView; y += yTile)
 	{
 		for(INT x = xOffset; x < xView; x += xTile)
 		{
-			sifDrawColorizedBits32ToDIB24Pitch(pbView, x, y, xView, yView, psifSurface24->lPitch, pbTile, xTile, yTile, m_crColorize);
+			sifDrawColorizedBits32ToDIB24Pitch(pbView, x, y, xView, yView, psifSurface24->lPitch, pbTile, xTile, yTile, lTilePitch, m_crColorize);
 		}
 	}
 
