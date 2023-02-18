@@ -350,18 +350,32 @@ VOID CLevelRenderer::UpdateFrame (VOID)
 			POINT ptCenter = { m_pGame->m_szWindow.cx / 2, m_pGame->m_szWindow.cy / 2 };
 			ClientToScreen(hwnd, &ptCenter);
 
-			if(pt.x != ptCenter.x)
+			if(pt.x != ptCenter.x || pt.y != ptCenter.y)
 			{
-				if(bKeyState[VK_MENU] & 0x80)
+				if(pt.x != ptCenter.x)
 				{
-					dblStrafe = static_cast<DOUBLE>(pt.x - ptCenter.x) / 2.0;
-					if(dblStrafe < -MOVE_RATE)
-						dblStrafe = -MOVE_RATE;
-					else if(dblStrafe > MOVE_RATE)
-						dblStrafe = MOVE_RATE;
+					if(bKeyState[VK_MENU] & 0x80)
+					{
+						dblStrafe = static_cast<DOUBLE>(pt.x - ptCenter.x) / 2.0;
+						if(dblStrafe < -MOVE_RATE)
+							dblStrafe = -MOVE_RATE;
+						else if(dblStrafe > MOVE_RATE)
+							dblStrafe = MOVE_RATE;
+					}
+					else
+						m_camera.Turn(static_cast<FLOAT>(pt.x - ptCenter.x) / 3.5f);
 				}
-				else
-					m_camera.Turn(static_cast<FLOAT>(pt.x - ptCenter.x) / 3.5f);
+
+				if(pt.y != ptCenter.y)
+				{
+					INT yDelta = ptCenter.y - pt.y;
+					if(abs(yDelta) >= 3)
+					{
+						MoveCamera((ptCenter.y > pt.y ? MOVE_RATE : -MOVE_RATE) / 2.0, m_camera.m_dblDirRadians);
+						fCheckItemPickup = true;
+					}
+				}
+
 				SetCursorPos(ptCenter.x, ptCenter.y);
 				fUpdate = true;
 			}
@@ -1308,6 +1322,11 @@ BOOL CInfiniteWolfenstein::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, L
 BOOL CInfiniteWolfenstein::OnKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
 	return m_pActive->OnKeyUp(uMsg, wParam, lParam, lResult);
+}
+
+BOOL CInfiniteWolfenstein::OnRButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+{
+	return m_pActive->OnKeyDown(uMsg, VK_SPACE, lParam, lResult);
 }
 
 BOOL CInfiniteWolfenstein::OnActivate (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
