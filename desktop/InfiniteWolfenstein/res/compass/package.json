@@ -1,0 +1,9 @@
+[
+	{
+		package: "buildsif",
+		name: "compass.sif",
+		canvas: 128,
+		arrange: true,
+		files: ["*.png"]
+	}
+]

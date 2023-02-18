@@ -31,6 +31,8 @@ CLevelRenderer::CLevelRenderer (CInfiniteWolfenstein* pGame) :
 	m_pGenerator(NULL),
 	m_pWalls(NULL),
 	m_pModels(NULL),
+	m_nCompassDir(-1),
+	m_pCompassFrame(NULL),
 	m_xRegion(0),
 	m_zRegion(0),
 	m_nPoints(0),
@@ -44,6 +46,7 @@ CLevelRenderer::CLevelRenderer (CInfiniteWolfenstein* pGame) :
 
 CLevelRenderer::~CLevelRenderer ()
 {
+	SafeRelease(m_pCompassFrame);
 }
 
 VOID CLevelRenderer::AttachLevelGenerator (CLevelGenerator* pGenerator)
@@ -85,6 +88,7 @@ HRESULT CLevelRenderer::PrepareLevel (INT nLevel, INT xRegion, INT zRegion, BOOL
 
 		m_camera.SetPosition((DOUBLE)(srRegion->m_xStartCell + srRegion->m_xRegion * REGION_WIDTH) + 0.5, 0.65,
 			(DOUBLE)(srRegion->m_zStartCell + srRegion->m_zRegion * REGION_WIDTH) + 0.5);
+		UpdateCompass();
 	}
 
 Cleanup:
@@ -307,19 +311,25 @@ VOID CLevelRenderer::DrawFrame (VOID)
 		glPopMatrix();
 	}
 
-	glPushMatrix();
-
 	glColor3f(1.0f, 1.0f, 1.0f);
+
+	glPushMatrix();
 
 	glTranslated(static_cast<DOUBLE>(psWindow->cx) - 10.0, static_cast<DOUBLE>(psWindow->cy) - 10.0, 0.0);
 	m_pGame->m_pGLFont->DrawTextGL(m_wzLevelLabel, 0.5f, DT_RIGHT);
 
 	glPopMatrix();
 
+	glPushMatrix();
+
 	glTranslated(10.0, static_cast<DOUBLE>(psWindow->cy) - 10.0, 0.0);
 	m_pGame->m_pGLFont->DrawTextGL(m_wzKeysLabel, 0.25f, DT_LEFT);
 	glTranslated(0.0, -20, 0.0);
 	m_pGame->m_pGLFont->DrawTextGL(m_wzScoreLabel, 0.5f, DT_LEFT);
+
+	glPopMatrix();
+
+	DrawCompass();
 
 	sifPopOrthoMode();
 
@@ -423,6 +433,8 @@ VOID CLevelRenderer::UpdateFrame (VOID)
 
 	if(fUpdate)
 	{
+		UpdateCompass();
+
 		if(dblStrafe)
 		{
 			DOUBLE dblStrafeDir = m_camera.m_dblDirRadians + Geometry::dPI / 2.0;
@@ -502,6 +514,40 @@ BOOL CLevelRenderer::OnKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& 
 }
 
 // Private Methods
+
+VOID CLevelRenderer::UpdateCompass (VOID)
+{
+	static const DOUBLE c_dblSlice = (Geometry::dPI * 2.0) / 8.0;
+
+	INT nDir = (INT)((m_camera.m_dblDirRadians + (c_dblSlice / 2.0)) / c_dblSlice);
+	if(nDir == 8)
+		nDir = 0;
+
+	if(m_nCompassDir != nDir)
+	{
+		m_nCompassDir = nDir;
+		SafeRelease(m_pCompassFrame);
+		m_pGame->GetCompassFrame(nDir, &m_pCompassFrame);
+	}
+}
+
+VOID CLevelRenderer::DrawCompass (VOID)
+{
+	TPOINT_RECT rect;
+
+	glBindTexture(GL_TEXTURE_2D, m_pGame->GetCompassTexture());
+	sifGetGLTexturePositionF(m_pCompassFrame, &rect.uLeft, &rect.vTop, &rect.uRight, &rect.vBottom);
+
+	glBegin(GL_QUADS);
+	glNormal3f(0.0f, 0.0f, 1.0f);
+
+	glTexCoord2f(rect.uLeft, rect.vBottom);		glVertex3f(16.0f, 16.0f, 0.0f);	// Bottom Left Of The Texture and Quad
+	glTexCoord2f(rect.uRight, rect.vBottom);	glVertex3f(80.0f, 16.0, 0.0f);	// Bottom Right Of The Texture and Quad
+	glTexCoord2f(rect.uRight, rect.vTop);		glVertex3f(80.0f, 80.0f, 0.0f);	// Top Right Of The Texture and Quad
+	glTexCoord2f(rect.uLeft, rect.vTop);		glVertex3f(16.0f, 80.0f, 0.0f);	// Top Left Of The Texture and Quad
+
+	glEnd();
+}
 
 VOID CLevelRenderer::UpdateViewingTiles (VOID)
 {
@@ -999,6 +1045,8 @@ CInfiniteWolfenstein::CInfiniteWolfenstein (HINSTANCE hInstance) :
 	m_pModels(NULL),
 	m_pSystem(NULL),
 	m_pFont(NULL),
+	m_pCompass(NULL),
+	m_nCompass(0),
 	m_pGLFont(NULL),
 	m_pGenerator(NULL),
 	m_renderer(this),
@@ -1020,6 +1068,14 @@ CInfiniteWolfenstein::~CInfiniteWolfenstein ()
 	SafeDelete(m_pRooms);
 	SafeDelete(m_pSpecial);
 	SafeDelete(m_pModels);
+
+	if(m_pCompass)
+	{
+		glDeleteTextures(1, &m_nCompass);
+
+		m_pCompass->Close();
+		SafeRelease(m_pCompass);
+	}
 
 	if(m_pFont)
 	{
@@ -1244,6 +1300,11 @@ VOID CInfiniteWolfenstein::SelectInterface (IGameInterface* pInterface)
 	m_player.Stop();
 }
 
+HRESULT CInfiniteWolfenstein::GetCompassFrame (INT nDir, __deref_out ISimbeyInterchangeFileLayer** ppCompassFrame)
+{
+	return m_pCompass->GetLayerByIndex(nDir, ppCompassFrame);
+}
+
 // CBaseWindow
 
 HINSTANCE CInfiniteWolfenstein::GetInstance (VOID)
@@ -1280,6 +1341,14 @@ HRESULT CInfiniteWolfenstein::CreateTextures (VOID)
 
 	SafeRelease(m_pGLFont);
 	Check(sifCreateFontGLFromSIF(m_pFont, FALSE, &m_pGLFont));
+
+	if(0 != m_nCompass)
+	{
+		glDeleteTextures(1, &m_nCompass);
+		m_nCompass = 0;
+	}
+
+	Check(sifMergeCanvasToOpenGLTexture32(m_pCompass, 0, 0, 0, 0, &m_nCompass));
 
 Cleanup:
 	return hr;
@@ -1462,6 +1531,8 @@ HRESULT CInfiniteWolfenstein::LoadPackage (PCWSTR pcwzPackage, BOOL fRequireAll)
 		Check(srPackage->OpenSIF(L"fonts\\font.sif", &srFont));
 		Check(CreateGLFont(srFont));
 		srFont->Close();
+
+		Check(srPackage->OpenSIF(L"compass\\compass.sif", &m_pCompass));
 	}
 
 	if(SUCCEEDED(srPackage->GetJSONData(SLP(L"rooms.json"), &srv)))

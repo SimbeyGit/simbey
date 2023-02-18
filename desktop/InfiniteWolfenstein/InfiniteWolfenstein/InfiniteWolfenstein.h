@@ -39,6 +39,8 @@ private:
 	TRefArray<CDungeonRegion> m_aCache;
 	CFrustum m_frustum;
 	CCamera m_camera;
+	INT m_nCompassDir;
+	ISimbeyInterchangeFileLayer* m_pCompassFrame;
 
 	TArray<DBLRECT> m_aSolids;			// Temporary Cache
 	TArray<CModelEntity*> m_aModels;	// Temporary Cache
@@ -82,6 +84,8 @@ public:
 	virtual BOOL OnKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 
 private:
+	VOID UpdateCompass (VOID);
+	VOID DrawCompass (VOID);
 	VOID UpdateViewingTiles (VOID);
 	VOID GetRegionPosition (INT& xRegion, INT& zRegion);
 	HRESULT GetDungeonRegion (INT xRegion, INT zRegion, __deref_out CDungeonRegion** ppRegion);
@@ -145,6 +149,8 @@ private:
 	TRStrMap<FMOD::Sound*> m_mapSounds;
 
 	ISimbeyInterchangeFile* m_pFont;
+	ISimbeyInterchangeFile* m_pCompass;
+	UINT m_nCompass;
 
 	CLevelRenderer m_renderer;
 	CLevelSelector m_selector;
@@ -190,6 +196,9 @@ public:
 	CLevelRenderer* GetLevelRenderer (VOID) { return &m_renderer; }
 	CLevelSelector* GetLevelSelector (VOID) { return &m_selector; }
 	VOID SelectInterface (IGameInterface* pInterface);
+
+	HRESULT GetCompassFrame (INT nDir, __deref_out ISimbeyInterchangeFileLayer** ppCompassFrame);
+	inline UINT GetCompassTexture (VOID) { return m_nCompass; }
 
 protected:
 	// CBaseWindow
