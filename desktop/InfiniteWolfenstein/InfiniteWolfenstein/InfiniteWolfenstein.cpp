@@ -718,9 +718,6 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove, DOUBLE dblDirRadians)
 	DPOINT dpCenter = m_camera.m_dblPoint;
 
 	dpCenter.x += sin(dblDirRadians) * dblMove;
-	dpCenter.z -= cos(dblDirRadians) * dblMove;
-
-	// Check sliding against solids
 	for(sysint i = 0; i < m_aSolids.Length(); i++)
 	{
 		DBLRECT& rect = m_aSolids[i];
@@ -729,25 +726,28 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove, DOUBLE dblDirRadians)
 
 		if(Geometry::IntersectDblRect(&rcInter, &rect, &rcPlayer))
 		{
-			DOUBLE xDelta = abs(rcInter.right - rcInter.left);
-			DOUBLE zDelta = abs(rcInter.bottom - rcInter.top);
-
-			if(xDelta < zDelta)
-			{
-				if(m_camera.m_dblPoint.x < rect.left)
-					dpCenter.x = rect.left - (PLAYER_RADIUS + 0.001);
-				else
-					dpCenter.x = rect.right + (PLAYER_RADIUS + 0.001);
-			}
+			if(m_camera.m_dblPoint.x < rect.left)
+				dpCenter.x = rect.left - (PLAYER_RADIUS + 0.001);
 			else
-			{
-				if(m_camera.m_dblPoint.z < rect.top)
-					dpCenter.z = rect.top - (PLAYER_RADIUS + 0.001);
-				else
-					dpCenter.z = rect.bottom + (PLAYER_RADIUS + 0.001);
-			}
+				dpCenter.x = rect.right + (PLAYER_RADIUS + 0.001);
 		}
 	}
+
+	dpCenter.z -= cos(dblDirRadians) * dblMove;
+	for(sysint i = 0; i < m_aSolids.Length(); i++)
+	{
+		DBLRECT& rect = m_aSolids[i];
+		DBLRECT rcInter;
+		DBLRECT rcPlayer = { dpCenter.x - PLAYER_RADIUS, dpCenter.z - PLAYER_RADIUS, dpCenter.x + PLAYER_RADIUS, dpCenter.z + PLAYER_RADIUS };
+
+		if(Geometry::IntersectDblRect(&rcInter, &rect, &rcPlayer))
+		{
+			if(m_camera.m_dblPoint.z < rect.top)
+				dpCenter.z = rect.top - (PLAYER_RADIUS + 0.001);
+			else
+				dpCenter.z = rect.bottom + (PLAYER_RADIUS + 0.001);
+		}
+	}    
 
 	m_camera.m_dblPoint = dpCenter;
 	m_aSolids.Clear();
