@@ -198,6 +198,11 @@
 					key: "Gold"
 				},
 				{
+					name: "SecretDoor",
+					type: "secret",
+					entity: "Secret.PNG"
+				},
+				{
 					name: "SilverKey",
 					type: "item",
 					sif: "SilverKey.SIF",

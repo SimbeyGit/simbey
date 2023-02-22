@@ -827,14 +827,20 @@ HRESULT CLevelGenerator::AddEntity (CDungeonRegion* pRegion, IJSONObject* pEntit
 	}
 	else
 	{
-		CModel* pModel;
-		CModelEntity* pItem;
+		CEntity* pItem;
 
-		Check(m_pModels->Resolve(rstrTypeW, &pModel));
-		if(pModel->m_fObstacle)
-			pItem = __new CModelObstacle(pModel);
+		if(0 == TStrCmpAssert(pcwzType, L"iw.SecretDoor"))
+			pItem = __new CSecretDoor(m_pWalls);
 		else
-			pItem = __new CModelItem(pModel);
+		{
+			CModel* pModel;
+
+			Check(m_pModels->Resolve(rstrTypeW, &pModel));
+			if(pModel->m_fObstacle)
+				pItem = __new CModelObstacle(pModel);
+			else
+				pItem = __new CModelItem(pModel);
+		}
 		CheckAlloc(pItem);
 
 		pRegion->m_bRegion[z * REGION_WIDTH + x].m_pEntities = pItem;

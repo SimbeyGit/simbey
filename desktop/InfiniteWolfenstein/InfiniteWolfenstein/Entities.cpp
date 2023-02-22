@@ -341,3 +341,225 @@ bool CModelItem::IsSpear (VOID)
 {
 	return m_pModel->m_fSpear;
 }
+
+CSecretDoor::CSecretDoor (CWallTextures* pWalls) :
+	m_pWalls(pWalls),
+	m_cBlocks(0),
+	m_nTravel(0),
+	m_eDir(NONE),
+	m_idxTravelBlock(0)
+{
+}
+
+CSecretDoor::~CSecretDoor ()
+{
+}
+
+VOID CSecretDoor::Draw (MODEL_LIST* pModels)
+{
+	if(NONE != m_eDir)
+	{
+		FRECT rc;
+		DOUBLE xMove = 0.0, zMove = 0.0, dblMove = (128.0 - (DOUBLE)m_nTravel) / 128.0;
+		GetDirection(xMove, zMove);
+
+		DOUBLE x = m_dpBlock.x + dblMove * xMove;
+		DOUBLE z = m_dpBlock.z + dblMove * zMove;
+
+		x -= 0.5;
+		z -= 0.5;
+
+		if(SUCCEEDED(m_pWalls->GetPosition(m_idxSides[1], &rc)))
+		{
+			// North Face
+			glNormal3f(0.0f, 0.0f, -1.0f);
+			glTexCoord2f(rc.right, rc.bottom); glVertex3f(x, 0.0f, z);
+			glTexCoord2f(rc.right, rc.top); glVertex3f(x, 1.0f, z);
+			glTexCoord2f(rc.left, rc.top); glVertex3f(x + 1.0f, 1.0f, z);
+			glTexCoord2f(rc.left, rc.bottom); glVertex3f(x + 1.0f, 0.0f, z);
+		}
+
+		if(SUCCEEDED(m_pWalls->GetPosition(m_idxSides[0], &rc)))
+		{
+			// West Face
+			glNormal3f(-1.0f, 0.0f, 0.0f);
+			glTexCoord2f(rc.left, rc.bottom); glVertex3f(x, 0.0f, z);
+			glTexCoord2f(rc.right, rc.bottom); glVertex3f(x, 0.0f, z + 1.0f);
+			glTexCoord2f(rc.right, rc.top); glVertex3f(x, 1.0f, z + 1.0f);
+			glTexCoord2f(rc.left, rc.top); glVertex3f(x, 1.0f, z);
+		}
+
+		if(SUCCEEDED(m_pWalls->GetPosition(m_idxSides[3], &rc)))
+		{
+			// South Face
+			glNormal3f(0.0f, 0.0f, 1.0f);
+			glTexCoord2f(rc.left, rc.bottom); glVertex3f(x, 0.0f, z + 1.0f);
+			glTexCoord2f(rc.right, rc.bottom); glVertex3f(x + 1.0f, 0.0f, z + 1.0f);
+			glTexCoord2f(rc.right, rc.top); glVertex3f(x + 1.0f, 1.0f, z + 1.0f);
+			glTexCoord2f(rc.left, rc.top); glVertex3f(x, 1.0f, z + 1.0f);
+		}
+
+		if(SUCCEEDED(m_pWalls->GetPosition(m_idxSides[2], &rc)))
+		{
+			// East Face
+			glNormal3f(1.0f, 0.0f, 0.0f);
+			glTexCoord2f(rc.right, rc.bottom); glVertex3f(x + 1.0f, 0.0f, z);
+			glTexCoord2f(rc.right, rc.top); glVertex3f(x + 1.0f, 1.0f, z);
+			glTexCoord2f(rc.left, rc.top); glVertex3f(x + 1.0f, 1.0f, z + 1.0f);
+			glTexCoord2f(rc.left, rc.bottom); glVertex3f(x + 1.0f, 0.0f, z + 1.0f);
+		}
+	}
+}
+
+VOID CSecretDoor::GetCollisionSolids (TArray<DBLRECT>* paSolids)
+{
+	if(NONE != m_eDir)
+	{
+		DBLRECT rect;
+		DOUBLE xMove = 0.0, zMove = 0.0, dblMove = (128.0 - (DOUBLE)m_nTravel) / 128.0;
+		GetDirection(xMove, zMove);
+
+		DOUBLE x = m_dpBlock.x + dblMove * xMove;
+		DOUBLE z = m_dpBlock.z + dblMove * zMove;
+
+		x -= 0.5;
+		z -= 0.5;
+
+		rect.left = x;
+		rect.top = z;
+		rect.right = x + 1.0;
+		rect.bottom = z + 1;
+		paSolids->Append(rect);
+	}
+}
+
+VOID CSecretDoor::Activate (CLevelRenderer* pRenderer, CDungeonRegion* pRegion)
+{
+	if(NONE == m_eDir)
+	{
+		INT xBlock = (INT)(m_dp.x - static_cast<DOUBLE>(pRegion->m_xRegion) * REGION_WIDTH);
+		INT zBlock = (INT)(m_dp.z - static_cast<DOUBLE>(pRegion->m_zRegion) * REGION_WIDTH);
+
+		BLOCK_DATA* pBlock = pRegion->m_bRegion + zBlock * REGION_WIDTH + xBlock;
+
+		if(TYPE_ANY_FLOOR != pBlock->idxBlock)
+		{
+			DOUBLE x, z;
+
+			pRenderer->GetPlayerPosition(&x, &z);
+
+			DOUBLE xDelta = m_dp.x - x;
+			DOUBLE zDelta = m_dp.z - z;
+
+			if(abs(xDelta) > abs(zDelta))
+			{
+				if(x < m_dp.x)
+					m_eDir = TRAVEL_EAST;
+				else
+					m_eDir = TRAVEL_WEST;
+			}
+			else
+			{
+				if(z < m_dp.z)
+					m_eDir = TRAVEL_SOUTH;
+				else
+					m_eDir = TRAVEL_NORTH;
+			}
+
+			m_dpBlock = m_dp;
+
+			if(TYPE_ANY_FLOOR == GetNextBlockType(pRegion) && SUCCEEDED(pRegion->AddActiveEntity(this)))
+			{
+				m_cBlocks = 2;
+				pRenderer->PlaySound(SLP(L"SecretDoor.wav"), m_dp);
+				PrepareNextBlockMovement(pBlock);
+				pRenderer->RenderRegion(pRegion);
+			}
+			else
+				pRenderer->PlaySound(SLP(L"NoWay.wav"), m_dp);
+		}
+	}
+}
+
+VOID CSecretDoor::Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion)
+{
+	if(0 == --m_nTravel)
+	{
+		DOUBLE xDir, zDir;
+
+		GetDirection(xDir, zDir);
+
+		m_dpBlock.x += xDir;
+		m_dpBlock.z += zDir;
+
+		INT xBlock = (INT)(m_dpBlock.x - static_cast<DOUBLE>(pRegion->m_xRegion) * REGION_WIDTH);
+		INT zBlock = (INT)(m_dpBlock.z - static_cast<DOUBLE>(pRegion->m_zRegion) * REGION_WIDTH);
+
+		BLOCK_DATA* pBlock = pRegion->m_bRegion + zBlock * REGION_WIDTH + xBlock;
+		Assert(TYPE_ANY_FLOOR == pBlock->idxBlock);
+		pBlock->idxBlock = m_idxTravelBlock;
+		m_idxTravelBlock = 0;
+
+		for(INT n = 0; n < ARRAYSIZE(pBlock->idxSides); n++)
+		{
+			Assert(TYPE_ANY_FLOOR == pBlock->idxSides[n]);
+			pBlock->idxSides[n] = m_idxSides[n];
+		}
+
+		if(0 == --m_cBlocks || TYPE_ANY_FLOOR != GetNextBlockType(pRegion))
+		{
+			pRegion->RemoveActiveEntity(this);
+			m_eDir = NONE;
+		}
+		else
+			PrepareNextBlockMovement(pBlock);
+
+		pRenderer->RenderRegion(pRegion);
+	}
+}
+
+VOID CSecretDoor::GetDirection (__out DOUBLE& x, __out DOUBLE& z)
+{
+	x = 0.0;
+	z = 0.0;
+
+	switch(m_eDir)
+	{
+	case TRAVEL_NORTH:
+		z = -1.0;
+		break;
+	case TRAVEL_EAST:
+		x = 1.0;
+		break;
+	case TRAVEL_SOUTH:
+		z = 1.0;
+		break;
+	case TRAVEL_WEST:
+		x = -1.0;
+		break;
+	}
+}
+
+VOID CSecretDoor::PrepareNextBlockMovement (BLOCK_DATA* pBlock)
+{
+	m_nTravel = 128;
+	m_idxTravelBlock = pBlock->idxBlock;
+	pBlock->idxBlock = TYPE_ANY_FLOOR;
+
+	for(INT n = 0; n < ARRAYSIZE(pBlock->idxSides); n++)
+	{
+		m_idxSides[n] = pBlock->idxSides[n];
+		pBlock->idxSides[n] = TYPE_ANY_FLOOR;
+	}
+}
+
+sysint CSecretDoor::GetNextBlockType (CDungeonRegion* pRegion)
+{
+	DOUBLE xMove = 0.0, zMove = 0.0;
+	GetDirection(xMove, zMove);
+
+	INT xNextBlock = (INT)(xMove + m_dpBlock.x - static_cast<DOUBLE>(pRegion->m_xRegion) * REGION_WIDTH);
+	INT zNextBlock = (INT)(zMove + m_dpBlock.z - static_cast<DOUBLE>(pRegion->m_zRegion) * REGION_WIDTH);
+
+	return pRegion->m_bRegion[zNextBlock * REGION_WIDTH + xNextBlock].idxBlock;
+}

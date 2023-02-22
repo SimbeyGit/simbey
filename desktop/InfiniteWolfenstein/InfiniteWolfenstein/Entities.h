@@ -125,3 +125,36 @@ public:
 	virtual bool IsSpear (VOID);
 	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids) { }
 };
+
+class CSecretDoor : public CEntity
+{
+public:
+	CWallTextures* m_pWalls;
+	INT m_cBlocks;
+	DPOINT m_dpBlock;
+	INT m_nTravel;
+	sysint m_idxTravelBlock;
+	sysint m_idxSides[4];
+
+	enum
+	{
+		NONE,
+		TRAVEL_NORTH,
+		TRAVEL_EAST,
+		TRAVEL_SOUTH,
+		TRAVEL_WEST
+	} m_eDir;
+
+public:
+	CSecretDoor (CWallTextures* pWalls);
+	~CSecretDoor ();
+
+	virtual VOID Draw (MODEL_LIST* pModels);
+	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids);
+	virtual VOID Activate (CLevelRenderer* pRenderer, CDungeonRegion* pRegion);
+	virtual VOID Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion);
+
+	VOID GetDirection (__out DOUBLE& x, __out DOUBLE& z);
+	VOID PrepareNextBlockMovement (BLOCK_DATA* pBlock);
+	sysint GetNextBlockType (CDungeonRegion* pRegion);
+};

@@ -244,6 +244,12 @@ BOOL CLevelRenderer::CheckCollisionsWithEntity (CEntity* pEntity)
 	return fCollision;
 }
 
+VOID CLevelRenderer::GetPlayerPosition (__out DOUBLE* px, __out DOUBLE* pz)
+{
+	*px = m_camera.m_dblPoint.x;
+	*pz = m_camera.m_dblPoint.z;
+}
+
 // IGameInterface
 
 VOID CLevelRenderer::DrawFrame (VOID)
