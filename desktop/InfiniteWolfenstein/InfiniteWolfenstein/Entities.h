@@ -126,24 +126,28 @@ public:
 	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids) { }
 };
 
-class CSecretDoor : public CEntity
+struct ACTIVE_SECRET
 {
-public:
-	CWallTextures* m_pWalls;
-	INT m_cBlocks;
-	DPOINT m_dpBlock;
-	INT m_nTravel;
-	sysint m_idxTravelBlock;
-	sysint m_idxSides[4];
+	INT cBlocks;
+	DPOINT dpBlock;
+	INT nTravel;
+	sysint idxTravelBlock;
+	sysint idxSides[4];
 
 	enum
 	{
-		NONE,
 		TRAVEL_NORTH,
 		TRAVEL_EAST,
 		TRAVEL_SOUTH,
 		TRAVEL_WEST
-	} m_eDir;
+	} eDir;
+};
+
+class CSecretDoor : public CEntity
+{
+public:
+	CWallTextures* m_pWalls;
+	ACTIVE_SECRET* m_pActive;
 
 public:
 	CSecretDoor (CWallTextures* pWalls);
