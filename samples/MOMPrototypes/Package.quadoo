@@ -207,6 +207,9 @@ function main ()
 		println("Building overland terrain animators...");
 		BuildTerrainAnimators(Host.OpenFolder("Assets\\overland\\terrain"));
 
+		println("Building large overland terrain animators...");
+		BuildTerrainAnimators(Host.OpenFolder("..\\..\\resources\\MoM\\overland_large\\terrain"));
+
 		println("Building combat terrain animators (Arcanus)...");
 		BuildCombatAnimators(Host.OpenFolder("Assets\\combat\\terrain"), "Arcanus");
 

@@ -269,6 +269,23 @@ public:
 	virtual BOOL ContinuePainting (VOID) { return FALSE; }
 };
 
+class COverlandTerrain
+{
+private:
+	CSIFPackage* m_pPackage;
+
+public:
+	COverlandTerrain ();
+	~COverlandTerrain ();
+
+	VOID SetRootPackage (CSIFPackage* pPackage);
+	HRESULT GetJSONData (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out IJSONValue** ppv);
+	HRESULT GetJSONArray (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out IJSONArray** ppArray);
+	HRESULT GetJSONObject (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out IJSONObject** ppObject);
+	HRESULT OpenSIF (PCWSTR pcwzSubPath, __deref_out ISimbeyInterchangeFile** ppSIF);
+	HRESULT OpenDirectory (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out CSIFPackage** ppSubPackage);
+};
+
 class CMOMWorldEditor :
 	public CBaseUnknown,
 	public CBaseWindow,
@@ -304,6 +321,9 @@ protected:
 	TRStrMap<ISimbeyInterchangeSprite*> m_mapFeatures;
 	CTerrainGallery* m_pFeatures;
 	TArray<CITYTILE> m_aCityTiles;
+
+	SIZE m_sizeTiles;
+	INT m_nCityOffset;
 
 	INT m_xWorld, m_yWorld;
 	MAPTILE* m_pArcanusWorld;
@@ -450,7 +470,7 @@ protected:
 	HRESULT LoadFeatures (ISimbeyInterchangeFile* pFeatures);
 	HRESULT LoadCityTiles (ISimbeyInterchangeFile* pCityTiles);
 
-	HRESULT LoadTerrain (VOID);
+	HRESULT LoadTerrain (COverlandTerrain& overland);
 	HRESULT CreateGallery (TRStrMap<CTileSet*>& mapTiles, CTerrainGallery** ppGallery);
 	HRESULT SetupMouse (VOID);
 

@@ -23,8 +23,13 @@
 #define	SURFACE_WIDTH		512
 #define	SURFACE_HEIGHT		320
 
-#define	TILE_WIDTH			20
-#define	TILE_HEIGHT			18
+#define	TILE_WIDTH_SMALL	20
+#define	TILE_HEIGHT_SMALL	18
+#define	CITY_OFFSET_SMALL	-6
+
+#define	TILE_WIDTH_LARGE	40
+#define	TILE_HEIGHT_LARGE	36
+#define	CITY_OFFSET_LARGE	-12
 
 const WCHAR c_wzAppClassName[] = L"MOMWorldEditorCls";
 const WCHAR c_wzRegAppKey[] = L"Software\\Simbey\\MOMWorldEditor";
@@ -292,6 +297,64 @@ HRESULT CPlaceCityCommand::Execute (class CMOMWorldEditor* pEditor, INT xTile, I
 // CMOMWorldEditor
 ///////////////////////////////////////////////////////////////////////////////
 
+COverlandTerrain::COverlandTerrain () :
+	m_pPackage(NULL)
+{
+}
+
+COverlandTerrain::~COverlandTerrain ()
+{
+	SafeRelease(m_pPackage);
+}
+
+VOID COverlandTerrain::SetRootPackage (CSIFPackage* pPackage)
+{
+	ReplaceInterface(m_pPackage, pPackage);
+}
+
+HRESULT COverlandTerrain::GetJSONData (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out IJSONValue** ppv)
+{
+	return m_pPackage->GetJSONData(pcwzSubPath, cchSubPath, ppv);
+}
+
+HRESULT COverlandTerrain::GetJSONArray (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out IJSONArray** ppArray)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+
+	Check(GetJSONData(pcwzSubPath, cchSubPath, &srv));
+	Check(srv->GetArray(ppArray));
+
+Cleanup:
+	return hr;
+}
+
+HRESULT COverlandTerrain::GetJSONObject (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out IJSONObject** ppObject)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+
+	Check(GetJSONData(pcwzSubPath, cchSubPath, &srv));
+	Check(srv->GetObject(ppObject));
+
+Cleanup:
+	return hr;
+}
+
+HRESULT COverlandTerrain::OpenSIF (PCWSTR pcwzSubPath, __deref_out ISimbeyInterchangeFile** ppSIF)
+{
+	return m_pPackage->OpenSIF(pcwzSubPath, ppSIF);
+}
+
+HRESULT COverlandTerrain::OpenDirectory (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out CSIFPackage** ppSubPackage)
+{
+	return m_pPackage->OpenDirectory(pcwzSubPath, cchSubPath, ppSubPackage);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CMOMWorldEditor
+///////////////////////////////////////////////////////////////////////////////
+
 CMOMWorldEditor::CMOMWorldEditor (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
 	m_pRibbon(NULL),
@@ -383,9 +446,11 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 {
 	HRESULT hr;
 	RECT rect = { 0, 0, nWidth, nHeight };
+	TStackRef<CSIFPackage> srOverland;
 	TStackRef<IJSONObject> srData, srSmoothing, srFeatures;
-	TStackRef<IJSONValue> srvRules, srvSmoothing, srvGenerators, srvProportions, srvFeatures;
+	TStackRef<IJSONValue> srvRules;
 	ISimbeyInterchangeFile* pSIF = NULL;
+	COverlandTerrain overland;
 
 	Check(CSIFRibbon::Create(DPI::Scale, &m_pRibbon));
 
@@ -395,41 +460,53 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 
 	Check(LoadPackage());
 
-	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\smoothing.json"), &srvSmoothing));
-	Check(srvSmoothing->GetObject(&srSmoothing));
+	if(SUCCEEDED(m_pPackage->OpenDirectory(SLP(L"overland_large"), &srOverland)) &&
+		IDYES == MessageBoxW(m_hwnd, L"Do you want to use the large tile set?", L"Large Tile Set", MB_YESNO))
+	{
+		m_sizeTiles.cx = TILE_WIDTH_LARGE;
+		m_sizeTiles.cy = TILE_HEIGHT_LARGE;
+		m_nCityOffset = CITY_OFFSET_LARGE;
+	}
+	else
+	{
+		srOverland.Release();
+
+		Check(m_pPackage->OpenDirectory(SLP(L"overland"), &srOverland));
+		m_sizeTiles.cx = TILE_WIDTH_SMALL;
+		m_sizeTiles.cy = TILE_HEIGHT_SMALL;
+		m_nCityOffset = CITY_OFFSET_SMALL;
+	}
+	overland.SetRootPackage(srOverland);
+
+	Check(overland.GetJSONObject(SLP(L"terrain\\smoothing.json"), &srSmoothing));
 	Check(CSmoothingSystem::LoadFromJSON(srSmoothing, m_mapSmoothingSystems));
 
-	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\rules.json"), &srvRules));
+	Check(overland.GetJSONData(SLP(L"terrain\\rules.json"), &srvRules));
 
 	m_pTileRules = __new CTileRules;
 	CheckAlloc(m_pTileRules);
 	Check(m_pTileRules->Initialize(m_mapSmoothingSystems, srvRules));
 
-	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\generators.json"), &srvGenerators));
-	Check(srvGenerators->GetArray(&m_pGenerators));
-
-	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\proportions.json"), &srvProportions));
-	Check(srvProportions->GetArray(&m_pProportions));
-
-	Check(m_pPackage->GetJSONData(SLP(L"overland\\terrain\\features.json"), &srvFeatures));
-	Check(srvFeatures->GetObject(&srFeatures));
+	Check(overland.GetJSONArray(SLP(L"terrain\\generators.json"), &m_pGenerators));
+	Check(overland.GetJSONArray(SLP(L"terrain\\proportions.json"), &m_pProportions));
+	Check(overland.GetJSONObject(SLP(L"terrain\\features.json"), &srFeatures));
 	Check(LoadMapFeatureChances(srFeatures));
 
 	m_pGeneratorGallery = __new CGeneratorGallery(m_pRibbon, m_pGenerators);
 	CheckAlloc(m_pGeneratorGallery);
 
-	Check(m_pPackage->OpenSIF(L"overland\\features\\features.sif", &pSIF));
+	Check(overland.OpenSIF(L"features\\features.sif", &pSIF));
 	m_pFeatures = __new CTerrainGallery(m_pRibbon, pSIF);
 	CheckAlloc(m_pFeatures);
 	Check(LoadFeatures(pSIF));
 	SafeRelease(pSIF);
 
-	Check(m_pPackage->OpenSIF(L"overland\\cities\\cities.sif", &pSIF));
+	Check(overland.OpenSIF(L"cities\\cities.sif", &pSIF));
 	Check(LoadCityTiles(pSIF));
 	pSIF->Close();
 	SafeRelease(pSIF);
 
-	Check(LoadTerrain());
+	Check(LoadTerrain(overland));
 
 	Check(m_pSurface->AddCanvas(NULL, TRUE, &m_pMain));
 	Check(static_cast<CInteractiveCanvas*>(m_pMain)->AddInteractiveLayer(TRUE, LayerRender::Masked, RGB(0, 0, 0), this, &m_pMapTileLayer));
@@ -440,8 +517,8 @@ HRESULT CMOMWorldEditor::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
 
 	Check(SetupMap(64, 48, TRUE));
 
-	m_pMain->SetScroll((m_xWorld * TILE_WIDTH) / 2 - SURFACE_WIDTH / 2,
-		(m_yWorld * TILE_HEIGHT) / 2 - SURFACE_HEIGHT / 2);
+	m_pMain->SetScroll((m_xWorld * m_sizeTiles.cx) / 2 - SURFACE_WIDTH / 2,
+		(m_yWorld * m_sizeTiles.cy) / 2 - SURFACE_HEIGHT / 2);
 	UpdateVisibleTiles();
 
 	CheckIfGetLastError(!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE));
@@ -1013,8 +1090,8 @@ HRESULT CMOMWorldEditor::LoadFrom (PCWSTR pcwzFile)
 	m_xWorld = nWidth;
 	m_yWorld = nHeight;
 
-	m_pMain->SetScroll((m_xWorld * TILE_WIDTH) / 2 - SURFACE_WIDTH / 2,
-		(m_yWorld * TILE_HEIGHT) / 2 - SURFACE_HEIGHT / 2);
+	m_pMain->SetScroll((m_xWorld * m_sizeTiles.cx) / 2 - SURFACE_WIDTH / 2,
+		(m_yWorld * m_sizeTiles.cy) / 2 - SURFACE_HEIGHT / 2);
 
 	m_pMapTileLayer->Clear();
 	m_pMain->ClearLayer(m_nFeaturesLayer);
@@ -1069,8 +1146,8 @@ HRESULT CMOMWorldEditor::PromptForNewMap (VOID)
 
 	Check(SetupMap(dlgNewWorld.m_nWidth, dlgNewWorld.m_nHeight, TRUE));
 
-	m_pMain->SetScroll((m_xWorld * TILE_WIDTH) / 2 - SURFACE_WIDTH / 2,
-		(m_yWorld * TILE_HEIGHT) / 2 - SURFACE_HEIGHT / 2);
+	m_pMain->SetScroll((m_xWorld * m_sizeTiles.cx) / 2 - SURFACE_WIDTH / 2,
+		(m_yWorld * m_sizeTiles.cy) / 2 - SURFACE_HEIGHT / 2);
 
 	m_pMapTileLayer->Clear();
 	m_pMain->ClearLayer(m_nFeaturesLayer);
@@ -1167,8 +1244,8 @@ HRESULT CMOMWorldEditor::GenerateRandomWorlds (VOID)
 	coords.fWrapsTopToBottom = FALSE;
 	Check(SetupMap(coords.nWidth, coords.nHeight, FALSE));
 
-	m_pMain->SetScroll((m_xWorld * TILE_WIDTH) / 2 - SURFACE_WIDTH / 2,
-		(m_yWorld * TILE_HEIGHT) / 2 - SURFACE_HEIGHT / 2);
+	m_pMain->SetScroll((m_xWorld * m_sizeTiles.cx) / 2 - SURFACE_WIDTH / 2,
+		(m_yWorld * m_sizeTiles.cy) / 2 - SURFACE_HEIGHT / 2);
 
 	{
 		MAPTILE* prgWorlds[2] = { m_pArcanusWorld, m_pMyrrorWorld };
@@ -1944,14 +2021,14 @@ HRESULT CMOMWorldEditor::UpdateVisibleTiles (VOID)
 	Check(m_pMain->RemoveHiddenSprites(m_nFeaturesLayer));
 	Check(m_pMain->RemoveHiddenSprites(m_nCitiesLayer));
 
-	xAdjust = rcView.left % TILE_WIDTH;
+	xAdjust = rcView.left % m_sizeTiles.cx;
 	if(0 != xAdjust)
 	{
 		rcView.left -= xAdjust;
 		if(rcView.left < 0)
 			rcView.left = 0;
 	}
-	yAdjust = rcView.top % TILE_HEIGHT;
+	yAdjust = rcView.top % m_sizeTiles.cy;
 	if(0 != yAdjust)
 	{
 		rcView.top -= yAdjust;
@@ -1959,15 +2036,15 @@ HRESULT CMOMWorldEditor::UpdateVisibleTiles (VOID)
 			rcView.top = 0;
 	}
 
-	for(LONG y = rcView.top; y < rcView.bottom; y += TILE_HEIGHT)
+	for(LONG y = rcView.top; y < rcView.bottom; y += m_sizeTiles.cy)
 	{
-		for(LONG x = rcView.left; x < rcView.right; x += TILE_WIDTH)
+		for(LONG x = rcView.left; x < rcView.right; x += m_sizeTiles.cx)
 		{
 			if(FAILED(m_pMain->FindSpriteAt(nMapTileLayer, x, y, NULL)))
 			{
 				TStackRef<ISimbeyInterchangeSprite> srSprite;
-				INT xTile = x / TILE_WIDTH;
-				INT yTile = y / TILE_HEIGHT;
+				INT xTile = x / m_sizeTiles.cx;
+				INT yTile = y / m_sizeTiles.cy;
 				MAPTILE* pMapTile = pWorld + (yTile * m_xWorld + xTile);
 
 				Check(pMapTile->pTile->CreateSprite(&srSprite));
@@ -2042,13 +2119,13 @@ VOID CMOMWorldEditor::Scroll (INT x, INT y)
 	xScroll += x;
 	if(xScroll < 0)
 		xScroll = 0;
-	else if(xScroll + SURFACE_WIDTH > m_xWorld * TILE_WIDTH)
-		xScroll = (m_xWorld * TILE_WIDTH) - SURFACE_WIDTH;
+	else if(xScroll + SURFACE_WIDTH > m_xWorld * m_sizeTiles.cx)
+		xScroll = (m_xWorld * m_sizeTiles.cx) - SURFACE_WIDTH;
 	yScroll += y;
 	if(yScroll < 0)
 		yScroll = 0;
-	else if(yScroll + SURFACE_HEIGHT > m_yWorld * TILE_HEIGHT)
-		yScroll = (m_yWorld * TILE_HEIGHT) - SURFACE_HEIGHT;
+	else if(yScroll + SURFACE_HEIGHT > m_yWorld * m_sizeTiles.cy)
+		yScroll = (m_yWorld * m_sizeTiles.cy) - SURFACE_HEIGHT;
 	m_pMain->SetScroll(xScroll, yScroll);
 	UpdateVisibleTiles();
 }
@@ -2251,15 +2328,15 @@ HRESULT CMOMWorldEditor::ClearTile (INT x, INT y, BOOL fActiveWorld)
 	TStackRef<ISimbeyInterchangeSprite> srSprite;
 
 	CheckIfIgnore(!fActiveWorld, S_FALSE);
-	CheckNoTrace(m_pMain->FindSpriteAt(m_pMapTileLayer->GetLayer(), x * TILE_WIDTH, y * TILE_HEIGHT, &srSprite));
+	CheckNoTrace(m_pMain->FindSpriteAt(m_pMapTileLayer->GetLayer(), x * m_sizeTiles.cx, y * m_sizeTiles.cy, &srSprite));
 	Check(m_pMapTileLayer->RemoveSprite(srSprite));
 	srSprite.Release();
 
-	if(SUCCEEDED(m_pMain->FindSpriteAt(m_nFeaturesLayer, x * TILE_WIDTH, y * TILE_HEIGHT, &srSprite)))
+	if(SUCCEEDED(m_pMain->FindSpriteAt(m_nFeaturesLayer, x * m_sizeTiles.cx, y * m_sizeTiles.cy, &srSprite)))
 		Check(m_pMain->RemoveSprite(m_nFeaturesLayer, srSprite));
 	srSprite.Release();
 
-	if(SUCCEEDED(m_pMain->FindSpriteAt(m_nCitiesLayer, x * TILE_WIDTH, y * TILE_HEIGHT, &srSprite)))
+	if(SUCCEEDED(m_pMain->FindSpriteAt(m_nCitiesLayer, x * m_sizeTiles.cx, y * m_sizeTiles.cy, &srSprite)))
 		Check(m_pMain->RemoveSprite(m_nCitiesLayer, srSprite));
 
 Cleanup:
@@ -2269,8 +2346,8 @@ Cleanup:
 HRESULT CMOMWorldEditor::PlaceSelectedTile (INT x, INT y)
 {
 	HRESULT hr;
-	INT xTile = x / TILE_WIDTH;
-	INT yTile = y / TILE_HEIGHT;
+	INT xTile = x / m_sizeTiles.cx;
+	INT yTile = y / m_sizeTiles.cy;
 
 	CheckIf(NULL == m_pCommand, E_FAIL);
 	Check(m_pCommand->Execute(this, xTile, yTile));
@@ -2331,18 +2408,18 @@ HRESULT CMOMWorldEditor::PlaceOrModifyCity (MAPTILE* pWorld, INT xTile, INT yTil
 	case IDC_DELETE:
 		if(IDC_DELETE == host.GetReturnValue())
 			SafeRelease(pTile->pData->m_pCity);
-		if(SUCCEEDED(m_pMain->FindSpriteAt(m_pMapTileLayer->GetLayer(), xTile * TILE_WIDTH, yTile * TILE_HEIGHT, &srSprite)))
+		if(SUCCEEDED(m_pMain->FindSpriteAt(m_pMapTileLayer->GetLayer(), xTile * m_sizeTiles.cx, yTile * m_sizeTiles.cy, &srSprite)))
 		{
 			m_pMain->RemoveSprite(m_pMapTileLayer->GetLayer(), srSprite);
 			srSprite.Release();
 
-			if(SUCCEEDED(m_pMain->FindSpriteAt(m_nFeaturesLayer, xTile * TILE_WIDTH, yTile * TILE_HEIGHT, &srSprite)))
+			if(SUCCEEDED(m_pMain->FindSpriteAt(m_nFeaturesLayer, xTile * m_sizeTiles.cx, yTile * m_sizeTiles.cy, &srSprite)))
 			{
 				m_pMain->RemoveSprite(m_nFeaturesLayer, srSprite);
 				srSprite.Release();
 			}
 
-			if(SUCCEEDED(m_pMain->FindSpriteAt(m_nCitiesLayer, xTile * TILE_WIDTH, yTile * TILE_HEIGHT, &srSprite)))
+			if(SUCCEEDED(m_pMain->FindSpriteAt(m_nCitiesLayer, xTile * m_sizeTiles.cx, yTile * m_sizeTiles.cy, &srSprite)))
 			{
 				m_pMain->RemoveSprite(m_nCitiesLayer, srSprite);
 				srSprite.Release();
@@ -2496,11 +2573,11 @@ HRESULT CMOMWorldEditor::LoadCityTiles (ISimbeyInterchangeFile* pCityTiles)
 		{
 			TStackRef<ISimbeyInterchangeFileLayer> srColorized;
 			Check(ColorizeLayer(srNormal, rgcrFlags[n], srFlags, &srColorized));
-			Check(sifCreateStaticSprite(srColorized, -6, -6, pTile->pNormal + n));
+			Check(sifCreateStaticSprite(srColorized, m_nCityOffset, m_nCityOffset, pTile->pNormal + n));
 
 			srColorized.Release();
 			Check(ColorizeLayer(srWalled, rgcrFlags[n], srFlags, &srColorized));
-			Check(sifCreateStaticSprite(srColorized, -6, -6, pTile->pWalled + n));
+			Check(sifCreateStaticSprite(srColorized, m_nCityOffset, m_nCityOffset, pTile->pWalled + n));
 		}
 
 		nTile++;
@@ -2512,16 +2589,16 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CMOMWorldEditor::LoadTerrain (VOID)
+HRESULT CMOMWorldEditor::LoadTerrain (COverlandTerrain& overland)
 {
 	HRESULT hr;
 	TStackRef<CSIFPackage> srArcanus, srMyrror;
 
-	Check(m_pPackage->OpenDirectory(SLP(L"overland\\terrain\\arcanus"), &srArcanus));
+	Check(overland.OpenDirectory(SLP(L"terrain\\arcanus"), &srArcanus));
 	Check(TileSetLoader::LoadTileSets(srArcanus, m_mapArcanus));
 	Check(CreateGallery(m_mapArcanus, &m_pArcanusTerrain));
 
-	Check(m_pPackage->OpenDirectory(SLP(L"overland\\terrain\\myrror"), &srMyrror));
+	Check(overland.OpenDirectory(SLP(L"terrain\\myrror"), &srMyrror));
 	Check(TileSetLoader::LoadTileSets(srMyrror, m_mapMyrror));
 	Check(CreateGallery(m_mapMyrror, &m_pMyrrorTerrain));
 
