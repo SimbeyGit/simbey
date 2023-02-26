@@ -753,7 +753,7 @@ VOID CLevelRenderer::MoveCamera (DOUBLE dblMove, DOUBLE dblDirRadians)
 			else
 				dpCenter.z = rect.bottom + (PLAYER_RADIUS + 0.001);
 		}
-	}    
+	}
 
 	m_camera.m_dblPoint = dpCenter;
 	m_aSolids.Clear();

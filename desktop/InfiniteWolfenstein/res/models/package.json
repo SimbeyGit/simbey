@@ -14,6 +14,14 @@
 	},
 	{
 		package: "sif",
+		name: "BlackPilled.SIF"
+	},
+	{
+		package: "model",
+		name: "BlackPilled.SML"
+	},
+	{
+		package: "sif",
 		name: "Chalice.SIF"
 	},
 	{
@@ -111,6 +119,15 @@
 					sif: "Barrel.SIF",
 					model: "Barrel.SML",
 					entity: "Barrel.PNG"
+				},
+				{
+					name: "BlackPilled",
+					type: "item",
+					sif: "BlackPilled.SIF",
+					model: "BlackPilled.SML",
+					entity: "BlackPilled.PNG",
+					pickup: "PickupLife.wav",
+					points: 150
 				},
 				{
 					name: "Chalice",
