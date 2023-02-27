@@ -16,6 +16,7 @@
 #define	COLOR_SILVER_LOCKED		RGB(0, 255, 255)
 #define	COLOR_RAILING			RGB(160, 88, 20)
 #define	COLOR_SWITCH			RGB(60, 120, 120)
+#define	COLOR_SPLIT_DOOR		RGB(192, 192, 0)
 
 interface IGrapher;
 
@@ -68,6 +69,7 @@ public:
 	HBRUSH m_hbrElevatorDoor;
 	HBRUSH m_hbrGoldLocked;
 	HBRUSH m_hbrSilverLocked;
+	HBRUSH m_hbrSplitDoor;
 	HBRUSH m_hbrRailing;
 	HBRUSH m_hbrSwitch;
 

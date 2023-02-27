@@ -62,6 +62,9 @@ public:
 	INT m_nLockedType;
 
 public:
+	static HRESULT CreateDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType, __deref_out CDoor** ppDoor);
+
+public:
 	CDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType);
 
 	virtual VOID Draw (MODEL_LIST* pModels);
@@ -69,8 +72,29 @@ public:
 	virtual VOID Activate (CLevelRenderer* pRenderer, CDungeonRegion* pRegion);
 	virtual VOID Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion);
 
-private:
+protected:
+	virtual VOID PlayDoorOpen (CLevelRenderer* pRenderer);
+	virtual VOID PlayDoorClose (CLevelRenderer* pRenderer);
+
 	VOID StartClosingDoor (CLevelRenderer* pRenderer);
+};
+
+class CSplitDoor : public CDoor
+{
+public:
+	static HRESULT CreateDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType, __deref_out CDoor** ppDoor);
+
+public:
+	CSplitDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType);
+
+	virtual VOID Draw (MODEL_LIST* pModels);
+	virtual VOID GetCollisionSolids (TArray<DBLRECT>* paSolids);
+
+protected:
+	VOID DrawHalfDoor (DOUBLE dblOffset, FLOAT rTexStart, FLOAT rTexEnd);
+
+	virtual VOID PlayDoorOpen (CLevelRenderer* pRenderer);
+	virtual VOID PlayDoorClose (CLevelRenderer* pRenderer);
 };
 
 class CElevatorSwitch : public CEntity

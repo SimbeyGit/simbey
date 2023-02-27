@@ -330,6 +330,7 @@ CRooms::CRooms () :
 	m_hbrElevatorDoor(NULL),
 	m_hbrGoldLocked(NULL),
 	m_hbrSilverLocked(NULL),
+	m_hbrSplitDoor(NULL),
 	m_hbrRailing(NULL),
 	m_hbrSwitch(NULL)
 {
@@ -349,6 +350,7 @@ CRooms::~CRooms ()
 	DeleteObject(m_hbrElevatorDoor);
 	DeleteObject(m_hbrGoldLocked);
 	DeleteObject(m_hbrSilverLocked);
+	DeleteObject(m_hbrSplitDoor);
 	DeleteObject(m_hbrRailing);
 	DeleteObject(m_hbrSwitch);
 }
@@ -386,6 +388,9 @@ HRESULT CRooms::Initialize (VOID)
 
 	m_hbrSilverLocked = CreateSolidBrush(COLOR_SILVER_LOCKED);
 	CheckIfGetLastError(NULL == m_hbrSilverLocked);
+
+	m_hbrSplitDoor = CreateSolidBrush(COLOR_SPLIT_DOOR);
+	CheckIfGetLastError(NULL == m_hbrSplitDoor);
 
 	m_hbrRailing = CreateSolidBrush(COLOR_RAILING);
 	CheckIfGetLastError(NULL == m_hbrRailing);
@@ -540,6 +545,9 @@ BOOL CRooms::Paint (IGrapher* pGrapher)
 				break;
 			case COLOR_SILVER_LOCKED:
 				hbrFill = m_hbrSilverLocked;
+				break;
+			case COLOR_SPLIT_DOOR:
+				hbrFill = m_hbrSplitDoor;
 				break;
 			case COLOR_RAILING:
 				hbrFill = m_hbrRailing;

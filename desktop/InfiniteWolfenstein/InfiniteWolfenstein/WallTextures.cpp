@@ -95,6 +95,7 @@ HRESULT CWallTextures::Initialize (VOID)
 	Check(AddType(pNamespace, TYPE_ANY_ELEVATOR_DOOR, SLP(L"elevator-door"), texture));
 	Check(AddType(pNamespace, TYPE_ANY_LOCKED_DOOR_GOLD, SLP(L"locked-gold"), texture));
 	Check(AddType(pNamespace, TYPE_ANY_LOCKED_DOOR_SILVER, SLP(L"locked-silver"), texture));
+	Check(AddType(pNamespace, TYPE_ANY_SPLIT_DOOR, SLP(L"split-door"), texture));
 	Check(AddType(pNamespace, TYPE_ANY_RAILING, SLP(L"railing"), texture));
 	Check(AddType(pNamespace, TYPE_ANY_SWITCH, SLP(L"switch"), texture));
 

@@ -20,8 +20,9 @@ class CSIFPackage;
 #define	TYPE_ANY_ELEVATOR_DOOR			8
 #define	TYPE_ANY_LOCKED_DOOR_GOLD		9
 #define	TYPE_ANY_LOCKED_DOOR_SILVER		10
-#define	TYPE_ANY_RAILING				11
-#define	TYPE_ANY_SWITCH					12
+#define	TYPE_ANY_SPLIT_DOOR				11
+#define	TYPE_ANY_RAILING				12
+#define	TYPE_ANY_SWITCH					13
 
 class CWallNamespace
 {

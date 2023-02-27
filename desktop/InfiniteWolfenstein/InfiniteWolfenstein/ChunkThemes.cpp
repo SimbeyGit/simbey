@@ -6,6 +6,7 @@ CChunkTheme::CChunkTheme () :
 	m_pMusic(NULL),
 	m_pDoorTypes(NULL),
 	m_pLockedTypes(NULL),
+	m_pSplitTypes(NULL),
 	m_pElevatorTypes(NULL),
 	m_pSwitchTypes(NULL),
 	m_pRailingTypes(NULL),
@@ -25,6 +26,7 @@ CChunkTheme::~CChunkTheme ()
 	SafeRelease(m_pMusic);
 	SafeRelease(m_pDoorTypes);
 	SafeRelease(m_pLockedTypes);
+	SafeRelease(m_pSplitTypes);
 	SafeRelease(m_pElevatorTypes);
 	SafeRelease(m_pSwitchTypes);
 	SafeRelease(m_pRailingTypes);
@@ -72,6 +74,10 @@ HRESULT CChunkThemeNamespace::Add (CWallThemes* pWallThemes, RSTRING rstrNameW, 
 
 	Check(pItem->FindNonNullValueW(L"locked_door", &srv));
 	Check(srv->GetArray(&pChunkTheme->m_pLockedTypes));
+	srv.Release();
+
+	Check(pItem->FindNonNullValueW(L"split_door", &srv));
+	Check(srv->GetArray(&pChunkTheme->m_pSplitTypes));
 	srv.Release();
 
 	Check(pItem->FindNonNullValueW(L"elevator", &srv));

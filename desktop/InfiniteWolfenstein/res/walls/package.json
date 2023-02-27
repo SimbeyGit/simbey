@@ -63,6 +63,12 @@
 					texture: "0121.png",
 					lockable: false,
 					track: "0117.png"
+				},
+				{
+					name: "SplitDoor",
+					texture: "0181.png",
+					lockable: false,
+					track: "0109.png"
 				}
 			],
 			switches:

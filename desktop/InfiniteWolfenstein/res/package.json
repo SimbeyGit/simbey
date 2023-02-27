@@ -191,6 +191,7 @@
 					decorations: 5,
 					door: ["iw.NormalDoor"],
 					locked_door: ["iw.LockedDoorLight", "iw.LockedDoorDark"],
+					split_door: ["iw.SplitDoor"],
 					elevator: ["iw.ElevatorDoorLight", "iw.ElevatorDoorDark"],
 					switch: ["iw.NormalElevator"],
 					railing: ["iw.NormalRailing"],

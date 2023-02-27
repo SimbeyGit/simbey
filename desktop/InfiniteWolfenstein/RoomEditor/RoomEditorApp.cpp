@@ -263,6 +263,7 @@ HRESULT CRoomEditorApp::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 	Check(CreateSwatchItem(SLP(L"Elevator Door"), SLP(L"any.elevator-door"), COLOR_ELEVATOR_DOOR));
 	Check(CreateSwatchItem(SLP(L"Locked Door [Gold]"), SLP(L"any.locked-gold"), COLOR_GOLD_LOCKED));
 	Check(CreateSwatchItem(SLP(L"Locked Door [Silver]"), SLP(L"any.locked-silver"), COLOR_SILVER_LOCKED));
+	Check(CreateSwatchItem(SLP(L"Split Door"), SLP(L"any.split-door"), COLOR_SPLIT_DOOR));
 	Check(CreateSwatchItem(SLP(L"Railing"), SLP(L"any.railing"), COLOR_RAILING));
 	Check(CreateSwatchItem(SLP(L"Switch"), SLP(L"any.switch"), COLOR_SWITCH));
 	Check(CreateSwatchItem(SLP(L"Pick Wall"), SLP(L"any.pick_wall"), RGB(0, 128, 192)));

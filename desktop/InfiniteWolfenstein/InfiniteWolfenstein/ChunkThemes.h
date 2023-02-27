@@ -16,6 +16,7 @@ public:
 	IJSONArray* m_pMusic;
 	IJSONArray* m_pDoorTypes;
 	IJSONArray* m_pLockedTypes;
+	IJSONArray* m_pSplitTypes;
 	IJSONArray* m_pElevatorTypes;
 	IJSONArray* m_pSwitchTypes;
 	IJSONArray* m_pRailingTypes;

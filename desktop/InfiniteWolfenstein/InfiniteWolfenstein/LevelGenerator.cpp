@@ -910,6 +910,7 @@ HRESULT CLevelGenerator::SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegi
 	IJSONArray* pDoorTypes = pRegion->m_pChunk->m_pDoorTypes;
 	IJSONArray* pLockedTypes = pRegion->m_pChunk->m_pLockedTypes;
 	IJSONArray* pElevatorTypes = pRegion->m_pChunk->m_pElevatorTypes;
+	IJSONArray* pSplitTypes = pRegion->m_pChunk->m_pSplitTypes;
 	TStackRef<IJSONObject> srDoorType;
 	TStackRef<IJSONValue> srv;
 	RSTRING rstrDoorTypeW = NULL;
@@ -929,6 +930,7 @@ HRESULT CLevelGenerator::SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegi
 			case TYPE_ANY_ELEVATOR_DOOR:
 			case TYPE_ANY_LOCKED_DOOR_GOLD:
 			case TYPE_ANY_LOCKED_DOOR_SILVER:
+			case TYPE_ANY_SPLIT_DOOR:
 				{
 					BLOCK_DATA* pBlockA = pRegion->GetBlock(x, z - 1);
 					BLOCK_DATA* pBlockB = pRegion->GetBlock(x, z + 1);
@@ -956,6 +958,8 @@ HRESULT CLevelGenerator::SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegi
 					if(-1 != nTrackA && -1 != nTrackB)
 					{
 						DOOR_DEF* pApplied;
+						HRESULT (*pfnCreateDoor)(CLevelRenderer*, CWallTextures*, bool, sysint, INT, CDoor**) = CDoor::CreateDoor;
+						CDoor* pDoor;
 
 						switch(pbCell->idxBlock)
 						{
@@ -967,6 +971,12 @@ HRESULT CLevelGenerator::SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegi
 							Check(pElevatorTypes->GetString(mt.Random(pElevatorTypes->Count()), &rstrSpecialDoorW));
 							Check(m_pWalls->m_mapDoorDefs.FindPtr(rstrSpecialDoorW, &pApplied));
 							break;
+						case TYPE_ANY_SPLIT_DOOR:
+							RStrRelease(rstrSpecialDoorW); rstrSpecialDoorW = NULL;
+							Check(pSplitTypes->GetString(mt.Random(pSplitTypes->Count()), &rstrSpecialDoorW));
+							Check(m_pWalls->m_mapDoorDefs.FindPtr(rstrSpecialDoorW, &pApplied));
+							pfnCreateDoor = CSplitDoor::CreateDoor;
+							break;
 						default:
 							RStrRelease(rstrSpecialDoorW); rstrSpecialDoorW = NULL;
 							Check(pLockedTypes->GetString(mt.Random(pLockedTypes->Count()), &rstrSpecialDoorW));
@@ -977,8 +987,7 @@ HRESULT CLevelGenerator::SetupDoors (CMersenneTwister& mt, CDungeonRegion* pRegi
 						pBlockA->idxSides[nTrackA] = pApplied->idxTrack;
 						pBlockB->idxSides[nTrackB] = pApplied->idxTrack;
 
-						CDoor* pDoor = __new CDoor(pRenderer, m_pWalls, fNorthSouth, pApplied->idxTexture, pbCell->idxBlock);
-						CheckAlloc(pDoor);
+						Check(pfnCreateDoor(pRenderer, m_pWalls, fNorthSouth, pApplied->idxTexture, pbCell->idxBlock, &pDoor));
 						pbCell->m_pEntities = pDoor;
 
 						pDoor->m_dp.x = static_cast<DOUBLE>(pRegion->m_xRegion) * REGION_WIDTH + x + 0.5;

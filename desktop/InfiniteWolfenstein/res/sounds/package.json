@@ -1,6 +1,14 @@
 [
 	{
 		package: "sound",
+		name: "BlakeStoneDoorOpen.wav"
+	},
+	{
+		package: "sound",
+		name: "BlakeStoneDoorClose.wav"
+	},
+	{
+		package: "sound",
 		name: "BlakeStoneGoldBars.wav"
 	},
 	{

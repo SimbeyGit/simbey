@@ -6,6 +6,12 @@
 #include "InfiniteWolfenstein.h"
 #include "Entities.h"
 
+HRESULT CDoor::CreateDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType, __deref_out CDoor** ppDoor)
+{
+	*ppDoor = __new CDoor(pLevel, pWalls, fNorthSouth, idxTexture, nLockedType);
+	return *ppDoor ? S_OK : E_OUTOFMEMORY;
+}
+
 CDoor::CDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType) :
 	m_pLevel(pLevel),
 	m_fNorthSouth(fNorthSouth),
@@ -19,8 +25,6 @@ CDoor::CDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, s
 
 VOID CDoor::Draw (MODEL_LIST* pModels)
 {
-	static const FCOLOR fclrDark = { 0.7f, 0.7f, 0.7f };
-	static const FCOLOR fclrLight = { 1.0f, 1.0f, 1.0f };
 	DOUBLE x = m_dp.x;
 	DOUBLE z = m_dp.z;
 
@@ -171,7 +175,7 @@ VOID CDoor::Activate (CLevelRenderer* pRenderer, CDungeonRegion* pRegion)
 
 		if(SUCCEEDED(pRegion->AddActiveEntity(this)))
 		{
-			pRenderer->PlaySound(SLP(L"DoorOpen.wav"), m_dp);
+			PlayDoorOpen(pRenderer);
 			m_eState = Opening;
 		}
 	}
@@ -213,11 +217,216 @@ VOID CDoor::Update (CLevelRenderer* pRenderer, CDungeonRegion* pRegion)
 	}
 }
 
-VOID CDoor::StartClosingDoor (CLevelRenderer* pRenderer)
+VOID CDoor::PlayDoorOpen (CLevelRenderer* pRenderer)
+{
+	pRenderer->PlaySound(SLP(L"DoorOpen.wav"), m_dp);
+}
+
+VOID CDoor::PlayDoorClose (CLevelRenderer* pRenderer)
 {
 	pRenderer->PlaySound(SLP(L"DoorClose.wav"), m_dp);
+}
+
+VOID CDoor::StartClosingDoor (CLevelRenderer* pRenderer)
+{
+	PlayDoorClose(pRenderer);
 	m_eState = Closing;
 	m_nTimer = 0;
+}
+
+HRESULT CSplitDoor::CreateDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType, __deref_out CDoor** ppDoor)
+{
+	*ppDoor = __new CSplitDoor(pLevel, pWalls, fNorthSouth, idxTexture, nLockedType);
+	return *ppDoor ? S_OK : E_OUTOFMEMORY;
+}
+
+CSplitDoor::CSplitDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType) :
+	CDoor(pLevel, pWalls, fNorthSouth, idxTexture, nLockedType)
+{
+}
+
+VOID CSplitDoor::Draw (MODEL_LIST* pModels)
+{
+	if(None == m_eState || Waiting == m_eState)
+		__super::Draw(pModels);
+	else
+	{
+		DOUBLE dblSlide = m_dblPosition / 2.0;
+
+		DrawHalfDoor(-0.5 - dblSlide, 0.0f, 0.5f);
+		DrawHalfDoor(dblSlide, 0.5f, 1.0f);
+
+		FLOAT rSize = m_rcTexture.right - m_rcTexture.left;
+		FLOAT rOneSlice = rSize / 64.0f;
+		FLOAT rHalf = m_rcTexture.left + rSize / 2.0f;
+		FLOAT rLeft = rHalf - rOneSlice;
+		FLOAT rRight = rHalf + rOneSlice;
+
+		if(m_fNorthSouth)
+		{
+			DOUBLE x = m_dp.x, z;
+			DOUBLE xEast = x + 0.06;
+			DOUBLE xWest = x - 0.06;
+
+			// North Face
+			z = m_dp.z - dblSlide;
+			glNormal3f(0.0f, 0.0f, -1.0f);
+			glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(xWest, 0.0, z);
+			glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z);
+			glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(xEast, 1.0, z);
+			glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(xWest, 1.0, z);
+
+			// South Face
+			z = m_dp.z + dblSlide;
+			glNormal3f(0.0f, 0.0f, 1.0f);
+			glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z);
+			glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(xWest, 0.0, z);
+			glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(xWest, 1.0, z);
+			glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(xEast, 1.0, z);
+		}
+		else
+		{
+			DOUBLE x, z = m_dp.z;
+			DOUBLE zNorth = z - 0.06;
+			DOUBLE zSouth = z + 0.06;
+
+			// East Face
+			x = m_dp.x - dblSlide;
+			glNormal3f( 1.0f, 0.0f, 0.0f);
+			glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(x, 0.0, zSouth);
+			glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(x, 0.0, zNorth);
+			glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(x, 1.0, zNorth);
+			glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(x, 1.0, zSouth);
+
+			// West Face
+			x = m_dp.x + dblSlide;
+			glNormal3f(-1.0f, 0.0f, 0.0f);
+			glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(x, 0.0, zNorth);
+			glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(x, 0.0, zSouth);
+			glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(x, 1.0, zSouth);
+			glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(x, 1.0, zNorth);
+		}
+	}
+}
+
+VOID CSplitDoor::GetCollisionSolids (TArray<DBLRECT>* paSolids)
+{
+	if(0.0 == m_dblPosition)
+		__super::GetCollisionSolids(paSolids);
+	else
+	{
+		DOUBLE dblSlide = m_dblPosition / 2.0;
+
+		DBLRECT rect;
+		DOUBLE x = m_dp.x;
+		DOUBLE z = m_dp.z;
+
+		if(m_fNorthSouth)
+		{
+			DOUBLE xWest = x - 0.06;
+			DOUBLE xEast = x + 0.06;
+
+			// West Face
+			rect.left = xWest;
+
+			// East Face
+			rect.right = xEast;
+
+			// North Half
+			rect.top = z - 0.5;
+			rect.bottom = z - dblSlide;
+			paSolids->Append(rect);
+
+			// South Half
+			rect.top = z + dblSlide;
+			rect.bottom = z + 0.5;
+			paSolids->Append(rect);
+		}
+		else
+		{
+			DOUBLE zNorth = z - 0.06;
+			DOUBLE zSouth = z + 0.06;
+
+			// North Face
+			rect.top = zNorth;
+
+			// South Face
+			rect.bottom = zSouth;
+
+			// West Half
+			rect.left = x - 0.5;
+			rect.right = x - dblSlide;
+			paSolids->Append(rect);
+
+			// East Half
+			rect.left = x + dblSlide;
+			rect.right = x + 0.5;
+			paSolids->Append(rect);
+		}
+	}
+}
+
+VOID CSplitDoor::DrawHalfDoor (DOUBLE dblOffset, FLOAT rTexStart, FLOAT rTexEnd)
+{
+	DOUBLE x = m_dp.x;
+	DOUBLE z = m_dp.z;
+
+	FLOAT rTexSize = m_rcTexture.right - m_rcTexture.left;
+	FLOAT rLeft = m_rcTexture.left + rTexSize * rTexStart;
+	FLOAT rRight = m_rcTexture.left + rTexSize * rTexEnd;
+
+	if(m_fNorthSouth)
+	{
+		z += dblOffset;
+
+		DOUBLE xWest = x - 0.06;
+		DOUBLE xEast = x + 0.06;
+
+		// West Face
+		glNormal3f(-1.0f, 0.0f, 0.0f);
+		glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(xWest, 0.0, z);
+		glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(xWest, 0.0, z + 0.5);
+		glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(xWest, 1.0, z + 0.5);
+		glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(xWest, 1.0, z);
+
+		// East Face
+		glNormal3f( 1.0f, 0.0f, 0.0f);
+		glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z + 0.5);
+		glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z);
+		glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(xEast, 1.0, z);
+		glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(xEast, 1.0, z + 0.5);
+	}
+	else
+	{
+		x += dblOffset;
+
+		DOUBLE zNorth = z - 0.06;
+		DOUBLE zSouth = z + 0.06;
+
+		// North Face
+		glNormal3f( 0.0f, 0.0f,-1.0f);
+		glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(x + 0.5, 0.0, zNorth);
+		glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(x, 0.0, zNorth);
+		glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(x, 1.0, zNorth);
+		glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(x + 0.5, 1.0, zNorth);
+
+		// South Face
+		glNormal3f( 0.0f, 0.0f, 1.0f);
+		glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(x, 0.0, zSouth);
+		glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(x + 0.5, 0.0, zSouth);
+		glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(x + 0.5, 1.0, zSouth);
+		glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(x, 1.0, zSouth);
+	}
+}
+
+VOID CSplitDoor::PlayDoorOpen (CLevelRenderer* pRenderer)
+{
+	pRenderer->PlaySound(SLP(L"BlakeStoneDoorOpen.wav"), m_dp);
+}
+
+VOID CSplitDoor::PlayDoorClose (CLevelRenderer* pRenderer)
+{
+	pRenderer->PlaySound(SLP(L"BlakeStoneDoorClose.wav"), m_dp);
 }
 
 CElevatorSwitch::CElevatorSwitch (BLOCK_DATA* pBlock, INT x, INT z, sysint idxUp) :
