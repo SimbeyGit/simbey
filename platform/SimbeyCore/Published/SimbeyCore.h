@@ -40,6 +40,7 @@ interface __declspec(uuid("BDC4A2B7-78BC-4616-BC0C-B53368D5725D")) ITempFileMana
 	virtual HRESULT STDMETHODCALLTYPE ClearFolder (__out_opt INT* pcFilesDeleted) = 0;
 	virtual HRESULT STDMETHODCALLTYPE CreateFileSet (__deref_out ITempFileSet** ppSet) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetFilePathFromName (PCWSTR pcwzName, __out RSTRING* prstrPath) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetBasePath (__deref_out RSTRING* prstrPath) = 0;
 };
 
 HRESULT WINAPI ScPrintVFExA (UINT nCodePage, __out_ecount(cchMaxOutput) PSTR pszOutput, INT cchMaxOutput, INT* pcchOutput, PCSTR pcszFormat, va_list vArgs);
@@ -73,7 +74,7 @@ HRESULT WINAPI ScCopyAnsiToStreamW (UINT nCodePage, ISequentialStream* pStream, 
 HRESULT WINAPI ScCopyWideToStreamA (UINT nCodePage, ISequentialStream* pStream, PCWSTR pcwzString, INT cchString, INT cchCopy);
 
 HRESULT WINAPI ScCreateRStringArray (__deref_out IRStringArray** ppArray);
-HRESULT WINAPI ScCreateTempFileManager (__in_opt PCWSTR pcwzBaseFolder, __in_opt PCWSTR pcwzSubFolder, __deref_out ITempFileManager** ppTempFileManager);
+HRESULT WINAPI ScCreateTempFileManager (__in_opt PCWSTR pcwzBaseFolder, __in_opt PCWSTR pcwzSubFolder, BOOL fCreateRandomFolder, __deref_out ITempFileManager** ppTempFileManager);
 
 HRESULT WINAPI ScReadContentTypeA (RSTRING rstrFileW, __out RSTRING* prstrContentTypeA);
 HRESULT WINAPI ScReadContentTypeW (RSTRING rstrFileW, __out RSTRING* prstrContentTypeW);
