@@ -133,7 +133,7 @@ VOID CDungeonRegion::FindRandomStart (CLevelGenerator* pGenerator)
 	}
 }
 
-CLevelGenerator::CLevelGenerator (CWallTextures* pWalls, CWallThemes* pWallThemes, CChunkThemes* pChunkThemes, CLevels* pLevels, CRooms* pRooms, CRooms* pSpecial, CModels* pModels, DWORD dwSeed) :
+CLevelGenerator::CLevelGenerator (CWallTextures* pWalls, CWallThemes* pWallThemes, CChunkThemes* pChunkThemes, CLevels* pLevels, CRooms* pRooms, CRooms* pSpecial, CModels* pModels, DWORDLONG dwlSeed) :
 	m_pWalls(pWalls),
 	m_pWallThemes(pWallThemes),
 	m_pChunkThemes(pChunkThemes),
@@ -141,12 +141,12 @@ CLevelGenerator::CLevelGenerator (CWallTextures* pWalls, CWallThemes* pWallTheme
 	m_pRooms(pRooms),
 	m_pSpecial(pSpecial),
 	m_pModels(pModels),
-	m_dwSeed(dwSeed),
 	m_nLevel(-1),
 	m_pLevelDef(NULL),
 	m_xHellStart(-1),
 	m_zHellStart(-1)
 {
+	m_uliSeed.QuadPart = dwlSeed;
 }
 
 CLevelGenerator::~CLevelGenerator ()
@@ -185,7 +185,10 @@ HRESULT CLevelGenerator::SetLevel (INT nLevel)
 
 	CheckIf(0 == aRandom.Length(), E_FAIL);
 
-	md5.AddData((PBYTE)&m_dwSeed, sizeof(m_dwSeed));
+	if(0 == m_uliSeed.HighPart)
+		md5.AddData((PBYTE)&m_uliSeed.LowPart, sizeof(m_uliSeed.LowPart));
+	else
+		md5.AddData((PBYTE)&m_uliSeed, sizeof(m_uliSeed));
 	md5.AddData((PBYTE)&nLevel, sizeof(nLevel));
 	md5.GetDigest(bDigest);
 
@@ -315,7 +318,10 @@ VOID CLevelGenerator::RandomizeLevelRegion (CMersenneTwister* pmt, INT xRegion, 
 	CMd5 md5;
 	BYTE bDigest[16];
 
-	md5.AddData((PBYTE)&m_dwSeed, sizeof(m_dwSeed));
+	if(0 == m_uliSeed.HighPart)
+		md5.AddData((PBYTE)&m_uliSeed.LowPart, sizeof(m_uliSeed.LowPart));
+	else
+		md5.AddData((PBYTE)&m_uliSeed, sizeof(m_uliSeed));
 	md5.AddData((PBYTE)&m_nLevel, sizeof(m_nLevel));
 	md5.AddData((PBYTE)&xRegion, sizeof(xRegion));
 	md5.AddData((PBYTE)&zRegion, sizeof(zRegion));
@@ -328,7 +334,10 @@ VOID CLevelGenerator::RandomizeRegionEdge (CMersenneTwister* pmt, INT xRegionA, 
 	CMd5 md5;
 	BYTE bDigest[16];
 
-	md5.AddData((PBYTE)&m_dwSeed, sizeof(m_dwSeed));
+	if(0 == m_uliSeed.HighPart)
+		md5.AddData((PBYTE)&m_uliSeed.LowPart, sizeof(m_uliSeed.LowPart));
+	else
+		md5.AddData((PBYTE)&m_uliSeed, sizeof(m_uliSeed));
 
 	if(xRegionA < xRegionB || yLevelA < yLevelB || zRegionA < zRegionB)
 	{
@@ -502,17 +511,28 @@ Cleanup:
 
 HRESULT CLevelGenerator::PlotHellStart (CMersenneTwister& mt, CDungeonRegion* pRegion)
 {
-	HRESULT hr;
-	RSTRING rstrHellStartW = NULL;
-	RSTRING rstrTypeW = NULL;
-	CRoom* pHellStart;
-
-	Check(RStrCreateW(LSP(L"HellStart"), &rstrHellStartW));
-	Check(m_pSpecial->Find(rstrHellStartW, &pHellStart));
-
-	for(sysint i = 0; i < pHellStart->m_aBlocks.Length(); i++)
+	HRESULT hr = PlotSpecialStart(mt, pRegion, m_xHellStart, m_zHellStart, SLP(L"HellStart"));
+	if(FAILED(hr))
 	{
-		ROOM_BLOCK& block = pHellStart->m_aBlocks[i];
+		// Let's use the smaller Hell start.  The source side was probably too close to an edge.
+		hr = PlotSpecialStart(mt, pRegion, m_xHellStart, m_zHellStart, SLP(L"HellStartSmall"));
+	}
+	return hr;
+}
+
+HRESULT CLevelGenerator::PlotSpecialStart (CMersenneTwister& mt, CDungeonRegion* pRegion, INT xStart, INT zStart, PCWSTR pcwzSpecial, INT cchSpecial)
+{
+	HRESULT hr;
+	RSTRING rstrSpecialW = NULL;
+	RSTRING rstrTypeW = NULL;
+	CRoom* pSpecial;
+
+	Check(RStrCreateW(cchSpecial, pcwzSpecial, &rstrSpecialW));
+	Check(m_pSpecial->Find(rstrSpecialW, &pSpecial));
+
+	for(sysint i = 0; i < pSpecial->m_aBlocks.Length(); i++)
+	{
+		ROOM_BLOCK& block = pSpecial->m_aBlocks[i];
 		if(block.pEntity)
 		{
 			TStackRef<IJSONValue> srv;
@@ -524,7 +544,7 @@ HRESULT CLevelGenerator::PlotHellStart (CMersenneTwister& mt, CDungeonRegion* pR
 			if(0 == nResult)
 			{
 				CWallTheme* pWallTheme = TPickRandomTheme<CWallTheme>(mt, pRegion->m_pChunk->m_nRoomMaxRandom, pRegion->m_pChunk->m_pRooms, pRegion->m_pChunk->m_cRooms);
-				Check(PlaceRoom(mt, pRegion, pHellStart, pWallTheme, m_xHellStart, m_zHellStart, block.x, block.z));
+				Check(PlaceRoom(mt, pRegion, pSpecial, pWallTheme, xStart, zStart, block.x, block.z));
 				break;
 			}
 			RStrRelease(rstrTypeW); rstrTypeW = NULL;
@@ -533,7 +553,7 @@ HRESULT CLevelGenerator::PlotHellStart (CMersenneTwister& mt, CDungeonRegion* pR
 
 Cleanup:
 	RStrRelease(rstrTypeW);
-	RStrRelease(rstrHellStartW);
+	RStrRelease(rstrSpecialW);
 	return hr;
 }
 
@@ -637,7 +657,7 @@ HRESULT CLevelGenerator::TraceTunnelFromConnector (CDungeonRegion* pRegion, BLOC
 	else
 	{
 		WCHAR wzSeed[128];
-		wsprintf(wzSeed, L"Failed: Seed=%u, x=%d, z=%d, rx=%d, rz=%d\r\n", m_dwSeed, x, z, pRegion->m_xRegion, pRegion->m_zRegion);
+		wsprintf(wzSeed, L"Failed: Seed=%q, x=%d, z=%d, rx=%d, rz=%d\r\n", m_uliSeed.QuadPart, x, z, pRegion->m_xRegion, pRegion->m_zRegion);
 		OutputDebugStringW(wzSeed);
 	}
 #endif

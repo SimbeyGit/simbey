@@ -259,7 +259,7 @@ VOID CLevelRenderer::DrawFrame (VOID)
 
 	m_camera.SetPerspective();
 
-	GLfloat LightPosition[] = {m_camera.m_dblPoint.x, m_camera.m_dblPoint.y, m_camera.m_dblPoint.z, 1.0f};
+	GLfloat LightPosition[] = { static_cast<FLOAT>(m_camera.m_dblPoint.x), static_cast<FLOAT>(m_camera.m_dblPoint.y), static_cast<FLOAT>(m_camera.m_dblPoint.z), 1.0f};
 	glLightfv(GL_LIGHT1, GL_POSITION, LightPosition);	// Position The Light
 
 	mlData.dpCamera = m_camera.m_dblPoint;
@@ -1105,7 +1105,7 @@ HRESULT CInfiniteWolfenstein::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 	COptions options;
 	sysint idxPkgCmd;
 	INT cDrivers;
-	DWORD dwSeed;
+	DWORDLONG dwlSeed;
 
 	Check(options.Parse(lpCmdLine));
 
@@ -1114,13 +1114,13 @@ HRESULT CInfiniteWolfenstein::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 	{
 		PCWSTR pcwzSeed = RStrToWide(rstrSeedW);
 		if(L'-' == *pcwzSeed)
-			dwSeed = Formatting::TAscToInt32(pcwzSeed);
+			dwlSeed = Formatting::TAscToInt64(pcwzSeed);
 		else
-			dwSeed = Formatting::TAscToUInt32(pcwzSeed);
+			dwlSeed = Formatting::TAscToXUInt64(pcwzSeed, 10);
 		RStrRelease(rstrSeedW);
 	}
 	else
-		dwSeed = GetTickCount();
+		dwlSeed = GetTickCount();
 
 	m_pWalls = __new CWallTextures;
 	CheckAlloc(m_pWalls);
@@ -1182,7 +1182,7 @@ HRESULT CInfiniteWolfenstein::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 
 	Check(m_player.Initialize());
 
-	m_pGenerator = __new CLevelGenerator(m_pWalls, m_pWallThemes, m_pChunkThemes, m_pLevels, m_pRooms, m_pSpecial, m_pModels, dwSeed);
+	m_pGenerator = __new CLevelGenerator(m_pWalls, m_pWallThemes, m_pChunkThemes, m_pLevels, m_pRooms, m_pSpecial, m_pModels, dwlSeed);
 	CheckAlloc(m_pGenerator);
 	m_renderer.AttachLevelGenerator(m_pGenerator);
 

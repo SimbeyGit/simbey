@@ -73,7 +73,7 @@ private:
 	CLevels* m_pLevels;
 	CRooms* m_pRooms, *m_pSpecial;
 	CModels* m_pModels;
-	DWORD m_dwSeed;
+	ULARGE_INTEGER m_uliSeed;
 
 	// Selected level data
 	INT m_nLevel;
@@ -88,7 +88,7 @@ private:
 	INT m_xHellStart, m_zHellStart;
 
 public:
-	CLevelGenerator (CWallTextures* pWalls, CWallThemes* pWallThemes, CChunkThemes* pChunkThemes, CLevels* pLevels, CRooms* pRooms, CRooms* pSpecial, CModels* pModels, DWORD dwSeed);
+	CLevelGenerator (CWallTextures* pWalls, CWallThemes* pWallThemes, CChunkThemes* pChunkThemes, CLevels* pLevels, CRooms* pRooms, CRooms* pSpecial, CModels* pModels, DWORDLONG dwlSeed);
 	~CLevelGenerator ();
 
 	HRESULT SetLevel (INT nLevel);
@@ -112,6 +112,7 @@ private:
 	HRESULT PlotElevators (CMersenneTwister& mt, CDungeonRegion* pRegion, INT nLevelOffset);
 	HRESULT PlotStartRoom (CMersenneTwister& mt, CDungeonRegion* pRegion);
 	HRESULT PlotHellStart (CMersenneTwister& mt, CDungeonRegion* pRegion);
+	HRESULT PlotSpecialStart (CMersenneTwister& mt, CDungeonRegion* pRegion, INT xStart, INT zStart, PCWSTR pcwzSpecial, INT cchSpecial);
 	HRESULT PlotSpearRoom (CMersenneTwister& mt, CDungeonRegion* pRegion);
 	HRESULT PlotFabricatedRooms (CMersenneTwister& mt, CDungeonRegion* pRegion);
 	HRESULT PlotFabricatedRoom (CMersenneTwister& mt, CDungeonRegion* pRegion, CRoom* pRoom);
