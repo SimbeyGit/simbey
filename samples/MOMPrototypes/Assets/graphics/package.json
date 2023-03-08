@@ -73,7 +73,11 @@
 				{ layer: 10 },	// ivory tower A
 				{ layer: 11 },	// ivory tower B
 				{ layer: 12 },	// ivory tower C
-				{ layer: 13 }	// ivory tower D
+				{ layer: 13 },	// ivory tower D
+				{ layer: 14 },	// Valerie tower A
+				{ layer: 15 },	// Valerie tower B
+				{ layer: 16 },	// Valerie tower C
+				{ layer: 17 }	// Valerie tower D
 			],
 			animations:
 			[
@@ -159,6 +163,30 @@
 					frames:
 					[
 						{ image: 13, ticks: 1, xoffset: 0, yoffset: 8 }
+					]
+				},
+				{	// Valerie tower A
+					frames:
+					[
+						{ image: 14, ticks: 1, xoffset: 1, yoffset: -69 }
+					]
+				},
+				{	// Valerie tower B
+					frames:
+					[
+						{ image: 15, ticks: 1, xoffset: 14, yoffset: -59 }
+					]
+				},
+				{	// Valerie tower C
+					frames:
+					[
+						{ image: 16, ticks: 1, xoffset: 0, yoffset: -71 }
+					]
+				},
+				{	// Valerie tower D
+					frames:
+					[
+						{ image: 17, ticks: 1, xoffset: 0, yoffset: 8 }
 					]
 				}
 			]

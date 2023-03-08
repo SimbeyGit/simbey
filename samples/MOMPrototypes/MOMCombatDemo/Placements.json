@@ -1,6 +1,6 @@
 {
 	player: "defense",
-	generator: "swamp",
+	generator: "darkForest",
 	world: "arcanus",
 	floating: false,
 	mana: 500,
@@ -118,32 +118,32 @@
 			},
 			*/
 			{
-				// Add the Ivory Tower A
+				// Add the Valerie Tower A
 				type: "building",
 				x: 9,
 				y: 18,
-				object: 10
+				object: 14
 			},
 			{
-				// Add the Ivory Tower B
+				// Add the Valerie Tower B
 				type: "building",
 				x: 9,
 				y: 17,
-				object: 11
+				object: 15
 			},
 			{
-				// Add the Ivory Tower C
+				// Add the Valerie Tower C
 				type: "building",
 				x: 10,
 				y: 17,
-				object: 12
+				object: 16
 			},
 			{
-				// Add the Ivory Tower D
+				// Add the Valerie Tower D
 				type: "building",
 				x: 10,
 				y: 18,
-				object: 13
+				object: 17
 			},
 			{
 				type: "unit",
