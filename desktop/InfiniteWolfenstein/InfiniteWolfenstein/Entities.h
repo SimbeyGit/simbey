@@ -47,6 +47,7 @@ public:
 	CLevelRenderer* m_pLevel;
 
 	bool m_fNorthSouth;
+	bool m_fReverseTexture;
 	FRECT m_rcTexture;
 
 	enum State

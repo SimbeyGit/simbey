@@ -15,6 +15,7 @@ HRESULT CDoor::CreateDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool f
 CDoor::CDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType) :
 	m_pLevel(pLevel),
 	m_fNorthSouth(fNorthSouth),
+	m_fReverseTexture(true),
 	m_eState(None),
 	m_nTimer(0),
 	m_dblPosition(0.0),
@@ -45,10 +46,22 @@ VOID CDoor::Draw (MODEL_LIST* pModels)
 
 		// East Face
 		glNormal3f( 1.0f, 0.0f, 0.0f);
-		glTexCoord2f(m_rcTexture.left, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z);
-		glTexCoord2f(m_rcTexture.left, m_rcTexture.top); glVertex3d(xEast, 1.0, z);
-		glTexCoord2f(m_rcTexture.right, m_rcTexture.top); glVertex3d(xEast, 1.0, z + 1.0);
-		glTexCoord2f(m_rcTexture.right, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z + 1.0);
+		if(m_fReverseTexture)
+		{
+			// Normal Doors
+			glTexCoord2f(m_rcTexture.right, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z + 1.0);
+			glTexCoord2f(m_rcTexture.left, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z);
+			glTexCoord2f(m_rcTexture.left, m_rcTexture.top); glVertex3d(xEast, 1.0, z);
+			glTexCoord2f(m_rcTexture.right, m_rcTexture.top); glVertex3d(xEast, 1.0, z + 1.0);
+		}
+		else
+		{
+			// Split Doors
+			glTexCoord2f(m_rcTexture.left, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z + 1.0);
+			glTexCoord2f(m_rcTexture.right, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z);
+			glTexCoord2f(m_rcTexture.right, m_rcTexture.top); glVertex3d(xEast, 1.0, z);
+			glTexCoord2f(m_rcTexture.left, m_rcTexture.top); glVertex3d(xEast, 1.0, z + 1.0);
+		}
 
 		if(m_dblPosition > 0.0)
 		{
@@ -72,10 +85,22 @@ VOID CDoor::Draw (MODEL_LIST* pModels)
 
 		// North Face
 		glNormal3f( 0.0f, 0.0f,-1.0f);
-		glTexCoord2f(m_rcTexture.right, m_rcTexture.bottom); glVertex3d(x + 1.0, 0.0, zNorth);
-		glTexCoord2f(m_rcTexture.left, m_rcTexture.bottom); glVertex3d(x, 0.0, zNorth);
-		glTexCoord2f(m_rcTexture.left, m_rcTexture.top); glVertex3d(x, 1.0, zNorth);
-		glTexCoord2f(m_rcTexture.right, m_rcTexture.top); glVertex3d(x + 1.0, 1.0, zNorth);
+		if(m_fReverseTexture)
+		{
+			// Normal Doors
+			glTexCoord2f(m_rcTexture.right, m_rcTexture.bottom); glVertex3d(x + 1.0, 0.0, zNorth);
+			glTexCoord2f(m_rcTexture.left, m_rcTexture.bottom); glVertex3d(x, 0.0, zNorth);
+			glTexCoord2f(m_rcTexture.left, m_rcTexture.top); glVertex3d(x, 1.0, zNorth);
+			glTexCoord2f(m_rcTexture.right, m_rcTexture.top); glVertex3d(x + 1.0, 1.0, zNorth);
+		}
+		else
+		{
+			// Split Doors
+			glTexCoord2f(m_rcTexture.left, m_rcTexture.bottom); glVertex3d(x + 1.0, 0.0, zNorth);
+			glTexCoord2f(m_rcTexture.right, m_rcTexture.bottom); glVertex3d(x, 0.0, zNorth);
+			glTexCoord2f(m_rcTexture.right, m_rcTexture.top); glVertex3d(x, 1.0, zNorth);
+			glTexCoord2f(m_rcTexture.left, m_rcTexture.top); glVertex3d(x + 1.0, 1.0, zNorth);
+		}
 
 		// South Face
 		glNormal3f( 0.0f, 0.0f, 1.0f);
@@ -243,6 +268,7 @@ HRESULT CSplitDoor::CreateDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, b
 CSplitDoor::CSplitDoor (CLevelRenderer* pLevel, CWallTextures* pWalls, bool fNorthSouth, sysint idxTexture, INT nLockedType) :
 	CDoor(pLevel, pWalls, fNorthSouth, idxTexture, nLockedType)
 {
+	m_fReverseTexture = false;
 }
 
 VOID CSplitDoor::Draw (MODEL_LIST* pModels)
@@ -389,6 +415,9 @@ VOID CSplitDoor::DrawHalfDoor (DOUBLE dblOffset, FLOAT rTexStart, FLOAT rTexEnd)
 		glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(xWest, 1.0, z + 0.5);
 		glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(xWest, 1.0, z);
 
+		rLeft = m_rcTexture.right - rTexSize * rTexStart;
+		rRight = m_rcTexture.right - rTexSize * rTexEnd;
+
 		// East Face
 		glNormal3f( 1.0f, 0.0f, 0.0f);
 		glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(xEast, 0.0, z + 0.5);
@@ -403,19 +432,22 @@ VOID CSplitDoor::DrawHalfDoor (DOUBLE dblOffset, FLOAT rTexStart, FLOAT rTexEnd)
 		DOUBLE zNorth = z - 0.06;
 		DOUBLE zSouth = z + 0.06;
 
-		// North Face
-		glNormal3f( 0.0f, 0.0f,-1.0f);
-		glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(x + 0.5, 0.0, zNorth);
-		glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(x, 0.0, zNorth);
-		glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(x, 1.0, zNorth);
-		glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(x + 0.5, 1.0, zNorth);
-
 		// South Face
 		glNormal3f( 0.0f, 0.0f, 1.0f);
 		glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(x, 0.0, zSouth);
 		glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(x + 0.5, 0.0, zSouth);
 		glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(x + 0.5, 1.0, zSouth);
 		glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(x, 1.0, zSouth);
+
+		rLeft = m_rcTexture.right - rTexSize * rTexStart;
+		rRight = m_rcTexture.right - rTexSize * rTexEnd;
+
+		// North Face
+		glNormal3f( 0.0f, 0.0f,-1.0f);
+		glTexCoord2f(rRight, m_rcTexture.bottom); glVertex3d(x + 0.5, 0.0, zNorth);
+		glTexCoord2f(rLeft, m_rcTexture.bottom); glVertex3d(x, 0.0, zNorth);
+		glTexCoord2f(rLeft, m_rcTexture.top); glVertex3d(x, 1.0, zNorth);
+		glTexCoord2f(rRight, m_rcTexture.top); glVertex3d(x + 0.5, 1.0, zNorth);
 	}
 }
 

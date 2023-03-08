@@ -1188,13 +1188,14 @@ HRESULT CInfiniteWolfenstein::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 
 	INT nLevel = 0;
 	RSTRING rstrLevelW;
-	if(options.GetParamValue(L"level", &rstrLevelW))
+	if(options.GetParamValue(L"floor", &rstrLevelW))
 	{
 		nLevel = Formatting::TAscToInt32(RStrToWide(rstrLevelW)) - 1;
 		RStrRelease(rstrLevelW);
 		CheckIf(nLevel < 0, E_INVALIDARG);
 	}
-	else if(options.GetParamValue(L"name", &rstrLevelW))
+
+	if(options.GetParamValue(L"level", &rstrLevelW))
 	{
 		for(;;)
 		{
