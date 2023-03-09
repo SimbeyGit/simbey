@@ -108,42 +108,12 @@
 	{
 		objects:
 		[
-			/*
 			{
 				// Add the wizard's tower
 				type: "building",
 				x: 10,
 				y: 18,
 				object: 5
-			},
-			*/
-			{
-				// Add the Valerie Tower A
-				type: "building",
-				x: 9,
-				y: 18,
-				object: 14
-			},
-			{
-				// Add the Valerie Tower B
-				type: "building",
-				x: 9,
-				y: 17,
-				object: 15
-			},
-			{
-				// Add the Valerie Tower C
-				type: "building",
-				x: 10,
-				y: 17,
-				object: 16
-			},
-			{
-				// Add the Valerie Tower D
-				type: "building",
-				x: 10,
-				y: 18,
-				object: 17
 			},
 			{
 				type: "unit",
