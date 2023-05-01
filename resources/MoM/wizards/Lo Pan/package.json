@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Lo Pan",
+			description: "Lo Pan is a mystic who cultivates the body's core spiritual energy. His training has opened a path to a secret branch of planetary magic, the geomancy, Feng-Shui. Lo Pan can anchor his spellcasting anywhere on Arcanus and Myrror. He does not have to channel the extravagant amounts of mana that wizards usually require to cast spells in faraway battles and maintain their summoned creatures.\r\n\r\nLo Pan is a human male who, along with the heroes Shin Bo and Taki, come from settled peoples displaced from the Nomad race by longitude lines and culture. He has a black fumanchu beard and swordpoint eyebrows, and he wears blue and red silk Hanfu with swallowtails and a hat.",
+			books:
+			[
+				{
+					school: "Sorcery",
+					books: 5
+				},
+				{
+					school: "Chaos",
+					books: 5
+				}
+			],
+			retorts:
+			[
+				"Channeler"
+			],
+			music: [ "MOM78.MID" ]
+		}
+	}
+]

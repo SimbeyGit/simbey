@@ -1,0 +1,35 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Rjak",
+			description: "Rjak is simply described in the Manual as an evil warlock, and it is never made clear what face lies beneath the black cowl. He may be of the High Men (a race that produces unusual talents), a bona fide Dark Elven Warlock, or a visitor from the underworld, as he bears an uncanny resemblance to a Death Knight, per the spell. Rjak wears a gold diadem and black wrappings. His rail-thin figure emits a gloomy halation in cutscenes, and his eyes glow red.\r\n\r\nRjak is the villain of the show. As he polishes his Death magic, he will be throwing together armies of undead vermin and demented mortal thralls, spreading plague and attacking everyone indiscriminately. Rjak is touched by the raw power of Hell; towns he captures reorganize themselves into syndicates of darkness and erect foul temples bent to his worship. His favorite color is Purple.",
+			books:
+			[
+				{
+					school: "Death",
+					books: 9
+				}
+			],
+			retorts:
+			[
+				"Infernal Power"
+			],
+			music: [ "MOM84.MID", "MOM85.MID" ]
+		}
+	}
+]

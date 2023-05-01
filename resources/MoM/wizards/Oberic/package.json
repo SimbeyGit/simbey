@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Oberic",
+			description: "Oberic is an elementalist, a wizard who comprehensively studies Nature, Chaos, and the yin-yang relationship they exhibit in shaping the world. Unlike the powers of Life and Death, these two realms can potentially be wielded by a single person. Mature elementalists display world-impacting prowess, calling down fire and storms and moving the mountains. Oberic is proudly self-reliant; he can evoke elements flexibly and condense Mana Crystals from them with ease.\r\n\r\nOberic is a male of High Men stock. Diverging from his portrait, his full body cutscene artwork indicates that he has total albinism, with ghostly white skin and hair and red eyes. He wears a yellow wizard robe and a dark green sculpted dragon headpiece.",
+			books:
+			[
+				{
+					school: "Nature",
+					books: 5
+				},
+				{
+					school: "Chaos",
+					books: 5
+				}
+			],
+			retorts:
+			[
+				"Mana Focusing"
+			],
+			music: [ "MOM82.MID", "MOM83.MID" ]
+		}
+	}
+]

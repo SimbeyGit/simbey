@@ -1,0 +1,35 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Ariel",
+			description: "Ariel is a high priestess in the High Men's church, an eminent organized religion on Arcanus featuring (in addition to herself) some major fighting characters like Roland, Elana, the order of Paladins, and the Chosen. The church's cathedrals are long lost, and Ariel will not be able to attach these figures to her faction until she becomes powerful. Armed with her charisma and access to the entire white magic repertoire, Ariel dreams of victory for the Life Realm and advancing her people to a higher level of existence.\r\n\r\nAriel is a fair-skinned female with an air of statuesque beauty. She has bright blue eyes and brunette hair braided into a Grecian crown and set with a gold circlet, and she wears a pastel dress with a bodice.",
+			books:
+			[
+				{
+					school: "Life",
+					books: 10
+				}
+			],
+			retorts:
+			[
+				"Charismatic"
+			],
+			music: [ "MOM94.MID", "MOM95.MID" ]
+		}
+	}
+]

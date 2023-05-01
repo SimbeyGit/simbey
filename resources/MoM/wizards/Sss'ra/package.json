@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Sss'ra",
+			description: "The only thing the exotic Myrran races have in common is their contempt for one another. Yet, the Draconian known as Sss'ra aims to expand his territory and unite the arrogant feudal clans of his world under a new ideology. His imperium is destined to change the face of Myrror with streamlined trade and guild activity. Then, he can turn his bloodthirsty vassals loose upon Arcanus instead, crush those pathetic kingdoms, and end all dispute as to who is the Master of Magic.\r\n\r\nSss'ra is a Draconian, a humanoid dragon-kin. He is covered in green scales from head to toe; has a long, thin tail; a reptilian head with horns and eerie yellow eyes; and purple wings that enable him to fly like the rest of his kind. He wears a white mantle with gold ornaments.",
+			books:
+			[
+				{
+					school: "Life",
+					books: 4
+				},
+				{
+					school: "Chaos",
+					books: 4
+				}
+			],
+			retorts:
+			[
+				"Myrran"
+			],
+			music: [ "MOM86.MID", "MOM87.MID" ]
+		}
+	}
+]

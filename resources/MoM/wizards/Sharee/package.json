@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Sharee",
+			description: "Sharee is a voodoo priestess with a paranormal talent, an ability to commune with the spirits of lower planes of Chaos and Death. Sharee may forge pacts with these beings or bind them to her will with secret rituals. Her methods are considerably more efficient than the summoning spells of other wizards, earning her the retort of Conjurer. Her goal in establishing a Fortress is to send swarms of death servants out roaming the world, searching for dark secrets in dark places.\r\n\r\nSharee is one of the wizards linked to Earth ethnic groups, not fitting in context with the game's three human Races. She appears as a fit, dark-skinned female dressed in nothing but a red bead loincloth. She wears quite a bit of ornamentation, including a feathered headdress with a skull and Ndebele neck rings.",
+			books:
+			[
+				{
+					school: "Death",
+					books: 5
+				},
+				{
+					school: "Chaos",
+					books: 5
+				}
+			],
+			retorts:
+			[
+				"Conjurer"
+			],
+			music: [ "MOM76.MID", "MOM77.MID" ]
+		}
+	}
+]

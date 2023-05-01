@@ -1,0 +1,35 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Tauron",
+			description: "Based on his summary in the game's Manual, Tauron seems to be an invader or exile from the plane of Chaos. Noble-ranked demons of that realm, such as the Efreet, will sometimes trickle into Arcanus through the Nodes or be summoned by a Chaos practitioner... but it is extraordinary for one to venture out and establish a Wizard Fortress. Looking across his new domain, Tauron sees an opportunity to rampage across unspoiled lands and haughtily wield his superhuman capabilities in Chaos magic.\r\n\r\nTauron has the appearance of a medium-statured human male with green eyes, sporting a black van dyke beard. He wears a heavy red and gold-trim mantle over grey.",
+			books:
+			[
+				{
+					school: "Chaos",
+					books: 10
+				}
+			],
+			retorts:
+			[
+				"Chaos Mastery"
+			],
+			music: [ "MOM88.MID", "MOM89.MID" ]
+		}
+	}
+]

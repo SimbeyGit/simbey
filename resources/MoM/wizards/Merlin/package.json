@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Merlin",
+			description: "Merlin is a great wizard engaged in a relentless personal quest for the Spell of Mastery. A devotee to his library and tomes, Merlin is the world's most capable magical researcher. The sage master aims to grasp all the godlike knowledge needed to weave that ultimate spell. Merlin retains a compassionate frame of mind as a wielder of Nature and Life, and the pursuit of his goal is as fulfilling as its completion.\r\n\r\nMerlin is shown to be an elderly male of the High Men race. He wears long, loose blue mage robes and has flowing grey-white hair and beard on a stern face, with piercing green eyes.",
+			books:
+			[
+				{
+					school: "Life",
+					books: 5
+				},
+				{
+					school: "Nature",
+					books: 5
+				}
+			],
+			retorts:
+			[
+				"Sage Master"
+			],
+			music: [ "MOM72.MID", "MOM73.MID" ]
+		}
+	}
+]

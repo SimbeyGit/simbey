@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			name: "Tlaloc",
+			description: "The priest Tlaloc presides over a warlike cult encircling his Fortress. He seeks to achieve godhood by rubbing the coins of Nature and Death together; from on high, he will bestow rainfall and fertility to those who do obeisance, and darkness and famine to those who do not. In the company of his followers, Tlaloc practices the ritual sacrifice of rebels in his domain. These ceremonies imbue his warriors with strength and fanaticism.\r\n\r\nTlaloc is a tanned, muscular human male sparsely clad in cloth and quetzal feathers. His character is based on Aztec mythology, with no cultural link to any of the game's human Races.",
+			books:
+			[
+				{
+					school: "Life",
+					books: 5
+				},
+				{
+					school: "Nature",
+					books: 5
+				}
+			],
+			retorts:
+			[
+				"Warlord"
+			],
+			music: [ "MOM96.MID", "MOM97.MID" ]
+		}
+	}
+]
