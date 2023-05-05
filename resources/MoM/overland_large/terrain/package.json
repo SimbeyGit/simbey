@@ -10,6 +10,34 @@
 				same:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
+					"darkForest",
+					"forest",
+					"grasslands",
+					"natureNode",
+					"sorceryNode",
+					"swamp",
+					"volcano"
+				],
+				border:
+				[
+					"hills",
+					"mountains",
+					"river",
+					"shore",
+					"swamp",
+					"tundra",
+					"volcano"
+				],
+				transition: "shore"
+			},
+			chaosNodeMonsters:
+			{
+				smoothing: "SS1",
+				same:
+				[
+					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -40,6 +68,7 @@
 				border:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -61,6 +90,7 @@
 				same:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -85,6 +115,7 @@
 				same:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -109,6 +140,7 @@
 				same:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -138,6 +170,7 @@
 				border:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -162,6 +195,7 @@
 				border:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -182,6 +216,7 @@
 				same:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -228,6 +263,7 @@
 				border:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"hills",
@@ -252,6 +288,7 @@
 				border:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -281,6 +318,7 @@
 				same:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -305,6 +343,7 @@
 				same:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -333,6 +372,7 @@
 				border:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -353,6 +393,7 @@
 				same:
 				[
 					"chaosNode",
+					"chaosNodeMonsters",
 					"darkForest",
 					"forest",
 					"grasslands",
@@ -383,6 +424,7 @@
 				width: 32,
 				height: 24,
 				depth: 2,
+				maxOpponents: 1,
 				zone:
 				{
 					width: 3,
@@ -411,6 +453,7 @@
 				width: 48,
 				height: 36,
 				depth: 2,
+				maxOpponents: 2,
 				zone:
 				{
 					width: 5,
@@ -439,6 +482,7 @@
 				width: 64,
 				height: 48,
 				depth: 2,
+				maxOpponents: 4,
 				zone:
 				{
 					width: 6,
@@ -467,6 +511,7 @@
 				width: 80,
 				height: 60,
 				depth: 2,
+				maxOpponents: 5,
 				zone:
 				{
 					width: 8,
@@ -495,6 +540,7 @@
 				width: 96,
 				height: 72,
 				depth: 2,
+				maxOpponents: 6,
 				zone:
 				{
 					width: 10,
@@ -523,6 +569,7 @@
 				width: 120,
 				height: 90,
 				depth: 2,
+				maxOpponents: 7,
 				zone:
 				{
 					width: 12,
@@ -551,6 +598,7 @@
 				width: 144,
 				height: 108,
 				depth: 2,
+				maxOpponents: 8,
 				zone:
 				{
 					width: 14,
@@ -739,6 +787,22 @@
 				nightShade: [1,1]
 			}
 		}
+	},
+	{
+		package: "json",
+		name: "magic.json",
+		data:
+		[
+			{
+				name: "Weak"
+			},
+			{
+				name: "Normal"
+			},
+			{
+				name: "Powerful"
+			}
+		]
 	},
 	{
 		package: "json",
