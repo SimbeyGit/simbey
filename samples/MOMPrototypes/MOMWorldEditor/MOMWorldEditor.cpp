@@ -2145,6 +2145,14 @@ HRESULT CMOMWorldEditor::SetupMap (INT xWorld, INT yWorld, BOOL fAddRandomTundra
 	Check(ResetWorldTiles(m_pArcanusWorld, m_xWorld, m_yWorld, m_mapArcanus, fAddRandomTundra));
 	Check(ResetWorldTiles(m_pMyrrorWorld, m_xWorld, m_yWorld, m_mapMyrror, fAddRandomTundra));
 
+	if(m_pCommand)
+	{
+		if(World::Arcanus == m_eType)
+			m_pCommand->UpdateWorldPtr(m_pArcanusWorld, m_xWorld, m_yWorld);
+		else
+			m_pCommand->UpdateWorldPtr(m_pMyrrorWorld, m_xWorld, m_yWorld);
+	}
+
 Cleanup:
 	if(FAILED(hr))
 	{

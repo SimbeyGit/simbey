@@ -216,6 +216,13 @@ public:
 		m_pGallery->Release();
 	}
 
+	VOID UpdateWorldPtr (MAPTILE* pWorld, INT xWorld, INT yWorld)
+	{
+		m_pWorld = pWorld;
+		m_xWorld = xWorld;
+		m_yWorld = yWorld;
+	}
+
 	virtual HRESULT Execute (class CMOMWorldEditor* pEditor, INT xTile, INT yTile) = 0;
 	virtual BOOL ContinuePainting (VOID) { return TRUE; }
 };
