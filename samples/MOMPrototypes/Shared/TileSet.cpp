@@ -305,7 +305,7 @@ HRESULT CPlaceItem::SetAltTile (TRStrMap<CTileSet*>* pmapTileSets, PCWSTR pcwzKe
 
 	Check(m_pTileRules->GetTileRuleSet(m_rstrTile, &pRuleSet));
 	Check(RStrCreateW(8, pcwzKey, &rstrKey));
-	Check(pRuleSet->GetAltTile(rstrKey, &rstrNewTile));
+	CheckNoTrace(pRuleSet->GetAltTile(rstrKey, &rstrNewTile));
 	RStrRelease(m_rstrTile); m_rstrTile = rstrNewTile;
 
 	Check(pmapTileSets->Find(m_rstrTile, &pTileSet));

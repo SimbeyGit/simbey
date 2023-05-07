@@ -2384,7 +2384,13 @@ HRESULT CMOMWorldEditor::PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStr
 
 	for(sysint i = 0; i < aTiles.Length(); i++)
 	{
-		pWorld[aTiles[i].y * m_xWorld + aTiles[i].x].pData->Clear();
+		MAPTILE* pMapTile = pWorld + aTiles[i].y * m_xWorld + aTiles[i].x;
+		if(pMapTile->pData->m_rstrFeature)
+		{
+			CTileSet* pTileSet = pMapTile->pTile->GetTileSet();
+			if(pTileSet->IsTileSet(L"ocean") || pTileSet->IsTileSet(L"shore"))
+				pMapTile->pData->Clear();
+		}
 		ClearTile(aTiles[i].x, aTiles[i].y, fActiveWorld);
 	}
 
