@@ -133,6 +133,7 @@ namespace QuadooVM
 		SHIFT_STACK,
 		DELETE_PROPERTY,
 		READ_DATA,
+		LOAD_EXTERN_CLASS,
 		SYSCALL_STATIC = 0xF8,
 		SYSCALL_DYNAMIC = 0xF9,
 		JSON = 0xFA,
@@ -251,6 +252,8 @@ namespace QuadooVM
 		INT_ATOU,			// atou(string, base) - Ascii To Unsigned
 		INT_INPUT,			// input(cb) - Reads text from the input source (IQuadooInputSource)
 		INT_LINEREADER,		// linereader(stream) - Creates a new text line reader object
+		INT_FETCH,			// fetch(oSource, vParam1, vParam2) - Fetches data using the IQuadooFetch interface, if supported
+		INT_FETCH_EXTRA,	// fetch(oSource, vParam1, vParam2, vExtra) - Fetches data using the IQuadooFetch interface, if supported, with an extra parameter
 		INT_TYPEOF = 0xFF	// typeof(value) - Return the type of the value using the Type enumeration below
 	};
 
@@ -442,6 +445,16 @@ interface __declspec(uuid("CA591902-FAC9-4b7e-80F1-7661794364F7")) IQuadooAsyncH
 	virtual HRESULT STDMETHODCALLTYPE Configure (IQuadooWaitForEvents* pWait) = 0;
 };
 
+interface __declspec(uuid("D10782FB-75C0-46e2-B6DB-DDD0D957C163")) IExternalClassLoader : IUnknown
+{
+	virtual HRESULT STDMETHODCALLTYPE LoadExternalClass (RSTRING rstrClass, IQuadooObject* pObject, __deref_out IQuadooObject** ppClass) = 0;
+};
+
+interface __declspec(uuid("B7B08FF5-E081-4093-86F2-ACCF2C01D57E")) IQuadooFetch : IUnknown
+{
+	virtual HRESULT STDMETHODCALLTYPE Fetch (QuadooVM::QVARIANT* pqvArgs, INT cArgs, __out QuadooVM::QVARIANT* pqv) = 0;
+};
+
 interface __declspec(uuid("35FE6D03-4D05-4b49-A7A3-CD9DC2C944C1")) IQuadooVM : IUnknown
 {
 	virtual HRESULT STDMETHODCALLTYPE AddGlobal (RSTRING rstrName, IQuadooObject* pObject) = 0;
@@ -465,6 +478,7 @@ interface __declspec(uuid("35FE6D03-4D05-4b49-A7A3-CD9DC2C944C1")) IQuadooVM : I
 	virtual HRESULT STDMETHODCALLTYPE ThrowAndResume (QuadooVM::QVARIANT* pqvValue, __in_opt QuadooVM::QVARIANT* pqvCode, __out_opt QuadooVM::QVARIANT* pqvResult) = 0;
 	virtual VOID STDMETHODCALLTYPE EnableCodeStepping (bool fStepping) = 0;
 	virtual HRESULT STDMETHODCALLTYPE SetInputSource (__in_opt IQuadooInputSource* pSource) = 0;
+	virtual HRESULT STDMETHODCALLTYPE AddExternalClassLoader (IExternalClassLoader* pLoader) = 0;
 };
 
 interface __declspec(uuid("23A1B25B-587A-4a4e-9506-396BE62A50CE")) IQuadooContainer : IUnknown
@@ -543,8 +557,8 @@ interface __declspec(uuid("67DF4FAC-B9C2-44a6-82AB-ADBC6FC9BB2E")) IQuadooDebugg
 	// AttachVM() is called when a new VM has been instantiated.  The IQuadooVM instance
 	// is provided, but no reference must be taken.  The pointer must be discarded once
 	// DetachVM() is called, and no methods should be called during DetachVM().
-	virtual HRESULT STDMETHODCALLTYPE AttachVM (RSTRING rstrProgramName, IQuadooVM* pVM) = 0;
-	virtual HRESULT STDMETHODCALLTYPE DetachVM (RSTRING rstrProgramName) = 0;
+	virtual HRESULT STDMETHODCALLTYPE AttachVM (IQuadooVM* pVM, RSTRING rstrProgramName) = 0;
+	virtual HRESULT STDMETHODCALLTYPE DetachVM (IQuadooVM* pVM, RSTRING rstrProgramName) = 0;
 
 	// InvokeBreakpoint() and UnhandledException() receive the IQuadooVM instance, the
 	// IP that triggered the call, and the VM data, which includes the next IP position.
