@@ -15,7 +15,9 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
@@ -42,7 +44,9 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
@@ -75,8 +79,10 @@
 					"hills",
 					"mountains",
 					"natureNode",
+					"natureNodeMonsters",
 					"river",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"shore",
 					"swamp",
 					"tundra",
@@ -95,7 +101,9 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
@@ -120,7 +128,9 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
@@ -145,7 +155,9 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
@@ -176,8 +188,10 @@
 					"grasslands",
 					"mountains",
 					"natureNode",
+					"natureNodeMonsters",
 					"river",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"shore",
 					"swamp",
 					"tundra",
@@ -201,8 +215,10 @@
 					"grasslands",
 					"hills",
 					"natureNode",
+					"natureNodeMonsters",
 					"river",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"shore",
 					"swamp",
 					"tundra",
@@ -221,7 +237,36 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
+					"swamp",
+					"volcano"
+				],
+				border:
+				[
+					"hills",
+					"mountains",
+					"river",
+					"shore",
+					"tundra"
+				],
+				transition: "shore"
+			},
+			natureNodeMonsters:
+			{
+				smoothing: "SS1",
+				same:
+				[
+					"chaosNode",
+					"chaosNodeMonsters",
+					"darkForest",
+					"forest",
+					"grasslands",
+					"natureNode",
+					"natureNodeMonsters",
+					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
@@ -270,7 +315,9 @@
 					"grasslands",
 					"mountains",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"tundra",
 					"volcano"
@@ -295,7 +342,9 @@
 					"hills",
 					"mountains",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"tundra",
 					"volcano"
@@ -323,7 +372,36 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
+					"swamp",
+					"volcano"
+				],
+				border:
+				[
+					"hills",
+					"mountains",
+					"river",
+					"shore",
+					"tundra"
+				],
+				transition: "shore"
+			},
+			sorceryNodeMonsters:
+			{
+				smoothing: "SS1",
+				same:
+				[
+					"chaosNode",
+					"chaosNodeMonsters",
+					"darkForest",
+					"forest",
+					"grasslands",
+					"natureNode",
+					"natureNodeMonsters",
+					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
@@ -348,7 +426,9 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
@@ -379,8 +459,10 @@
 					"hills",
 					"mountains",
 					"natureNode",
+					"natureNodeMonsters",
 					"river",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"shore",
 					"swamp",
 					"volcano"
@@ -398,7 +480,9 @@
 					"forest",
 					"grasslands",
 					"natureNode",
+					"natureNodeMonsters",
 					"sorceryNode",
+					"sorceryNodeMonsters",
 					"swamp",
 					"volcano"
 				],
