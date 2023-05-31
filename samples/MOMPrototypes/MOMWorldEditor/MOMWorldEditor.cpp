@@ -1795,22 +1795,25 @@ HRESULT CMOMWorldEditor::PlaceMapFeatures (IRandomNumber* pRand, MAPTILE* pWorld
 					}
 				}
 
-				nSelected = pRand->Next(nTotalChance);
-
-				for(sysint i = 0; i < aFeatures.Length(); i++)
+				if(0 < nTotalChance)
 				{
-					FEATURE_CHANCE& chance = aFeatures[i];
-					if(nSelected < chance.nChance)
-					{
-						pWorld->pData->m_rstrFeature = chance.rstrFeature;
-						chance.rstrFeature = NULL;
-						break;
-					}
-					nSelected -= chance.nChance;
-				}
+					nSelected = pRand->Next(nTotalChance);
 
-				for(sysint i = 0; i < aFeatures.Length(); i++)
-					RStrRelease(aFeatures[i].rstrFeature);
+					for(sysint i = 0; i < aFeatures.Length(); i++)
+					{
+						FEATURE_CHANCE& chance = aFeatures[i];
+						if(nSelected < chance.nChance)
+						{
+							pWorld->pData->m_rstrFeature = chance.rstrFeature;
+							chance.rstrFeature = NULL;
+							break;
+						}
+						nSelected -= chance.nChance;
+					}
+
+					for(sysint i = 0; i < aFeatures.Length(); i++)
+						RStrRelease(aFeatures[i].rstrFeature);
+				}
 			}
 
 			pWorld++;

@@ -715,7 +715,7 @@
 		[
 			{
 				name: "Small",
-				percentageOfMapIsLand: 15,
+				percentageOfMapIsLand: 16,
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
 				tundraRowCount: 7,
@@ -743,7 +743,7 @@
 			},
 			{
 				name: "Medium",
-				percentageOfMapIsLand: 20,
+				percentageOfMapIsLand: 21,
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
 				tundraRowCount: 7,
@@ -771,7 +771,7 @@
 			},
 			{
 				name: "Large",
-				percentageOfMapIsLand: 30,
+				percentageOfMapIsLand: 31,
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
 				tundraRowCount: 7,
@@ -799,7 +799,7 @@
 			},
 			{
 				name: "Huge",
-				percentageOfMapIsLand: 45,
+				percentageOfMapIsLand: 46,
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
 				tundraRowCount: 7,
@@ -832,6 +832,10 @@
 		name: "features.json",
 		data:
 		{
+			grasslands:
+			{
+				wheat: [1,0]
+			},
 			mountains:
 			{
 				iron: [4,1],
