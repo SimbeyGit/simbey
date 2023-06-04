@@ -254,6 +254,7 @@ namespace QuadooVM
 		INT_LINEREADER,		// linereader(stream) - Creates a new text line reader object
 		INT_FETCH,			// fetch(oSource, vParam1, vParam2) - Fetches data using the IQuadooFetch interface, if supported
 		INT_FETCH_EXTRA,	// fetch(oSource, vParam1, vParam2, vExtra) - Fetches data using the IQuadooFetch interface, if supported, with an extra parameter
+		INT_MAPFIND,		// mapfind(oMap, vKey, ref vOut) - Returns true (and sets vOut) if vKey is found in the map, otherwise false
 		INT_TYPEOF = 0xFF	// typeof(value) - Return the type of the value using the Type enumeration below
 	};
 
@@ -695,3 +696,4 @@ HRESULT WINAPI QVMInvokeManagedMethod (QuadooVM::QVARIANT* pqvObject, RSTRING rs
 HRESULT WINAPI QVMFindJSONArrayObject (IJSONArray* pJSONArray, QuadooVM::QVARIANT* pqvField, QuadooVM::QVARIANT* pqvValue, __deref_out IJSONObject** ppObject, __out_opt sysint* pidxItem);
 HRESULT WINAPI QVMDeleteProperty (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARIANT* pqvProperty, __out QuadooVM::QVARIANT* pqvResult);
 HRESULT WINAPI QVMCreateLineReader (ISequentialStream* pStream, __out QuadooVM::QVARIANT* pqv);
+HRESULT WINAPI QVMMapFind (QuadooVM::QVARIANT* pqvArgs, __out QuadooVM::QVARIANT* pqvResult);
