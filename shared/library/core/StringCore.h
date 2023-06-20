@@ -589,15 +589,14 @@ public:
 		if(TTraits::TValidator::ValidateParam(pctzText) &&
 			TTraits::TValidator::ValidateParam(pctzFrag))
 		{
-			INT iText = 0, iFrag = 0;
 			T chT, chF, chFirst = TTraits::TReadChar::ReadCharacter(*pctzFrag);
 			do
 			{
 				chT = TTraits::TReadChar::ReadCharacter(*pctzText);
 				if(chT == chFirst)
 				{
-					iText = 1;
-					iFrag = 1;
+					INT iText = 1;
+					INT iFrag = 1;
 					for(;;)
 					{
 						chF = TTraits::TReadChar::ReadCharacter(pctzFrag[iFrag++]);
@@ -620,24 +619,25 @@ public:
 		if(TTraits::TValidator::ValidateParam(pctzText) &&
 			TTraits::TValidator::ValidateParam(pctzFrag))
 		{
-			INT iFrag = 0;
-			T chT, chF, chFirst = TTraits::TReadChar::ReadCharacter(*pctzFrag);
+			T chFirst = TTraits::TReadChar::ReadCharacter(*pctzFrag);
 			do
 			{
-				chT = TTraits::TReadChar::ReadCharacter(*pctzText);
+				T chT = TTraits::TReadChar::ReadCharacter(*pctzText);
 				if(chT == chFirst)
 				{
-					iFrag = 1;
+					INT iFrag = 1;
+
 					for(INT i = 1; i < cchText; i++)
 					{
-						chF = TTraits::TReadChar::ReadCharacter(pctzFrag[iFrag++]);
-						if(chF == 0)
-							return pctzText;
+						T chF = TTraits::TReadChar::ReadCharacter(pctzFrag[iFrag++]);
 						chT = TTraits::TReadChar::ReadCharacter(pctzText[i]);
 						if(chT != chF)
-							break;
+							goto FindNext;
 					}
+
+					return pctzText;
 				}
+	FindNext:
 				pctzText++;
 			} while(0 < --cchText);
 		}
