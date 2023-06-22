@@ -83,3 +83,4 @@ HRESULT WINAPI ScCopyStream (ISequentialStream* pstmDest, ISequentialStream* pst
 
 HRESULT WINAPI ScRegisterServer (HMODULE hModule, const IID& iidClass, PCWSTR pcwzProgID, PCWSTR pcwzModuleDescription);
 HRESULT WINAPI ScUnregisterServer (const IID& iidClass, PCWSTR pcwzProgID);
+HRESULT WINAPI ScAddImplementedCategories (const IID& iidClass, __in_ecount(cCategories) const GUID* pcrgCategories, INT cCategories);
