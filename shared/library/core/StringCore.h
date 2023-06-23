@@ -621,17 +621,21 @@ public:
 		{
 			do
 			{
-				for(INT idxRead = 0; idxRead < cchText; idxRead++)
+				INT idxRead = 0;
+
+				for(; idxRead < cchText; idxRead++)
 				{
 					T chF = TTraits::TReadChar::ReadCharacter(pctzFrag[idxRead]);
 					if('\0' == chF)
-						break;
+						return pctzText;
 					T chT = TTraits::TReadChar::ReadCharacter(pctzText[idxRead]);
 					if(chT != chF)
 						goto FindNext;
 				}
 
-				return pctzText;
+				if(idxRead == cchText && '\0' == pctzFrag[idxRead])
+					return pctzText;
+
 	FindNext:
 				pctzText++;
 			} while(0 < --cchText);
