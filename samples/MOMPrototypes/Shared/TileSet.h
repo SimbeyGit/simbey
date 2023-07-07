@@ -23,6 +23,7 @@ private:
 		ISimbeyInterchangeAnimator* m_pAnimator;
 	};
 	bool m_fIsSprite;
+	BYTE m_bAverage[4];		// BGRA
 
 public:
 	CTile (CTileSet* pTileSet, RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite);
@@ -31,7 +32,9 @@ public:
 
 	inline CTileSet* GetTileSet (VOID) { return m_pTileSet; }
 	inline RSTRING GetKey (VOID) { return m_rstrKey; }
+	inline const BYTE* GetAverageDIB32 (VOID) { return m_bAverage; }
 
+	HRESULT CalculateAverageColor (VOID);
 	HRESULT CreateSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
 };
 

@@ -36,6 +36,43 @@ CTile::~CTile ()
 	RStrRelease(m_rstrKey);
 }
 
+HRESULT CTile::CalculateAverageColor (VOID)
+{
+	HRESULT hr;
+	ISimbeyInterchangeSprite* pSprite = NULL;
+	PBYTE pBits;
+	INT nWidth, nHeight, cPixels;
+	INT nRed = 0, nGreen = 0, nBlue = 0;
+
+	if(m_fIsSprite)
+		pSprite = m_pSprite;
+	else
+		Check(m_pAnimator->CreateSprite(&pSprite));
+
+	Check(pSprite->GetFrameImage(&pBits, &nWidth, &nHeight));
+
+	cPixels = nWidth * nHeight;
+	for(INT i = 0; i < cPixels; i++)
+	{
+		pBits += sizeof(DWORD);
+
+		// Note - Not considering the alpha channel
+		nRed += pBits[0];
+		nGreen += pBits[1];
+		nBlue += pBits[2];
+	}
+
+	m_bAverage[0] = static_cast<BYTE>(nBlue / cPixels);
+	m_bAverage[1] = static_cast<BYTE>(nGreen / cPixels);
+	m_bAverage[2] = static_cast<BYTE>(nRed / cPixels);
+	m_bAverage[3] = 255;
+
+Cleanup:
+	if(!m_fIsSprite)
+		SafeRelease(pSprite);
+	return hr;
+}
+
 HRESULT CTile::CreateSprite (__deref_out ISimbeyInterchangeSprite** ppSprite)
 {
 	HRESULT hr;
@@ -91,9 +128,12 @@ HRESULT CTileSet::AddVariant (RSTRING rstrKey, ISimbeyInterchangeSprite* pSprite
 
 	pTile = __new CTile(this, rstrKey, pSprite);
 	CheckAlloc(pTile);
+	Check(pTile->CalculateAverageColor());
 	Check(pTiles->Append(pTile));
+	pTile = NULL;
 
 Cleanup:
+	SafeDelete(pTile);
 	return hr;
 }
 
@@ -107,9 +147,12 @@ HRESULT CTileSet::AddVariant (RSTRING rstrKey, ISimbeyInterchangeAnimator* pAnim
 
 	pTile = __new CTile(this, rstrKey, pAnimator);
 	CheckAlloc(pTile);
+	Check(pTile->CalculateAverageColor());
 	Check(pTiles->Append(pTile));
+	pTile = NULL;
 
 Cleanup:
+	SafeDelete(pTile);
 	return hr;
 }
 
