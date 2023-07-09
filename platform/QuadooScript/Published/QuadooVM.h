@@ -477,9 +477,16 @@ interface __declspec(uuid("35FE6D03-4D05-4b49-A7A3-CD9DC2C944C1")) IQuadooVM : I
 	virtual HRESULT STDMETHODCALLTYPE SetPrintTarget (__in_opt IQuadooPrintTarget* pTarget) = 0;
 	virtual HRESULT STDMETHODCALLTYPE End (VOID) = 0;
 	virtual HRESULT STDMETHODCALLTYPE ThrowAndResume (QuadooVM::QVARIANT* pqvValue, __in_opt QuadooVM::QVARIANT* pqvCode, __out_opt QuadooVM::QVARIANT* pqvResult) = 0;
-	virtual VOID STDMETHODCALLTYPE EnableCodeStepping (bool fStepping) = 0;
 	virtual HRESULT STDMETHODCALLTYPE SetInputSource (__in_opt IQuadooInputSource* pSource) = 0;
 	virtual HRESULT STDMETHODCALLTYPE AddExternalClassLoader (IExternalClassLoader* pLoader) = 0;
+};
+
+interface __declspec(uuid("0ED2B4A2-61E3-4054-B3E5-9D6149AF18E8")) IQuadooDebugProvider : IUnknown
+{
+	virtual VOID STDMETHODCALLTYPE EnableCodeStepping (bool fStepping) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetFileAndLine (__inout ULONG* pIP, __out RSTRING* prstrFile, __out ULONG* pnLine) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetBreakpoints (ULONG nFile, ULONG nLine, __out ISequentialStream* pstmIP) = 0;
+	virtual HRESULT STDMETHODCALLTYPE SetBreakpoint (ULONG idxIP, QuadooVM::Instruction eBreakpoint) = 0;
 };
 
 interface __declspec(uuid("23A1B25B-587A-4a4e-9506-396BE62A50CE")) IQuadooContainer : IUnknown

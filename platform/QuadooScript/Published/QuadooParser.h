@@ -31,6 +31,7 @@ interface __declspec(uuid("8D833697-09F8-4daa-9DAD-0B90313FCDD5")) IQuadooEnumVa
 interface __declspec(uuid("BE60854D-DAE9-4d51-BB6C-392FE4A15C41")) IQuadooDebugTree : IUnknown
 {
 	virtual STDMETHODIMP_(DWORD) GetFiles (VOID) = 0;
+	virtual STDMETHODIMP GetFileString (DWORD idxFile, __out DWORD* pidFile) = 0;
 	virtual STDMETHODIMP GetFilePath (DWORD idxFile, __deref_out RSTRING* prstrFileW) = 0;
 	virtual STDMETHODIMP EnumVariables (RSTRING rstrFileW, INT nLineNumber, IQuadooEnumVariables* pEnum) = 0;
 };
