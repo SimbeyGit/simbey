@@ -561,9 +561,9 @@ HRESULT CQuadooProject::SwitchToFile (CProjectFile* pFile)
 	InvalidateRect(m_hwnd, &rc, FALSE);
 
 Cleanup:
+	EnableWindow(m_hwndEditor, SUCCEEDED(hr));
 	if(FAILED(hr) && -1 != idxTab)
 		CloseTab(idxTab);
-	EnableWindow(m_hwndEditor, SUCCEEDED(hr));
 
 	RStrRelease(rstrLabel);
 	if(hdc)
