@@ -74,7 +74,7 @@ BEGIN
         MENUITEM "&Open Project",               ID_FILE_OPENPROJECT
         MENUITEM "&Close Project",              ID_FILE_CLOSEPROJECT
         MENUITEM SEPARATOR
-        MENUITEM "&Save File",                  ID_FILE_SAVEFILE
+        MENUITEM "&Save File\tCtrl+S",          ID_FILE_SAVEFILE
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_FILE_EXIT
     END
@@ -178,6 +178,7 @@ END
 IDR_ACCELERATOR ACCELERATORS 
 BEGIN
     VK_F5,          ID_RUN_SCRIPT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVEFILE,       VIRTKEY, CONTROL, NOINVERT
 END
 
 #endif    // English (U.S.) resources
