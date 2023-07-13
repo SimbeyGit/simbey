@@ -1,0 +1,197 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAIN                ICON                    "main.ico"
+IDI_CLOSED_FOLDER       ICON                    "ClosedFolder.ico"
+IDI_OPEN_FOLDER         ICON                    "OpenFolder.ico"
+IDI_QUADOO_FILE         ICON                    "QuadooFile.ico"
+IDI_CLOSE               ICON                    "Close.ico"
+IDI_DROP_DOWN           ICON                    "DropDown.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New Project",                ID_FILE_NEW_PROJECT
+        MENUITEM "&Open Project",               ID_FILE_OPENPROJECT
+        MENUITEM "&Close Project",              ID_FILE_CLOSEPROJECT
+        MENUITEM SEPARATOR
+        MENUITEM "&Save File",                  ID_FILE_SAVEFILE
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    POPUP "&Project"
+    BEGIN
+        MENUITEM "Run &Parameters",             ID_PROJECT_RUNPARAMETERS
+        MENUITEM SEPARATOR
+        MENUITEM "&Start Without Debugging\tCtrl+F5", ID_RUN_SCRIPT
+        MENUITEM SEPARATOR
+        MENUITEM "&Add File",                   ID_PROJECT_ADDFILE
+        MENUITEM "&New File",                   ID_PROJECT_NEWFILE
+    END
+END
+
+IDR_FILE_MENU MENU 
+BEGIN
+    POPUP "&Context"
+    BEGIN
+        MENUITEM "&Remove",                     ID_CONTEXT_REMOVE
+        MENUITEM SEPARATOR
+        MENUITEM "Set &Default",                ID_CONTEXT_SETDEFAULT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_SPLITTER            BITMAP                  "Splitter.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_NEW_PROJECT DIALOGEX 0, 0, 180, 134
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Create New Project"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Project Type",IDC_STATIC,6,6,168,42,WS_TABSTOP
+    CONTROL         "Console (QVM.exe)",IDC_QVM,"Button",BS_AUTORADIOBUTTON,12,18,78,10
+    CONTROL         "Windowed (WQVM.exe)",IDC_WQVM,"Button",BS_AUTORADIOBUTTON,12,30,93,10
+    LTEXT           "Project Path:",IDC_STATIC,6,54,43,8
+    EDITTEXT        IDC_PROJECT_PATH,6,66,168,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Browse",IDC_BROWSE,6,84,50,14
+    DEFPUSHBUTTON   "OK",IDOK,6,114,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,114,50,14
+END
+
+IDD_RUN_PARAMS DIALOGEX 0, 0, 196, 146
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Run Parameters"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Installed Engine:",IDC_STATIC,6,6,54,8
+    EDITTEXT        IDC_INSTALLED_ENGINE,6,18,180,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Command Line Arguments:",IDC_STATIC,6,42,86,8
+    EDITTEXT        IDC_COMMAND_ARGS,6,54,180,14,ES_AUTOHSCROLL
+    LTEXT           "Starting Directory:",IDC_STATIC,6,78,60,8
+    EDITTEXT        IDC_STARTING_DIR,6,90,180,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,6,126,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,126,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_NEW_PROJECT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 173
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 127
+    END
+
+    IDD_RUN_PARAMS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 189
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 139
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR ACCELERATORS 
+BEGIN
+    VK_F5,          ID_RUN_SCRIPT,          VIRTKEY, CONTROL, NOINVERT
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

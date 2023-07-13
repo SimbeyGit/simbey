@@ -129,24 +129,25 @@ namespace Text
 		return hr;
 	}
 
-	HRESULT WINAPI LoadFromHandle (HANDLE hFile, PWSTR* ppwzText, INT* pcchText)
+	HRESULT WINAPI LoadFromHandle (HANDLE hFile, PWSTR* ppwzText, INT* pcchText, UINT nCodePage)
 	{
 		HRESULT hr;
 		ULONG cb;
 		DWORD dwSize = GetFileSize(hFile, NULL);
-		PBYTE pbData = __new BYTE[dwSize];
+		PBYTE pbData = __new BYTE[0 == dwSize ? sizeof(WCHAR) : dwSize];
 
 		CheckAlloc(pbData);
 
 		if(0 < dwSize)
 		{
 			CheckIfGetLastError(!ReadFile(hFile, pbData, dwSize, &cb, NULL));
-			Check(ConvertRawTextToUnicode(pbData, dwSize, ppwzText, pcchText));
+			Check(ConvertRawTextToUnicode(pbData, dwSize, ppwzText, pcchText, nCodePage));
 		}
 		else
 		{
-			// Reuse the zero-byte buffer.
+			// Reuse the two-byte buffer.
 			*ppwzText = reinterpret_cast<PWSTR>(pbData);
+			*(*ppwzText) = L'\0';
 			pbData = NULL;
 			*pcchText = 0;
 			hr = S_OK;
@@ -157,26 +158,26 @@ namespace Text
 		return hr;
 	}
 
-	HRESULT WINAPI LoadFromFile (PCWSTR pcwzFile, PWSTR* ppwzText, INT* pcchText)
+	HRESULT WINAPI LoadFromFile (PCWSTR pcwzFile, PWSTR* ppwzText, INT* pcchText, UINT nCodePage)
 	{
 		HRESULT hr;
 		HANDLE hFile = CreateFileW(pcwzFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 		CheckIfGetLastErrorIgnore(INVALID_HANDLE_VALUE == hFile, ERROR_FILE_NOT_FOUND);
-		Check(LoadFromHandle(hFile, ppwzText, pcchText));
+		Check(LoadFromHandle(hFile, ppwzText, pcchText, nCodePage));
 
 	Cleanup:
 		SafeCloseFileHandle(hFile);
 		return hr;
 	}
 
-	HRESULT WINAPI LoadFromFileA (PCSTR pcszFile, PWSTR* ppwzText, INT* pcchText)
+	HRESULT WINAPI LoadFromFileA (PCSTR pcszFile, PWSTR* ppwzText, INT* pcchText, UINT nCodePage)
 	{
 		HRESULT hr;
 		HANDLE hFile = CreateFileA(pcszFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 		CheckIfGetLastErrorIgnore(INVALID_HANDLE_VALUE == hFile, ERROR_FILE_NOT_FOUND);
-		Check(LoadFromHandle(hFile, ppwzText, pcchText));
+		Check(LoadFromHandle(hFile, ppwzText, pcchText, nCodePage));
 
 	Cleanup:
 		SafeCloseFileHandle(hFile);

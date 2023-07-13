@@ -8,7 +8,7 @@ function main ()
 	do
 	{
 		var strExt = oEnum.Ext;
-		if(0 != strcmpi(strExt, "quadoo") && 0 != strcmpi(strExt, "cmd"))
+		if(oEnum.IsFile && 0 != strcmpi(strExt, "quadoo") && 0 != strcmpi(strExt, "cmd"))
 		{
 			var strName = oEnum.Name;
 
