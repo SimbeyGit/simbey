@@ -29,6 +29,7 @@ public:
 	ULONG DataRemaining (VOID) const;
 	ULONG Capacity (VOID) const;
 	HRESULT Seek (LONG lMove, DWORD dwOrigin, __out ULONG* pulNewPosition);
+	HRESULT CopyTo (PVOID pvDest, ULONG idxOffset, ULONG cbCopy);
 
 	HRESULT UpdateReadPtr (ULONG cbSkip);
 	BYTE const* GetReadPtr (VOID) const;

@@ -216,6 +216,10 @@ HRESULT CQuadooStudio::CreateNewProject (VOID)
 	Check(JSONAddStringWToObject(srProject, rstrField, SLP(L"")));
 	RStrRelease(rstrField); rstrField = NULL;
 
+	Check(RStrCreateW(LSP(L"argsEmbedded"), &rstrField));
+	Check(JSONAddStringWToObject(srProject, rstrField, SLP(L"")));
+	RStrRelease(rstrField); rstrField = NULL;
+
 	Check(RStrCreateW(LSP(L"startDir"), &rstrField));
 	Check(JSONAddStringWToObject(srProject, rstrField, SLP(L".\\")));
 	RStrRelease(rstrField); rstrField = NULL;

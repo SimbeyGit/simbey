@@ -14,6 +14,7 @@
 #include "Published\JSON.h"
 #include "Tabs.h"
 #include "RunParamsDlg.h"
+#include "ProjectCompilerDlg.h"
 #include "QuadooProject.h"
 
 const WCHAR c_wzQuadooProjectClass[] = L"QuadooProjectCls";
@@ -285,8 +286,13 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 		case ID_PROJECT_ADDFILE:
 		case ID_PROJECT_NEWFILE:
 		case ID_CONTEXT_REMOVE:
-		case ID_RUN_SCRIPT:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED | OLECMDF_ENABLED;
+			break;
+		case ID_RUN_SCRIPT:
+		case ID_PROJECT_COMPILE:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(NULL != FindDefaultScript())
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 			break;
 		case ID_FILE_SAVEFILE:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
@@ -358,6 +364,10 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 
 	case ID_RUN_SCRIPT:
 		hr = RunScript();
+		break;
+
+	case ID_PROJECT_COMPILE:
+		hr = ShowProjectCompiler();
 		break;
 
 	default:
@@ -1062,4 +1072,32 @@ VOID CQuadooProject::RemoveFilePrompt (CProjectFile* pFile)
 		UpdateFiles();
 		Save();
 	}
+}
+
+HRESULT CQuadooProject::ShowProjectCompiler (VOID)
+{
+	HRESULT hr;
+	RSTRING rstrTarget = NULL, rstrEngine = NULL;
+	CProjectFile* pDefault = FindDefaultScript();
+	CDialogHost dlgHost(m_hInstance);
+
+	CheckIf(NULL == pDefault, E_UNEXPECTED);
+	Check(GetProjectTarget(&rstrTarget));
+	Check(FindInstalledEngine(&rstrEngine));
+
+	Check(SaveAll());
+
+	{
+		CProjectCompilerDlg dlgCompiler(m_pProject, rstrTarget, rstrEngine, m_rstrProjectDir, pDefault->m_pwzAbsolutePath);
+
+		Check(dlgHost.Display(m_hwnd, &dlgCompiler));
+
+		if(dlgHost.GetReturnValue() == IDOK)
+			Check(Save());
+	}
+
+Cleanup:
+	RStrRelease(rstrTarget);
+	RStrRelease(rstrEngine);
+	return hr;
 }

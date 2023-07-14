@@ -70,8 +70,8 @@ IDR_MENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "&New Project",                ID_FILE_NEW_PROJECT
-        MENUITEM "&Open Project",               ID_FILE_OPENPROJECT
+        MENUITEM "&New Project...",             ID_FILE_NEW_PROJECT
+        MENUITEM "&Open Project...",            ID_FILE_OPENPROJECT
         MENUITEM "&Close Project",              ID_FILE_CLOSEPROJECT
         MENUITEM SEPARATOR
         MENUITEM "&Save File\tCtrl+S",          ID_FILE_SAVEFILE
@@ -80,12 +80,13 @@ BEGIN
     END
     POPUP "&Project"
     BEGIN
-        MENUITEM "Run &Parameters",             ID_PROJECT_RUNPARAMETERS
+        MENUITEM "Edit Run &Parameters...",     ID_PROJECT_RUNPARAMETERS
         MENUITEM SEPARATOR
         MENUITEM "&Start Without Debugging\tCtrl+F5", ID_RUN_SCRIPT
+        MENUITEM "&Compile...",                 ID_PROJECT_COMPILE
         MENUITEM SEPARATOR
-        MENUITEM "&Add File",                   ID_PROJECT_ADDFILE
-        MENUITEM "&New File",                   ID_PROJECT_NEWFILE
+        MENUITEM "&Add File...",                ID_PROJECT_ADDFILE
+        MENUITEM "&New File...",                ID_PROJECT_NEWFILE
     END
 END
 
@@ -142,6 +143,23 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,60,126,50,14
 END
 
+IDD_COMPILE_TO_EXE DIALOGEX 0, 0, 202, 164
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Compile to Executable"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Binary Template:",IDC_STATIC,6,6,55,8
+    EDITTEXT        IDC_BINARY_TEMPLATE,6,18,186,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Embedded Program Arguments:",IDC_STATIC,6,48,102,8
+    EDITTEXT        IDC_EMBED_ARGS,6,60,186,14,ES_AUTOHSCROLL
+    LTEXT           "Program Icon:",IDC_STATIC,6,90,46,8
+    ICON            "",IDC_EMBED_ICON,6,102,21,20
+    PUSHBUTTON      "Select Icon",IDC_SELECT_ICON,60,96,50,14
+    PUSHBUTTON      "Clear Icon",IDC_CLEAR_ICON,60,114,50,14
+    DEFPUSHBUTTON   "Compile",IDOK,6,144,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,144,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -165,6 +183,14 @@ BEGIN
         RIGHTMARGIN, 189
         TOPMARGIN, 7
         BOTTOMMARGIN, 139
+    END
+
+    IDD_COMPILE_TO_EXE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 195
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 157
     END
 END
 #endif    // APSTUDIO_INVOKED

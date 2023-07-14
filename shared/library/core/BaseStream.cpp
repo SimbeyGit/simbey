@@ -155,6 +155,21 @@ HRESULT CBaseStream::Seek (LONG lMove, DWORD dwOrigin, __out ULONG* pulNewPositi
 	return hr;
 }
 
+HRESULT CBaseStream::CopyTo (PVOID pvDest, ULONG idxOffset, ULONG cbCopy)
+{
+	idxOffset += m_iReadPtr;
+	if(idxOffset <= m_cbData)
+	{
+		ULONG cbAvailable = m_cbData - idxOffset;
+		if(cbCopy <= cbAvailable)
+		{
+			CopyMemory(pvDest, m_pBuffer + idxOffset, cbCopy);
+			return S_OK;
+		}
+	}
+	return E_FAIL;
+}
+
 HRESULT CBaseStream::UpdateReadPtr (ULONG cbSkip)
 {
 	HRESULT hr;

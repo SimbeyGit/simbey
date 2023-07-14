@@ -139,4 +139,5 @@ private:
 	BOOL CloseTab (sysint idxTab);
 
 	VOID RemoveFilePrompt (CProjectFile* pFile);
+	HRESULT ShowProjectCompiler (VOID);
 };
