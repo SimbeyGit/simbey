@@ -523,6 +523,10 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 			}
 		}
 		break;
+
+	case WM_SETFOCUS:
+		SetFocus(m_hwndEditor);
+		break;
 	}
 
 	return __super::DefWindowProc(message, wParam, lParam, lResult);
@@ -559,6 +563,8 @@ HRESULT CQuadooProject::SwitchToFile (CProjectFile* pFile)
 
 	m_pTabs->GetTabsRect(0, 0, rc);
 	InvalidateRect(m_hwnd, &rc, FALSE);
+
+	PostMessage(m_hwnd, WM_SETFOCUS, 0, 0);
 
 Cleanup:
 	EnableWindow(m_hwndEditor, SUCCEEDED(hr));
@@ -755,8 +761,8 @@ HRESULT CQuadooProject::RunScript (VOID)
 	Check(srv->GetString(&rstrArgs));
 	srv.Release();
 
-	if(0 < RStrLen(rstrScriptArgs))
-		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\" %r", pFile->m_pwzAbsolutePath, rstrScriptArgs));
+	if(0 < RStrLen(rstrArgs))
+		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\" %r", pFile->m_pwzAbsolutePath, rstrArgs));
 	else
 		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\"", pFile->m_pwzAbsolutePath));
 

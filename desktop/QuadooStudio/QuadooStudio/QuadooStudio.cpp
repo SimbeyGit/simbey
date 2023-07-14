@@ -443,6 +443,15 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 		}
 		break;
 
+	case WM_SETFOCUS:
+		if(m_pProject)
+		{
+			HWND hwnd;
+			m_pProject->GetWindow(&hwnd);
+			SetFocus(hwnd);
+		}
+		break;
+
 	case WM_CLOSE:
 		{
 			VARIANT vSystemClose, vCancel;
