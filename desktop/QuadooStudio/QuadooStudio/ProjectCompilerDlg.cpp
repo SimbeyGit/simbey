@@ -383,18 +383,17 @@ HRESULT CProjectCompilerDlg::AddIconToModule (HANDLE hModule, CMemoryStream& stm
 	HRESULT hr;
 	ICONHEAD ih;
 	ICONDIRENTRY* pDirectory = NULL;
-	ULONG cb, cbSkipped;
+	ULONG cb;
 	CMemoryStream stmGroup;
 	GROUPICONHEADER gih;
 	GROUPICONENTRY* pIcons;
 
-	Check(stmIcon.Read(&ih, sizeof(ih), &cb));
+	Check(stmIcon.CopyTo(&ih, 0, sizeof(ih)));
 
 	pDirectory = __new ICONDIRENTRY[ih.wCount];
 	CheckAlloc(pDirectory);
 
-	Check(stmIcon.Read(pDirectory, sizeof(ICONDIRENTRY) * ih.wCount, &cb));
-	cbSkipped = sizeof(ih) + sizeof(ICONDIRENTRY) * ih.wCount;
+	Check(stmIcon.CopyTo(pDirectory, sizeof(ih), sizeof(ICONDIRENTRY) * ih.wCount));
 
 	if(1 < ih.wCount)
 	{
@@ -421,7 +420,7 @@ HRESULT CProjectCompilerDlg::AddIconToModule (HANDLE hModule, CMemoryStream& stm
 		pIcons[i].wResourceID = static_cast<WORD>(i + idxIconOffset + 1);
 		pIcons[i].wReserved = 0;
 
-		CheckIfGetLastError(!UpdateResource(hModule, RT_ICON, MAKEINTRESOURCE(pIcons[i].wResourceID), 0, const_cast<PBYTE>(stmIcon.GetReadPtr() + (pDirectory[i].dwImageOffset - cbSkipped)), pDirectory[i].dwBytesInRes));
+		CheckIfGetLastError(!UpdateResource(hModule, RT_ICON, MAKEINTRESOURCE(pIcons[i].wResourceID), 0, const_cast<PBYTE>(stmIcon.GetReadPtr() + pDirectory[i].dwImageOffset), pDirectory[i].dwBytesInRes));
 	}
 
 	CheckIfGetLastError(!UpdateResource(hModule, RT_GROUP_ICON, pcwzName, 0, const_cast<PBYTE>(stmGroup.GetReadPtr()), stmGroup.DataRemaining()));
