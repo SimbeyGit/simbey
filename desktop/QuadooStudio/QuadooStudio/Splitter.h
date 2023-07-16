@@ -11,6 +11,7 @@ private:
 	HINSTANCE m_hInstance;
 	HBRUSH m_hbrPattern;
 	HWND m_hwndLeft;
+	INT m_nWidth;
 	BOOL m_fDragging;
 	INT m_xDragStart;
 
@@ -30,6 +31,7 @@ public:
 	static HRESULT Unregister (HINSTANCE hInstance);
 
 	HRESULT Initialize (HWND hwndParent, HWND hwndLeft);
+	inline INT GetWidth (VOID) { return m_nWidth; }
 
 	// CBaseWindow
 	virtual HINSTANCE GetInstance (VOID);

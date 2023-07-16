@@ -148,12 +148,12 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Compile to Executable"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Binary Template:",IDC_STATIC,6,6,55,8
+    LTEXT           "Binary Template:",IDC_STATIC,6,6,60,8
     EDITTEXT        IDC_BINARY_TEMPLATE,6,18,186,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "Embedded Program Arguments:",IDC_STATIC,6,48,102,8
+    LTEXT           "Embedded Program Arguments:",IDC_STATIC,6,48,114,8
     EDITTEXT        IDC_EMBED_ARGS,6,60,186,14,ES_AUTOHSCROLL
-    LTEXT           "Program Icon:",IDC_STATIC,6,90,46,8
-    ICON            "",IDC_EMBED_ICON,6,102,21,20
+    LTEXT           "Program Icon:",IDC_STATIC,6,90,60,8
+    ICON            "",IDC_EMBED_ICON,6,102,20,20
     PUSHBUTTON      "Select Icon",IDC_SELECT_ICON,60,96,50,14
     PUSHBUTTON      "Clear Icon",IDC_CLEAR_ICON,60,114,50,14
     DEFPUSHBUTTON   "Compile",IDOK,6,144,50,14

@@ -1,6 +1,7 @@
 #include <windows.h>
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
+#include "Library\DPI.h"
 #include "Splitter.h"
 
 const WCHAR c_wzSplitterClass[] = L"SplitterCls";
@@ -9,6 +10,7 @@ CSplitter::CSplitter (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
 	m_hbrPattern(NULL),
 	m_hwndLeft(NULL),
+	m_nWidth(0),
 	m_fDragging(FALSE)
 {
 }
@@ -42,8 +44,23 @@ HRESULT CSplitter::Unregister (HINSTANCE hInstance)
 
 HRESULT CSplitter::Initialize (HWND hwndParent, HWND hwndLeft)
 {
+	HRESULT hr;
+	BITMAP bmp;
+	HBITMAP hbmSplitter = LoadBitmap(m_hInstance, MAKEINTRESOURCE(IDB_SPLITTER));
+
+	CheckIfGetLastError(NULL == hbmSplitter);
+
+	CheckIfGetLastError(0 == GetObject(hbmSplitter, sizeof(BITMAP), &bmp));
+	m_nWidth = (INT)DPI::Scale((FLOAT)bmp.bmWidth);
+
+	m_hbrPattern = CreatePatternBrush(hbmSplitter);
+
 	m_hwndLeft = hwndLeft;
-	return Create(0, WS_CHILD | WS_VISIBLE, c_wzSplitterClass, NULL, 0, 0, 3, 10, hwndParent, SW_SHOW);
+	Check(Create(0, WS_CHILD | WS_VISIBLE, c_wzSplitterClass, NULL, 0, 0, m_nWidth, 10, hwndParent, SW_SHOW));
+
+Cleanup:
+	SafeDeleteGdiObject(hbmSplitter);
+	return hr;
 }
 
 // CBaseWindow
@@ -67,19 +84,6 @@ BOOL CSplitter::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESU
 {
 	switch(message)
 	{
-	case WM_CREATE:
-		{
-			HBITMAP hbmSplitter = LoadBitmap(m_hInstance, MAKEINTRESOURCE(IDB_SPLITTER));
-			if(NULL == hbmSplitter)
-			{
-				lResult = -1;
-				return TRUE;
-			}
-			m_hbrPattern = CreatePatternBrush(hbmSplitter);
-			DeleteObject(hbmSplitter);
-		}
-		break;
-
 	case WM_ERASEBKGND:
 		{
 			RECT rc;

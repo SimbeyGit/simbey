@@ -260,7 +260,7 @@ HRESULT CQuadooStudio::OpenProject (PCWSTR pcwzProject)
 	RECT rcSite;
 
 	GetClientRect(m_hwnd, &rcSite);
-	rcSite.left += GetTreeWidth() + GetSplitterWidth();
+	rcSite.left += GetTreeWidth() + m_pSplitter->GetWidth();
 
 	pProject = __new CQuadooProject(m_hInstance, m_hwndTree);
 	CheckAlloc(pProject);
@@ -352,7 +352,7 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 	case WM_SIZE:
 		{
 			RECT rc;
-			INT cxTree, cxSplitter = GetSplitterWidth();
+			INT cxTree, cxSplitter = m_pSplitter->GetWidth();
 
 			GetClientRect(m_hwnd, &rc);
 			cxTree = GetTreeWidth();
@@ -545,9 +545,4 @@ INT CQuadooStudio::GetTreeWidth (VOID)
 	RECT rc;
 	GetWindowRect(m_hwndTree, &rc);
 	return rc.right - rc.left;
-}
-
-INT CQuadooStudio::GetSplitterWidth (VOID)
-{
-	return (INT)DPI::Scale(3.0f);
 }
