@@ -4,7 +4,7 @@
 #include "Library\Core\RStrMap.h"
 #include "Library\Core\BaseUnknown.h"
 #include "Library\Window\BaseWindow.h"
-
+#include "Keywords.h"
 interface IJSONObject;
 
 class CTabs;
@@ -68,6 +68,9 @@ private:
 	HMODULE m_hRichEdit;
 	HWND m_hwndEditor;
 
+	const KEYWORD *keywords;
+	int keyword_count;
+
 public:
 	IMP_BASE_UNKNOWN
 
@@ -81,6 +84,8 @@ public:
 	CQuadooProject (HINSTANCE hInstance, HWND hwndTree);
 	~CQuadooProject ();
 
+	void InitFormatText (VOID);
+	void FormatWord (VOID);
 	static HRESULT Register (HINSTANCE hInstance);
 	static HRESULT Unregister (HINSTANCE hInstance);
 
