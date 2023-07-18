@@ -154,10 +154,11 @@ Cleanup:
 HRESULT CQuadooProject::Save (VOID)
 {
 	HRESULT hr;
-	CMemoryStream stmJSON;
+	CMemoryStream stmJSON, stmFormatted;
 
 	Check(JSONSerializeObject(m_pProject, &stmJSON));
-	Check(Text::SaveToFile(stmJSON.TGetReadPtr<WCHAR>(), stmJSON.TDataRemaining<WCHAR>(), RStrToWide(m_rstrProject)));
+	Check(ReformatJSON(stmJSON.TGetReadPtr<WCHAR>(), stmJSON.TDataRemaining<WCHAR>(), &stmFormatted));
+	Check(Text::SaveToFile(stmFormatted.TGetReadPtr<WCHAR>(), stmFormatted.TDataRemaining<WCHAR>(), RStrToWide(m_rstrProject)));
 
 Cleanup:
 	return hr;
@@ -950,13 +951,14 @@ HRESULT CQuadooProject::LoadTabData (CProjectFile* pFile)
 		Check(Text::LoadFromFile(pFile->m_pwzAbsolutePath, &pwzText, &cchText));
 
 	CheckIfGetLastError(!SetWindowTextW(m_hwndEditor, pwzText));
-
 	SendMessage(m_hwndEditor, EM_SETMODIFY, pFile->m_fModified, 0);
 	pFile->m_fModified = false;
 
 	hr = S_OK;
 
 Cleanup:
+	if(FAILED(hr))
+		SendMessage(m_hwndEditor, EM_SETMODIFY, false, 0);
 	SafeDeleteArrayCount(pwzText, cchText);
 	return hr;
 }

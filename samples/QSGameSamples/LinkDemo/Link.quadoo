@@ -1,4 +1,4 @@
-#define IDI_MAIN		103
+﻿#define IDI_MAIN		103
 
 #define RGB(r,g,b)		(r | (g << 8) | (b << 16))
 
@@ -400,6 +400,12 @@ class CTestGame : IGameClient
 	}
 };
 
+function SetIcon ()
+{
+	var oFolder = Host.OpenFolder();
+	return oFolder.IsFile("Link.ico") ? "file:" + oFolder.GetPathOf("Link.ico") : IDI_MAIN;
+}
+
 function main ()
 {
 	var oGame = Host.LoadQuadoo("QSGame.dll");
@@ -408,7 +414,7 @@ function main ()
 	oFrame.Title = "Link Demo";
 	oFrame.Width = 700;
 	oFrame.Height = 650;
-	oFrame.Icon = IDI_MAIN;
+	oFrame.Icon = SetIcon();
 	oFrame.Show = 1;
 
 	try

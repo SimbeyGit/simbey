@@ -3,7 +3,6 @@
 #include <docobj.h>
 #include "Library\Core\RStrMap.h"
 #include "Library\Core\BaseUnknown.h"
-#include "Library\Util\RString.h"
 #include "Library\Window\BaseWindow.h"
 
 interface IJSONObject;
