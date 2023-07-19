@@ -17,6 +17,10 @@
 #include "ProjectCompilerDlg.h"
 #include "QuadooProject.h"
 
+#ifndef ENM_CLIPFORMAT
+	#define	ENM_CLIPFORMAT	0x00000080
+#endif
+
 const WCHAR c_wzQuadooProjectClass[] = L"QuadooProjectCls";
 
 CQuadooProject::CQuadooProject (HINSTANCE hInstance, HWND hwndTree) :
@@ -46,132 +50,11 @@ CQuadooProject::~CQuadooProject()
 	RStrRelease(m_rstrProjectDir);
 	RStrRelease(m_rstrProject);
 
-	if (m_hRichEdit)
+	if(m_hRichEdit)
 		FreeLibrary(m_hRichEdit);
 }
 
-void CQuadooProject::InitFormatText (VOID)
-{
-	SendMessage(m_hwndEditor, EM_HIDESELECTION, 1, 0);
-	CHARRANGE OldRange;
-	SendMessage(m_hwndEditor, EM_EXGETSEL, 0, LPARAM(&OldRange));
-	CHARFORMAT2 cf;
-	ZeroMemory(&cf, sizeof(CHARFORMAT2));
-	cf.cbSize = sizeof(CHARFORMAT2);
-	cf.dwMask = CFM_COLOR;
-	cf.dwEffects = 0;
-
-	int totalStrLength = GetWindowTextLength(m_hwndEditor);
-	WCHAR *txt = __new WCHAR[totalStrLength + 1];
-	GetWindowText(m_hwndEditor, txt, totalStrLength + 1);
-	int curPos = 0;
-	int word_end_pos = 1;
-	int addition_pos = 0;
-	while (curPos < totalStrLength)
-	{
-		word_end_pos = SendMessage(m_hwndEditor, EM_FINDWORDBREAK, WB_MOVEWORDRIGHT, curPos);
-		if (curPos >= word_end_pos)
-			break;
-		int strLength = word_end_pos - curPos;
-
-		WCHAR* temp = __new WCHAR[strLength + 1];
-		CopyMemory(temp, txt + curPos + addition_pos, strLength * sizeof(WCHAR));
-		for(INT j = strLength - 1; j >= 0; j--)
-		{
-			if (temp[j] != L' ')
-			{
-				temp[j + 1] = L'\0';
-				strLength = j + 1;
-				break;
-			}
-		}
-		if (strLength == 1 && (temp[0] == L'\n' || temp[0] == L'\r'))
-			addition_pos++;
-		if (strLength == 1)
-		{
-			curPos = word_end_pos;
-			__delete temp;
-			continue;
-		}
-
-		for(INT i = 0; i < keyword_count; i++)
-		{
-			if (strLength != keywords[i].cchKeyword)
-				continue;
-			if (lstrcmpW(temp, keywords[i].pcwzKeyword) == 0)
-			{
-				CHARRANGE cr2;
-				cr2.cpMin = curPos + 0;
-				cr2.cpMax = curPos + keywords[i].cchKeyword;
-				cf.crTextColor = keywords[i].crKeyword;
-				SendMessage(m_hwndEditor, EM_SETSEL, (WPARAM)curPos, (LPARAM)(curPos + keywords[i].cchKeyword));
-				SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
-				break;
-			}
-		}
-		__delete temp;
-		curPos = word_end_pos;
-	}
-	//SendMessage(m_hwndEditor, EM_EXSETSEL, 0, LPARAM(&OldRange)); // restores old selection
-	cf.crTextColor = RGB(0, 0, 0);
-	SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
-	__delete txt;
-	SendMessage(m_hwndEditor, EM_HIDESELECTION, 0, 0);
-	// CHARRANGE endRange;
-	// endRange.cpMin = 0;
-	// endRange.cpMax = 0;
-	SendMessage(m_hwndEditor, EM_EXSETSEL, 0, LPARAM(&OldRange));
-}
-
-void CQuadooProject::FormatWord (VOID)
-{
-	CHARRANGE cr1;
-	SendMessage(m_hwndEditor, EM_EXGETSEL, 0, (LPARAM)&cr1);
-	int word_start_pos = SendMessage(m_hwndEditor, EM_FINDWORDBREAK, WB_MOVEWORDLEFT, cr1.cpMin);
-
-	CHARFORMAT cf;
-	cf.cbSize = sizeof(CHARFORMAT);
-	cf.dwMask = CFM_COLOR;
-	cf.dwEffects = 0;
-	int i;
-	for (i = 0; i < keyword_count; i++)
-	{
-		FINDTEXTEX ft;
-		CHARRANGE ch;
-		ch.cpMin = word_start_pos;
-		ch.cpMax = cr1.cpMin;
-		ft.chrg = ch;
-		ft.lpstrText = keywords[i].pcwzKeyword;
-		int fIndex = SendMessage(m_hwndEditor, EM_FINDTEXTW, (WPARAM)FR_DOWN | FR_WHOLEWORD, (LPARAM)&ft);
-		if (fIndex >= 0)
-		{
-			CHARRANGE cr2;
-			cr2.cpMin = fIndex;
-			cr2.cpMax = fIndex + keywords[i].cchKeyword;
-			SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
-			cf.crTextColor = keywords[i].crKeyword;
-			SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
-			cr2.cpMin = cr1.cpMin;
-			cr2.cpMax = cr1.cpMin;
-			SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
-			break;
-		}
-	}
-	if (i == keyword_count)
-	{
-		CHARRANGE cr2;
-		cr2.cpMin = word_start_pos;
-		cr2.cpMax = cr1.cpMin;
-		SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
-		cf.crTextColor = RGB(0, 0, 0);
-		SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
-		cr2.cpMin = cr1.cpMin;
-		cr2.cpMax = cr1.cpMin;
-		SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
-	}
-}
-
-HRESULT CQuadooProject::Register (HINSTANCE hInstance)
+HRESULT CQuadooProject::Register(HINSTANCE hInstance)
 {
 	WNDCLASSEX wnd = {0};
 
@@ -281,7 +164,7 @@ HRESULT CQuadooProject::Save (VOID)
 	Check(JSONSerializeObject(m_pProject, &stmJSON));
 	Check(ReformatJSON(stmJSON.TGetReadPtr<WCHAR>(), stmJSON.TDataRemaining<WCHAR>(), &stmFormatted));
 	Check(Text::SaveToFile(stmFormatted.TGetReadPtr<WCHAR>(), stmFormatted.TDataRemaining<WCHAR>(), RStrToWide(m_rstrProject)));
-	
+
 Cleanup:
 	return hr;
 }
@@ -518,6 +401,7 @@ HRESULT CQuadooProject::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
 	return __super::FinalizeAndShow(dwStyle, nCmdShow);
 }
 
+
 BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
 	switch (message)
@@ -526,8 +410,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		m_hwndEditor = CreateWindowEx(0,
 			RICHEDIT_CLASS, NULL, WS_VISIBLE | WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE,
 			0, 0, 100, 100, m_hwnd, NULL, m_hInstance, NULL);
-
-		if (NULL == m_hwndEditor)
+		if(NULL == m_hwndEditor)
 		{
 			lResult = -1;
 			return TRUE;
@@ -542,7 +425,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 			SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_ALL, (LPARAM)&cf);
 
 			LRESULT lMask = SendMessage(m_hwndEditor, EM_GETEVENTMASK, 0, 0);
-			lMask |= ENM_KEYEVENTS;
+			lMask |= ENM_CLIPFORMAT | ENM_KEYEVENTS;
 			SendMessage(m_hwndEditor, EM_SETEVENTMASK, 0, lMask);
 		}
 
@@ -550,30 +433,30 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		break;
 
 	case WM_PAINT:
+	{
+		RECT rcTabs, rcBody, rc;
+		PAINTSTRUCT ps;
+
+		m_pTabs->GetTabsRect(0, 0, rcTabs);
+
+		GetClientRect(m_hwnd, &rcBody);
+		rcBody.top = rcTabs.bottom;
+
+		HDC hdc = BeginPaint(m_hwnd, &ps);
+
+		if(IntersectRect(&rc, &ps.rcPaint, &rcTabs))
+			m_pTabs->Draw(hdc, 0, 0);
+
+		if(IntersectRect(&rc, &ps.rcPaint, &rcBody))
 		{
-			RECT rcTabs, rcBody, rc;
-			PAINTSTRUCT ps;
-
-			m_pTabs->GetTabsRect(0, 0, rcTabs);
-
-			GetClientRect(m_hwnd, &rcBody);
-			rcBody.top = rcTabs.bottom;
-
-			HDC hdc = BeginPaint(m_hwnd, &ps);
-
-			if (IntersectRect(&rc, &ps.rcPaint, &rcTabs))
-				m_pTabs->Draw(hdc, 0, 0);
-
-			if (IntersectRect(&rc, &ps.rcPaint, &rcBody))
-			{
-				HBRUSH hbrBody = CreateSolidBrush(RGB(105, 161, 191));
-				FillRect(hdc, &rcBody, hbrBody);
-				DeleteObject(hbrBody);
-			}
-
-			EndPaint(m_hwnd, &ps);
+			HBRUSH hbrBody = CreateSolidBrush(RGB(105, 161, 191));
+			FillRect(hdc, &rcBody, hbrBody);
+			DeleteObject(hbrBody);
 		}
-		break;
+
+		EndPaint(m_hwnd, &ps);
+	}
+	break;
 
 	case WM_SIZE:
 		m_pTabs->Resize(LOWORD(lParam), HIWORD(lParam));
@@ -585,7 +468,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		break;
 
 	case WM_MOUSEMOVE:
-		if (m_pTabs->MouseHover(m_hwnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
+		if(m_pTabs->MouseHover(m_hwnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
 		{
 			RECT rc;
 			m_pTabs->GetTabsRect(0, 0, rc);
@@ -594,10 +477,10 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		break;
 
 	case WM_LBUTTONDOWN:
-		if (m_pTabs->IsCloseButton(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)) ||
+		if(m_pTabs->IsCloseButton(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)) ||
 			m_pTabs->IsDropDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
 		{
-			if (m_pTabs->MouseHover(m_hwnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
+			if(m_pTabs->MouseHover(m_hwnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
 			{
 				RECT rc;
 				m_pTabs->GetTabsRect(0, 0, rc);
@@ -609,7 +492,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		else
 		{
 			CProjectFile* pFile = m_pTabs->TFindTabFromPoint<CProjectFile>(LOWORD(lParam), HIWORD(lParam));
-			if (pFile)
+			if(pFile)
 				SwitchToFile(pFile);
 		}
 		break;
@@ -617,33 +500,33 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 	case WM_LBUTTONUP:
 		ReleaseCapture();
 
-		if (m_pTabs->IsCloseButton(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
+		if(m_pTabs->IsCloseButton(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
 		{
 			sysint idxTab = m_pTabs->GetActiveTab();
-			if (-1 != idxTab)
+			if(-1 != idxTab)
 				CloseTab(idxTab);
 		}
-		else if (m_pTabs->IsDropDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
+		else if(m_pTabs->IsDropDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))
 		{
 			sysint idxTab;
-			if (m_pTabs->PopupTabs(m_hwnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), &idxTab) && m_pTabs->GetActiveTab() != idxTab)
+			if(m_pTabs->PopupTabs(m_hwnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), &idxTab) && m_pTabs->GetActiveTab() != idxTab)
 				SwitchToFile(m_pTabs->TGetTabData<CProjectFile>(idxTab));
 		}
 		break;
 
 	case WM_NOTIFY:
 		{
-			MSGFILTER *pMsgFilter = (MSGFILTER *)lParam;
-			if (pMsgFilter->msg == WM_CHAR)
+			MSGFILTER* pMsgFilter = (MSGFILTER *)lParam;
+			if(pMsgFilter->msg == WM_CHAR)
 			{
-				if (SendMessage(m_hwndEditor, EM_GETMODIFY, 0, 0))
+				if(SendMessage(m_hwndEditor, EM_GETMODIFY, 0, 0))
 				{
 					FormatWord();
 					sysint idxTab = m_pTabs->GetActiveTab();
-					if (-1 != idxTab)
+					if(-1 != idxTab)
 					{
 						CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
-						if (!pFile->m_fModified)
+						if(!pFile->m_fModified)
 						{
 							RECT rc;
 
@@ -656,10 +539,16 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 					}
 				}
 			}
+			else if(pMsgFilter->msg == WM_KEYUP)
+			{
+				if((pMsgFilter->wParam == 0x56 && GetAsyncKeyState(VK_CONTROL))
+					|| (pMsgFilter->wParam == VK_INSERT && GetAsyncKeyState(VK_SHIFT)))
+				{
+					// Reformat the pasted text.
+					InitFormatText();
+				}
+			}
 		}
-		break;
-
-	case WM_VSCROLL:
 		break;
 
 	case WM_SETFOCUS:
@@ -1078,10 +967,9 @@ HRESULT CQuadooProject::LoadTabData (CProjectFile* pFile)
 		Check(Text::LoadFromFile(pFile->m_pwzAbsolutePath, &pwzText, &cchText));
 	
 	CheckIfGetLastError(!SetWindowTextW(m_hwndEditor, pwzText));
-	InitFormatText();
+	Check(InitFormatText());
 	SendMessage(m_hwndEditor, EM_SETMODIFY, pFile->m_fModified, 0);
 	pFile->m_fModified = false;
-	hr = S_OK;
 	
 Cleanup:
 	if(FAILED(hr))
@@ -1220,7 +1108,7 @@ HRESULT CQuadooProject::ShowProjectCompiler(VOID)
 		CProjectCompilerDlg dlgCompiler(m_pProject, rstrTarget, rstrEngine, m_rstrProjectDir, pDefault->m_pwzAbsolutePath);
 
 		Check(dlgHost.Display(m_hwnd, &dlgCompiler));
-		if (dlgHost.GetReturnValue() == IDOK)
+		if(dlgHost.GetReturnValue() == IDOK)
 			Check(Save());
 	}
 
@@ -1228,4 +1116,131 @@ Cleanup:
 	RStrRelease(rstrTarget);
 	RStrRelease(rstrEngine);
 	return hr;
+}
+
+HRESULT CQuadooProject::InitFormatText (VOID)
+{
+	HRESULT hr;
+	PWSTR pwzText = NULL;
+	INT cchText;
+	CHARRANGE OldRange;
+	CHARFORMAT2 cf;
+	int curPos = 0;
+	int word_end_pos = 1;
+	int addition_pos = 0;
+
+	SendMessage(m_hwndEditor, EM_HIDESELECTION, 1, 0);
+
+	cchText = GetWindowTextLength(m_hwndEditor);
+	pwzText = __new WCHAR[cchText + 1];
+	CheckAlloc(pwzText);
+
+	GetWindowText(m_hwndEditor, pwzText, cchText + 1);
+
+	SendMessage(m_hwndEditor, EM_EXGETSEL, 0, LPARAM(&OldRange));
+
+	cf.cbSize = sizeof(CHARFORMAT2);
+	cf.dwMask = CFM_COLOR;
+	cf.dwEffects = 0;
+
+	while(curPos != -1)
+	{
+		word_end_pos = SendMessage(m_hwndEditor, EM_FINDWORDBREAK, WB_MOVEWORDRIGHT, curPos);
+		if(curPos >= word_end_pos)
+			break;
+		int cchWord = word_end_pos - curPos;
+
+		PCWSTR pcwzWord = pwzText + curPos + addition_pos;
+		for(INT j = cchWord - 1; j >= 0; j--)
+		{
+			if(pcwzWord[j] != L' ')
+			{
+				cchWord = j + 1;
+				break;
+			}
+		}
+		if(cchWord == 1 && (pcwzWord[0] == L'\n' || pcwzWord[0] == L'\r'))
+			addition_pos++;
+		if(cchWord == 1)
+		{
+			curPos = word_end_pos;
+			continue;
+		}
+
+		for(INT i = 0; i < keyword_count; i++)
+		{
+			if(cchWord != keywords[i].cchKeyword)
+				continue;
+			if(0 == TStrCmpNAssert(pcwzWord, keywords[i].pcwzKeyword, cchWord))
+			{
+				CHARRANGE cr2;
+				cr2.cpMin = curPos + 0;
+				cr2.cpMax = curPos + keywords[i].cchKeyword;
+				cf.crTextColor = keywords[i].crKeyword;
+				SendMessage(m_hwndEditor, EM_SETSEL, (WPARAM)curPos, (LPARAM)(curPos + keywords[i].cchKeyword));
+				SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
+				break;
+			}
+		}
+		curPos = word_end_pos;
+	}
+
+	SendMessage(m_hwndEditor, EM_EXSETSEL, 0, LPARAM(&OldRange));
+	cf.crTextColor = RGB(0, 0, 0);
+	SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
+
+	hr = S_OK;
+
+Cleanup:
+	SendMessage(m_hwndEditor, EM_HIDESELECTION, 0, 0);
+	__delete_array pwzText;
+	return hr;
+}
+
+VOID CQuadooProject::FormatWord (VOID)
+{
+	CHARRANGE cr1;
+	SendMessage(m_hwndEditor, EM_EXGETSEL, 0, (LPARAM)&cr1);
+	int word_start_pos = SendMessage(m_hwndEditor, EM_FINDWORDBREAK, WB_MOVEWORDLEFT, cr1.cpMin);
+
+	CHARFORMAT cf;
+	cf.cbSize = sizeof(CHARFORMAT);
+	cf.dwMask = CFM_COLOR;
+	cf.dwEffects = 0;
+	int i;
+	for(i = 0; i < keyword_count; i++)
+	{
+		FINDTEXTEX ft;
+		CHARRANGE ch;
+		ch.cpMin = word_start_pos;
+		ch.cpMax = cr1.cpMin;
+		ft.chrg = ch;
+		ft.lpstrText = keywords[i].pcwzKeyword;
+		int fIndex = SendMessage(m_hwndEditor, EM_FINDTEXTW, (WPARAM)FR_DOWN | FR_WHOLEWORD, (LPARAM)&ft);
+		if(fIndex >= 0)
+		{
+			CHARRANGE cr2;
+			cr2.cpMin = fIndex;
+			cr2.cpMax = fIndex + keywords[i].cchKeyword;
+			SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
+			cf.crTextColor = keywords[i].crKeyword;
+			SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
+			cr2.cpMin = cr1.cpMin;
+			cr2.cpMax = cr1.cpMin;
+			SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
+			break;
+		}
+	}
+	if(i == keyword_count)
+	{
+		CHARRANGE cr2;
+		cr2.cpMin = word_start_pos;
+		cr2.cpMax = cr1.cpMin;
+		SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
+		cf.crTextColor = RGB(0, 0, 0);
+		SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
+		cr2.cpMin = cr1.cpMin;
+		cr2.cpMax = cr1.cpMin;
+		SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
+	}
 }

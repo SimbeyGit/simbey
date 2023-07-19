@@ -5,6 +5,7 @@
 #include "Library\Core\BaseUnknown.h"
 #include "Library\Window\BaseWindow.h"
 #include "Keywords.h"
+
 interface IJSONObject;
 
 class CTabs;
@@ -84,8 +85,6 @@ public:
 	CQuadooProject (HINSTANCE hInstance, HWND hwndTree);
 	~CQuadooProject ();
 
-	void InitFormatText (VOID);
-	void FormatWord (VOID);
 	static HRESULT Register (HINSTANCE hInstance);
 	static HRESULT Unregister (HINSTANCE hInstance);
 
@@ -144,4 +143,7 @@ private:
 
 	VOID RemoveFilePrompt (CProjectFile* pFile);
 	HRESULT ShowProjectCompiler (VOID);
+
+	HRESULT InitFormatText (VOID);
+	VOID FormatWord (VOID);
 };
