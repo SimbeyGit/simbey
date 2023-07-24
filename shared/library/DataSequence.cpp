@@ -18,7 +18,7 @@
 #include "core\CoreDefs.h"
 #include "DataSequence.h"
 
-sequence::sequence ()
+CDataSequence::CDataSequence ()
 {
 	head = tail		= 0;
 	sequence_length = 0;
@@ -26,7 +26,7 @@ sequence::sequence ()
 	group_refcount	= 0;
 }
 
-sequence::~sequence ()
+CDataSequence::~CDataSequence ()
 {
 	clear();
 
@@ -34,7 +34,7 @@ sequence::~sequence ()
 	__delete tail;
 }
 
-HRESULT sequence::Initialize (VOID)
+HRESULT CDataSequence::Initialize (VOID)
 {
 	HRESULT hr = S_OK;
 
@@ -53,10 +53,10 @@ Cleanup:
 	return hr;
 }
 
-HRESULT sequence::prepare ()
+HRESULT CDataSequence::prepare ()
 {
 	HRESULT hr;
-	sequence::buffer_control* pBuffer;
+	CDataSequence::buffer_control* pBuffer;
 
 	sequence_length = 0;
 
@@ -72,7 +72,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT sequence::prepare (const seqchar_t *buffer, size_t length)
+HRESULT CDataSequence::prepare (const seqchar_t *buffer, size_t length)
 {
 	HRESULT hr;
 	buffer_control* bc;
@@ -98,7 +98,7 @@ Cleanup:
 	return hr;
 }
 
-void sequence::clearstack (eventstack &dest)
+void CDataSequence::clearstack (eventstack &dest)
 {
 	for(sysint i = 0; i < dest.Length(); i++)
 	{
@@ -111,7 +111,7 @@ void sequence::clearstack (eventstack &dest)
 
 #ifdef DEBUG_SEQUENCE
 
-void sequence::debug1 ()
+void CDataSequence::debug1 ()
 {
 	span *sptr;
 
@@ -124,7 +124,7 @@ void sequence::debug1 ()
 	printf("\n");
 }
 
-void sequence::debug2 ()
+void CDataSequence::debug2 ()
 {
 	span *sptr;
 
@@ -166,7 +166,7 @@ void sequence::debug2 ()
 //
 //	Allocate a buffer and add it to our 'buffer control' list
 //
-HRESULT sequence::alloc_buffer (size_t maxsize, __deref_out sequence::buffer_control** ppBuffer)
+HRESULT CDataSequence::alloc_buffer (size_t maxsize, __deref_out CDataSequence::buffer_control** ppBuffer)
 {
 	HRESULT hr;
 	buffer_control* bc = __new buffer_control;
@@ -190,7 +190,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT sequence::alloc_modifybuffer (size_t maxsize, __deref_out sequence::buffer_control** ppBuffer)
+HRESULT CDataSequence::alloc_modifybuffer (size_t maxsize, __deref_out CDataSequence::buffer_control** ppBuffer)
 {
 	HRESULT hr;
 	buffer_control* bc;
@@ -209,7 +209,7 @@ Cleanup:
 //
 //	Import the specified range of data into the sequence so we have our own private copy
 //
-HRESULT sequence::import_buffer (const seqchar_t *buf, size_t len, size_t *buffer_offset)
+HRESULT CDataSequence::import_buffer (const seqchar_t *buf, size_t len, size_t *buffer_offset)
 {
 	HRESULT hr;
 	buffer_control* bc;
@@ -238,14 +238,14 @@ Cleanup:
 }
 
 //
-//	sequence::spanfromindex
+//	CDataSequence::spanfromindex
 //
 //	search the spanlist for the span which encompasses the specified index position
 //
 //	index		- character-position index
 //	*spanindex  - index of span within sequence
 //
-sequence::span* sequence::spanfromindex (size_w index, size_w *spanindex = 0) const
+CDataSequence::span* CDataSequence::spanfromindex (size_w index, size_w *spanindex = 0) const
 {
 	span * sptr;
 	size_w curidx = 0;
@@ -274,7 +274,7 @@ sequence::span* sequence::spanfromindex (size_w index, size_w *spanindex = 0) co
 	return NULL;
 }
 
-void sequence::swap_spanrange(span_range *src, span_range *dest)
+void CDataSequence::swap_spanrange(span_range *src, span_range *dest)
 {
 	if(src->boundary)
 	{
@@ -303,7 +303,7 @@ void sequence::swap_spanrange(span_range *src, span_range *dest)
 	}
 }
 
-void sequence::restore_spanrange (span_range *range, bool undo_or_redo)
+void CDataSequence::restore_spanrange (span_range *range, bool undo_or_redo)
 {
 	if(range->boundary)
 	{
@@ -374,12 +374,12 @@ void sequence::restore_spanrange (span_range *range, bool undo_or_redo)
 }
 
 //
-//	sequence::undoredo
+//	CDataSequence::undoredo
 //
 //	private routine used to undo/redo spanrange events to/from 
 //	the sequence - handles 'grouped' events
 //
-HRESULT sequence::undoredo (eventstack &source, eventstack &dest)
+HRESULT CDataSequence::undoredo (eventstack &source, eventstack &dest)
 {
 	HRESULT hr;
 	span_range* range = NULL;
@@ -414,7 +414,7 @@ Cleanup:
 // 
 //	UNDO the last action
 //
-HRESULT sequence::undo ()
+HRESULT CDataSequence::undo ()
 {
 	return undoredo(undostack, redostack);
 }
@@ -422,23 +422,23 @@ HRESULT sequence::undo ()
 //
 //	REDO the last UNDO
 //
-HRESULT sequence::redo ()
+HRESULT CDataSequence::redo ()
 {
 	return undoredo(redostack, undostack);
 }
 
 //
-//	Will calling sequence::undo change the sequence?
+//	Will calling CDataSequence::undo change the sequence?
 //
-bool sequence::canundo () const
+bool CDataSequence::canundo () const
 {
 	return undostack.Length() != 0;
 }
 
 //
-//	Will calling sequence::redo change the sequence?
+//	Will calling CDataSequence::redo change the sequence?
 //
-bool sequence::canredo () const
+bool CDataSequence::canredo () const
 {
 	return redostack.Length() != 0;
 }
@@ -447,7 +447,7 @@ bool sequence::canredo () const
 //	Group repeated actions on the sequence (insert/erase etc)
 //	into a single 'undoable' action
 //
-void sequence::group()
+void CDataSequence::group()
 {
 	if(group_refcount == 0)
 	{
@@ -461,7 +461,7 @@ void sequence::group()
 //
 //	Close the grouping
 //
-void sequence::ungroup()
+void CDataSequence::ungroup()
 {
 	if(group_refcount > 0)
 		group_refcount--;
@@ -470,17 +470,17 @@ void sequence::ungroup()
 //
 //	Return logical length of the sequence
 //
-size_w sequence::size () const
+size_w CDataSequence::size () const
 {
 	return sequence_length;
 }
 
 //
-//	sequence::initundo
+//	CDataSequence::initundo
 //
 //	create a new (empty) span range and save the current sequence state
 //
-HRESULT sequence::initundo (size_w index, size_w length, action act, __deref_out sequence::span_range** ppRange)
+HRESULT CDataSequence::initundo (size_w index, size_w length, action act, __deref_out CDataSequence::span_range** ppRange)
 {
 	HRESULT hr;
 	span_range* pRange = __new span_range(
@@ -501,7 +501,7 @@ Cleanup:
 	return hr;
 }
 
-sequence::span_range* sequence::stackback(eventstack &source, size_t idx)
+CDataSequence::span_range* CDataSequence::stackback(eventstack &source, size_t idx)
 {
 	sysint length = source.Length();
 	
@@ -515,21 +515,21 @@ sequence::span_range* sequence::stackback(eventstack &source, size_t idx)
 	}
 }
 
-void sequence::record_action (action act, size_w index)
+void CDataSequence::record_action (action act, size_w index)
 {
 	lastaction_index = index;
 	lastaction       = act;
 }
 
-bool sequence::can_optimize (action act, size_w index)
+bool CDataSequence::can_optimize (action act, size_w index)
 {
 	return (lastaction == act && lastaction_index == index);
 }
 
 //
-//	sequence::insert_worker
+//	CDataSequence::insert_worker
 //
-HRESULT sequence::insert_worker (size_w index, const seqchar_t *buf, size_w length, action act)
+HRESULT CDataSequence::insert_worker (size_w index, const seqchar_t *buf, size_w length, action act)
 {
 	HRESULT		hr;
 	span *		sptr;
@@ -625,12 +625,12 @@ Cleanup:
 }
 
 //
-//	sequence::insert
+//	CDataSequence::insert
 //
 //	Insert a buffer into the sequence at the specified position.
 //	Consecutive insertions are optimized into a single event
 //
-HRESULT sequence::insert (size_w index, const seqchar_t *buf, size_w length)
+HRESULT CDataSequence::insert (size_w index, const seqchar_t *buf, size_w length)
 {
 	HRESULT hr = insert_worker(index, buf, length, action_insert);
 	if(SUCCEEDED(hr))
@@ -639,21 +639,21 @@ HRESULT sequence::insert (size_w index, const seqchar_t *buf, size_w length)
 }
 
 //
-//	sequence::insert
+//	CDataSequence::insert
 //
 //	Insert specified character-value into sequence
 //
-HRESULT sequence::insert (size_w index, const seqchar_t val)
+HRESULT CDataSequence::insert (size_w index, const seqchar_t val)
 {
 	return insert(index, &val, 1);
 }
 
 //
-//	sequence::deletefromsequence
+//	CDataSequence::deletefromsequence
 //
 //	Remove + delete the specified *span* from the sequence
 //
-void sequence::deletefromsequence(span **psptr)
+void CDataSequence::deletefromsequence(span **psptr)
 {
 	span *sptr = *psptr;
 	sptr->prev->next = sptr->next;
@@ -665,9 +665,9 @@ void sequence::deletefromsequence(span **psptr)
 }
 
 //
-//	sequence::erase_worker
+//	CDataSequence::erase_worker
 //
-HRESULT sequence::erase_worker (size_w index, size_w length, action act)
+HRESULT CDataSequence::erase_worker (size_w index, size_w length, action act)
 {
 	HRESULT		hr;
 	span		*sptr;
@@ -833,11 +833,11 @@ Cleanup:
 }
 
 //
-//	sequence::erase 
+//	CDataSequence::erase 
 //
 //  "removes" the specified range of data from the sequence. 
 //
-HRESULT sequence::erase (size_w index, size_w len)
+HRESULT CDataSequence::erase (size_w index, size_w len)
 {
 	HRESULT hr = erase_worker(index, len, action_erase);
 	if(SUCCEEDED(hr))
@@ -846,17 +846,17 @@ HRESULT sequence::erase (size_w index, size_w len)
 }
 
 //
-//	sequence::erase
+//	CDataSequence::erase
 //
 //	remove single character from sequence
 //
-HRESULT sequence::erase (size_w index)
+HRESULT CDataSequence::erase (size_w index)
 {
 	return erase(index, 1);
 }
 
 //
-//	sequence::replace
+//	CDataSequence::replace
 //
 //	A 'replace' (or 'overwrite') is a combination of erase+inserting
 //  (first we erase a section of the sequence, then insert a new block
@@ -864,10 +864,10 @@ HRESULT sequence::erase (size_w index)
 //
 //	Doing this as a distinct operation (erase+insert at the 
 //  same time) is really complicated, so I just make use of the existing 
-//  sequence::erase and sequence::insert and combine them into action. We
+//  CDataSequence::erase and CDataSequence::insert and combine them into action. We
 //	need to play with the undo stack to combine them in a 'true' sense.
 //
-HRESULT sequence::replace(size_w index, const seqchar_t *buf, size_w length, size_w erase_length)
+HRESULT CDataSequence::replace(size_w index, const seqchar_t *buf, size_w length, size_w erase_length)
 {
 	HRESULT hr;
 	size_t remlen;
@@ -912,52 +912,52 @@ Cleanup:
 }
 
 //
-//	sequence::replace
+//	CDataSequence::replace
 //
 //	overwrite with the specified buffer
 //
-HRESULT sequence::replace (size_w index, const seqchar_t *buf, size_w length)
+HRESULT CDataSequence::replace (size_w index, const seqchar_t *buf, size_w length)
 {
 	return replace(index, buf, length, length);
 }
 
 //
-//	sequence::replace
+//	CDataSequence::replace
 //
 //	overwrite with a single character-value
 //
-HRESULT sequence::replace (size_w index, const seqchar_t val)
+HRESULT CDataSequence::replace (size_w index, const seqchar_t val)
 {
 	return replace(index, &val, 1);
 }
 
 //
-//	sequence::append
+//	CDataSequence::append
 //
-//	very simple wrapper around sequence::insert, just inserts at
+//	very simple wrapper around CDataSequence::insert, just inserts at
 //  the end of the sequence
 //
-HRESULT sequence::append (const seqchar_t *buf, size_w length)
+HRESULT CDataSequence::append (const seqchar_t *buf, size_w length)
 {
 	return insert(size(), buf, length);
 }
 
 //
-//	sequence::append
+//	CDataSequence::append
 //
 //	append a single character to the sequence
 //
-HRESULT sequence::append (const seqchar_t val)
+HRESULT CDataSequence::append (const seqchar_t val)
 {
 	return append(&val, 1);
 }
 
 //
-//	sequence::clear
+//	CDataSequence::clear
 //
 //	empty the entire sequence, clear undo/redo history etc
 //
-VOID sequence::clear ()
+VOID CDataSequence::clear ()
 {
 	span *sptr, *tmp;
 	
@@ -988,13 +988,13 @@ VOID sequence::clear ()
 }
 
 //
-//	sequence::render
+//	CDataSequence::render
 //
 //	render the specified range of data (index, len) and store in 'dest'
 //
 //	Returns number of chars copied into destination
 //
-HRESULT sequence::render(size_w index, seqchar_t* dest, size_w length, __out size_w* pnCopied) const
+HRESULT CDataSequence::render(size_w index, seqchar_t* dest, size_w length, __out size_w* pnCopied) const
 {
 	HRESULT hr;
 	size_w total = 0, spanoffset;
@@ -1029,7 +1029,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT sequence::render_length(size_w index, __out size_w* pnSize) const
+HRESULT CDataSequence::render_length(size_w index, __out size_w* pnSize) const
 {
 	HRESULT hr;
 	size_w total = 0, spanoffset;
@@ -1058,7 +1058,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT sequence::render_offsets (TArray<size_w>& aOffsets, seqchar_t seqBreak) const
+HRESULT CDataSequence::render_offsets (TArray<size_w>& aOffsets, seqchar_t seqBreak) const
 {
 	HRESULT hr;
 	size_w index = 0;
@@ -1086,11 +1086,11 @@ Cleanup:
 }
 
 //
-//	sequence::peek
+//	CDataSequence::peek
 //
 //	return single element at specified position in the sequence
 //
-seqchar_t sequence::peek(size_w index) const
+seqchar_t CDataSequence::peek(size_w index) const
 {
 	seqchar_t value;
 	size_w n;
@@ -1098,42 +1098,42 @@ seqchar_t sequence::peek(size_w index) const
 }
 
 //
-//	sequence::poke
+//	CDataSequence::poke
 //
 //	modify single element at specified position in the sequence
 //
-HRESULT sequence::poke(size_w index, seqchar_t value) 
+HRESULT CDataSequence::poke(size_w index, seqchar_t value) 
 {
 	return replace(index, &value, 1);
 }
 
 //
-//	sequence::operator[] const
+//	CDataSequence::operator[] const
 //
 //	readonly array access
 //
-seqchar_t sequence::operator[] (size_w index) const
+seqchar_t CDataSequence::operator[] (size_w index) const
 {
 	return peek(index);
 }
 
 //
-//	sequence::operator[] 
+//	CDataSequence::operator[] 
 //
 //	read/write array access
 //
-sequence::ref sequence::operator[] (size_w index)
+CDataSequence::ref CDataSequence::operator[] (size_w index)
 {
 	return ref(this, index);
 }
 
 //
-//	sequence::breakopt
+//	CDataSequence::breakopt
 //
 //	Prevent subsequent operations from being optimized (coalesced) 
 //  with the last.
 //
-void sequence::breakopt()
+void CDataSequence::breakopt()
 {
 	lastaction = action_invalid;
 }

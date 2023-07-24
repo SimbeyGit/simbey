@@ -36,7 +36,7 @@ const size_w MAX_SEQUENCE_LENGTH = ((size_w)(-1) / sizeof(seqchar_t));
 //
 //	sequence class!
 //
-class sequence
+class CDataSequence
 {
 public:
 	// forward declare the nested helper-classes
@@ -49,8 +49,8 @@ public:
 public:
 
 	// sequence construction
-	sequence ();
-	~sequence ();
+	CDataSequence ();
+	~CDataSequence ();
 
 	// Initialization
 	HRESULT		Initialize (VOID);
@@ -111,10 +111,10 @@ public:
 	HRESULT		render(size_w index, seqchar_t *buf, size_w len, __out size_w* pnCopied) const;
 	HRESULT		render_length(size_w index, __out size_w* pnSize) const;
 	HRESULT		render_offsets (TArray<size_w>& aOffsets, seqchar_t seqBreak) const;
-	seqchar_t		peek(size_w index) const;
+	seqchar_t	peek(size_w index) const;
 	HRESULT		poke(size_w index, seqchar_t val);
 
-	seqchar_t		operator[] (size_w index) const;
+	seqchar_t	operator[] (size_w index) const;
 	ref			operator[] (size_w index);
 
 private:
@@ -173,19 +173,16 @@ private:
 	size_w			lastaction_index;
 	action			lastaction;
 	bool			can_quicksave;
-	
-	void			LOCK();
-	void			UNLOCK();
 };
 
 //
-//	sequence::action
+//	CDataSequence::action
 //
 //	enumeration of the type of 'edit actions' our sequence supports.
 //	only important when we try to 'optimize' repeated operations on the
 //	sequence by coallescing them into a single span.
 //
-enum sequence::action
+enum CDataSequence::action
 { 
 	action_invalid, 
 	action_insert, 
@@ -194,13 +191,13 @@ enum sequence::action
 };
 
 //
-//	sequence::span
+//	CDataSequence::span
 //
 //	private class to the sequence
 //
-class sequence::span
+class CDataSequence::span
 {
-	friend class sequence;
+	friend class CDataSequence;
 	friend class span_range;
 	
 public:
@@ -230,16 +227,16 @@ private:
 };
 
 //
-//	sequence::span_range
+//	CDataSequence::span_range
 //
 //	private class to the sequence. Used to represent a contiguous range of spans.
 //	used by the undo/redo stacks to store state. A span-range effectively represents
 //	the range of spans affected by an event (operation) on the sequence
 //  
 //
-class sequence::span_range
+class CDataSequence::span_range
 {
-	friend class sequence;
+	friend class CDataSequence;
 
 public:
 
@@ -380,15 +377,15 @@ private:
 };
 
 //
-//	sequence::ref
+//	CDataSequence::ref
 //
 //	temporary 'reference' to the sequence, used for
-//  non-const array access with sequence::operator[]
+//  non-const array access with CDataSequence::operator[]
 //
-class sequence::ref
+class CDataSequence::ref
 {
 public:
-	ref(sequence* s, size_w i) 
+	ref(CDataSequence* s, size_w i) 
 		:  
 		seq(s),  
 		index(i) 
@@ -407,14 +404,14 @@ public:
 	}
 
 private:
-	size_w		index;
-	sequence*	seq;
+	size_w index;
+	CDataSequence* seq;
 };
 
 //
 //	buffer_control
 //
-class sequence::buffer_control
+class CDataSequence::buffer_control
 {
 public:
 	seqchar_t* buffer;
