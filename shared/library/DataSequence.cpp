@@ -996,7 +996,7 @@ VOID CDataSequence::clear ()
 //
 HRESULT CDataSequence::render(size_w index, seqchar_t* dest, size_w length, __out size_w* pnCopied) const
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 	size_w total = 0, spanoffset;
 
 	// find span to start rendering at
@@ -1009,21 +1009,20 @@ HRESULT CDataSequence::render(size_w index, seqchar_t* dest, size_w length, __ou
 	// copy each span's referenced data in succession
 	while(length && sptr != tail)
 	{
-		size_w copylen   = min(sptr->length - spanoffset, length);
-		seqchar_t *source  = buffer_list[sptr->buffer]->buffer + sptr->offset;
+		size_w cchSpan = min(sptr->length - spanoffset, length);
+		seqchar_t* source = buffer_list[sptr->buffer]->buffer + sptr->offset;
 
-		memcpy(dest, source + spanoffset, copylen * sizeof(seqchar_t));
+		memcpy(dest, source + spanoffset, cchSpan * sizeof(seqchar_t));
 
-		dest	+= copylen;
-		length	-= copylen;
-		total	+= copylen;
+		dest	+= cchSpan;
+		length	-= cchSpan;
+		total	+= cchSpan;
 
 		sptr = sptr->next;
 		spanoffset = 0;
 	}
 
 	*pnCopied = total;
-	hr = S_OK;
 
 Cleanup:
 	return hr;
@@ -1031,7 +1030,7 @@ Cleanup:
 
 HRESULT CDataSequence::render_length(size_w index, __out size_w* pnSize) const
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 	size_w total = 0, spanoffset;
 
 	// find span to start rendering at
@@ -1044,15 +1043,14 @@ HRESULT CDataSequence::render_length(size_w index, __out size_w* pnSize) const
 	// copy each span's referenced data in succession
 	while(sptr != tail)
 	{
-		size_w copylen = sptr->length - spanoffset;
-		total += copylen;
+		size_w cchSpan = sptr->length - spanoffset;
+		total += cchSpan;
 
 		sptr = sptr->next;
 		spanoffset = 0;
 	}
 
 	*pnSize = total;
-	hr = S_OK;
 
 Cleanup:
 	return hr;
@@ -1071,12 +1069,15 @@ HRESULT CDataSequence::render_offsets (TArray<size_w>& aOffsets, seqchar_t seqBr
 
 	while(sptr != tail)
 	{
-		size_w copylen = sptr->length;
+		size_w cchSpan = sptr->length;
 		seqchar_t* source = buffer_list[sptr->buffer]->buffer + sptr->offset;
 
-		if(seqBreak == source[copylen - 1])
-			Check(aOffsets.Append(index + 1));
-		index += copylen;
+		for(size_w i = 0; i < cchSpan; i++)
+		{
+			if(seqBreak == source[i])
+				Check(aOffsets.Append(index + i + 1));
+		}
+		index += cchSpan;
 
 		sptr = sptr->next;
 	}
@@ -1105,6 +1106,31 @@ seqchar_t CDataSequence::peek(size_w index) const
 HRESULT CDataSequence::poke(size_w index, seqchar_t value) 
 {
 	return replace(index, &value, 1);
+}
+
+HRESULT CDataSequence::StreamOut (ISequentialStream* pstmData)
+{
+	HRESULT hr = S_OK;
+	span* sptr;
+
+	CheckIf(head == tail, E_FAIL);
+	sptr = head->next;
+
+	// copy each span's referenced data in succession
+	while(sptr != tail)
+	{
+		ULONG cb;
+
+		size_w cchSpan = sptr->length;
+		seqchar_t* source = buffer_list[sptr->buffer]->buffer + sptr->offset;
+
+		Check(pstmData->Write(source, cchSpan * sizeof(seqchar_t), &cb));
+
+		sptr = sptr->next;
+	}
+
+Cleanup:
+	return hr;
 }
 
 //

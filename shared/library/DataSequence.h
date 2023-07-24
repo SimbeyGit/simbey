@@ -114,6 +114,8 @@ public:
 	seqchar_t	peek(size_w index) const;
 	HRESULT		poke(size_w index, seqchar_t val);
 
+	HRESULT		StreamOut (ISequentialStream* pstmData);
+
 	seqchar_t	operator[] (size_w index) const;
 	ref			operator[] (size_w index);
 
@@ -260,7 +262,7 @@ public:
 		group_id(id)
 	{
 	}
-		
+
 	// destructor does nothing - because sometimes we don't want
 	// to free the contents when the span_range is deleted. e.g. when
 	// the span_range is just a temporary helper object. The contents
