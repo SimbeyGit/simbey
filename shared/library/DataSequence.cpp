@@ -72,7 +72,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CDataSequence::prepare (const seqchar_t *buffer, size_t length)
+HRESULT CDataSequence::prepare (const seqchar_t* buffer, size_t length)
 {
 	HRESULT hr;
 	buffer_control* bc;
@@ -96,6 +96,11 @@ HRESULT CDataSequence::prepare (const seqchar_t *buffer, size_t length)
 
 Cleanup:
 	return hr;
+}
+
+bool CDataSequence::is_prepared ()
+{
+	return 0 != buffer_list.Length();
 }
 
 void CDataSequence::clearstack (eventstack &dest)
@@ -247,7 +252,7 @@ Cleanup:
 //
 CDataSequence::span* CDataSequence::spanfromindex (size_w index, size_w *spanindex = 0) const
 {
-	span * sptr;
+	span* sptr;
 	size_w curidx = 0;
 
 	// scan the list looking for the span which holds the specified index
@@ -465,6 +470,12 @@ void CDataSequence::ungroup()
 {
 	if(group_refcount > 0)
 		group_refcount--;
+}
+
+void CDataSequence::event_pair (__out sysint* pnUndo, __out sysint* pnRedo)
+{
+	*pnUndo = undostack.Length();
+	*pnRedo = redostack.Length();
 }
 
 //
@@ -1084,6 +1095,45 @@ HRESULT CDataSequence::render_offsets (TArray<size_w>& aOffsets, seqchar_t seqBr
 
 Cleanup:
 	return hr;
+}
+
+size_w CDataSequence::longest_line (seqchar_t seqBreak, seqchar_t seqTab, int nTabWidth)
+{
+	size_w nLongest = 0;
+
+	if(head != tail)
+	{
+		size_w xpos = 0;
+		span* sptr = head->next;
+
+		while(sptr != tail)
+		{
+			size_w cchSpan = sptr->length;
+			seqchar_t* source = buffer_list[sptr->buffer]->buffer + sptr->offset;
+
+			for(size_w i = 0; i < cchSpan; i++)
+			{
+				seqchar_t sch = source[i];
+				if(seqBreak == sch)
+				{
+					if(xpos > nLongest)
+						nLongest = xpos;
+					xpos = 0;
+				}
+				else if(seqTab == sch)
+					xpos += nTabWidth - (xpos % nTabWidth);
+				else
+					xpos++;
+			}
+
+			sptr = sptr->next;
+		}
+
+		if(xpos > nLongest)
+			nLongest = xpos;
+	}
+
+	return nLongest;
 }
 
 //

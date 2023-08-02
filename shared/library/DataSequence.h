@@ -47,7 +47,6 @@ public:
 	enum			action;
 
 public:
-
 	// sequence construction
 	CDataSequence ();
 	~CDataSequence ();
@@ -64,7 +63,8 @@ public:
 	//
 	// prepare from an in-memory buffer
 	//
-	HRESULT		prepare (const seqchar_t *buffer, size_t length);
+	HRESULT		prepare (const seqchar_t* buffer, size_t length);
+	bool		is_prepared ();
 
 	//
 	//	sequence statistics
@@ -98,6 +98,7 @@ public:
 	void		ungroup();
 	size_w		event_index() const  { return undoredo_index; }
 	size_w		event_length() const { return undoredo_length; }
+	void		event_pair (__out sysint* pnUndo, __out sysint* pnRedo);
 
 #ifdef DEBUG_SEQUENCE
 	// print out the sequence
@@ -111,6 +112,7 @@ public:
 	HRESULT		render(size_w index, seqchar_t *buf, size_w len, __out size_w* pnCopied) const;
 	HRESULT		render_length(size_w index, __out size_w* pnSize) const;
 	HRESULT		render_offsets (TArray<size_w>& aOffsets, seqchar_t seqBreak) const;
+	size_w		longest_line (seqchar_t seqBreak, seqchar_t seqTab, int nTabWidth);
 	seqchar_t	peek(size_w index) const;
 	HRESULT		poke(size_w index, seqchar_t val);
 
@@ -120,7 +122,6 @@ public:
 	ref			operator[] (size_w index);
 
 private:
-
 	typedef			TArray<span_range*>	eventstack;
 	typedef			TArray<buffer_control*> bufferlist;
 

@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TextDocument.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -254,6 +258,10 @@
 			</File>
 			<File
 				RelativePath=".\Tabs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TextDocument.h"
 				>
 			</File>
 		</Filter>
