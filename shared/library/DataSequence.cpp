@@ -1093,6 +1093,9 @@ HRESULT CDataSequence::render_offsets (TArray<size_w>& aOffsets, seqchar_t seqBr
 		sptr = sptr->next;
 	}
 
+	// The last offset is included for sizing the real last line.
+	Check(aOffsets.Append(index));
+
 Cleanup:
 	return hr;
 }

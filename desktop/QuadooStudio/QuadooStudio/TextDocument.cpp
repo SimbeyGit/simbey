@@ -121,7 +121,7 @@ VOID CTextDocument::ResetModifiedSnapshot (VOID)
 bool CTextDocument::GetLineFromOffset (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset)
 {
 	sysint low  = 0;
-	sysint high = m_aLines.Length() - 1;
+	sysint high = LineCount() - 1;
 	sysint line = 0;
 
 	if(high == -1)
@@ -157,13 +157,22 @@ bool CTextDocument::GetLineFromOffset (size_w index, __out ULONG* pnLine, __out 
 
 size_w CTextDocument::LineLength (sysint cLine)
 {
-	if(cLine < m_aLines.Length())
-	{
-		if(cLine == m_aLines.Length() - 1)
-			return m_seq.size() - m_aLines[cLine];
+	if(cLine < LineCount())
 		return m_aLines[cLine + 1] - m_aLines[cLine];
-	}
 	return 0;
+}
+
+CTextIterator CTextDocument::IterateLine (ULONG lineno, ULONG* linestart, ULONG* linelen)
+{
+	ULONG idxOffset;
+
+	if(lineno >= LineCount() || !GetLineFromOffset(m_aLines[lineno], linestart, &idxOffset))
+	{
+		*linelen = 0;
+		return CTextIterator();
+	}
+
+	return CTextIterator(idxOffset, *linelen, this);
 }
 
 HRESULT CTextDocument::Update (VOID)

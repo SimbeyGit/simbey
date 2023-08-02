@@ -2,6 +2,8 @@
 
 #include "Library\DataSequence.h"
 
+class CTextIterator;
+
 class CTextDocument
 {
 private:
@@ -35,8 +37,78 @@ public:
 	bool IsModified (VOID);
 	VOID ResetModifiedSnapshot (VOID);
 
+	inline sysint LineCount (VOID) { return 0 < m_aLines.Length() ? m_aLines.Length() - 1 : 0; }
 	bool GetLineFromOffset (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset);
 	size_w LineLength (sysint cLine);
 
+	CTextIterator IterateLine (ULONG lineno, ULONG* linestart, ULONG* linelen);
+
 	HRESULT Update (VOID);
+};
+
+class CTextIterator
+{
+public:
+	// default constructor sets all members to zero
+	CTextIterator ()
+		: text_doc(NULL), off_bytes(0), len_bytes(0)
+	{
+	}
+
+	CTextIterator (ULONG off, ULONG len, CTextDocument *td)
+		: text_doc(td), off_bytes(off), len_bytes(len)
+	{
+		text_doc->AddRef();
+	}
+
+	~CTextIterator ()
+	{
+		SafeRelease(text_doc);
+	}
+
+	// default copy-constructor
+	CTextIterator (const CTextIterator &ti) 
+		: off_bytes(ti.off_bytes), len_bytes(ti.len_bytes)
+	{
+		SetInterface(text_doc, ti.text_doc);
+	}
+
+	// assignment operator
+	CTextIterator& operator= (CTextIterator &ti)
+	{
+		text_doc  = ti.text_doc;
+		off_bytes = ti.off_bytes;
+		len_bytes = ti.len_bytes;
+		return *this;
+	}
+
+	ULONG gettext (WCHAR* buf, ULONG buflen)
+	{
+		if(text_doc)
+		{
+			// get text from the TextDocument at the specified byte-offset
+			ULONG len = text_doc->m_seq.render(off_bytes, buf, len_bytes, &buflen);
+
+			// adjust the iterator's internal position
+			off_bytes += len;
+			len_bytes -= len;
+
+			return buflen;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	operator bool()
+	{
+		return text_doc ? true : false;
+	}
+
+private:
+	CTextDocument* text_doc;
+
+	ULONG off_bytes;
+	ULONG len_bytes;
 };
