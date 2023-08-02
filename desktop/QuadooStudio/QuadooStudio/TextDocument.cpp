@@ -164,15 +164,15 @@ size_w CTextDocument::LineLength (sysint cLine)
 
 CTextIterator CTextDocument::IterateLine (ULONG lineno, ULONG* linestart, ULONG* linelen)
 {
-	ULONG idxOffset;
-
-	if(lineno >= LineCount() || !GetLineFromOffset(m_aLines[lineno], linestart, &idxOffset))
+	if(static_cast<sysint>(lineno) >= LineCount() || !GetLineFromOffset(m_aLines[lineno], NULL, linestart))
 	{
+		*linestart = 0;
 		*linelen = 0;
 		return CTextIterator();
 	}
 
-	return CTextIterator(idxOffset, *linelen, this);
+	*linelen = LineLength(lineno);
+	return CTextIterator(*linestart, *linelen, this);
 }
 
 HRESULT CTextDocument::Update (VOID)

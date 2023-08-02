@@ -76,7 +76,7 @@ public:
 	// assignment operator
 	CTextIterator& operator= (CTextIterator &ti)
 	{
-		text_doc  = ti.text_doc;
+		ReplaceInterface(text_doc, ti.text_doc);
 		off_bytes = ti.off_bytes;
 		len_bytes = ti.len_bytes;
 		return *this;
