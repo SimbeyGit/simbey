@@ -37,10 +37,11 @@ public:
 	bool IsModified (VOID);
 	VOID ResetModifiedSnapshot (VOID);
 
-	inline sysint LineCount (VOID) { return 0 < m_aLines.Length() ? m_aLines.Length() - 1 : 0; }
+	inline ULONG LineCount (VOID) { return 0 < m_aLines.Length() ? static_cast<ULONG>(m_aLines.Length() - 1) : 0; }
 	bool GetLineFromOffset (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset);
-	size_w LineLength (sysint cLine);
+	size_w LineLength (ULONG cLine);
 
+	CTextIterator Iterate (ULONG offset_chars);
 	CTextIterator IterateLine (ULONG lineno, ULONG* linestart, ULONG* linelen);
 
 	HRESULT Update (VOID);
@@ -55,7 +56,7 @@ public:
 	{
 	}
 
-	CTextIterator (ULONG off, ULONG len, CTextDocument *td)
+	CTextIterator (ULONG off, ULONG len, CTextDocument* td)
 		: text_doc(td), off_bytes(off), len_bytes(len)
 	{
 		text_doc->AddRef();
@@ -67,7 +68,7 @@ public:
 	}
 
 	// default copy-constructor
-	CTextIterator (const CTextIterator &ti) 
+	CTextIterator (const CTextIterator &ti)
 		: off_bytes(ti.off_bytes), len_bytes(ti.len_bytes)
 	{
 		SetInterface(text_doc, ti.text_doc);
@@ -86,12 +87,18 @@ public:
 	{
 		if(text_doc)
 		{
-			// get text from the TextDocument at the specified byte-offset
-			ULONG len = text_doc->m_seq.render(off_bytes, buf, len_bytes, &buflen);
+			if(buflen > len_bytes)
+				buflen = len_bytes;
 
-			// adjust the iterator's internal position
-			off_bytes += len;
-			len_bytes -= len;
+			// get text from the TextDocument at the specified byte-offset
+			if(SUCCEEDED(text_doc->m_seq.render(off_bytes, buf, buflen, &buflen)))
+			{
+				// adjust the iterator's internal position
+				off_bytes += buflen;
+				len_bytes -= buflen;
+			}
+			else
+				buflen = 0;
 
 			return buflen;
 		}

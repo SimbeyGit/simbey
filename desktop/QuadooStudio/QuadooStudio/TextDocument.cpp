@@ -155,11 +155,16 @@ bool CTextDocument::GetLineFromOffset (size_w index, __out ULONG* pnLine, __out 
 	return true;
 }
 
-size_w CTextDocument::LineLength (sysint cLine)
+size_w CTextDocument::LineLength (ULONG cLine)
 {
 	if(cLine < LineCount())
 		return m_aLines[cLine + 1] - m_aLines[cLine];
 	return 0;
+}
+
+CTextIterator CTextDocument::Iterate (ULONG offset_chars)
+{
+	return CTextIterator(offset_chars, m_seq.size() - offset_chars, this);
 }
 
 CTextIterator CTextDocument::IterateLine (ULONG lineno, ULONG* linestart, ULONG* linelen)

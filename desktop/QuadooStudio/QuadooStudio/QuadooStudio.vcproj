@@ -215,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TextEditor.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -262,6 +266,10 @@
 			</File>
 			<File
 				RelativePath=".\TextDocument.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TextEditor.h"
 				>
 			</File>
 		</Filter>

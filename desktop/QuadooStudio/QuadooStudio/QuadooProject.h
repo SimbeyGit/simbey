@@ -1,14 +1,17 @@
 #pragma once
 
 #include <docobj.h>
+#include "Library\Core\Map.h"
 #include "Library\Core\RStrMap.h"
 #include "Library\Core\BaseUnknown.h"
 #include "Library\Window\BaseWindow.h"
-#include "Keywords.h"
+#include "TextEditor.h"
 
 interface IJSONObject;
 
 class CTabs;
+
+struct TVNSYNTAXHIGHLIGHT;
 
 class CProjectFile
 {
@@ -20,28 +23,26 @@ public:
 
 	HTREEITEM m_hItem;
 
-	INT m_cchTabText;
-	PWSTR m_pwzTabText;
+	CTextDocument* m_pTabDocument;
+	TEXT_EDIT_VIEW m_tev;
 
 	bool m_fDefault;
-	bool m_fModified;
 
 public:
 	CProjectFile (RSTRING rstrPath) :
 		m_pwzAbsolutePath(NULL),
 		m_cchAbsolutePath(0),
 		m_hItem(NULL),
-		m_cchTabText(0),
-		m_pwzTabText(NULL),
-		m_fDefault(false),
-		m_fModified(false)
+		m_pTabDocument(NULL),
+		m_fDefault(false)
 	{
 		RStrSet(m_rstrPath, rstrPath);
+		ZeroMemory(&m_tev, sizeof(m_tev));
 	}
 
 	~CProjectFile ()
 	{
-		SafeDeleteArrayCount(m_pwzTabText, m_cchTabText);
+		SafeRelease(m_pTabDocument);
 		SafeDeleteArrayCount(m_pwzAbsolutePath, m_cchAbsolutePath);
 		RStrRelease(m_rstrPath);
 	}
@@ -66,11 +67,8 @@ private:
 	IJSONObject* m_pProject;
 	TRStrMap<CProjectFile*> m_mapFiles;
 
-	HMODULE m_hRichEdit;
-	HWND m_hwndEditor;
-
-	const KEYWORD *keywords;
-	int keyword_count;
+	TNamedMapW<COLORREF> m_mapKeywords;
+	CTextEditor* m_pEditor;
 
 public:
 	IMP_BASE_UNKNOWN
@@ -125,6 +123,9 @@ public:
 	HRESULT AddFile (RSTRING rstrPath, __deref_out CProjectFile** ppFile);
 
 private:
+	VOID ApplySyntaxColoring (TVNSYNTAXHIGHLIGHT* pHighlight);
+	VOID ColorKeyword (TVNSYNTAXHIGHLIGHT* pHighlight, WCHAR wchPrevKeyword, INT idxStart, INT idxEnd);
+
 	HRESULT SaveAll (VOID);
 	HRESULT RunScript (VOID);
 
@@ -143,7 +144,4 @@ private:
 
 	VOID RemoveFilePrompt (CProjectFile* pFile);
 	HRESULT ShowProjectCompiler (VOID);
-
-	HRESULT InitFormatText (VOID);
-	VOID FormatWord (VOID);
 };

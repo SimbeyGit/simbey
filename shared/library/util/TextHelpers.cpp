@@ -81,20 +81,24 @@ namespace Text
 	{
 		static const BYTE bUTF[] = { 0xEF, 0xBB, 0xBF };
 		HRESULT hr;
-		ULONG cb;
-		INT cchUTF8;
 		PSTR pszUTF8 = NULL;
 
-		CheckIf(NULL == pcwzText, E_INVALIDARG);
+		if(0 < cchText)
+		{
+			ULONG cb;
+			INT cchUTF8;
 
-		cchUTF8 = WideCharToMultiByte(CP_UTF8, 0, pcwzText, cchText, NULL, 0, NULL, NULL);
-		CheckIfGetLastError(0 == cchUTF8 && 0 != cchText);
-		pszUTF8 = __new CHAR[cchUTF8 + 1];
-		CheckAlloc(pszUTF8);
-		WideCharToMultiByte(CP_UTF8, 0, pcwzText, cchText, pszUTF8, cchUTF8 + 1, NULL, NULL);
+			CheckIf(NULL == pcwzText, E_INVALIDARG);
 
-		CheckIfGetLastError(!WriteFile(hFile, bUTF, sizeof(bUTF), &cb, NULL));
-		CheckIfGetLastError(!WriteFile(hFile, pszUTF8, cchUTF8, &cb, NULL));
+			cchUTF8 = WideCharToMultiByte(CP_UTF8, 0, pcwzText, cchText, NULL, 0, NULL, NULL);
+			CheckIfGetLastError(0 == cchUTF8 && 0 != cchText);
+			pszUTF8 = __new CHAR[cchUTF8 + 1];
+			CheckAlloc(pszUTF8);
+			WideCharToMultiByte(CP_UTF8, 0, pcwzText, cchText, pszUTF8, cchUTF8 + 1, NULL, NULL);
+
+			CheckIfGetLastError(!WriteFile(hFile, bUTF, sizeof(bUTF), &cb, NULL));
+			CheckIfGetLastError(!WriteFile(hFile, pszUTF8, cchUTF8, &cb, NULL));
+		}
 
 		hr = S_OK;
 

@@ -12,6 +12,7 @@
 #include "Library\MenuUtil.h"
 #include "Library\Window\DialogHost.h"
 #include "Published\JSON.h"
+#include "Keywords.h"
 #include "Tabs.h"
 #include "RunParamsDlg.h"
 #include "ProjectCompilerDlg.h"
@@ -33,14 +34,14 @@ CQuadooProject::CQuadooProject (HINSTANCE hInstance, HWND hwndTree) :
 	m_rstrProjectDir(NULL),
 	m_pProject(NULL),
 	m_hProjectRoot(NULL),
-	m_hRichEdit(NULL),
-	m_hwndEditor(NULL)
+	m_pEditor(NULL)
 {
-	GetKeywords(&keywords, &keyword_count);
 }
 
 CQuadooProject::~CQuadooProject()
 {
+	Assert(NULL == m_pEditor);
+
 	SafeDelete(m_pTabs);
 
 	DestroyIcon(m_hCloseIcon);
@@ -49,9 +50,6 @@ CQuadooProject::~CQuadooProject()
 	SafeRelease(m_pProject);
 	RStrRelease(m_rstrProjectDir);
 	RStrRelease(m_rstrProject);
-
-	if(m_hRichEdit)
-		FreeLibrary(m_hRichEdit);
 }
 
 HRESULT CQuadooProject::Register(HINSTANCE hInstance)
@@ -86,10 +84,12 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	TVINSERTSTRUCT tvis = {0};
 	PCWSTR pcwzLabelPtr = TStrRChr(pcwzProject, L'\\'), pcwzExt;
 	PWSTR pwzJSON = NULL;
-	INT cchJSON;
+	INT cchJSON, cKeywords;
+	const KEYWORD* pcrgKeywords;
 
-	m_hRichEdit = LoadLibrary(L"riched20.dll");
-	CheckIfGetLastError(NULL == m_hRichEdit);
+	GetKeywords(&pcrgKeywords, &cKeywords);
+	for(INT i = 0; i < cKeywords; i++)
+		Check(m_mapKeywords.Add(pcrgKeywords[i].pcwzKeyword, pcrgKeywords[i].crKeyword));
 
 	m_hCloseIcon = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_CLOSE), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
 	m_hDropDown = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_DROP_DOWN), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
@@ -97,6 +97,9 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	m_pTabs = __new CTabs(m_hCloseIcon, m_hDropDown);
 	CheckAlloc(m_pTabs);
 	Check(m_pTabs->LoadMetrics(hwndParent));
+
+	m_pEditor = __new CTextEditor(m_hInstance);
+	CheckAlloc(m_pEditor);
 
 	Check(Create(0, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, c_wzQuadooProjectClass, NULL, rcSite.left, rcSite.top, rcSite.right - rcSite.left, rcSite.bottom - rcSite.top, hwndParent, SW_NORMAL));
 
@@ -150,6 +153,9 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	Check(RStrCreateW(TStrLenAssert(pcwzProject), pcwzProject, &m_rstrProject));
 
 Cleanup:
+	if(FAILED(hr))
+		SafeRelease(m_pEditor);
+
 	SafeDeleteArray(pwzJSON);
 	RStrRelease(rstrPath);
 	RStrRelease(rstrLabel);
@@ -394,6 +400,7 @@ HINSTANCE CQuadooProject::GetInstance (VOID)
 
 VOID CQuadooProject::OnFinalDestroy (HWND hwnd)
 {
+	SafeRelease(m_pEditor);
 }
 
 HRESULT CQuadooProject::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
@@ -401,69 +408,55 @@ HRESULT CQuadooProject::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
 	return __super::FinalizeAndShow(dwStyle, nCmdShow);
 }
 
-
 BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	switch (message)
+	switch(message)
 	{
 	case WM_CREATE:
-		m_hwndEditor = CreateWindowEx(0,
-			RICHEDIT_CLASS, NULL, WS_VISIBLE | WS_CHILD | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE,
-			0, 0, 100, 100, m_hwnd, NULL, m_hInstance, NULL);
-		if(NULL == m_hwndEditor)
 		{
-			lResult = -1;
-			return TRUE;
+			RECT rcSite;
+			if(FAILED(m_pEditor->Initialize(m_hwnd, rcSite, 4)))
+			{
+				lResult = -1;
+				return TRUE;
+			}
 		}
 
-		{
-			CHARFORMAT2 cf;
-			ZeroMemory(&cf, sizeof(cf));
-			cf.cbSize = sizeof(CHARFORMAT2);
-			cf.dwMask = CFM_FACE;
-			TStrCchCpy(cf.szFaceName, ARRAYSIZE(cf.szFaceName), L"Courier New");
-			SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_ALL, (LPARAM)&cf);
-
-			LRESULT lMask = SendMessage(m_hwndEditor, EM_GETEVENTMASK, 0, 0);
-			lMask |= ENM_CLIPFORMAT | ENM_KEYEVENTS;
-			SendMessage(m_hwndEditor, EM_SETEVENTMASK, 0, lMask);
-		}
-
-		EnableWindow(m_hwndEditor, FALSE);
+		m_pEditor->EnableEditor(FALSE);
 		break;
 
 	case WM_PAINT:
-	{
-		RECT rcTabs, rcBody, rc;
-		PAINTSTRUCT ps;
-
-		m_pTabs->GetTabsRect(0, 0, rcTabs);
-
-		GetClientRect(m_hwnd, &rcBody);
-		rcBody.top = rcTabs.bottom;
-
-		HDC hdc = BeginPaint(m_hwnd, &ps);
-
-		if(IntersectRect(&rc, &ps.rcPaint, &rcTabs))
-			m_pTabs->Draw(hdc, 0, 0);
-
-		if(IntersectRect(&rc, &ps.rcPaint, &rcBody))
 		{
-			HBRUSH hbrBody = CreateSolidBrush(RGB(105, 161, 191));
-			FillRect(hdc, &rcBody, hbrBody);
-			DeleteObject(hbrBody);
-		}
+			RECT rcTabs, rcBody, rc;
+			PAINTSTRUCT ps;
 
-		EndPaint(m_hwnd, &ps);
-	}
-	break;
+			m_pTabs->GetTabsRect(0, 0, rcTabs);
+
+			GetClientRect(m_hwnd, &rcBody);
+			rcBody.top = rcTabs.bottom;
+
+			HDC hdc = BeginPaint(m_hwnd, &ps);
+
+			if(IntersectRect(&rc, &ps.rcPaint, &rcTabs))
+				m_pTabs->Draw(hdc, 0, 0);
+
+			if(IntersectRect(&rc, &ps.rcPaint, &rcBody))
+			{
+				HBRUSH hbrBody = CreateSolidBrush(RGB(105, 161, 191));
+				FillRect(hdc, &rcBody, hbrBody);
+				DeleteObject(hbrBody);
+			}
+
+			EndPaint(m_hwnd, &ps);
+		}
+		break;
 
 	case WM_SIZE:
 		m_pTabs->Resize(LOWORD(lParam), HIWORD(lParam));
 
 		{
 			const SIZE* pcszTabs = m_pTabs->GetSize();
-			MoveWindow(m_hwndEditor, 1, pcszTabs->cy, pcszTabs->cx - 2, (HIWORD(lParam) - pcszTabs->cy) - 1, TRUE);
+			m_pEditor->Move(1, pcszTabs->cy, pcszTabs->cx - 2, (HIWORD(lParam) - pcszTabs->cy) - 1, TRUE);
 		}
 		break;
 
@@ -516,43 +509,41 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 
 	case WM_NOTIFY:
 		{
-			MSGFILTER* pMsgFilter = (MSGFILTER *)lParam;
-			if(pMsgFilter->msg == WM_CHAR)
+			NMHDR* pnmhdr = reinterpret_cast<NMHDR*>(lParam);
+			if(TVN_SYNTAX_HIGHLIGHT == pnmhdr->code)
 			{
-				if(SendMessage(m_hwndEditor, EM_GETMODIFY, 0, 0))
-				{
-					FormatWord();
-					sysint idxTab = m_pTabs->GetActiveTab();
-					if(-1 != idxTab)
-					{
-						CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
-						if(!pFile->m_fModified)
-						{
-							RECT rc;
-
-							pFile->m_fModified = true;
-							m_pTabs->HighlightTab(idxTab, true);
-
-							m_pTabs->GetTabsRect(0, 0, rc);
-							InvalidateRect(m_hwnd, &rc, FALSE);
-						}
-					}
-				}
+				TVNSYNTAXHIGHLIGHT* pHighlight = static_cast<TVNSYNTAXHIGHLIGHT*>(pnmhdr);
+				ApplySyntaxColoring(pHighlight);
 			}
-			else if(pMsgFilter->msg == WM_KEYUP)
+		}
+		break;
+
+	case WM_COMMAND:
+		if(EN_UPDATE == HIWORD(wParam))
+		{
+			if(m_pEditor->IsModified())
 			{
-				if((pMsgFilter->wParam == 0x56 && GetAsyncKeyState(VK_CONTROL))
-					|| (pMsgFilter->wParam == VK_INSERT && GetAsyncKeyState(VK_SHIFT)))
+				sysint idxTab = m_pTabs->GetActiveTab();
+				if(-1 != idxTab)
 				{
-					// Reformat the pasted text.
-					InitFormatText();
+					CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
+					RECT rc;
+
+					m_pTabs->HighlightTab(idxTab, true);
+
+					m_pTabs->GetTabsRect(0, 0, rc);
+					InvalidateRect(m_hwnd, &rc, FALSE);
 				}
 			}
 		}
 		break;
 
 	case WM_SETFOCUS:
-		SetFocus(m_hwndEditor);
+		{
+			HWND hwndEditor;
+			if(SUCCEEDED(m_pEditor->GetWindow(&hwndEditor)))
+				SetFocus(hwndEditor);
+		}
 		break;
 	}
 
@@ -594,7 +585,7 @@ HRESULT CQuadooProject::SwitchToFile (CProjectFile* pFile)
 	PostMessage(m_hwnd, WM_SETFOCUS, 0, 0);
 
 Cleanup:
-	EnableWindow(m_hwndEditor, SUCCEEDED(hr));
+	m_pEditor->EnableEditor(SUCCEEDED(hr));
 	if(FAILED(hr) && -1 != idxTab)
 		CloseTab(idxTab);
 
@@ -746,6 +737,92 @@ Cleanup:
 	return hr;
 }
 
+VOID CQuadooProject::ApplySyntaxColoring (TVNSYNTAXHIGHLIGHT* pHighlight)
+{
+	INT cch = pHighlight->nTextLen, idxKeyword = -1;
+	PCWSTR pcwzText = pHighlight->pcwzText;
+	WCHAR wchPrev = L'\0', wchPrevKeyword = L'\0';
+	bool fQuoted = false;
+
+	for(INT i = 0; i < cch; i++)
+	{
+		WCHAR wch = pcwzText[i];
+
+		if(L'"' == wch)
+		{
+			if(fQuoted)
+			{
+				if(L'\\' != wchPrev)
+					fQuoted = false;
+			}
+			else
+			{
+				if(-1 != idxKeyword)
+				{
+					ColorKeyword(pHighlight, wchPrevKeyword, idxKeyword, i);
+					idxKeyword = -1;
+				}
+
+				fQuoted = true;
+			}
+
+			pHighlight->pAttr[i].fg = RGB(80, 0, 0);
+		}
+		else if(fQuoted)
+			pHighlight->pAttr[i].fg = RGB(80, 0, 0);
+		else if((wch >= L'a' && wch <= L'z') || (wch >= L'A' && wch <= L'Z'))
+		{
+			if(-1 == idxKeyword)
+			{
+				idxKeyword = i;
+				wchPrevKeyword = wchPrev;
+			}
+		}
+		else if(idxKeyword != -1)
+		{
+			ColorKeyword(pHighlight, wchPrevKeyword, idxKeyword, i);
+			idxKeyword = -1;
+		}
+		else if(L'/' == wch && L'/' == wchPrev)
+		{
+			for(INT n = i - 1; n < cch; n++)
+			{
+				pHighlight->pAttr[n].fg = RGB(255, 255, 255);
+				pHighlight->pAttr[n].bg = RGB(0, 0, 255);
+			}
+			break;
+		}
+
+		wchPrev = wch;
+	}
+
+	if(-1 != idxKeyword)
+		ColorKeyword(pHighlight, wchPrevKeyword, idxKeyword, cch);
+}
+
+VOID CQuadooProject::ColorKeyword (TVNSYNTAXHIGHLIGHT* pHighlight, WCHAR wchPrevKeyword, INT idxStart, INT idxEnd)
+{
+	if(L'.' != wchPrevKeyword)
+	{
+		WCHAR wzKeyword[64];
+		INT cch = idxEnd - idxStart;
+
+		if(cch < ARRAYSIZE(wzKeyword))
+		{
+			COLORREF cr;
+
+			CopyMemory(wzKeyword, pHighlight->pcwzText + idxStart, cch * sizeof(WCHAR));
+			wzKeyword[cch] = L'\0';
+
+			if(SUCCEEDED(m_mapKeywords.Find(wzKeyword, &cr)))
+			{
+				for(INT i = 0; i < cch; i++)
+					pHighlight->pAttr[idxStart + i].fg = cr;
+			}
+		}
+	}
+}
+
 HRESULT CQuadooProject::SaveAll (VOID)
 {
 	HRESULT hr = S_FALSE;
@@ -756,10 +833,10 @@ HRESULT CQuadooProject::SaveAll (VOID)
 		CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
 		if(idxActive == idxTab)
 		{
-			if(SendMessage(m_hwndEditor, EM_GETMODIFY, 0, 0))
+			if(m_pEditor->IsModified())
 				Check(SaveTab(idxTab));
 		}
-		else if(pFile->m_fModified)
+		else if(pFile->m_pTabDocument->IsModified())
 			Check(SaveTab(idxTab));
 	}
 
@@ -932,17 +1009,11 @@ HRESULT CQuadooProject::SaveTabData (CProjectFile* pFile)
 {
 	HRESULT hr;
 
-	CheckIf(NULL == m_hwndEditor, E_FAIL);
+	Assert(NULL == pFile->m_pTabDocument);
 
-	pFile->m_cchTabText = GetWindowTextLength(m_hwndEditor);
-	if(0 < pFile->m_cchTabText)
-	{
-		pFile->m_pwzTabText = __new WCHAR[pFile->m_cchTabText + 1];
-		CheckAlloc(pFile->m_pwzTabText);
-		GetWindowText(m_hwndEditor, pFile->m_pwzTabText, pFile->m_cchTabText + 1);
-		pFile->m_fModified = FALSE != SendMessage(m_hwndEditor, EM_GETMODIFY, 0, 0);
-	}
-
+	CheckIf(NULL == m_pEditor, E_FAIL);
+	SetInterface(pFile->m_pTabDocument, m_pEditor->GetTextDocument());
+	m_pEditor->GetTextEditView(&pFile->m_tev);
 	hr = S_OK;
 
 Cleanup:
@@ -955,25 +1026,21 @@ HRESULT CQuadooProject::LoadTabData (CProjectFile* pFile)
 	PWSTR pwzText = NULL;
 	INT cchText;
 
-	if(pFile->m_pwzTabText)
+	if(pFile->m_pTabDocument)
 	{
-		pwzText = pFile->m_pwzTabText;
-		cchText = pFile->m_cchTabText;
-
-		pFile->m_pwzTabText = NULL;
-		pFile->m_cchTabText = 0;
+		m_pEditor->SetTextDocument(pFile->m_pTabDocument);
+		m_pEditor->SetTextEditView(&pFile->m_tev);
+		SafeRelease(pFile->m_pTabDocument);
+		hr = S_OK;
 	}
 	else
+	{
 		Check(Text::LoadFromFile(pFile->m_pwzAbsolutePath, &pwzText, &cchText));
-	
-	CheckIfGetLastError(!SetWindowTextW(m_hwndEditor, pwzText));
-	Check(InitFormatText());
-	SendMessage(m_hwndEditor, EM_SETMODIFY, pFile->m_fModified, 0);
-	pFile->m_fModified = false;
-	
+		Check(m_pEditor->Prepare(pwzText, cchText));
+		m_pEditor->ResetTextEditView();
+	}
+
 Cleanup:
-	if(FAILED(hr))
-		SendMessage(m_hwndEditor, EM_SETMODIFY, false, 0);
 	SafeDeleteArrayCount(pwzText, cchText);
 	return hr;
 }
@@ -982,34 +1049,25 @@ HRESULT CQuadooProject::SaveTab (sysint idxTab)
 {
 	HRESULT hr;
 	CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
-	bool fActiveTab = false;
+	CTextDocument* pDocument = pFile->m_pTabDocument;
+	CMemoryStream stmText;
 	RECT rc;
 
 	if(m_pTabs->GetActiveTab() == idxTab)
 	{
-		Assert(NULL == pFile->m_pwzTabText);
-		Check(SaveTabData(pFile));
-		fActiveTab = true;
+		Assert(NULL == pDocument);
+		pDocument = m_pEditor->GetTextDocument();
 	}
 
-	Check(Text::SaveToFile(pFile->m_pwzTabText, pFile->m_cchTabText, pFile->m_pwzAbsolutePath));
-
-	if(fActiveTab)
-	{
-		// Clear the modified flag for the active tab's editor.
-		SendMessage(m_hwndEditor, EM_SETMODIFY, 0, 0);
-	}
+	Check(pDocument->m_seq.StreamOut(&stmText));
+	Check(Text::SaveToFile(stmText.TGetReadPtr<WCHAR>(), stmText.TDataRemaining<WCHAR>(), pFile->m_pwzAbsolutePath));
+	pDocument->ResetModifiedSnapshot();
 
 	Check(m_pTabs->HighlightTab(idxTab, false));
 	m_pTabs->GetTabsRect(0, 0, rc);
 	InvalidateRect(m_hwnd, &rc, FALSE);
 
 Cleanup:
-	if(fActiveTab)
-	{
-		SafeDeleteArrayCount(pFile->m_pwzTabText, pFile->m_cchTabText);
-		pFile->m_fModified = false;
-	}
 	return hr;
 }
 
@@ -1046,15 +1104,15 @@ BOOL CQuadooProject::PromptToSaveTab (sysint idxTab)
 BOOL CQuadooProject::CloseTab (sysint idxTab)
 {
 	sysint idxActive = m_pTabs->GetActiveTab();
-	if(idxActive == idxTab && SendMessage(m_hwndEditor, EM_GETMODIFY, 0, 0))
+	if(idxActive == idxTab)
 	{
-		if(!PromptToSaveTab(idxTab))
+		if(m_pEditor->IsModified() && !PromptToSaveTab(idxTab))
 			return FALSE;
 	}
 	else
 	{
 		CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
-		if(pFile->m_fModified && !PromptToSaveTab(idxTab))
+		if(pFile->m_pTabDocument->IsModified() && !PromptToSaveTab(idxTab))
 			return FALSE;
 	}
 
@@ -1070,8 +1128,9 @@ BOOL CQuadooProject::CloseTab (sysint idxTab)
 
 	if(NULL == pNext || FAILED(SwitchToFile(pNext)))
 	{
-		SetWindowText(m_hwndEditor, L" ");
-		EnableWindow(m_hwndEditor, FALSE);
+		m_pEditor->Prepare(NULL, 0);
+		m_pEditor->ResetTextEditView();
+		m_pEditor->EnableEditor(FALSE);
 	}
 
 	return TRUE;
@@ -1116,131 +1175,4 @@ Cleanup:
 	RStrRelease(rstrTarget);
 	RStrRelease(rstrEngine);
 	return hr;
-}
-
-HRESULT CQuadooProject::InitFormatText (VOID)
-{
-	HRESULT hr;
-	PWSTR pwzText = NULL;
-	INT cchText;
-	CHARRANGE OldRange;
-	CHARFORMAT2 cf;
-	int curPos = 0;
-	int word_end_pos = 1;
-	int addition_pos = 0;
-
-	SendMessage(m_hwndEditor, EM_HIDESELECTION, 1, 0);
-
-	cchText = GetWindowTextLength(m_hwndEditor);
-	pwzText = __new WCHAR[cchText + 1];
-	CheckAlloc(pwzText);
-
-	GetWindowText(m_hwndEditor, pwzText, cchText + 1);
-
-	SendMessage(m_hwndEditor, EM_EXGETSEL, 0, LPARAM(&OldRange));
-
-	cf.cbSize = sizeof(CHARFORMAT2);
-	cf.dwMask = CFM_COLOR;
-	cf.dwEffects = 0;
-
-	while(curPos != -1)
-	{
-		word_end_pos = SendMessage(m_hwndEditor, EM_FINDWORDBREAK, WB_MOVEWORDRIGHT, curPos);
-		if(curPos >= word_end_pos)
-			break;
-		int cchWord = word_end_pos - curPos;
-
-		PCWSTR pcwzWord = pwzText + curPos + addition_pos;
-		for(INT j = cchWord - 1; j >= 0; j--)
-		{
-			if(pcwzWord[j] != L' ')
-			{
-				cchWord = j + 1;
-				break;
-			}
-		}
-		if(cchWord == 1 && (pcwzWord[0] == L'\n' || pcwzWord[0] == L'\r'))
-			addition_pos++;
-		if(cchWord == 1)
-		{
-			curPos = word_end_pos;
-			continue;
-		}
-
-		for(INT i = 0; i < keyword_count; i++)
-		{
-			if(cchWord != keywords[i].cchKeyword)
-				continue;
-			if(0 == TStrCmpNAssert(pcwzWord, keywords[i].pcwzKeyword, cchWord))
-			{
-				CHARRANGE cr2;
-				cr2.cpMin = curPos + 0;
-				cr2.cpMax = curPos + keywords[i].cchKeyword;
-				cf.crTextColor = keywords[i].crKeyword;
-				SendMessage(m_hwndEditor, EM_SETSEL, (WPARAM)curPos, (LPARAM)(curPos + keywords[i].cchKeyword));
-				SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
-				break;
-			}
-		}
-		curPos = word_end_pos;
-	}
-
-	SendMessage(m_hwndEditor, EM_EXSETSEL, 0, LPARAM(&OldRange));
-	cf.crTextColor = RGB(0, 0, 0);
-	SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION, (LPARAM)&cf);
-
-	hr = S_OK;
-
-Cleanup:
-	SendMessage(m_hwndEditor, EM_HIDESELECTION, 0, 0);
-	__delete_array pwzText;
-	return hr;
-}
-
-VOID CQuadooProject::FormatWord (VOID)
-{
-	CHARRANGE cr1;
-	SendMessage(m_hwndEditor, EM_EXGETSEL, 0, (LPARAM)&cr1);
-	int word_start_pos = SendMessage(m_hwndEditor, EM_FINDWORDBREAK, WB_MOVEWORDLEFT, cr1.cpMin);
-
-	CHARFORMAT cf;
-	cf.cbSize = sizeof(CHARFORMAT);
-	cf.dwMask = CFM_COLOR;
-	cf.dwEffects = 0;
-	int i;
-	for(i = 0; i < keyword_count; i++)
-	{
-		FINDTEXTEX ft;
-		CHARRANGE ch;
-		ch.cpMin = word_start_pos;
-		ch.cpMax = cr1.cpMin;
-		ft.chrg = ch;
-		ft.lpstrText = keywords[i].pcwzKeyword;
-		int fIndex = SendMessage(m_hwndEditor, EM_FINDTEXTW, (WPARAM)FR_DOWN | FR_WHOLEWORD, (LPARAM)&ft);
-		if(fIndex >= 0)
-		{
-			CHARRANGE cr2;
-			cr2.cpMin = fIndex;
-			cr2.cpMax = fIndex + keywords[i].cchKeyword;
-			SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
-			cf.crTextColor = keywords[i].crKeyword;
-			SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
-			cr2.cpMin = cr1.cpMin;
-			cr2.cpMax = cr1.cpMin;
-			SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
-			break;
-		}
-	}
-	if(i == keyword_count)
-	{
-		CHARRANGE cr2;
-		cr2.cpMin = word_start_pos;
-		cr2.cpMax = cr1.cpMin;
-		SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
-		cf.crTextColor = RGB(0, 0, 0);
-		SendMessage(m_hwndEditor, EM_SETCHARFORMAT, SCF_SELECTION | SCF_WORD, (LPARAM)&cf);
-		cr2.cpMin = cr1.cpMin;
-		cr2.cpMax = cr1.cpMin;
-		SendMessage(m_hwndEditor, EM_EXSETSEL, 0, (WPARAM)&cr2);
-	}
 }
