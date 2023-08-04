@@ -7,8 +7,8 @@
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
 #include "Library\DPI.h"
+#include "Published\CodeEdit.h"
 #include "Splitter.h"
-#include "TextEditor.h"
 #include "QuadooProject.h"
 #include "QuadooStudio.h"
 
@@ -37,7 +37,7 @@ INT WINAPI wWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	Check(StartCommonControls(ICC_TAB_CLASSES | ICC_TREEVIEW_CLASSES));
 
 	Check(CSplitter::Register(hInstance));
-	Check(CTextEditor::Register(hInstance));
+	Check(CodeEditRegister());
 	Check(CQuadooProject::Register(hInstance));
 	Check(CQuadooStudio::Register(hInstance));
 
@@ -60,7 +60,7 @@ Cleanup:
 
 	CQuadooStudio::Unregister(hInstance);
 	CQuadooProject::Unregister(hInstance);
-	CTextEditor::Unregister(hInstance);
+	CodeEditUnregister();
 	CSplitter::Unregister(hInstance);
 
 	OleUninitialize();

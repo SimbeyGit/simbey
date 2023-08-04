@@ -98,7 +98,7 @@ Cleanup:
 	return hr;
 }
 
-bool CDataSequence::is_prepared ()
+bool CDataSequence::is_prepared () const
 {
 	return 0 != buffer_list.Length();
 }
@@ -1161,7 +1161,7 @@ HRESULT CDataSequence::poke(size_w index, seqchar_t value)
 	return replace(index, &value, 1);
 }
 
-HRESULT CDataSequence::StreamOut (ISequentialStream* pstmData)
+HRESULT CDataSequence::StreamOut (ISequentialStream* pstmData) const
 {
 	HRESULT hr = S_OK;
 	span* sptr;

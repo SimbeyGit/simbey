@@ -5,7 +5,7 @@
 #include "Library\Core\RStrMap.h"
 #include "Library\Core\BaseUnknown.h"
 #include "Library\Window\BaseWindow.h"
-#include "TextEditor.h"
+#include "Published\CodeEdit.h"
 
 interface IJSONObject;
 
@@ -23,7 +23,7 @@ public:
 
 	HTREEITEM m_hItem;
 
-	CTextDocument* m_pTabDocument;
+	ITextDocument* m_pTabDocument;
 	TEXT_EDIT_VIEW m_tev;
 
 	bool m_fDefault;
@@ -68,7 +68,7 @@ private:
 	TRStrMap<CProjectFile*> m_mapFiles;
 
 	TNamedMapW<COLORREF> m_mapKeywords;
-	CTextEditor* m_pEditor;
+	ICodeEditor* m_pEditor;
 
 public:
 	IMP_BASE_UNKNOWN

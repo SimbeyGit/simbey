@@ -64,7 +64,7 @@ public:
 	// prepare from an in-memory buffer
 	//
 	HRESULT		prepare (const seqchar_t* buffer, size_t length);
-	bool		is_prepared ();
+	bool		is_prepared () const;
 
 	//
 	//	sequence statistics
@@ -116,7 +116,7 @@ public:
 	seqchar_t	peek(size_w index) const;
 	HRESULT		poke(size_w index, seqchar_t val);
 
-	HRESULT		StreamOut (ISequentialStream* pstmData);
+	HRESULT		StreamOut (ISequentialStream* pstmData) const;
 
 	seqchar_t	operator[] (size_w index) const;
 	ref			operator[] (size_w index);

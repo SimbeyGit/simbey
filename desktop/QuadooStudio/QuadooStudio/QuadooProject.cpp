@@ -98,9 +98,6 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	CheckAlloc(m_pTabs);
 	Check(m_pTabs->LoadMetrics(hwndParent));
 
-	m_pEditor = __new CTextEditor(m_hInstance);
-	CheckAlloc(m_pEditor);
-
 	Check(Create(0, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, c_wzQuadooProjectClass, NULL, rcSite.left, rcSite.top, rcSite.right - rcSite.left, rcSite.bottom - rcSite.top, hwndParent, SW_NORMAL));
 
 	CheckIf(NULL == pcwzProject, E_UNEXPECTED);
@@ -153,9 +150,6 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	Check(RStrCreateW(TStrLenAssert(pcwzProject), pcwzProject, &m_rstrProject));
 
 Cleanup:
-	if(FAILED(hr))
-		SafeRelease(m_pEditor);
-
 	SafeDeleteArray(pwzJSON);
 	RStrRelease(rstrPath);
 	RStrRelease(rstrLabel);
@@ -415,7 +409,9 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 	case WM_CREATE:
 		{
 			RECT rcSite;
-			if(FAILED(m_pEditor->Initialize(m_hwnd, rcSite, 4)))
+			GetClientRect(m_hwnd, &rcSite);
+
+			if(FAILED(CodeEditCreate(m_hwnd, rcSite, 4, &m_pEditor)))
 			{
 				lResult = -1;
 				return TRUE;
@@ -455,8 +451,10 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		m_pTabs->Resize(LOWORD(lParam), HIWORD(lParam));
 
 		{
+			TStackRef<IBaseWindow> srEditorWin;
+			SideAssertHr(m_pEditor->QueryInterface(&srEditorWin));
 			const SIZE* pcszTabs = m_pTabs->GetSize();
-			m_pEditor->Move(1, pcszTabs->cy, pcszTabs->cx - 2, (HIWORD(lParam) - pcszTabs->cy) - 1, TRUE);
+			srEditorWin->Move(1, pcszTabs->cy, pcszTabs->cx - 2, (HIWORD(lParam) - pcszTabs->cy) - 1, TRUE);
 		}
 		break;
 
@@ -539,11 +537,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		break;
 
 	case WM_SETFOCUS:
-		{
-			HWND hwndEditor;
-			if(SUCCEEDED(m_pEditor->GetWindow(&hwndEditor)))
-				SetFocus(hwndEditor);
-		}
+		m_pEditor->SetFocus();
 		break;
 	}
 
@@ -1049,7 +1043,7 @@ HRESULT CQuadooProject::SaveTab (sysint idxTab)
 {
 	HRESULT hr;
 	CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
-	CTextDocument* pDocument = pFile->m_pTabDocument;
+	ITextDocument* pDocument = pFile->m_pTabDocument;
 	CMemoryStream stmText;
 	RECT rc;
 
@@ -1059,7 +1053,7 @@ HRESULT CQuadooProject::SaveTab (sysint idxTab)
 		pDocument = m_pEditor->GetTextDocument();
 	}
 
-	Check(pDocument->m_seq.StreamOut(&stmText));
+	Check(pDocument->StreamOut(&stmText));
 	Check(Text::SaveToFile(stmText.TGetReadPtr<WCHAR>(), stmText.TDataRemaining<WCHAR>(), pFile->m_pwzAbsolutePath));
 	pDocument->ResetModifiedSnapshot();
 

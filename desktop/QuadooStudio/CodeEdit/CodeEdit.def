@@ -1,0 +1,8 @@
+LIBRARY	"CodeEdit"
+
+DESCRIPTION	'Code/Text Editor'
+
+EXPORTS
+			CodeEditRegister		@1
+			CodeEditUnregister		@2
+			CodeEditCreate			@3

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="QuadooStudio"
-	ProjectGUID="{CD09641A-6701-4E62-B623-A43C3E8DC3EB}"
-	RootNamespace="QuadooStudio"
+	Name="CodeEdit"
+	ProjectGUID="{1A53C986-8D6D-4B6E-B0C6-62C525254096}"
+	RootNamespace="CodeEdit"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -20,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="..\..\..\target\$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\JSON;..\..\..\platform\QuadooScript;..\CodeEdit"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;USE_SIMBEY_CORE_API_REDIRECT"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CODEEDIT_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -62,11 +62,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib"
+				AdditionalDependencies="SimbeyCore.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\target\lib\debug"
+				ModuleDefinitionFile="CodeEdit.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				ImportLibrary="..\..\..\target\lib\$(ConfigurationName)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -95,7 +97,7 @@
 			Name="Release|Win32"
 			OutputDirectory="..\..\..\target\$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -118,8 +120,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\JSON;..\..\..\platform\QuadooScript;..\CodeEdit"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;USE_SIMBEY_CORE_API_REDIRECT"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CODEEDIT_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -138,13 +140,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib"
+				AdditionalDependencies="SimbeyCore.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\target\lib\release"
+				ModuleDefinitionFile="CodeEdit.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				ImportLibrary="..\..\..\target\lib\$(ConfigurationName)\$(ProjectName).lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -179,39 +183,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Keywords.cpp"
+				RelativePath=".\CodeEdit.def"
 				>
 			</File>
 			<File
-				RelativePath=".\NewProjectDlg.cpp"
+				RelativePath=".\CodeEditMain.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ProjectCompilerDlg.cpp"
+				RelativePath=".\TextDocument.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\QuadooProject.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\QuadooStudio.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RunParamsDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Splitter.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Tabs.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\WinMain.cpp"
+				RelativePath=".\TextEditor.cpp"
 				>
 			</File>
 		</Filter>
@@ -221,39 +205,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Keywords.h"
+				RelativePath=".\TextDocument.h"
 				>
 			</File>
 			<File
-				RelativePath=".\NewProjectDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ProjectCompilerDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\QuadooProject.h"
-				>
-			</File>
-			<File
-				RelativePath=".\QuadooStudio.h"
-				>
-			</File>
-			<File
-				RelativePath=".\resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RunParamsDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Splitter.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Tabs.h"
+				RelativePath=".\TextEditor.h"
 				>
 			</File>
 		</Filter>
@@ -262,36 +218,40 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="Published"
+			>
 			<File
-				RelativePath=".\Close.ico"
+				RelativePath=".\Published\CodeEdit.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ClosedFolder.ico"
+				RelativePath=".\Published\UspAttr.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="UspLib"
+			>
+			<File
+				RelativePath=".\UspLib\UspCtrl.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\DropDown.ico"
+				RelativePath=".\UspLib\UspLib.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\main.ico"
+				RelativePath=".\UspLib\usplib.h"
 				>
 			</File>
 			<File
-				RelativePath=".\OpenFolder.ico"
+				RelativePath=".\UspLib\UspMouse.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\QuadooFile.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\QuadooStudio.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\Splitter.bmp"
+				RelativePath=".\UspLib\UspPaint.cpp"
 				>
 			</File>
 		</Filter>
@@ -299,35 +259,11 @@
 			Name="Library"
 			>
 			<File
-				RelativePath="..\..\..\shared\library\ChooseFile.cpp"
+				RelativePath="..\..\..\shared\library\DataSequence.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\shared\library\ChooseFile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\shared\library\DPI.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\shared\library\DPI.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\shared\library\MenuUtil.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\shared\library\MenuUtil.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\shared\library\Sorting.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\shared\library\Sorting.h"
+				RelativePath="..\..\..\shared\library\DataSequence.h"
 				>
 			</File>
 			<Filter
@@ -403,6 +339,18 @@
 				</File>
 			</Filter>
 			<Filter
+				Name="Util"
+				>
+				<File
+					RelativePath="..\..\..\shared\library\util\Formatting.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\util\Formatting.h"
+					>
+				</File>
+			</Filter>
+			<Filter
 				Name="Window"
 				>
 				<File
@@ -431,46 +379,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\shared\library\window\IBaseWindow.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Util"
-				>
-				<File
-					RelativePath="..\..\..\shared\library\util\Formatting.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\Formatting.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\Registry.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\Registry.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\RString.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\Shell.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\Shell.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\TextHelpers.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\TextHelpers.h"
 					>
 				</File>
 			</Filter>
