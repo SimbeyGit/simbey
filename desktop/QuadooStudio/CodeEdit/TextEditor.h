@@ -193,7 +193,7 @@ private:
 	void UpdateLine (ULONG nLineNo);
 
 	VOID FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrlDown, BOOL fAdvancing);
-	BOOL MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* pnFileOffset, int* psnappedX);
+	VOID MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* pnFileOffset, int* psnappedX);
 	HMENU CreateContextMenu (VOID);
 
 	VOID MoveWordPrev ();

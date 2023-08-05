@@ -34,7 +34,7 @@
 #define TXC_DISABLED			14			// disabled window background
 #define TXC_MAX_COLORS			15			// keep this updated!
 
-	//
+//
 //	Text Editor Notification Messages defined here - 
 //	sent via the WM_NOTIFY message
 //
@@ -86,6 +86,12 @@ struct TVNSYNTAXHIGHLIGHT : NMHDR
 struct TVNMCONTEXTMENU : NMHDR
 {
 	HMENU	hMenu;
+	POINT	ptClient;
+	ULONG	nLine;
+	ULONG	nOffset;
+	INT		xCaretPos;
+	ULONG	nWordOffset;
+	PCWSTR	pcwzWord;
 };
 
 //

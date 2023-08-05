@@ -1568,7 +1568,7 @@ VOID CTextEditor::FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrl
 	NotifyParent(TVN_CURSOR_CHANGE);
 }
 
-BOOL CTextEditor::MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* pnFileOffset, int* psnappedX)
+VOID CTextEditor::MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* pnFileOffset, int* psnappedX)
 {
 	ULONG nLineNo;
 	ULONG off_chars, cchLine;
@@ -1612,8 +1612,6 @@ BOOL CTextEditor::MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* p
 	*pnFileOffset	= cp + off_chars;
 	*psnappedX		= mx;// - m_nHScrollPos * m_nFontWidth;
 	//*psnappedX		+= LeftMarginWidth();
-
-	return 0;
 }
 
 HMENU CTextEditor::CreateContextMenu (VOID)
@@ -2245,9 +2243,52 @@ LRESULT CTextEditor::OnContextMenu (HWND wParam, int x, int y)
 	cm.hMenu = CreateContextMenu();
 	if(cm.hMenu)
 	{
+		USPCACHE*			uspCache;
+		CSCRIPT_LOGATTR*	logAttr;
+		ULONG				lineOffset;
+
+		cm.ptClient.x = x;
+		cm.ptClient.y = y;
+		cm.pcwzWord = NULL;
+		cm.nWordOffset = (ULONG)-1;
+		ScreenToClient(m_hwnd, &cm.ptClient);
+		MouseCoordToFilePos(cm.ptClient.x, cm.ptClient.y, &cm.nLine, &cm.nOffset, &cm.xCaretPos);
+
+		// get Uniscribe data for current line
+		if(GetLogAttr(cm.nLine, &uspCache, &logAttr, &lineOffset))
+		{
+			ULONG nStart = cm.nOffset, nEnd = cm.nOffset;
+			ULONG nLineEnd = m_pTextDoc->LineOffset(cm.nLine + 1), cch;
+
+			while(nStart > lineOffset && !logAttr[nStart - lineOffset].fWordStop && !logAttr[nStart - lineOffset].fWhiteSpace)
+				nStart--;
+			while(nEnd < nLineEnd && !logAttr[nEnd - lineOffset].fWordStop && !logAttr[nEnd - lineOffset].fWhiteSpace)
+				nEnd++;
+
+			if(nStart < nEnd && logAttr[nStart - lineOffset].fWhiteSpace)
+				nStart++;
+
+			cch = nEnd - nStart;
+			if(0 < cch)
+			{
+				cm.pcwzWord = __new WCHAR[cch + 1];
+				if(cm.pcwzWord)
+				{
+					size_w cchCopied = 0;
+					m_pTextDoc->Render(nStart, const_cast<PWSTR>(cm.pcwzWord), cch, &cchCopied);
+					const_cast<PWSTR>(cm.pcwzWord)[cchCopied] = L'\0';
+
+					cm.nWordOffset = nStart;
+				}
+			}
+		}
+
 		NotifyParent(TVN_INIT_CONTEXT_MENU, &cm);
 		TrackPopupMenu(cm.hMenu, 0, x, y, 0, m_hwnd, NULL);
 		DestroyMenu(cm.hMenu);
+
+		if(cm.pcwzWord)
+			__delete_array const_cast<PWSTR>(cm.pcwzWord);
 	}
 	return 0;
 }

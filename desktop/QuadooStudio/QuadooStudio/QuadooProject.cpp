@@ -508,10 +508,41 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 	case WM_NOTIFY:
 		{
 			NMHDR* pnmhdr = reinterpret_cast<NMHDR*>(lParam);
-			if(TVN_SYNTAX_HIGHLIGHT == pnmhdr->code)
+
+			switch(pnmhdr->code)
 			{
-				TVNSYNTAXHIGHLIGHT* pHighlight = static_cast<TVNSYNTAXHIGHLIGHT*>(pnmhdr);
-				ApplySyntaxColoring(pHighlight);
+			case TVN_SYNTAX_HIGHLIGHT:
+				{
+					TVNSYNTAXHIGHLIGHT* pHighlight = static_cast<TVNSYNTAXHIGHLIGHT*>(pnmhdr);
+					ApplySyntaxColoring(pHighlight);
+				}
+				break;
+			case TVN_INIT_CONTEXT_MENU:
+				{
+					TVNMCONTEXTMENU* pContext = static_cast<TVNMCONTEXTMENU*>(pnmhdr);
+					PCWSTR pcwzWord = pContext->pcwzWord;
+					if(pcwzWord)
+					{
+						WCHAR wzFind[200];
+						if(SUCCEEDED(Formatting::TPrintF(wzFind, ARRAYSIZE(wzFind), NULL, L"Find %ls...", pcwzWord)))
+						{
+							HMENU hMenu = pContext->hMenu;
+							MENUITEMINFO mii = {0};
+
+							mii.cbSize = sizeof(mii);
+
+							mii.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
+							mii.wID = 1;
+							mii.dwTypeData = wzFind;
+							InsertMenuItem(hMenu, 0, TRUE, &mii);
+
+							mii.fMask = MIIM_FTYPE;
+							mii.fType = MFT_MENUBARBREAK;
+							InsertMenuItem(hMenu, 1, TRUE, &mii);
+						}
+					}
+				}
+				break;
 			}
 		}
 		break;
