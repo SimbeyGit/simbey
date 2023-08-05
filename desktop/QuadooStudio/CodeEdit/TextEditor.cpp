@@ -5,6 +5,7 @@
 //
 
 #include <windows.h>
+#include <afxres.h>	// If you don't have MFC installed, there is a copy of this file in the "shared" folder
 #include "RichEdit.h"
 #include "Library\Core\CoreDefs.h"
 #include "Library\Util\Formatting.h"
@@ -470,6 +471,40 @@ BOOL CTextEditor::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 			return TRUE;
 		}
 		break;
+
+	case WM_CONTEXTMENU:
+		lResult = OnContextMenu((HWND)wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return TRUE;
+
+	case WM_COMMAND:
+		switch(LOWORD(wParam))
+		{
+		case ID_EDIT_UNDO:
+			lResult = Undo();
+			break;
+		case ID_EDIT_REDO:
+			lResult = Redo();
+			break;
+		case ID_EDIT_CUT:
+			lResult = OnCut();
+			break;
+		case ID_EDIT_COPY:
+			lResult = OnCopy();
+			break;
+		case ID_EDIT_PASTE:
+			lResult = OnPaste();
+			break;
+		case ID_EDIT_CLEAR:
+			lResult = OnClear();
+			break;
+		case ID_EDIT_SELECT_ALL:
+			lResult = SelectAll();
+			break;
+		default:
+			lResult = SendMessage(GetParent(m_hwnd), WM_COMMAND, wParam, lParam);
+			break;
+		}
+		return TRUE;
 	}
 
 	return FALSE;
@@ -1581,6 +1616,34 @@ BOOL CTextEditor::MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* p
 	return 0;
 }
 
+HMENU CTextEditor::CreateContextMenu (VOID)
+{
+	HMENU hMenu = CreatePopupMenu();
+
+	// do we have a selection?
+	UINT fSelection = (m_nSelectionStart == m_nSelectionEnd) ?
+		MF_DISABLED| MF_GRAYED : MF_ENABLED;
+
+	// is there text on the clipboard?
+	UINT fClipboard = (IsClipboardFormatAvailable(CF_TEXT) || IsClipboardFormatAvailable(CF_UNICODETEXT)) ?
+		MF_ENABLED : MF_GRAYED | MF_DISABLED;
+
+	UINT fCanUndo = CanUndo() ? MF_ENABLED : MF_GRAYED | MF_DISABLED;
+	UINT fCanRedo = CanRedo() ? MF_ENABLED : MF_GRAYED | MF_DISABLED;
+
+	AppendMenu(hMenu, MF_STRING|fCanUndo,				ID_EDIT_UNDO,		L"&Undo");
+	AppendMenu(hMenu, MF_STRING|fCanRedo,				ID_EDIT_REDO,		L"&Redo");
+	AppendMenu(hMenu, MF_SEPARATOR,						0, 0);
+	AppendMenu(hMenu, MF_STRING|fSelection,				ID_EDIT_CUT,		L"Cu&t");
+	AppendMenu(hMenu, MF_STRING|fSelection,				ID_EDIT_COPY,		L"&Copy");
+	AppendMenu(hMenu, MF_STRING|fClipboard,				ID_EDIT_PASTE,		L"&Paste");
+	AppendMenu(hMenu, MF_STRING|fSelection,				ID_EDIT_CLEAR,		L"&Delete");
+	AppendMenu(hMenu, MF_SEPARATOR,						0, 0);
+	AppendMenu(hMenu, MF_STRING|MF_ENABLED,				ID_EDIT_SELECT_ALL,	L"&Select All");
+
+	return hMenu;
+}
+
 VOID CTextEditor::MoveWordPrev ()
 {
 	USPCACHE		* uspCache;
@@ -2176,6 +2239,19 @@ LRESULT CTextEditor::OnMouseActivate (HWND hwndTop, UINT nHitTest, UINT nMessage
 	return MA_ACTIVATE;
 }
 
+LRESULT CTextEditor::OnContextMenu (HWND wParam, int x, int y)
+{
+	TVNMCONTEXTMENU cm;
+	cm.hMenu = CreateContextMenu();
+	if(cm.hMenu)
+	{
+		NotifyParent(TVN_INIT_CONTEXT_MENU, &cm);
+		TrackPopupMenu(cm.hMenu, 0, x, y, 0, m_hwnd, NULL);
+		DestroyMenu(cm.hMenu);
+	}
+	return 0;
+}
+
 LRESULT CTextEditor::OnMouseWheel (int nDelta)
 {
 #ifndef	SPI_GETWHEELSCROLLLINES	
@@ -2326,8 +2402,12 @@ LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
 	{
 		nLineNo = (my / m_nLineHeight) + m_nVScrollPos;
 
-		TVNMARGINCLICK mc = { { 0 }, nLineNo, mx, xMargin, FALSE };
-		NotifyParent(TVN_MARGIN_CLICK, (NMHDR *)&mc);
+		TVNMARGINCLICK mc;
+		mc.nLineNo = nLineNo;
+		mc.xClick = mx;
+		mc.xMargin = xMargin;
+		mc.fHandled = FALSE;
+		NotifyParent(TVN_MARGIN_CLICK, &mc);
 
 		// If the parent handled the click, then just return now.
 		if(mc.fHandled)
@@ -2366,8 +2446,11 @@ LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
 
 	SetCapture(m_hwnd);
 
-	TVNCURSORINFO ci = { { 0 }, nLineNo, 0, m_nCursorOffset };
-	NotifyParent(TVN_CURSOR_CHANGE, (NMHDR *)&ci);
+	TVNCURSORINFO ci;
+	ci.nLineNo = nLineNo;
+	ci.nColumnNo = 0;
+	ci.nOffset = m_nCursorOffset;
+	NotifyParent(TVN_CURSOR_CHANGE, &ci);
 	return 0;
 }
 
@@ -2458,7 +2541,6 @@ LRESULT CTextEditor::OnMouseMove (UINT nFlags, int mx, int my)
 
 		m_cpBlockEnd.line = nLineNo;
 		m_cpBlockEnd.xpos = mx + m_nHScrollPos * m_nFontWidth - LeftMarginWidth();//m_nCaretPosX;
-
 
 		// redraw the old and new lines if they are different
 		UpdateLine(nLineNo);

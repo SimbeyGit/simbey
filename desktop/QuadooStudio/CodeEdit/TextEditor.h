@@ -194,6 +194,7 @@ private:
 
 	VOID FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrlDown, BOOL fAdvancing);
 	BOOL MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* pnFileOffset, int* psnappedX);
+	HMENU CreateContextMenu (VOID);
 
 	VOID MoveWordPrev ();
 	VOID MoveWordNext ();
@@ -223,6 +224,7 @@ private:
 	LRESULT OnVScroll (UINT nSBCode, UINT nPos);
 	LRESULT OnHScroll (UINT nSBCode, UINT nPos);
 	LRESULT OnMouseActivate (HWND hwndTop, UINT nHitTest, UINT nMessage);
+	LRESULT OnContextMenu (HWND wParam, int x, int y);
 	LRESULT OnMouseWheel (int nDelta);
 	LRESULT OnTimer (UINT_PTR nTimer);
 	LRESULT OnLButtonDown (UINT nFlags, int mx, int my);
