@@ -70,6 +70,8 @@ private:
 	TNamedMapW<COLORREF> m_mapKeywords;
 	ICodeEditor* m_pEditor;
 
+	WCHAR m_wzFindSymbol[200];	// Used when finding symbols using the context menu
+
 public:
 	IMP_BASE_UNKNOWN
 
@@ -123,6 +125,9 @@ public:
 	HRESULT AddFile (RSTRING rstrPath, __deref_out CProjectFile** ppFile);
 
 private:
+	HRESULT ExtractFindSymbol (PCWSTR pcwzWord, INT idxWordPtr);
+	HRESULT FindSymbol (VOID);
+
 	VOID ApplySyntaxColoring (TVNSYNTAXHIGHLIGHT* pHighlight);
 	VOID ColorKeyword (TVNSYNTAXHIGHLIGHT* pHighlight, WCHAR wchPrevKeyword, INT idxStart, INT idxEnd);
 

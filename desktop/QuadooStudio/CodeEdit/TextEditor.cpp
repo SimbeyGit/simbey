@@ -580,6 +580,12 @@ BOOL CTextEditor::SelectAll (VOID)
 	return m_nSelectionEnd > m_nSelectionStart;
 }
 
+VOID CTextEditor::ScrollView (INT xCaret, ULONG nLine)
+{
+	m_nCursorOffset = m_pTextDoc->LineOffset(nLine) + xCaret;
+	UpdateView(false);
+}
+
 BOOL CTextEditor::ForwardDelete (VOID)
 {
 	ULONG selstart = min(m_nSelectionStart, m_nSelectionEnd);

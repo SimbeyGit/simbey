@@ -36,7 +36,15 @@ interface __declspec(uuid("BE60854D-DAE9-4d51-BB6C-392FE4A15C41")) IQuadooDebugT
 	virtual STDMETHODIMP EnumVariables (RSTRING rstrFileW, INT nLineNumber, IQuadooEnumVariables* pEnum) = 0;
 };
 
+interface __declspec(uuid("8385B200-0BB2-4f27-A749-8BDE81807BBA")) IQuadooDefinitions : IUnknown
+{
+	virtual STDMETHODIMP_(DWORD) Count (VOID) = 0;
+	virtual STDMETHODIMP GetDefinition (DWORD idxDef, __out RSTRING* prstrFile, __out INT* pnLine, __out PCWSTR* ppcwzToken) = 0;
+};
+
 HRESULT WINAPI QuadooParseToStream (PCWSTR pcwzFile, DWORD dwFlags, __out ISequentialStream* pstmBinaryScript, __out_opt ISequentialStream* pstmDebug, IQuadooCompilerStatus* pStatus, __deref_opt_out IQuadooDebugTree** ppDebugTree = NULL);
 HRESULT WINAPI QuadooParseTextToStream (PCWSTR pcwzFileTag, INT cchFileTag, PCWSTR pcwzText, INT cchText, DWORD dwFlags, __out ISequentialStream* pstmBinaryScript, __out_opt ISequentialStream* pstmDebug, IQuadooCompilerStatus* pStatus, __deref_opt_out IQuadooDebugTree** ppDebugTree = NULL);
 HRESULT WINAPI QuadooAllocStream (__deref_out ISequentialStream** ppStream);
 DWORD WINAPI QuadooStreamDataSize (ISequentialStream* pStream);
+
+HRESULT WINAPI QuadooFindDefinitions (PCWSTR pcwzFile, PCWSTR pcwzDef, __deref_out IQuadooDefinitions** ppDefs);

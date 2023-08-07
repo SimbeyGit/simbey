@@ -136,6 +136,8 @@ public:
 	virtual ULONG SelectionSize (VOID);
 	virtual BOOL SelectAll (VOID);
 
+	virtual VOID ScrollView (INT xCaret, ULONG nLine);
+
 	// CBaseWindow
 	virtual HINSTANCE GetInstance (VOID);
 	virtual VOID OnFinalDestroy (HWND hwnd);

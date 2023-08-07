@@ -16,6 +16,7 @@
 #include "Tabs.h"
 #include "RunParamsDlg.h"
 #include "ProjectCompilerDlg.h"
+#include "GotoDefinitionDlg.h"
 #include "QuadooProject.h"
 
 #ifndef ENM_CLIPFORMAT
@@ -521,10 +522,10 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 				{
 					TVNMCONTEXTMENU* pContext = static_cast<TVNMCONTEXTMENU*>(pnmhdr);
 					PCWSTR pcwzWord = pContext->pcwzWord;
-					if(pcwzWord)
+					if(pcwzWord && SUCCEEDED(ExtractFindSymbol(pcwzWord, pContext->nOffset - pContext->nWordOffset)))
 					{
-						WCHAR wzFind[200];
-						if(SUCCEEDED(Formatting::TPrintF(wzFind, ARRAYSIZE(wzFind), NULL, L"Find %ls...", pcwzWord)))
+						WCHAR wzCmd[200];
+						if(SUCCEEDED(Formatting::TPrintF(wzCmd, ARRAYSIZE(wzCmd), NULL, L"Find %ls...", m_wzFindSymbol)))
 						{
 							HMENU hMenu = pContext->hMenu;
 							MENUITEMINFO mii = {0};
@@ -532,8 +533,8 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 							mii.cbSize = sizeof(mii);
 
 							mii.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
-							mii.wID = 1;
-							mii.dwTypeData = wzFind;
+							mii.wID = ID_FIND_SYMBOL;
+							mii.dwTypeData = wzCmd;
 							InsertMenuItem(hMenu, 0, TRUE, &mii);
 
 							mii.fMask = MIIM_FTYPE;
@@ -565,6 +566,8 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 				}
 			}
 		}
+		else if(0 == HIWORD(wParam) && ID_FIND_SYMBOL == LOWORD(wParam))
+			FindSymbol();
 		break;
 
 	case WM_SETFOCUS:
@@ -759,6 +762,92 @@ HRESULT CQuadooProject::AddFile (RSTRING rstrPath, __deref_out CProjectFile** pp
 
 Cleanup:
 	SafeDelete(pFile);
+	return hr;
+}
+
+HRESULT CQuadooProject::ExtractFindSymbol (PCWSTR pcwzWord, INT idxWordPtr)
+{
+	HRESULT hr;
+	PCWSTR pcwzPtrA = TStrCchRChr(pcwzWord, idxWordPtr, L'(');
+	PCWSTR pcwzPtrB = TStrCchRChr(pcwzWord, idxWordPtr, L')');
+	PCWSTR pcwzPtr = (pcwzPtrA > pcwzPtrB) ? pcwzPtrA : pcwzPtrB;
+	if(pcwzPtr)
+	{
+		idxWordPtr -= static_cast<INT>((pcwzPtr + 1) - pcwzWord);
+		pcwzWord = pcwzPtr + 1;
+	}
+
+	while(Formatting::IsSpace(*pcwzWord) || L'[' == *pcwzWord || L'.' == *pcwzWord)
+	{
+		pcwzWord++;
+		idxWordPtr--;
+	}
+
+	pcwzPtr = TFindEnd(pcwzWord + idxWordPtr, L"]().,;");
+	if(pcwzPtr)
+		hr = TStrCchCpyN(m_wzFindSymbol, ARRAYSIZE(m_wzFindSymbol), pcwzWord, static_cast<INT>(pcwzPtr - pcwzWord));
+	else
+		hr = TStrCchCpy(m_wzFindSymbol, ARRAYSIZE(m_wzFindSymbol), pcwzWord);
+
+	return hr;
+}
+
+HRESULT CQuadooProject::FindSymbol (VOID)
+{
+	HRESULT hr;
+	TStackRef<IQuadooDefinitions> srDefs;
+	sysint idxActive = m_pTabs->GetActiveTab();
+	RSTRING rstrFile = NULL;
+
+	PCWSTR pcwzFind = TStrRChr(m_wzFindSymbol, L'.');
+	if(pcwzFind)
+		pcwzFind++;
+	else
+		pcwzFind = m_wzFindSymbol;
+
+	CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxActive);
+
+	Check(QuadooFindDefinitions(pFile->m_pwzAbsolutePath, pcwzFind, &srDefs));
+
+	if(0 < srDefs->Count())
+	{
+		CGotoDefinitionDlg dlgGotoDef(srDefs);
+
+		if(1 < srDefs->Count())
+		{
+			CDialogHost dlgHost(m_hInstance);
+
+			Check(dlgHost.Display(m_hwnd, &dlgGotoDef));
+			CheckIfIgnore(IDCANCEL == dlgHost.GetReturnValue(), E_ABORT);
+		}
+
+		INT nLine;
+		PCWSTR pcwzToken;
+
+		Check(srDefs->GetDefinition(dlgGotoDef.GetSelectedDef(), &rstrFile, &nLine, &pcwzToken));
+		if(0 != TStrCmpIAssert(pFile->m_pwzAbsolutePath, RStrToWide(rstrFile)))
+		{
+			pFile = NULL;
+
+			for(sysint i = 0; i < m_mapFiles.Length(); i++)
+			{
+				CProjectFile* pProjectFile = *m_mapFiles.GetValuePtr(i);
+				if(0 == TStrCmpIAssert(pProjectFile->m_pwzAbsolutePath, RStrToWide(rstrFile)))
+				{
+					pFile = pProjectFile;
+					break;
+				}
+			}
+
+			CheckIf(NULL == pFile, HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND));
+			SwitchToFile(pFile);
+		}
+
+		m_pEditor->ScrollView(0, nLine - 1);
+	}
+
+Cleanup:
+	RStrRelease(rstrFile);
 	return hr;
 }
 

@@ -15,6 +15,7 @@
 #define IDD_RUN_PARAMS                  111
 #define IDR_ACCELERATOR                 112
 #define IDD_COMPILE_TO_EXE              113
+#define IDD_GOTO_DEFINITION             114
 #define IDC_PROJECT_FILES               1001
 #define IDC_QVM                         1002
 #define IDC_WQVM                        1003
@@ -28,6 +29,7 @@
 #define IDC_BINARY_TEMPLATE             1011
 #define IDC_SELECT_ICON                 1012
 #define IDC_CLEAR_ICON                  1013
+#define IDC_DEFINITIONS                 1014
 #define ID_FILE_EXIT                    40001
 #define ID_FILE_NEW_PROJECT             40003
 #define ID_PROJECT_ADDFILE              40004
@@ -40,14 +42,15 @@
 #define ID_PROJECT_RUNPARAMETERS        40011
 #define ID_RUN_SCRIPT                   40012
 #define ID_PROJECT_COMPILE              40013
+#define ID_FIND_SYMBOL                  40014
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        114
-#define _APS_NEXT_COMMAND_VALUE         40014
-#define _APS_NEXT_CONTROL_VALUE         1014
+#define _APS_NEXT_RESOURCE_VALUE        115
+#define _APS_NEXT_COMMAND_VALUE         40015
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

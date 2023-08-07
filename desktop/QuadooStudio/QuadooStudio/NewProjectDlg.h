@@ -2,6 +2,7 @@
 
 #include "Library\Window\BaseDialog.h"
 #include "Library\ChooseFile.h"
+#include "Published\QuadooParser.h"
 
 class CNewProjectDlg :
 	public CBaseDialog
