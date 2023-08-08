@@ -262,7 +262,7 @@ HRESULT CQuadooStudio::OpenProject (PCWSTR pcwzProject)
 	GetClientRect(m_hwnd, &rcSite);
 	rcSite.left += GetTreeWidth() + m_pSplitter->GetWidth();
 
-	pProject = __new CQuadooProject(m_hInstance, m_hwndTree);
+	pProject = __new CQuadooProject(m_hInstance, &m_dm, m_hwndTree);
 	CheckAlloc(pProject);
 	Check(pProject->Initialize(m_hwnd, rcSite, pcwzProject));
 
@@ -306,6 +306,20 @@ Cleanup:
 	RStrRelease(rstrTitle);
 	RStrRelease(rstrLabel);
 	return hr;
+}
+
+VOID CQuadooStudio::UpdateColorScheme (VOID)
+{
+	m_dm.Update();
+	m_dm.StylizeTitleBar(m_hwnd);
+
+	if(m_dm.IsDarkMode())
+		TreeView_SetBkColor(m_hwndTree, RGB(40, 40, 40));
+	else
+		TreeView_SetBkColor(m_hwndTree, (COLORREF)-1);
+
+	if(m_pProject)
+		m_pProject->UpdateColorScheme();
 }
 
 // CBaseWindow
@@ -400,6 +414,31 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 
 				switch(pnmh->code)
 				{
+				case NM_CUSTOMDRAW:
+					if(m_dm.IsDarkMode())
+					{
+						LPNMTVCUSTOMDRAW pCustomDraw = (LPNMTVCUSTOMDRAW)lParam;
+						switch(pCustomDraw->nmcd.dwDrawStage)
+						{
+						case CDDS_PREPAINT:
+							lResult = CDRF_NOTIFYITEMDRAW;
+							return TRUE;
+						case CDDS_ITEMPREPAINT:
+							if(pCustomDraw->nmcd.uItemState & CDIS_SELECTED)
+							{
+								pCustomDraw->clrText = RGB(255, 255, 255);
+								pCustomDraw->clrTextBk = RGB(70, 70, 70);
+							}
+							else
+							{
+								pCustomDraw->clrText = RGB(255, 255, 255);
+								pCustomDraw->clrTextBk = RGB(40, 40, 40);
+							}
+							lResult = 0;
+							return TRUE;
+						}
+					}
+					break;
 				case NM_DBLCLK:
 					{
 						POINT pt;
@@ -486,6 +525,48 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 			}
 		}
 		break;
+
+	case WM_SETTINGCHANGE:
+		UpdateColorScheme();
+		InvalidateRect(m_hwnd, NULL, TRUE);
+		break;
+
+	case WM_KILLFOCUS:
+	case WM_ACTIVATE:
+	case WM_ACTIVATEAPP:
+	case 3:
+	case 15:
+	case 20:
+	case 24:
+	case 32:
+	case 36:
+	case 70:
+	case 71:
+	case 85:
+	case 127:
+	case 129:
+	case 131:
+	case 132:
+	case 133:
+	case 134:
+	case 145:
+	case 146:
+	case 147:
+	case 148:
+	case 297:
+	case 512:
+	case 528:
+	case 641:
+	case 642:
+	case 799:
+	case 49395:
+		break;
+
+	default:
+		{
+			INT n = message;
+		}
+		break;
 	}
 
 	return __super::DefWindowProc(message, wParam, lParam, lResult);
@@ -532,6 +613,8 @@ HRESULT CQuadooStudio::OnCreate (VOID)
 	Check(m_pSplitter->Initialize(m_hwnd, m_hwndTree));
 
 	TreeView_SetImageList(m_hwndTree, m_hImageList, TVSIL_NORMAL);
+
+	UpdateColorScheme();
 
 Cleanup:
 	DestroyIcon(hClosedFolder);

@@ -9,6 +9,7 @@
 
 interface IJSONObject;
 
+class CDarkMode;
 class CTabs;
 
 struct TVNSYNTAXHIGHLIGHT;
@@ -55,6 +56,7 @@ class CQuadooProject :
 {
 private:
 	HINSTANCE m_hInstance;
+	CDarkMode* m_pdm;
 	HWND m_hwndTree;
 
 	HICON m_hCloseIcon, m_hDropDown;
@@ -70,6 +72,8 @@ private:
 	TNamedMapW<COLORREF> m_mapKeywords;
 	ICodeEditor* m_pEditor;
 
+	COLORREF m_crStrings, m_crCommentForeground, m_crCommentHighlight;
+
 	WCHAR m_wzFindSymbol[200];	// Used when finding symbols using the context menu
 
 public:
@@ -82,7 +86,7 @@ public:
 	END_UNK_MAP
 
 public:
-	CQuadooProject (HINSTANCE hInstance, HWND hwndTree);
+	CQuadooProject (HINSTANCE hInstance, CDarkMode* pdm, HWND hwndTree);
 	~CQuadooProject ();
 
 	static HRESULT Register (HINSTANCE hInstance);
@@ -93,6 +97,7 @@ public:
 	HRESULT UpdateFiles (VOID);
 	HRESULT CloseProject (BOOL fPromptUserForSave);
 
+	VOID UpdateColorScheme (VOID);
 	VOID ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen);
 	VOID ActivateItem (HTREEITEM hItem);
 	VOID Move (const RECT& rcSite);
@@ -125,6 +130,8 @@ public:
 	HRESULT AddFile (RSTRING rstrPath, __deref_out CProjectFile** ppFile);
 
 private:
+	HRESULT UpdateColors (VOID);
+
 	HRESULT ExtractFindSymbol (PCWSTR pcwzWord, INT idxWordPtr);
 	HRESULT FindSymbol (VOID);
 

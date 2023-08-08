@@ -15,43 +15,30 @@ VOID CTab::Draw (CTabs* pTabs, Gdiplus::Graphics& graphics, Gdiplus::Font* pFont
 		pt[i].Y = (rBarSize - m_pt[i].Y);
 	}
 
+	Gdiplus::LinearGradientBrush brGradient(
+		Gdiplus::PointF(pt[0].X, pt[1].Y),			// Start point of the gradient (top-left)
+		Gdiplus::PointF(pt[0].X, pt[0].Y),			// End point of the gradient (bottom-left)
+		m_fActive ? pTabs->m_tabColors.crActive1 : (fHover ? pTabs->m_tabColors.crHover1 : pTabs->m_tabColors.crNormal1),	// Starting color (top color)
+		m_fHighlight ? pTabs->m_tabColors.crHighlight : (m_fActive ? pTabs->m_tabColors.crActive2 : (fHover ? pTabs->m_tabColors.crHover2 : pTabs->m_tabColors.crNormal2)));	// Ending color (bottom color)
+	graphics.FillPolygon(&brGradient, pt, ARRAYSIZE(pt));
+
+	Gdiplus::PointF ptLabel(pt[1].X + pTabs->m_yTextOffset, pt[1].Y + pTabs->m_yTextOffset);
+	Gdiplus::SolidBrush brLabel(pTabs->m_tabColors.crLabel);
+
+	Gdiplus::Pen pnOutline(m_fActive ? pTabs->m_tabColors.crActiveOutline : pTabs->m_tabColors.crNormalOutline, 1.0f);
+	graphics.DrawLine(&pnOutline, pt[0], pt[1]);
+	graphics.DrawLine(&pnOutline, pt[1], pt[2]);
+	graphics.DrawLine(&pnOutline, pt[2], pt[3]);
+	graphics.DrawLine(&pnOutline, pt[3], pt[4]);
+
+	graphics.DrawString(RStrToWide(m_rstrLabel), RStrLen(m_rstrLabel), pFont, ptLabel, &brLabel);
+
+	if(m_fActive)
 	{
-		Gdiplus::Color crNormal1(255, 236, 245, 252);
-		Gdiplus::Color crNormal2(255, 152, 180, 210);
-
-		Gdiplus::Color crHover1(255, 247, 252, 254);
-		Gdiplus::Color crHover2(255, 129, 208, 241);
-
-		Gdiplus::Color crActive1(255, 249, 252, 254);
-		Gdiplus::Color crActive2(255, 210, 230, 250);
-
-		Gdiplus::Color crHighlight(255, 215, 138, 255);
-
-		Gdiplus::LinearGradientBrush brGradient(
-			Gdiplus::PointF(pt[0].X, pt[1].Y),			// Start point of the gradient (top-left)
-			Gdiplus::PointF(pt[0].X, pt[0].Y),			// End point of the gradient (bottom-left)
-			m_fActive ? crActive1 : (fHover ? crHover1 : crNormal1),	// Starting color (top color)
-			m_fHighlight ? crHighlight : (m_fActive ? crActive2 : (fHover ? crHover2 : crNormal2)));	// Ending color (bottom color)
-		graphics.FillPolygon(&brGradient, pt, ARRAYSIZE(pt));
-
-		Gdiplus::PointF ptLabel(pt[1].X + pTabs->m_yTextOffset, pt[1].Y + pTabs->m_yTextOffset);
-		Gdiplus::SolidBrush brBlack(Gdiplus::Color(255, 0, 0, 0));
-
-		Gdiplus::Pen pnOutline(m_fActive ? Gdiplus::Color(255, 105, 161, 191) : Gdiplus::Color(255, 145, 150, 162), 1.0f);
-		graphics.DrawLine(&pnOutline, pt[0], pt[1]);
-		graphics.DrawLine(&pnOutline, pt[1], pt[2]);
-		graphics.DrawLine(&pnOutline, pt[2], pt[3]);
-		graphics.DrawLine(&pnOutline, pt[3], pt[4]);
-
-		graphics.DrawString(RStrToWide(m_rstrLabel), RStrLen(m_rstrLabel), pFont, ptLabel, &brBlack);
-
-		if(m_fActive)
-		{
-			Gdiplus::PointF ptLeft(0.0f, pt[0].Y);
-			Gdiplus::PointF ptRight((FLOAT)pTabs->m_szTabs.cx, pt[4].Y);
-			graphics.DrawLine(&pnOutline, pt[0], ptLeft);
-			graphics.DrawLine(&pnOutline, pt[4], ptRight);
-		}
+		Gdiplus::PointF ptLeft(0.0f, pt[0].Y);
+		Gdiplus::PointF ptRight((FLOAT)pTabs->m_szTabs.cx, pt[4].Y);
+		graphics.DrawLine(&pnOutline, pt[0], ptLeft);
+		graphics.DrawLine(&pnOutline, pt[4], ptRight);
 	}
 }
 
@@ -92,6 +79,54 @@ CTabs::~CTabs ()
 	SafeDelete(m_pNormal);
 	SafeDelete(m_pBold);
 	SafeDelete(m_pBuffer);
+}
+
+VOID CTabs::SetDarkMode (bool fDarkMode)
+{
+	if(fDarkMode)
+	{
+		m_tabColors.crBackground = Gdiplus::Color(255, 60, 60, 60);
+
+		m_tabColors.crNormal1 = Gdiplus::Color(255, 80, 80, 80);
+		m_tabColors.crNormal2 = Gdiplus::Color(255, 100, 100, 100);
+
+		m_tabColors.crHover1 = Gdiplus::Color(255, 100, 100, 100);
+		m_tabColors.crHover2 = Gdiplus::Color(255, 120, 120, 120);
+
+		m_tabColors.crActive1 = Gdiplus::Color(255, 90, 90, 90);
+		m_tabColors.crActive2 = Gdiplus::Color(255, 110, 110, 110);
+
+		m_tabColors.crActiveOutline = Gdiplus::Color(255, 50, 50, 50);
+		m_tabColors.crNormalOutline = Gdiplus::Color(255, 40, 40, 40);
+
+		m_tabColors.crHighlight = Gdiplus::Color(255, 210, 140, 20);
+		m_tabColors.crLabel = Gdiplus::Color(255, 220, 220, 220);
+
+		m_tabColors.crButtonOutline = Gdiplus::Color(255, 80, 80, 80);
+		m_tabColors.crButtonBackground = Gdiplus::Color(255, 100, 100, 100);
+	}
+	else
+	{
+		m_tabColors.crBackground = Gdiplus::Color(255, 236, 239, 250);
+
+		m_tabColors.crNormal1 = Gdiplus::Color(255, 236, 245, 252);
+		m_tabColors.crNormal2 = Gdiplus::Color(255, 152, 180, 210);
+
+		m_tabColors.crHover1 = Gdiplus::Color(255, 247, 252, 254);
+		m_tabColors.crHover2 = Gdiplus::Color(255, 129, 208, 241);
+
+		m_tabColors.crActive1 = Gdiplus::Color(255, 249, 252, 254);
+		m_tabColors.crActive2 = Gdiplus::Color(255, 210, 230, 250);
+
+		m_tabColors.crActiveOutline = Gdiplus::Color(255, 105, 161, 191);
+		m_tabColors.crNormalOutline = Gdiplus::Color(255, 145, 150, 162);
+
+		m_tabColors.crHighlight = Gdiplus::Color(255, 215, 138, 255);
+		m_tabColors.crLabel = Gdiplus::Color(255, 0, 0, 0);
+
+		m_tabColors.crButtonOutline = Gdiplus::Color(255, 51, 153, 255);
+		m_tabColors.crButtonBackground = Gdiplus::Color(255, 206, 237, 250);
+	}
 }
 
 HRESULT CTabs::LoadMetrics (HWND hwnd)
@@ -266,7 +301,7 @@ VOID CTabs::Draw (HDC hdc, LONG x, LONG y)
 	Gdiplus::Graphics graphics(m_pBuffer);
 	CTab* pActive = NULL;
 
-	Gdiplus::SolidBrush brBackground(Gdiplus::Color(255, 236, 239, 250));
+	Gdiplus::SolidBrush brBackground(m_tabColors.crBackground);
 	Gdiplus::RectF rcBackground(0.0f, 0.0f, (FLOAT)m_szTabs.cx, (FLOAT)m_szTabs.cy);
 	graphics.FillRectangle(&brBackground, rcBackground);
 
@@ -284,7 +319,7 @@ VOID CTabs::Draw (HDC hdc, LONG x, LONG y)
 		pActive->Draw(this, graphics, m_pBold, false);
 	else
 	{
-		Gdiplus::Pen pnOutline(Gdiplus::Color(255, 105, 161, 191), 1.0f);
+		Gdiplus::Pen pnOutline(m_tabColors.crActiveOutline, 1.0f);
 		Gdiplus::PointF ptLeft(0.0f, (FLOAT)(m_szTabs.cy - 1));
 		Gdiplus::PointF ptRight((FLOAT)m_szTabs.cx, ptLeft.Y);
 		graphics.DrawLine(&pnOutline, ptLeft, ptRight);
@@ -445,8 +480,8 @@ VOID CTabs::DrawButton (Gdiplus::Graphics& graphics, LONG xLeft, LONG yCenter, H
 {
 	if(fHover)
 	{
-		Gdiplus::Pen pnOutline(Gdiplus::Color(255, 51, 153, 255), 1.0f);
-		Gdiplus::SolidBrush brBackground(Gdiplus::Color(255, 206, 237, 250));
+		Gdiplus::Pen pnOutline(m_tabColors.crButtonOutline, 1.0f);
+		Gdiplus::SolidBrush brBackground(m_tabColors.crButtonBackground);
 		Gdiplus::RectF rcBackground((FLOAT)xLeft, (FLOAT)yCenter - (FLOAT)szButton.cy / 2.0f - m_xButtonPadding,
 			(FLOAT)szButton.cx + m_xButtonPadding * 2.0f, (FLOAT)szButton.cy + m_xButtonPadding * 2.0f);
 		graphics.FillRectangle(&brBackground, rcBackground);

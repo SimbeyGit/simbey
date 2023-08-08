@@ -25,8 +25,8 @@
 #define TXC_HIGHLIGHT2			5			// inactive background highlight color
 #define TXC_SELMARGIN1			6			// selection margin color #1
 #define TXC_SELMARGIN2			7			// selection margin color #2
-#define TXC_LINENUMBERTEXT		8			// line number text
-#define TXC_LINENUMBER			9			// line number background
+#define TXC_MARGIN_BORDER		8			// margin border
+#define TXC_MARGIN				9			// margin background
 #define TXC_LONGLINETEXT		10			// long-line text
 #define TXC_LONGLINE			11			// long-line background
 #define TXC_CURRENTLINETEXT		12			// active line text
@@ -173,8 +173,9 @@ interface __declspec(uuid("CF4C929F-A311-40ec-90D4-45AE343597B7")) ICodeEditor :
 	virtual BOOL SelectAll (VOID) = 0;
 
 	virtual VOID ScrollView (INT xCaret, ULONG nLine) = 0;
+	virtual VOID SetDarkMode (bool fDarkMode, bool fUseSystemColors) = 0;
 };
 
 HRESULT WINAPI CodeEditRegister (VOID);
 HRESULT WINAPI CodeEditUnregister (VOID);
-HRESULT WINAPI CodeEditCreate (HWND hwndParent, const RECT& rcSite, INT nTabWidth, __deref_out ICodeEditor** ppEditor);
+HRESULT WINAPI CodeEditCreate (HWND hwndParent, const RECT& rcSite, INT nTabWidth, bool fDarkMode, bool fUseSystemColors, __deref_out ICodeEditor** ppEditor);

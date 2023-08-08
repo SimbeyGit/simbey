@@ -156,7 +156,7 @@ int ScrollDir (int counter, int distance)
 	return 0;
 }
 
-CTextEditor::CTextEditor (HINSTANCE hInstance) :
+CTextEditor::CTextEditor (HINSTANCE hInstance, bool fDarkMode, bool fUseSystemColors) :
 	m_hInstance(hInstance),
 	m_pTextDoc(NULL),
 	m_hMarginCursor(NULL)
@@ -193,22 +193,7 @@ CTextEditor::CTextEditor (HINSTANCE hInstance) :
 	if(m_nCaretWidth == 0)
 		m_nCaretWidth = 2;
 
-	// Default display colors
-	m_rgbColorList[TXC_FOREGROUND]		= SYSCOL(COLOR_WINDOWTEXT);
-	m_rgbColorList[TXC_BACKGROUND]		= SYSCOL(COLOR_WINDOW);			// RGB(34,54,106)
-	m_rgbColorList[TXC_HIGHLIGHTTEXT]	= SYSCOL(COLOR_HIGHLIGHTTEXT);
-	m_rgbColorList[TXC_HIGHLIGHT]		= SYSCOL(COLOR_HIGHLIGHT);
-	m_rgbColorList[TXC_HIGHLIGHTTEXT2]	= SYSCOL(COLOR_WINDOWTEXT);		//INACTIVECAPTIONTEXT);
-	m_rgbColorList[TXC_HIGHLIGHT2]		= SYSCOL(COLOR_3DFACE);			//INACTIVECAPTION);
-	m_rgbColorList[TXC_SELMARGIN1]		= SYSCOL(COLOR_3DFACE);
-	m_rgbColorList[TXC_SELMARGIN2]		= SYSCOL(COLOR_3DHIGHLIGHT);
-	m_rgbColorList[TXC_LINENUMBERTEXT]	= SYSCOL(COLOR_3DSHADOW);
-	m_rgbColorList[TXC_LINENUMBER]		= SYSCOL(COLOR_3DFACE);
-	m_rgbColorList[TXC_LONGLINETEXT]	= SYSCOL(COLOR_3DSHADOW);
-	m_rgbColorList[TXC_LONGLINE]		= SYSCOL(COLOR_3DFACE);
-	m_rgbColorList[TXC_CURRENTLINETEXT] = SYSCOL(COLOR_WINDOWTEXT);
-	m_rgbColorList[TXC_CURRENTLINE]		= RGB(230,240,255);
-	m_rgbColorList[TXC_DISABLED]		= SYSCOL(COLOR_INACTIVECAPTION);
+	SetDarkMode(fDarkMode, fUseSystemColors);
 
 	ZeroMemory(m_uspFontList, sizeof(m_uspFontList));
 
@@ -584,6 +569,53 @@ VOID CTextEditor::ScrollView (INT xCaret, ULONG nLine)
 {
 	m_nCursorOffset = m_pTextDoc->LineOffset(nLine) + xCaret;
 	UpdateView(false);
+}
+
+VOID CTextEditor::SetDarkMode (bool fDarkMode, bool fUseSystemColors)
+{
+	if(fUseSystemColors || !fDarkMode)
+	{
+		// Default display colors
+		m_rgbColorList[TXC_FOREGROUND]		= SYSCOL(COLOR_WINDOWTEXT);
+		m_rgbColorList[TXC_BACKGROUND]		= SYSCOL(COLOR_WINDOW);			// RGB(34,54,106)
+		m_rgbColorList[TXC_HIGHLIGHTTEXT]	= SYSCOL(COLOR_HIGHLIGHTTEXT);
+		m_rgbColorList[TXC_HIGHLIGHT]		= SYSCOL(COLOR_HIGHLIGHT);
+		m_rgbColorList[TXC_HIGHLIGHTTEXT2]	= SYSCOL(COLOR_WINDOWTEXT);		//INACTIVECAPTIONTEXT);
+		m_rgbColorList[TXC_HIGHLIGHT2]		= SYSCOL(COLOR_3DFACE);			//INACTIVECAPTION);
+		m_rgbColorList[TXC_SELMARGIN1]		= SYSCOL(COLOR_3DFACE);
+		m_rgbColorList[TXC_SELMARGIN2]		= SYSCOL(COLOR_3DHIGHLIGHT);
+		m_rgbColorList[TXC_MARGIN_BORDER]	= SYSCOL(COLOR_3DSHADOW);
+		m_rgbColorList[TXC_MARGIN]			= SYSCOL(COLOR_3DFACE);
+		m_rgbColorList[TXC_LONGLINETEXT]	= SYSCOL(COLOR_3DSHADOW);
+		m_rgbColorList[TXC_LONGLINE]		= SYSCOL(COLOR_3DFACE);
+		m_rgbColorList[TXC_CURRENTLINETEXT] = SYSCOL(COLOR_WINDOWTEXT);
+		m_rgbColorList[TXC_CURRENTLINE]		= RGB(230,240,255);
+		m_rgbColorList[TXC_DISABLED]		= SYSCOL(COLOR_INACTIVECAPTION);
+	}
+	else
+	{
+		m_rgbColorList[TXC_FOREGROUND]		= RGB(255, 255, 255);
+		m_rgbColorList[TXC_BACKGROUND]		= RGB(40, 40, 40);
+		m_rgbColorList[TXC_HIGHLIGHTTEXT]	= RGB(255, 255, 255);
+		m_rgbColorList[TXC_HIGHLIGHT]		= RGB(120, 120, 100);
+		m_rgbColorList[TXC_HIGHLIGHTTEXT2]	= RGB(200, 200, 200);		//INACTIVECAPTIONTEXT);
+		m_rgbColorList[TXC_HIGHLIGHT2]		= RGB(80, 80, 70);			//INACTIVECAPTION);
+		m_rgbColorList[TXC_SELMARGIN1]		= SYSCOL(COLOR_3DFACE);
+		m_rgbColorList[TXC_SELMARGIN2]		= SYSCOL(COLOR_3DHIGHLIGHT);
+		m_rgbColorList[TXC_MARGIN_BORDER]	= RGB(70, 70, 70);
+		m_rgbColorList[TXC_MARGIN]			= RGB(120, 120, 120);
+		m_rgbColorList[TXC_LONGLINETEXT]	= SYSCOL(COLOR_3DSHADOW);
+		m_rgbColorList[TXC_LONGLINE]		= SYSCOL(COLOR_3DFACE);
+		m_rgbColorList[TXC_CURRENTLINETEXT] = RGB(255, 255, 240);
+		m_rgbColorList[TXC_CURRENTLINE]		= RGB(70, 70, 60);
+		m_rgbColorList[TXC_DISABLED]		= RGB(80, 80, 80);
+	}
+
+	if(m_hwnd)
+	{
+		ResetLineCache();
+		RefreshWindow();
+	}
 }
 
 BOOL CTextEditor::ForwardDelete (VOID)
@@ -1156,8 +1188,8 @@ void CTextEditor::PaintMargin (HDC hdc, ULONG nLineNo, const RECT& rcMargin)
 	rcBorder.left = rcBackground.right;
 	rcBorder.right = rcBorder.left + 1;
 
-	PaintRect(hdc, rcBackground, GetColor(TXC_LINENUMBER));
-	PaintRect(hdc, rcBorder, GetColor(TXC_LINENUMBERTEXT));
+	PaintRect(hdc, rcBackground, GetColor(TXC_MARGIN));
+	PaintRect(hdc, rcBorder, GetColor(TXC_MARGIN_BORDER));
 
 	di.CtlType = ODT_STATIC;
 	di.CtlID = GetDlgCtrlID(m_hwnd);
@@ -1420,11 +1452,13 @@ VOID CTextEditor::RepositionCaret ()
 VOID CTextEditor::UpdateView (bool fAdvancing)
 {
 	// This method was called "Smeg" in Neatpad
+	ULONG nLine;
 
 	UpdateMetrics();
 	SetupScrollbars();
 
-	UpdateCaretOffset(m_nCursorOffset, fAdvancing, &m_nCaretPosX, &m_nCurrentLine);
+	UpdateCaretOffset(m_nCursorOffset, fAdvancing, &m_nCaretPosX, &nLine);
+	UpdateLine(nLine);
 
 	m_nAnchorPosX = m_nCaretPosX;
 	ScrollToPosition(m_nCaretPosX, m_nCurrentLine);
@@ -1537,6 +1571,8 @@ void CTextEditor::UpdateLine (ULONG nLineNo)
 
 VOID CTextEditor::FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrlDown, BOOL fAdvancing)
 {
+	ULONG nLine;
+
 	// Extend selection if <shift> is down
 	if(fShiftDown)
 	{		
@@ -1554,7 +1590,8 @@ VOID CTextEditor::FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrl
 	}
 
 	// update caret-location (xpos, line#) from the offset
-	UpdateCaretOffset(m_nCursorOffset, fAdvancing, &m_nCaretPosX, &m_nCurrentLine);
+	UpdateCaretOffset(m_nCursorOffset, fAdvancing, &m_nCaretPosX, &nLine);
+	UpdateLine(nLine);
 
 	// maintain the caret 'anchor' position *except* for up/down actions
 	if(nKeyCode != VK_UP && nKeyCode != VK_DOWN)
@@ -1669,7 +1706,7 @@ VOID CTextEditor::MoveWordPrev ()
 
 		if(m_nCurrentLine > 0)
 		{
-			MoveLineEnd(m_nCurrentLine-1);
+			MoveLineEnd(m_nCurrentLine - 1);
 			return;
 		}
 	}
@@ -1705,7 +1742,7 @@ VOID CTextEditor::MoveWordNext ()
 	if(charPos == uspCache->length_CRLF)
 	{
 		if(m_nCurrentLine + 1 < m_pTextDoc->LineCount())
-			MoveLineStart(m_nCurrentLine+1);
+			MoveLineStart(m_nCurrentLine + 1);
 
 		return;
 	}
@@ -1755,7 +1792,7 @@ VOID CTextEditor::MoveCharPrev ()
 
 		if(m_nCurrentLine > 0)
 		{
-			MoveLineEnd(m_nCurrentLine-1);
+			MoveLineEnd(m_nCurrentLine - 1);
 			return;
 		}
 	}
@@ -1805,7 +1842,7 @@ VOID CTextEditor::MoveLineUp (int numLines)
 	int				  charPos;
 	BOOL			  trailing;
 
-	m_nCurrentLine -= min(m_nCurrentLine, (unsigned)numLines);
+	UpdateLine(m_nCurrentLine - min(m_nCurrentLine, (unsigned)numLines));
 
 	// get Uniscribe data for prev line
 	uspData = GetUspData(0, m_nCurrentLine, &lineOffset);
@@ -1824,7 +1861,7 @@ VOID CTextEditor::MoveLineDown (int numLines)
 	int				  charPos;
 	BOOL			  trailing;
 
-	m_nCurrentLine += min(m_pTextDoc->LineCount() - m_nCurrentLine - 1, (unsigned)numLines);
+	UpdateLine(m_nCurrentLine + min(m_pTextDoc->LineCount() - m_nCurrentLine - 1, (unsigned)numLines));
 
 	// get Uniscribe data for prev line
 	uspData = GetUspData(0, m_nCurrentLine, &lineOffset);
@@ -2482,7 +2519,7 @@ LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
 
 		InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
 
-		UpdateCaretOffset(m_nCursorOffset, FALSE, &m_nCaretPosX, &m_nCurrentLine);
+		UpdateCaretOffset(m_nCursorOffset, FALSE, &m_nCaretPosX, &nLineNo);
 		m_nAnchorPosX = m_nCaretPosX;
 
 		// set capture for mouse-move selections
@@ -2506,8 +2543,11 @@ LRESULT CTextEditor::OnLButtonUp (UINT nFlags, int x, int y)
 	// shift cursor to end of selection
 	if(m_nSelectionMode == SEL_MARGIN)
 	{
+		ULONG nLine;
+
 		m_nCursorOffset = m_nSelectionEnd;
-		UpdateCaretOffset(m_nCursorOffset, FALSE, &m_nCaretPosX, &m_nCurrentLine);
+		UpdateCaretOffset(m_nCursorOffset, FALSE, &m_nCaretPosX, &nLine);
+		UpdateLine(nLine);
 	}
 
 	if(m_nSelectionMode)

@@ -107,7 +107,7 @@ public:
 	END_UNK_MAP
 
 public:
-	CTextEditor (HINSTANCE hInstance);
+	CTextEditor (HINSTANCE hInstance, bool fDarkMode, bool fUseSystemColors);
 	~CTextEditor ();
 
 	static HRESULT Register (HINSTANCE hInstance, DWORD dwClassCookie);
@@ -137,6 +137,7 @@ public:
 	virtual BOOL SelectAll (VOID);
 
 	virtual VOID ScrollView (INT xCaret, ULONG nLine);
+	virtual VOID SetDarkMode (bool fDarkMode, bool fUseSystemColors);
 
 	// CBaseWindow
 	virtual HINSTANCE GetInstance (VOID);

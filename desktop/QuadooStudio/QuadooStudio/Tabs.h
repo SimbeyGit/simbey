@@ -7,6 +7,29 @@
 
 class CTabs;
 
+struct TAB_COLORS
+{
+	Gdiplus::Color crBackground;
+
+	Gdiplus::Color crNormal1;
+	Gdiplus::Color crNormal2;
+
+	Gdiplus::Color crHover1;
+	Gdiplus::Color crHover2;
+
+	Gdiplus::Color crActive1;
+	Gdiplus::Color crActive2;
+
+	Gdiplus::Color crActiveOutline;
+	Gdiplus::Color crNormalOutline;
+
+	Gdiplus::Color crHighlight;
+	Gdiplus::Color crLabel;
+
+	Gdiplus::Color crButtonOutline;
+	Gdiplus::Color crButtonBackground;
+};
+
 class CTab
 {
 public:
@@ -78,6 +101,7 @@ private:
 	SIZE m_szTabs, m_szDropDown, m_szCloseButton;
 	LONG m_xRightButtons, m_xButtonPadding;
 
+	TAB_COLORS m_tabColors;
 	TArray<CTab*> m_aTabs;
 	sysint m_cVisible;
 	sysint m_idxHover;
@@ -87,6 +111,8 @@ private:
 public:
 	CTabs (HICON hCloseIcon, HICON hDropDown);
 	~CTabs ();
+
+	VOID SetDarkMode (bool fDarkMode);
 
 	HRESULT LoadMetrics (HWND hwnd);
 	VOID Resize (LONG nWidth, LONG nHeight);

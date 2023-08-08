@@ -31,10 +31,10 @@ HRESULT WINAPI CodeEditUnregister (VOID)
 	return CTextEditor::Unregister(g_hModule, g_dwClassCookie);
 }
 
-HRESULT WINAPI CodeEditCreate (HWND hwndParent, const RECT& rcSite, INT nTabWidth, __deref_out ICodeEditor** ppEditor)
+HRESULT WINAPI CodeEditCreate (HWND hwndParent, const RECT& rcSite, INT nTabWidth, bool fDarkMode, bool fUseSystemColors, __deref_out ICodeEditor** ppEditor)
 {
 	HRESULT hr;
-	CTextEditor* pEditor = __new CTextEditor(g_hModule);
+	CTextEditor* pEditor = __new CTextEditor(g_hModule, fDarkMode, fUseSystemColors);
 
 	CheckAlloc(pEditor);
 	Check(pEditor->Initialize(hwndParent, rcSite, nTabWidth, g_dwClassCookie));

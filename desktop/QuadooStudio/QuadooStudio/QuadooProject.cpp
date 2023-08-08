@@ -17,6 +17,7 @@
 #include "RunParamsDlg.h"
 #include "ProjectCompilerDlg.h"
 #include "GotoDefinitionDlg.h"
+#include "DarkMode.h"
 #include "QuadooProject.h"
 
 #ifndef ENM_CLIPFORMAT
@@ -25,8 +26,9 @@
 
 const WCHAR c_wzQuadooProjectClass[] = L"QuadooProjectCls";
 
-CQuadooProject::CQuadooProject (HINSTANCE hInstance, HWND hwndTree) :
+CQuadooProject::CQuadooProject (HINSTANCE hInstance, CDarkMode* pdm, HWND hwndTree) :
 	m_hInstance(hInstance),
+	m_pdm(pdm),
 	m_hwndTree(hwndTree),
 	m_hCloseIcon(NULL),
 	m_hDropDown(NULL),
@@ -85,12 +87,9 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	TVINSERTSTRUCT tvis = {0};
 	PCWSTR pcwzLabelPtr = TStrRChr(pcwzProject, L'\\'), pcwzExt;
 	PWSTR pwzJSON = NULL;
-	INT cchJSON, cKeywords;
-	const KEYWORD* pcrgKeywords;
+	INT cchJSON;
 
-	GetKeywords(&pcrgKeywords, &cKeywords);
-	for(INT i = 0; i < cKeywords; i++)
-		Check(m_mapKeywords.Add(pcrgKeywords[i].pcwzKeyword, pcrgKeywords[i].crKeyword));
+	Check(UpdateColors());
 
 	m_hCloseIcon = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_CLOSE), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
 	m_hDropDown = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_DROP_DOWN), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
@@ -98,6 +97,7 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	m_pTabs = __new CTabs(m_hCloseIcon, m_hDropDown);
 	CheckAlloc(m_pTabs);
 	Check(m_pTabs->LoadMetrics(hwndParent));
+	m_pTabs->SetDarkMode(m_pdm->IsDarkMode());
 
 	Check(Create(0, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, c_wzQuadooProjectClass, NULL, rcSite.left, rcSite.top, rcSite.right - rcSite.left, rcSite.bottom - rcSite.top, hwndParent, SW_NORMAL));
 
@@ -222,6 +222,18 @@ HRESULT CQuadooProject::CloseProject (BOOL fPromptUserForSave)
 
 	Destroy();
 	return S_OK;
+}
+
+VOID CQuadooProject::UpdateColorScheme (VOID)
+{
+	RECT rc;
+
+	m_pTabs->SetDarkMode(m_pdm->IsDarkMode());
+	m_pTabs->GetTabsRect(0, 0, rc);
+	InvalidateRect(m_hwnd, &rc, FALSE);
+
+	m_pEditor->SetDarkMode(m_pdm->IsDarkMode(), !m_pdm->HasThemes());
+	UpdateColors();
 }
 
 VOID CQuadooProject::ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen)
@@ -412,7 +424,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 			RECT rcSite;
 			GetClientRect(m_hwnd, &rcSite);
 
-			if(FAILED(CodeEditCreate(m_hwnd, rcSite, 4, &m_pEditor)))
+			if(FAILED(CodeEditCreate(m_hwnd, rcSite, 4, m_pdm->IsDarkMode(), !m_pdm->HasThemes(), &m_pEditor)))
 			{
 				lResult = -1;
 				return TRUE;
@@ -765,6 +777,42 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CQuadooProject::UpdateColors (VOID)
+{
+	HRESULT hr = S_OK;
+	INT cKeywords;
+	const KEYWORD* pcrgKeywords;
+
+	m_mapKeywords.Clear();
+	GetKeywords(&pcrgKeywords, &cKeywords);
+	if(m_pdm->IsDarkMode())
+	{
+		for(INT i = 0; i < cKeywords; i++)
+			Check(m_mapKeywords.Add(pcrgKeywords[i].pcwzKeyword, pcrgKeywords[i].crDarkMode));
+	}
+	else
+	{
+		for(INT i = 0; i < cKeywords; i++)
+			Check(m_mapKeywords.Add(pcrgKeywords[i].pcwzKeyword, pcrgKeywords[i].crKeyword));
+	}
+
+	if(m_pdm->IsDarkMode())
+	{
+		m_crStrings = RGB(255, 80, 80);
+		m_crCommentForeground = RGB(220, 220, 240);
+		m_crCommentHighlight = RGB(90, 90, 110);
+	}
+	else
+	{
+		m_crStrings = RGB(80, 0, 0);
+		m_crCommentForeground = RGB(255, 255, 255);
+		m_crCommentHighlight = RGB(0, 0, 255);
+	}
+
+Cleanup:
+	return hr;
+}
+
 HRESULT CQuadooProject::ExtractFindSymbol (PCWSTR pcwzWord, INT idxWordPtr)
 {
 	HRESULT hr;
@@ -880,10 +928,10 @@ VOID CQuadooProject::ApplySyntaxColoring (TVNSYNTAXHIGHLIGHT* pHighlight)
 				fQuoted = true;
 			}
 
-			pHighlight->pAttr[i].fg = RGB(80, 0, 0);
+			pHighlight->pAttr[i].fg = m_crStrings;
 		}
 		else if(fQuoted)
-			pHighlight->pAttr[i].fg = RGB(80, 0, 0);
+			pHighlight->pAttr[i].fg = m_crStrings;
 		else if((wch >= L'a' && wch <= L'z') || (wch >= L'A' && wch <= L'Z'))
 		{
 			if(-1 == idxKeyword)
@@ -901,8 +949,8 @@ VOID CQuadooProject::ApplySyntaxColoring (TVNSYNTAXHIGHLIGHT* pHighlight)
 		{
 			for(INT n = i - 1; n < cch; n++)
 			{
-				pHighlight->pAttr[n].fg = RGB(255, 255, 255);
-				pHighlight->pAttr[n].bg = RGB(0, 0, 255);
+				pHighlight->pAttr[n].fg = m_crCommentForeground;
+				pHighlight->pAttr[n].bg = m_crCommentHighlight;
 			}
 			break;
 		}
