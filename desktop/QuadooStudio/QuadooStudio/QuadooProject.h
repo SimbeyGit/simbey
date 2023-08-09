@@ -131,6 +131,7 @@ public:
 
 private:
 	HRESULT UpdateColors (VOID);
+	INT CustomTrackPopupMenu (HMENU hPopup, UINT uFlags, const POINT& ptScreen);
 
 	HRESULT ExtractFindSymbol (PCWSTR pcwzWord, INT idxWordPtr);
 	HRESULT FindSymbol (VOID);

@@ -18,6 +18,7 @@
 #include "ProjectCompilerDlg.h"
 #include "GotoDefinitionDlg.h"
 #include "DarkMode.h"
+#include "CustomMenu.h"
 #include "QuadooProject.h"
 
 #ifndef ENM_CLIPFORMAT
@@ -246,7 +247,7 @@ VOID CQuadooProject::ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen)
 			INT nCmd;
 
 			MenuUtil::EnableMenuItems(NULL, hPopup, this);
-			nCmd = TrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_RETURNCMD | TPM_NONOTIFY, ptScreen.x, ptScreen.y, 0, m_hwnd, NULL);
+			nCmd = CustomTrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_RETURNCMD | TPM_NONOTIFY, ptScreen);
 			if(0 != nCmd)
 				Exec(NULL, nCmd, 0, NULL, NULL);
 			DestroyMenu(hPopup);
@@ -263,7 +264,7 @@ VOID CQuadooProject::ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen)
 			if(pFile->m_fDefault)
 				CheckMenuItem(hPopup, ID_CONTEXT_SETDEFAULT, MF_BYCOMMAND | MF_CHECKED);
 
-			nCmd = TrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_RETURNCMD | TPM_NONOTIFY, ptScreen.x, ptScreen.y, 0, m_hwnd, NULL);
+			nCmd = CustomTrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_RETURNCMD | TPM_NONOTIFY, ptScreen);
 			if(0 != nCmd)
 			{
 				VARIANT vItem;
@@ -554,6 +555,33 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 							InsertMenuItem(hMenu, 1, TRUE, &mii);
 						}
 					}
+
+					if(m_pdm->IsDarkMode())
+					{
+						TStackRef<IBaseWindow> srWindow;
+						if(SUCCEEDED(m_pEditor->QueryInterface(&srWindow)))
+						{
+							CCustomMenu* pCustomMenu = __new CCustomMenu(pContext->hMenu);
+							pCustomMenu->SetDarkMode();
+							srWindow->AttachSubclassHandler(pCustomMenu);
+							pCustomMenu->Rebuild(pContext->hMenu);
+
+							pContext->pvUserParam = pCustomMenu;
+						}
+					}
+				}
+				break;
+			case TVN_CLOSE_CONTEXT_MENU:
+				{
+					TVNMCLOSECONTEXT* pClose = static_cast<TVNMCLOSECONTEXT*>(pnmhdr);
+					if(pClose->pvUserParam)
+					{
+						CCustomMenu* pCustomMenu = reinterpret_cast<CCustomMenu*>(pClose->pvUserParam);
+						TStackRef<IBaseWindow> srWindow;
+						if(SUCCEEDED(m_pEditor->QueryInterface(&srWindow)))
+							srWindow->DetachSubclassHandler(pCustomMenu);
+						__delete pCustomMenu;
+					}
 				}
 				break;
 			}
@@ -811,6 +839,29 @@ HRESULT CQuadooProject::UpdateColors (VOID)
 
 Cleanup:
 	return hr;
+}
+
+INT CQuadooProject::CustomTrackPopupMenu (HMENU hPopup, UINT uFlags, const POINT& ptScreen)
+{
+	CCustomMenu* pCustomMenu = NULL;
+
+	if(m_pdm->IsDarkMode())
+	{
+		pCustomMenu = __new CCustomMenu(hPopup);
+		pCustomMenu->SetDarkMode();
+		AttachSubclassHandler(pCustomMenu);
+		pCustomMenu->Rebuild(hPopup);
+	}
+
+	INT nCmd = TrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_RETURNCMD | TPM_NONOTIFY, ptScreen.x, ptScreen.y, 0, m_hwnd, NULL);
+
+	if(pCustomMenu)
+	{
+		DetachSubclassHandler(pCustomMenu);
+		__delete pCustomMenu;
+	}
+
+	return nCmd;
 }
 
 HRESULT CQuadooProject::ExtractFindSymbol (PCWSTR pcwzWord, INT idxWordPtr)

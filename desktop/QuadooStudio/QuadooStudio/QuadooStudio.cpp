@@ -20,36 +20,14 @@ const WCHAR c_wzQuadooStudioClass[] = L"QuadooStudioCls";
 const WCHAR c_wzQuadooStudioTitle[] = L"Quadoo Studio";
 const WCHAR c_wzRegistryKey[] = L"Software\\Simbey\\QuadooStudio";
 
-void SetMenuItemTypes (HMENU hMenu, UINT nAddFlags, UINT nRemoveFlags)
-{
-    int itemCount = GetMenuItemCount(hMenu);
-
-    for(int i = 0; i < itemCount; ++i)
-    {
-        MENUITEMINFO menuItemInfo = { sizeof(MENUITEMINFO) };
-        menuItemInfo.fMask = MIIM_FTYPE;
-
-        if(GetMenuItemInfo(hMenu, i, TRUE, &menuItemInfo))
-        {
-            menuItemInfo.fType = (menuItemInfo.fType | nAddFlags) & ~nRemoveFlags;
-
-            SetMenuItemInfo(hMenu, i, TRUE, &menuItemInfo);
-
-            HMENU hSubMenu = GetSubMenu(hMenu, i);
-            if(hSubMenu)
-                SetMenuItemTypes(hSubMenu, nAddFlags, nRemoveFlags);
-        }
-    }
-}
-
 CQuadooStudio::CQuadooStudio (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
 	m_hAccel(NULL),
 	m_pGdiPlusStartupInput(NULL),
 	m_gdiplusToken(NULL),
 	m_hwndTree(NULL),
-	m_hbrDarkMenu(NULL),
 	m_hImageList(NULL),
+	m_pCustomMenu(NULL),
 	m_pSplitter(NULL),
 	m_pProject(NULL)
 {
@@ -57,11 +35,14 @@ CQuadooStudio::CQuadooStudio (HINSTANCE hInstance) :
 
 CQuadooStudio::~CQuadooStudio ()
 {
-	ClearMenuMap();
+	if(m_pCustomMenu)
+	{
+		DetachSubclassHandler(m_pCustomMenu);
+		SafeDelete(m_pCustomMenu);
+	}
 
 	if(m_hImageList)
 		ImageList_Destroy(m_hImageList);
-	SafeDeleteGdiObject(m_hbrDarkMenu);
 
 	if(m_pGdiPlusStartupInput)
 	{
@@ -347,21 +328,25 @@ VOID CQuadooStudio::UpdateColorScheme (VOID)
 	if(m_pProject)
 		m_pProject->UpdateColorScheme();
 
-	MENUINFO menuInfo = { sizeof(MENUINFO) };
-	menuInfo.fMask = MIM_BACKGROUND | MIM_APPLYTOSUBMENUS;
 	if(m_dm.IsDarkMode())
 	{
-		SetMenuItemTypes(::GetMenu(m_hwnd), MFT_OWNERDRAW, 0);
-		if(NULL == m_hbrDarkMenu)
-			m_hbrDarkMenu = CreateSolidBrush(RGB(40, 40, 40));
-		menuInfo.hbrBack = m_hbrDarkMenu;
+		if(NULL == m_pCustomMenu)
+		{
+			m_pCustomMenu = __new CCustomMenu(::GetMenu(m_hwnd));
+			m_pCustomMenu->SetDarkMode();
+			AttachSubclassHandler(m_pCustomMenu);
+		}
 	}
 	else
 	{
-		SetMenuItemTypes(::GetMenu(m_hwnd), 0, MFT_OWNERDRAW);
-		menuInfo.hbrBack = (HBRUSH)(COLOR_MENU + 1); // Default system background color
+		if(m_pCustomMenu)
+		{
+			DetachSubclassHandler(m_pCustomMenu);
+			SafeDelete(m_pCustomMenu);
+
+			InvalidateRect(m_hwnd, NULL, TRUE);
+		}
 	}
-	SetMenuInfo(::GetMenu(m_hwnd), &menuInfo);
 }
 
 // CBaseWindow
@@ -429,8 +414,8 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 		{
 			if(SUCCEEDED(MenuUtil::EnableMenuItems(NULL, (HMENU)wParam, this)))
 			{
-				ClearMenuMap();
-				BuildMenuMap((HMENU)wParam);
+				if(m_pCustomMenu)
+					m_pCustomMenu->Rebuild((HMENU)wParam);
 				lResult = 0;
 				return TRUE;
 			}
@@ -525,108 +510,6 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 							m_pProject->ShowTreeContext(hItem, pt);
 					}
 					break;
-				}
-			}
-		}
-		break;
-
-	case WM_MEASUREITEM:
-		{
-			MEASUREITEMSTRUCT* pmis = (MEASUREITEMSTRUCT*)lParam;
-			if(pmis->CtlType == ODT_MENU)
-			{
-				RSTRING rstrLabel;
-
-				SIZE size = { pmis->itemWidth, pmis->itemHeight };
-				HDC hdc = GetDC(m_hwnd);
-
-				if(SUCCEEDED(m_mapMenu.Find(pmis->itemID, &rstrLabel)))
-				{
-					GetTextExtentPoint32(hdc, RStrToWide(rstrLabel), RStrLen(rstrLabel), &size);
-					size.cx += size.cy + 2;
-				}
-				else
-				{
-					WCHAR wzLabel[256];
-
-					INT cch = GetMenuString(::GetMenu(m_hwnd), pmis->itemID, wzLabel, ARRAYSIZE(wzLabel), MF_BYCOMMAND);
-					if(0 < cch)
-						GetTextExtentPoint32(hdc, wzLabel, cch, &size);
-					else
-						size.cy = 4;
-				}
-
-				pmis->itemWidth = size.cx + 2;
-				pmis->itemHeight = size.cy + 2;
-				ReleaseDC(m_hwnd, hdc);
-			}
-		}
-		break;
-
-	case WM_DRAWITEM:
-		{
-			DRAWITEMSTRUCT* pdis = (DRAWITEMSTRUCT*)lParam;
-			if(pdis->CtlType == ODT_MENU)
-			{
-				RECT rc = pdis->rcItem;
-				WCHAR wzItem[256];
-				INT cchItem;
-				HBRUSH hBrush;
-
-				if(pdis->itemState & ODS_SELECTED)
-					hBrush = CreateSolidBrush(RGB(80, 80, 80));
-				else
-					hBrush = CreateSolidBrush(RGB(40, 40, 40));
-
-				FillRect(pdis->hDC, &pdis->rcItem, hBrush);
-				DeleteObject(hBrush);
-
-				cchItem = GetMenuString((HMENU)pdis->hwndItem, pdis->itemID, wzItem, ARRAYSIZE(wzItem), MF_BYCOMMAND);
-
-				if(0 < cchItem)
-				{
-					rc.left++;
-					rc.right--;
-
-					if(m_mapMenu.HasItem(pdis->itemID))
-						rc.left += (rc.bottom - rc.top) + 2;
-
-					// Draw the menu item text
-					if(pdis->itemState & ODS_DISABLED)
-						SetTextColor(pdis->hDC, RGB(128, 128, 128));
-					else
-						SetTextColor(pdis->hDC, RGB(255, 255, 255));
-					SetBkMode(pdis->hDC, TRANSPARENT);
-
-					PWSTR pwzBreak = const_cast<PWSTR>(TStrCchRChr(wzItem, cchItem, L'\t'));
-					if(pwzBreak)
-					{
-						INT cchTemp = static_cast<INT>(pwzBreak - wzItem);
-						INT cchShortcut = (cchItem - cchTemp) - 1;
-						cchItem = cchTemp;
-						pwzBreak++;
-
-						RECT rcShortcut = rc;
-						rcShortcut.right -= 10;
-						DrawText(pdis->hDC, pwzBreak, cchShortcut, &rcShortcut, DT_VCENTER | DT_SINGLELINE | DT_RIGHT);
-					}
-
-					DrawText(pdis->hDC, wzItem, cchItem, &rc, DT_VCENTER | DT_SINGLELINE);
-				}
-				else
-				{
-					rc.left += 10;
-					rc.right -= 10;
-
-					while(rc.bottom - rc.top > 3)
-					{
-						rc.top++;
-						rc.bottom--;
-					}
-
-					hBrush = CreateSolidBrush(RGB(120, 120, 120));
-					FillRect(pdis->hDC, &rc, hBrush);
-					DeleteObject(hBrush);
 				}
 			}
 		}
@@ -737,43 +620,4 @@ INT CQuadooStudio::GetTreeWidth (VOID)
 	RECT rc;
 	GetWindowRect(m_hwndTree, &rc);
 	return rc.right - rc.left;
-}
-
-VOID CQuadooStudio::ClearMenuMap (VOID)
-{
-	for(sysint i = 0; i < m_mapMenu.Length(); i++)
-		RStrRelease(*m_mapMenu.GetValuePtr(i));
-	m_mapMenu.Clear();
-}
-
-HRESULT CQuadooStudio::BuildMenuMap (HMENU hMenu)
-{
-	HRESULT hr = S_FALSE;
-	RSTRING rstrLabel = NULL;
-    int itemCount = GetMenuItemCount(hMenu);
-
-    for(int i = 0; i < itemCount; i++)
-    {
-        MENUITEMINFO menuItemInfo = { sizeof(MENUITEMINFO) };
-        menuItemInfo.fMask = MIIM_STRING;
-
-        if(GetMenuItemInfo(hMenu, i, TRUE, &menuItemInfo) && 0 < menuItemInfo.cch)
-        {
-			Check(RStrAllocW(++menuItemInfo.cch, &rstrLabel, &menuItemInfo.dwTypeData));
-
-	        menuItemInfo.fMask = MIIM_STRING | MIIM_ID;
-			GetMenuItemInfo(hMenu, i, TRUE, &menuItemInfo);
-
-			Check(m_mapMenu.Add(menuItemInfo.wID, rstrLabel));
-			rstrLabel = NULL;
-
-            HMENU hSubMenu = GetSubMenu(hMenu, i);
-            if(hSubMenu)
-                BuildMenuMap(hSubMenu);
-        }
-    }
-
-Cleanup:
-	RStrRelease(rstrLabel);
-	return hr;
 }

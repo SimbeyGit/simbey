@@ -44,6 +44,7 @@
 #define	TVN_MARGIN_CLICK		(TVN_BASE + 2)
 #define TVN_SYNTAX_HIGHLIGHT	(TVN_BASE + 3)
 #define TVN_INIT_CONTEXT_MENU	(TVN_BASE + 4)
+#define	TVN_CLOSE_CONTEXT_MENU	(TVN_BASE + 5)
 
 struct TEXT_EDIT_VIEW
 {
@@ -92,6 +93,12 @@ struct TVNMCONTEXTMENU : NMHDR
 	INT		xCaretPos;
 	ULONG	nWordOffset;
 	PCWSTR	pcwzWord;
+	PVOID	pvUserParam;
+};
+
+struct TVNMCLOSECONTEXT : NMHDR
+{
+	PVOID	pvUserParam;
 };
 
 //

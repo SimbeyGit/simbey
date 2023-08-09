@@ -2286,6 +2286,7 @@ LRESULT CTextEditor::OnContextMenu (HWND wParam, int x, int y)
 	cm.hMenu = CreateContextMenu();
 	if(cm.hMenu)
 	{
+		TVNMCLOSECONTEXT	cc;
 		USPCACHE*			uspCache;
 		CSCRIPT_LOGATTR*	logAttr;
 		ULONG				lineOffset;
@@ -2294,6 +2295,7 @@ LRESULT CTextEditor::OnContextMenu (HWND wParam, int x, int y)
 		cm.ptClient.y = y;
 		cm.pcwzWord = NULL;
 		cm.nWordOffset = (ULONG)-1;
+		cm.pvUserParam = NULL;
 		ScreenToClient(m_hwnd, &cm.ptClient);
 		MouseCoordToFilePos(cm.ptClient.x, cm.ptClient.y, &cm.nLine, &cm.nOffset, &cm.xCaretPos);
 
@@ -2327,7 +2329,9 @@ LRESULT CTextEditor::OnContextMenu (HWND wParam, int x, int y)
 		}
 
 		NotifyParent(TVN_INIT_CONTEXT_MENU, &cm);
+		cc.pvUserParam = cm.pvUserParam;
 		TrackPopupMenu(cm.hMenu, 0, x, y, 0, m_hwnd, NULL);
+		NotifyParent(TVN_CLOSE_CONTEXT_MENU, &cc);
 		DestroyMenu(cm.hMenu);
 
 		if(cm.pcwzWord)
