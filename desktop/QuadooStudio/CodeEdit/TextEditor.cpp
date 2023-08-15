@@ -283,6 +283,7 @@ HRESULT CTextEditor::Prepare (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchT
 	SetTextDocument(srDocument);
 
 	ResetLineCache();
+	UpdateView(false);
 	RefreshWindow();
 
 Cleanup:

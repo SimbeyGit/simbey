@@ -97,6 +97,8 @@ public:
 	HRESULT UpdateFiles (VOID);
 	HRESULT CloseProject (BOOL fPromptUserForSave);
 
+	HRESULT SetPageScript (INT idScript);
+
 	VOID UpdateColorScheme (VOID);
 	VOID ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen);
 	VOID ActivateItem (HTREEITEM hItem);
@@ -144,6 +146,7 @@ private:
 
 	HRESULT GetProjectTarget (__deref_out RSTRING* prstrTarget);
 	HRESULT FindInstalledEngine (__deref_out RSTRING* prstrEngine);
+	BOOL IsWebProject (VOID);
 
 	CProjectFile* GetProjectFromTreeItem (HTREEITEM hItem);
 	CProjectFile* FindDefaultScript (VOID);

@@ -318,6 +318,10 @@
 				RelativePath=".\Splitter.bmp"
 				>
 			</File>
+			<File
+				RelativePath=".\webservice.txt"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Library"

@@ -50,6 +50,8 @@ BOOL CNewProjectDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 				TStrCchCpy(m_wzProjectType, ARRAYSIZE(m_wzProjectType), L"qvm");
 			else if(SendMessage(GetDlgItem(IDC_WQVM), BM_GETCHECK, 0, 0) & BST_CHECKED)
 				TStrCchCpy(m_wzProjectType, ARRAYSIZE(m_wzProjectType), L"wqvm");
+			else if(SendMessage(GetDlgItem(IDC_WEBSERVICE), BM_GETCHECK, 0, 0) & BST_CHECKED)
+				TStrCchCpy(m_wzProjectType, ARRAYSIZE(m_wzProjectType), L"web");
 			else
 				break;
 			__fallthrough;

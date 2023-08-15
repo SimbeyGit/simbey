@@ -151,6 +151,12 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 
 	Check(RStrCreateW(TStrLenAssert(pcwzProject), pcwzProject, &m_rstrProject));
 
+	if(IsWebProject() && IDYES == MessageBox(m_hwnd, L"Would you like to add a default web service script to your project?", L"Add Web Service Script", MB_YESNO))
+	{
+		if(SUCCEEDED(NewFilePrompt()))
+			SetPageScript(IDR_WEBSERVICE);
+	}
+
 Cleanup:
 	SafeDeleteArray(pwzJSON);
 	RStrRelease(rstrPath);
@@ -223,6 +229,39 @@ HRESULT CQuadooProject::CloseProject (BOOL fPromptUserForSave)
 
 	Destroy();
 	return S_OK;
+}
+
+HRESULT CQuadooProject::SetPageScript (INT idScript)
+{
+	HRESULT hr;
+	HMODULE hModule = GetModuleHandle(NULL);
+	PWSTR pwzScript = NULL;
+    HRSRC hResource = FindResourceExW(hModule, L"TEXT", MAKEINTRESOURCEW(idScript), 0);
+	HGLOBAL hMemory = NULL;
+	DWORD cbSize;
+	INT cchScript;
+
+	CheckIfGetLastError(NULL == hResource);
+	cbSize = SizeofResource(hModule, hResource);
+
+	hMemory = LoadResource(hModule, hResource);
+	CheckIfGetLastError(NULL == hMemory);
+
+	Check(Text::ConvertRawTextToUnicode(reinterpret_cast<PBYTE>(GlobalLock(hMemory)), cbSize, &pwzScript, &cchScript));
+	Check(m_pEditor->Prepare(pwzScript, cchScript));
+
+	sysint idxTab = m_pTabs->GetActiveTab();
+	if(-1 != idxTab)
+	{
+		CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
+		m_pTabs->HighlightTab(idxTab, true);
+	}
+
+Cleanup:
+	if(hMemory)
+		GlobalUnlock(hMemory);
+	SafeDeleteArray(pwzScript);
+	return hr;
 }
 
 VOID CQuadooProject::UpdateColorScheme (VOID)
@@ -309,9 +348,13 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED | OLECMDF_ENABLED;
 			break;
 		case ID_RUN_SCRIPT:
-		case ID_PROJECT_COMPILE:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
 			if(NULL != FindDefaultScript())
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
+			break;
+		case ID_PROJECT_COMPILE:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(NULL != FindDefaultScript() && !IsWebProject())
 				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 			break;
 		case ID_FILE_SAVEFILE:
@@ -693,7 +736,8 @@ HRESULT CQuadooProject::AddFilePrompt (VOID)
 	CProjectFile* pFile;
 
 	Check(pick.Initialize());
-	CheckIfIgnore(!pick.OpenSingleFile(m_hwnd, L"Add Existing File To Project", L"QuadooScript (*.quadoo)\0*.quadoo\0"), E_ABORT);
+	CheckIfIgnore(!pick.OpenSingleFile(m_hwnd, L"Add Existing File To Project",
+		IsWebProject() ? L"ASP (*.asp)\0*.asp\0" : L"QuadooScript (*.quadoo)\0*.quadoo\0"), E_ABORT);
 
 	if(PathRelativePathToW(wzRelative, RStrToWide(m_rstrProjectDir), FILE_ATTRIBUTE_DIRECTORY, pick.GetFile(0), 0))
 	{
@@ -731,14 +775,15 @@ HRESULT CQuadooProject::NewFilePrompt (VOID)
 
 	Check(pick.Initialize());
 	Check(pick.SetInitialDirectory(RStrToWide(m_rstrProjectDir)));
-	CheckIfIgnore(!pick.SaveFile(m_hwnd, L"Add New File To Project", L"QuadooScript (*.quadoo)\0*.quadoo\0"), E_ABORT);
+	CheckIfIgnore(!pick.SaveFile(m_hwnd, L"Add New File To Project",
+		IsWebProject() ? L"ASP (*.asp)\0*.asp\0" : L"QuadooScript (*.quadoo)\0*.quadoo\0"), E_ABORT);
 
 	if(PathRelativePathToW(wzRelative, RStrToWide(m_rstrProjectDir), FILE_ATTRIBUTE_DIRECTORY, pick.GetFile(0), 0))
 	{
 		Check(RStrCreateW(TStrLenAssert(wzRelative), wzRelative, &rstrPath));
 		CheckIf(m_mapFiles.HasItem(rstrPath), E_FAIL);
 
-		hFile = CreateFileW(pick.GetFile(0), GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+		hFile = CreateFileW(pick.GetFile(0), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		CheckIfGetLastError(INVALID_HANDLE_VALUE == hFile);
 		SafeCloseFileHandle(hFile);
 
@@ -1069,38 +1114,45 @@ HRESULT CQuadooProject::RunScript (VOID)
 	LONG_PTR nResult;
 
 	Check(SaveAll());
-
 	CheckIf(NULL == pFile, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
-	Check(FindInstalledEngine(&rstrEngine));
-	Check(GetProjectTarget(&rstrTarget));
 
-	Check(m_pProject->FindNonNullValueW(L"args", &srv));
-	Check(srv->GetString(&rstrArgs));
-	srv.Release();
-
-	if(0 < RStrLen(rstrArgs))
-		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\" %r", pFile->m_pwzAbsolutePath, rstrArgs));
-	else
-		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\"", pFile->m_pwzAbsolutePath));
-
-	Check(m_pProject->FindNonNullValueW(L"startDir", &srv));
-	Check(srv->GetString(&rstrStartDir));
-	Check(Formatting::TBuildDirectory(RStrToWide(m_rstrProjectDir), RStrLen(m_rstrProjectDir), RStrToWide(rstrStartDir), RStrLen(rstrStartDir), &pwzStartDir, &cchStartDir));
-
-	Check(RStrCompareIW(rstrTarget, L"qvm", &nCompare));
-	if(0 == nCompare)
+	if(IsWebProject())
 	{
-		WCHAR wzBatchFile[MAX_PATH], wzComSpec[MAX_PATH];
-
-		Check(RStrFormatW(&rstrBatch, L"@Echo off\r\ntitle %r\r\n\"%r\" %r\r\npause\r\ndel \"%%~f0\"\r\n", pFile->m_rstrPath, rstrEngine, rstrScriptArgs));
-		Check(Formatting::TPrintF(wzBatchFile, ARRAYSIZE(wzBatchFile), NULL, L"%r_run.cmd", m_rstrProjectDir));
-		Check(Text::SaveToFileNoBOM(RStrToWide(rstrBatch), RStrLen(rstrBatch), CP_ACP, wzBatchFile));
-		Check(RStrFormatW(&rstrBatchArgs, L"/c \"%ls\"", wzBatchFile));
-		CheckIfGetLastError(0 == GetEnvironmentVariable(L"ComSpec", wzComSpec, ARRAYSIZE(wzComSpec)));
-		Check(HrShellExecute(m_hwnd, L"open", wzComSpec, RStrToWide(rstrBatchArgs), pwzStartDir, SW_SHOW, nResult));
+		MessageBox(m_hwnd, L"Not yet implemented!", L"Launch Web Service", MB_OK);
 	}
 	else
-		Check(HrShellExecute(m_hwnd, L"open", RStrToWide(rstrEngine), RStrToWide(rstrScriptArgs), pwzStartDir, SW_SHOW, nResult));
+	{
+		Check(FindInstalledEngine(&rstrEngine));
+		Check(GetProjectTarget(&rstrTarget));
+
+		Check(m_pProject->FindNonNullValueW(L"args", &srv));
+		Check(srv->GetString(&rstrArgs));
+		srv.Release();
+
+		if(0 < RStrLen(rstrArgs))
+			Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\" %r", pFile->m_pwzAbsolutePath, rstrArgs));
+		else
+			Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\"", pFile->m_pwzAbsolutePath));
+
+		Check(m_pProject->FindNonNullValueW(L"startDir", &srv));
+		Check(srv->GetString(&rstrStartDir));
+		Check(Formatting::TBuildDirectory(RStrToWide(m_rstrProjectDir), RStrLen(m_rstrProjectDir), RStrToWide(rstrStartDir), RStrLen(rstrStartDir), &pwzStartDir, &cchStartDir));
+
+		Check(RStrCompareIW(rstrTarget, L"qvm", &nCompare));
+		if(0 == nCompare)
+		{
+			WCHAR wzBatchFile[MAX_PATH], wzComSpec[MAX_PATH];
+
+			Check(RStrFormatW(&rstrBatch, L"@Echo off\r\ntitle %r\r\n\"%r\" %r\r\npause\r\ndel \"%%~f0\"\r\n", pFile->m_rstrPath, rstrEngine, rstrScriptArgs));
+			Check(Formatting::TPrintF(wzBatchFile, ARRAYSIZE(wzBatchFile), NULL, L"%r_run.cmd", m_rstrProjectDir));
+			Check(Text::SaveToFileNoBOM(RStrToWide(rstrBatch), RStrLen(rstrBatch), CP_ACP, wzBatchFile));
+			Check(RStrFormatW(&rstrBatchArgs, L"/c \"%ls\"", wzBatchFile));
+			CheckIfGetLastError(0 == GetEnvironmentVariable(L"ComSpec", wzComSpec, ARRAYSIZE(wzComSpec)));
+			Check(HrShellExecute(m_hwnd, L"open", wzComSpec, RStrToWide(rstrBatchArgs), pwzStartDir, SW_SHOW, nResult));
+		}
+		else
+			Check(HrShellExecute(m_hwnd, L"open", RStrToWide(rstrEngine), RStrToWide(rstrScriptArgs), pwzStartDir, SW_SHOW, nResult));
+	}
 
 Cleanup:
 	if(FAILED(hr))
@@ -1195,6 +1247,21 @@ Cleanup:
 	if(hKey)
 		RegCloseKey(hKey);
 	return hr;
+}
+
+BOOL CQuadooProject::IsWebProject (VOID)
+{
+	HRESULT hr;
+	RSTRING rstrTarget = NULL;
+	INT nResult;
+
+	Check(GetProjectTarget(&rstrTarget));
+	Check(RStrCompareIW(rstrTarget, L"web", &nResult));
+	CheckIfIgnore(0 != nResult, S_FALSE);
+
+Cleanup:
+	RStrRelease(rstrTarget);
+	return S_OK == hr;
 }
 
 CProjectFile* CQuadooProject::GetProjectFromTreeItem (HTREEITEM hItem)
@@ -1363,7 +1430,7 @@ VOID CQuadooProject::RemoveFilePrompt (CProjectFile* pFile)
 	}
 }
 
-HRESULT CQuadooProject::ShowProjectCompiler(VOID)
+HRESULT CQuadooProject::ShowProjectCompiler (VOID)
 {
 	HRESULT hr;
 	RSTRING rstrTarget = NULL, rstrEngine = NULL;

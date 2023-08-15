@@ -1,0 +1,63 @@
+<%@ language="QuadooScript" %>
+<%
+
+var Request = Host.ParseFiles();
+
+function WritePageJSON (vJSON)
+{
+	Response.ContentType = "application/json";
+	Response.CacheControl = "no-store";
+	print((string)vJSON);
+}
+
+function WriteCustomJSONError (nStatus, strError)
+{
+	var oError = JSONCreateObject();
+	oError.error_message = strError;
+	Response.Status = nStatus + " Error";
+	WritePageJSON(oError);
+}
+
+function WriteJSONError (strError)
+{
+	WriteCustomJSONError(400, strError);
+}
+
+class CMyWebService
+{
+	CMyWebService ()
+	{
+		// Initialize things here
+	}
+
+	function _hello ()
+	{
+		var oHello = JSONCreateObject();
+		oHello.message = "Hello, Web Service!";
+		WritePageJSON(oHello);
+	}
+};
+
+function main ()
+{
+	var oWebService = new CMyWebService;
+	var strAction = Request.OptFind("action", "");
+
+	try
+		invoke("_" + strAction, oWebService);
+	catch(e)
+	{
+		var oError = JSONCreateObject();
+		var vValue = e.Value;
+		oError.error_message = e.ToString();
+		if(QVType.String == typeof(vValue))
+			oError.exception = vValue;
+		else
+			oError.exception = "Code: " + (string)vValue;
+		oError.action = strAction;
+		Response.Status = "500 Exception";
+		WritePageJSON(oError);
+	}
+}
+
+%>
