@@ -151,7 +151,7 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 
 	Check(RStrCreateW(TStrLenAssert(pcwzProject), pcwzProject, &m_rstrProject));
 
-	if(IsWebProject() && IDYES == MessageBox(m_hwnd, L"Would you like to add a default web service script to your project?", L"Add Web Service Script", MB_YESNO))
+	if(IsWebProject() && 0 == srFiles->Count() && IDYES == MessageBox(m_hwnd, L"Would you like to add a default web service script to your project?", L"Add Web Service Script", MB_YESNO))
 	{
 		if(SUCCEEDED(NewFilePrompt()))
 			SetPageScript(IDR_WEBSERVICE);
@@ -712,7 +712,13 @@ HRESULT CQuadooProject::EditRunParams (VOID)
 	CDialogHost dlgHost(m_hInstance);
 	RSTRING rstrEngine = NULL;
 
-	FindInstalledEngine(&rstrEngine);
+	if(IsWebProject())
+	{
+		if(FAILED(FindActiveQuadoo(&rstrEngine)))
+			Check(RStrCreateW(LSP(L"NOT INSTALLED"), &rstrEngine));
+	}
+	else
+		FindInstalledEngine(&rstrEngine);
 
 	{
 		CRunParamsDlg dlgParams(m_pProject, rstrEngine, m_rstrProjectDir);
@@ -1244,6 +1250,44 @@ HRESULT CQuadooProject::FindInstalledEngine (__deref_out RSTRING* prstrEngine)
 Cleanup:
 	RStrRelease(rstrTarget);
 
+	if(hKey)
+		RegCloseKey(hKey);
+	return hr;
+}
+
+HRESULT CQuadooProject::FindActiveQuadoo (__deref_out RSTRING* prstrEngine)
+{
+	HRESULT hr;
+	HKEY hKey = NULL;
+	WCHAR wzClass[80], *pwzClassPtr, wzPath[MAX_PATH];
+	LONG cb;
+	INT cch, cchRemaining;
+
+	Check(TStrCchCpyEx(wzClass, ARRAYSIZE(wzClass), L"CLSID\\", &pwzClassPtr, &cchRemaining));
+	cb = cchRemaining * sizeof(WCHAR);
+
+	CheckWin32Error(RegOpenKey(HKEY_CLASSES_ROOT, L"QuadooScript\\CLSID", &hKey));
+	CheckWin32Error(RegQueryValue(hKey, NULL, pwzClassPtr, &cb));
+	CheckIf(cb % sizeof(WCHAR), E_UNEXPECTED);
+	cch = (ARRAYSIZE(wzClass) - cchRemaining) + cb / sizeof(WCHAR);
+	if(0 < cch && wzClass[cch - 1] == L'\0')
+		cch--;
+
+	Check(TStrCchCpy(wzClass + cch, ARRAYSIZE(wzClass) - cch, L"\\InprocServer32"));
+	cb = sizeof(wzPath);
+
+	RegCloseKey(hKey); hKey = NULL;
+	CheckWin32Error(RegOpenKey(HKEY_CLASSES_ROOT, wzClass, &hKey));
+
+	CheckWin32Error(RegQueryValue(hKey, NULL, wzPath, &cb));
+	CheckIf(cb % sizeof(WCHAR), E_UNEXPECTED);
+	cch = cb / sizeof(WCHAR);
+	if(0 < cch && wzPath[cch - 1] == L'\0')
+		cch--;
+
+	Check(RStrCreateW(cch, wzPath, prstrEngine));
+
+Cleanup:
 	if(hKey)
 		RegCloseKey(hKey);
 	return hr;

@@ -146,6 +146,7 @@ private:
 
 	HRESULT GetProjectTarget (__deref_out RSTRING* prstrTarget);
 	HRESULT FindInstalledEngine (__deref_out RSTRING* prstrEngine);
+	static HRESULT FindActiveQuadoo (__deref_out RSTRING* prstrEngine);
 	BOOL IsWebProject (VOID);
 
 	CProjectFile* GetProjectFromTreeItem (HTREEITEM hItem);
