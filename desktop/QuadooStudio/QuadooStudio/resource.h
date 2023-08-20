@@ -17,6 +17,7 @@
 #define IDD_COMPILE_TO_EXE              113
 #define IDD_GOTO_DEFINITION             114
 #define IDR_WEBSERVICE                  115
+#define IDD_WEB_PARAMS                  116
 #define IDC_PROJECT_FILES               1001
 #define IDC_QVM                         1002
 #define IDC_WQVM                        1003
@@ -32,6 +33,9 @@
 #define IDC_SELECT_ICON                 1013
 #define IDC_CLEAR_ICON                  1014
 #define IDC_DEFINITIONS                 1015
+#define IDC_HOST_AND_SERVER             1016
+#define IDC_COPY_PATH                   1017
+#define IDC_COPY_TO_PATH                1018
 #define ID_FILE_EXIT                    40001
 #define ID_FILE_NEW_PROJECT             40003
 #define ID_PROJECT_ADDFILE              40004
@@ -50,9 +54,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        116
+#define _APS_NEXT_RESOURCE_VALUE        117
 #define _APS_NEXT_COMMAND_VALUE         40015
-#define _APS_NEXT_CONTROL_VALUE         1016
+#define _APS_NEXT_CONTROL_VALUE         1019
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

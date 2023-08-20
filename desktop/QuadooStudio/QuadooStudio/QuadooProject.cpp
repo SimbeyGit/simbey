@@ -15,6 +15,7 @@
 #include "Keywords.h"
 #include "Tabs.h"
 #include "RunParamsDlg.h"
+#include "WebParamsDlg.h"
 #include "ProjectCompilerDlg.h"
 #include "GotoDefinitionDlg.h"
 #include "DarkMode.h"
@@ -716,13 +717,20 @@ HRESULT CQuadooProject::EditRunParams (VOID)
 	{
 		if(FAILED(FindActiveQuadoo(&rstrEngine)))
 			Check(RStrCreateW(LSP(L"NOT INSTALLED"), &rstrEngine));
+
+		{
+			CWebParamsDlg dlgParams(m_pProject, rstrEngine, m_rstrProjectDir);
+			Check(dlgHost.Display(m_hwnd, &dlgParams));
+		}
 	}
 	else
+	{
 		FindInstalledEngine(&rstrEngine);
 
-	{
-		CRunParamsDlg dlgParams(m_pProject, rstrEngine, m_rstrProjectDir);
-		Check(dlgHost.Display(m_hwnd, &dlgParams));
+		{
+			CRunParamsDlg dlgParams(m_pProject, rstrEngine, m_rstrProjectDir);
+			Check(dlgHost.Display(m_hwnd, &dlgParams));
+		}
 	}
 
 	if(IDOK == dlgHost.GetReturnValue())

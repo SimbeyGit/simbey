@@ -171,6 +171,22 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,259,161,50,14
 END
 
+IDD_WEB_PARAMS DIALOGEX 0, 0, 196, 146
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Web Service Parameters"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Installed Engine:",IDC_STATIC,6,6,54,8
+    EDITTEXT        IDC_INSTALLED_ENGINE,6,18,180,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Host and Server Path:",IDC_STATIC,6,42,72,8
+    EDITTEXT        IDC_HOST_AND_SERVER,6,54,180,14,ES_AUTOHSCROLL
+    CONTROL         "Copy script files to path before running?",IDC_COPY_PATH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,78,145,10
+    EDITTEXT        IDC_COPY_TO_PATH,6,90,180,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,6,126,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,126,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -210,6 +226,14 @@ BEGIN
         RIGHTMARGIN, 309
         TOPMARGIN, 7
         BOTTOMMARGIN, 175
+    END
+
+    IDD_WEB_PARAMS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 189
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 139
     END
 END
 #endif    // APSTUDIO_INVOKED
