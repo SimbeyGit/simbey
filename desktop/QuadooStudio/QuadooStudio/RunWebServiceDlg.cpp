@@ -155,6 +155,7 @@ BOOL CRunWebServiceDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lPara
 #else
 		SetWindowText(GetDlgItem(IDC_AGENT), L"Mozilla/5 (Windows; Win32; x86) QuadooStudio");
 #endif
+		SetWindowText(GetDlgItem(IDC_BODY), L"{\"action\":\"hello\"}");
 		CenterHost();
 		SetFocus(GetDlgItem(IDOK));
 		break;
