@@ -161,4 +161,7 @@ private:
 
 	VOID RemoveFilePrompt (CProjectFile* pFile);
 	HRESULT ShowProjectCompiler (VOID);
+	HRESULT CopyWebScripts (VOID);
+
+	static BOOL IsFileOutOfSync (PCWSTR pcwzSource, PCWSTR pcwzTarget);
 };

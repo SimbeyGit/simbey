@@ -2,8 +2,6 @@
 #include <shlwapi.h>
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
-#include "Library\Core\StringCore.h"
-#include "Library\Util\RString.h"
 #include "Library\Util\Formatting.h"
 #include "Published\JSON.h"
 #include "WebParamsDlg.h"
@@ -131,8 +129,12 @@ HRESULT CWebParamsDlg::WriteServerAndPath (VOID)
 
 	hwnd = GetDlgItem(IDC_HOST_AND_SERVER);
 	cch = GetWindowTextLength(hwnd);
+	CheckIf(0 == cch, HRESULT_FROM_WIN32(ERROR_NO_DATA));
+
 	Check(RStrAllocW(cch, &rstrValue, &pwzPtr));
 	GetWindowText(hwnd, pwzPtr, cch + 1);
+	CheckIf(0 != TStrICmpNAssert(pwzPtr, SLP(L"http://")) && 0 != TStrICmpNAssert(pwzPtr, SLP(L"https://")), HRESULT_FROM_WIN32(ERROR_PROTOCOL_UNREACHABLE));
+
 	Check(JSONCreateString(rstrValue, &srv));
 	Check(m_pProject->AddValueW(L"webHost", srv));
 

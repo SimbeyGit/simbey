@@ -215,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RunWebServiceDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Splitter.cpp"
 				>
 			</File>
@@ -274,6 +278,10 @@
 			</File>
 			<File
 				RelativePath=".\RunParamsDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RunWebServiceDlg.h"
 				>
 			</File>
 			<File
@@ -507,6 +515,18 @@
 				</File>
 				<File
 					RelativePath="..\..\..\shared\library\util\TextHelpers.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Net"
+				>
+				<File
+					RelativePath="..\..\..\shared\library\net\AsyncWinHttp.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\net\AsyncWinHttp.h"
 					>
 				</File>
 			</Filter>

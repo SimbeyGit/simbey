@@ -18,6 +18,7 @@
 #define IDD_GOTO_DEFINITION             114
 #define IDR_WEBSERVICE                  115
 #define IDD_WEB_PARAMS                  116
+#define IDD_RUN_WEBSERVICE              117
 #define IDC_PROJECT_FILES               1001
 #define IDC_QVM                         1002
 #define IDC_WQVM                        1003
@@ -36,6 +37,19 @@
 #define IDC_HOST_AND_SERVER             1016
 #define IDC_COPY_PATH                   1017
 #define IDC_COPY_TO_PATH                1018
+#define IDC_VERB                        1019
+#define IDC_REFERRER                    1020
+#define IDC_USERNAME                    1021
+#define IDC_PASSWORD                    1022
+#define IDC_HEADER_VALUE                1024
+#define IDC_HEADER_NAME                 1025
+#define IDC_CONTENT_TYPE                1026
+#define IDC_QUERY_STRING                1027
+#define IDC_COOKIES                     1028
+#define IDC_BODY                        1029
+#define IDC_RESPONSE                    1030
+#define IDC_STATUS                      1031
+#define IDC_AGENT                       1032
 #define ID_FILE_EXIT                    40001
 #define ID_FILE_NEW_PROJECT             40003
 #define ID_PROJECT_ADDFILE              40004
@@ -54,9 +68,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        117
+#define _APS_NEXT_RESOURCE_VALUE        118
 #define _APS_NEXT_COMMAND_VALUE         40015
-#define _APS_NEXT_CONTROL_VALUE         1019
+#define _APS_NEXT_CONTROL_VALUE         1033
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -14,12 +14,13 @@
 #include "Published\JSON.h"
 #include "Keywords.h"
 #include "Tabs.h"
+#include "DarkMode.h"
+#include "CustomMenu.h"
 #include "RunParamsDlg.h"
 #include "WebParamsDlg.h"
 #include "ProjectCompilerDlg.h"
 #include "GotoDefinitionDlg.h"
-#include "DarkMode.h"
-#include "CustomMenu.h"
+#include "RunWebServiceDlg.h"
 #include "QuadooProject.h"
 
 #ifndef ENM_CLIPFORMAT
@@ -1132,7 +1133,38 @@ HRESULT CQuadooProject::RunScript (VOID)
 
 	if(IsWebProject())
 	{
-		MessageBox(m_hwnd, L"Not yet implemented!", L"Launch Web Service", MB_OK);
+		PCWSTR pcwzName = TStrCchRChr(pFile->m_pwzAbsolutePath, pFile->m_cchAbsolutePath, L'\\');
+		bool fCopyPath;
+
+		if(pcwzName) pcwzName++;
+
+		if(FAILED(m_pProject->FindNonNullValueW(L"webHost", &srv)))
+		{
+			Check(EditRunParams());
+			Check(m_pProject->FindNonNullValueW(L"webHost", &srv));
+		}
+
+		Check(srv->GetString(&rstrStartDir));
+		srv.Release();
+
+		PCWSTR pcwzHost = RStrToWide(rstrStartDir);
+		INT cchHost = RStrLen(rstrStartDir);
+		CheckIf(0 == cchHost, E_INVALIDARG);
+
+		if(pcwzHost[cchHost - 1] != L'/')
+			Check(RStrFormatW(&rstrTarget, L"%r/%ls", rstrStartDir, pcwzName));
+		else
+			Check(RStrFormatW(&rstrTarget, L"%r%ls", rstrStartDir, pcwzName));
+
+		if(SUCCEEDED(m_pProject->FindNonNullValueW(L"copyWebPath", &srv)) && SUCCEEDED(srv->GetBoolean(&fCopyPath)) && fCopyPath)
+			Check(CopyWebScripts());
+
+		{
+			CDialogHost dlgHost(m_hInstance);
+			CRunWebServiceDlg dlgRunWebService(m_pProject, rstrTarget);
+
+			Check(dlgHost.Display(m_hwnd, &dlgRunWebService));
+		}
 	}
 	else
 	{
@@ -1507,4 +1539,56 @@ Cleanup:
 	RStrRelease(rstrTarget);
 	RStrRelease(rstrEngine);
 	return hr;
+}
+
+HRESULT CQuadooProject::CopyWebScripts (VOID)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+	RSTRING rstrCopyPath = NULL, rstrTarget = NULL;
+
+	Check(m_pProject->FindNonNullValueW(L"copyPath", &srv));
+	Check(srv->GetString(&rstrCopyPath));
+
+	for(sysint i = 0; i < m_mapFiles.Length(); i++)
+	{
+		CProjectFile* pFile = *m_mapFiles.GetValuePtr(i);
+		PCWSTR pcwzName = TStrRChr(pFile->m_pwzAbsolutePath, L'\\');
+		if(pcwzName) pcwzName++;
+
+		Check(RStrFormatW(&rstrTarget, L"%r\\%ls", rstrCopyPath, pcwzName));
+
+		if(IsFileOutOfSync(pFile->m_pwzAbsolutePath, RStrToWide(rstrTarget)))
+			CheckIfGetLastError(!CopyFile(pFile->m_pwzAbsolutePath, RStrToWide(rstrTarget), FALSE));
+		RStrRelease(rstrTarget); rstrTarget = NULL;
+	}
+
+Cleanup:
+	RStrRelease(rstrTarget);
+	RStrRelease(rstrCopyPath);
+	return hr;
+}
+
+BOOL CQuadooProject::IsFileOutOfSync (PCWSTR pcwzSource, PCWSTR pcwzTarget)
+{
+	BOOL fOutOfSync = TRUE;
+	WIN32_FIND_DATA wfdTarget, wfdSource;
+
+	HANDLE hTarget = FindFirstFile(pcwzTarget, &wfdTarget);
+	if(INVALID_HANDLE_VALUE != hTarget)
+	{
+		HANDLE hSource = FindFirstFile(pcwzSource, &wfdSource);
+		if(INVALID_HANDLE_VALUE != hSource)
+		{
+			fOutOfSync = wfdSource.nFileSizeLow != wfdTarget.nFileSizeLow ||
+				wfdSource.nFileSizeHigh != wfdTarget.nFileSizeHigh ||
+				wfdSource.ftLastWriteTime.dwLowDateTime != wfdTarget.ftLastWriteTime.dwLowDateTime ||
+				wfdSource.ftLastWriteTime.dwHighDateTime != wfdTarget.ftLastWriteTime.dwHighDateTime;
+			FindClose(hSource);
+		}
+
+		FindClose(hTarget);
+	}
+
+	return fOutOfSync;
 }
