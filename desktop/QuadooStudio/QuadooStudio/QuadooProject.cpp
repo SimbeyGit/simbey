@@ -238,7 +238,7 @@ HRESULT CQuadooProject::SetPageScript (INT idScript)
 	HRESULT hr;
 	HMODULE hModule = GetModuleHandle(NULL);
 	PWSTR pwzScript = NULL;
-    HRSRC hResource = FindResourceExW(hModule, L"TEXT", MAKEINTRESOURCEW(idScript), 0);
+	HRSRC hResource = FindResourceExW(hModule, L"TEXT", MAKEINTRESOURCEW(idScript), 0);
 	HGLOBAL hMemory = NULL;
 	PVOID pvResource = NULL;
 	DWORD cbSize;
@@ -1108,7 +1108,7 @@ HRESULT CQuadooProject::SaveAll (VOID)
 		CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
 		if(idxActive == idxTab)
 		{
-			if(m_pEditor->IsModified())
+			if(m_pTabs->GetActiveTabHighlight())
 				Check(SaveTab(idxTab));
 		}
 		else if(pFile->m_pTabDocument->IsModified())
@@ -1472,7 +1472,7 @@ BOOL CQuadooProject::CloseTab (sysint idxTab)
 	sysint idxActive = m_pTabs->GetActiveTab();
 	if(idxActive == idxTab)
 	{
-		if(m_pEditor->IsModified() && !PromptToSaveTab(idxTab))
+		if(m_pTabs->GetActiveTabHighlight() && !PromptToSaveTab(idxTab))
 			return FALSE;
 	}
 	else

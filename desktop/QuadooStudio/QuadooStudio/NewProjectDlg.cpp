@@ -33,6 +33,7 @@ BOOL CNewProjectDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 	{
 	case WM_INITDIALOG:
 		SendMessage(GetDlgItem(IDC_QVM), BM_SETCHECK, BST_CHECKED, 0);
+		SetFocus(GetDlgItem(IDC_QVM));
 		CenterHost();
 		break;
 
