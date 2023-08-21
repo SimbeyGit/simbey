@@ -240,6 +240,7 @@ HRESULT CQuadooProject::SetPageScript (INT idScript)
 	PWSTR pwzScript = NULL;
     HRSRC hResource = FindResourceExW(hModule, L"TEXT", MAKEINTRESOURCEW(idScript), 0);
 	HGLOBAL hMemory = NULL;
+	PVOID pvResource = NULL;
 	DWORD cbSize;
 	INT cchScript;
 
@@ -249,7 +250,10 @@ HRESULT CQuadooProject::SetPageScript (INT idScript)
 	hMemory = LoadResource(hModule, hResource);
 	CheckIfGetLastError(NULL == hMemory);
 
-	Check(Text::ConvertRawTextToUnicode(reinterpret_cast<PBYTE>(GlobalLock(hMemory)), cbSize, &pwzScript, &cchScript));
+	pvResource = LockResource(hMemory);
+	CheckIfGetLastError(NULL == pvResource);
+
+	Check(Text::ConvertRawTextToUnicode(reinterpret_cast<PBYTE>(pvResource), cbSize, &pwzScript, &cchScript));
 	Check(m_pEditor->Prepare(pwzScript, cchScript));
 
 	sysint idxTab = m_pTabs->GetActiveTab();
@@ -260,8 +264,6 @@ HRESULT CQuadooProject::SetPageScript (INT idScript)
 	}
 
 Cleanup:
-	if(hMemory)
-		GlobalUnlock(hMemory);
 	SafeDeleteArray(pwzScript);
 	return hr;
 }

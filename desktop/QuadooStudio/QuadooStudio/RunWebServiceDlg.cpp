@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
 #include "Library\Util\Formatting.h"
+#include "Published\SimbeyCore.h"
 #include "Published\JSON.h"
 #include "RunWebServiceDlg.h"
 
@@ -205,7 +206,19 @@ BOOL CRunWebServiceDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lPara
 					}
 					else
 					{
-						// TODO
+						CMemoryStream stmBase64;
+						DWORD cbBase64;
+
+						if(SUCCEEDED(ScEncodeBase64LinesA(m_pWebCall->m_stmResponse.GetReadPtr(), m_pWebCall->m_stmResponse.DataRemaining(), &stmBase64, &cbBase64)))
+						{
+							RSTRING rstrResponseW;
+
+							if(SUCCEEDED(RStrConvertToW(CP_UTF8, cbBase64, stmBase64.TGetReadPtr<CHAR>(), &rstrResponseW)))
+							{
+								SetWindowText(GetDlgItem(IDC_RESPONSE), RStrToWide(rstrResponseW));
+								RStrRelease(rstrResponseW);
+							}
+						}
 					}
 				}
 			}
