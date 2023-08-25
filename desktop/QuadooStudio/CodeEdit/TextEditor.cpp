@@ -190,7 +190,7 @@ CTextEditor::CTextEditor (HINSTANCE hInstance, bool fDarkMode, bool fUseSystemCo
 	SystemParametersInfo(SPI_GETCARETWIDTH, 0, &m_nCaretWidth, 0);
 
 	// Display-related data
-	m_uStyleFlags		= 0;
+	m_uStyleFlags		= TXS_SELMARGIN;
 	m_nLongLineLimit	= 256;
 	if(m_nCaretWidth == 0)
 		m_nCaretWidth = 2;
@@ -629,17 +629,32 @@ VOID CTextEditor::SetDarkMode (bool fDarkMode, bool fUseSystemColors)
 	}
 }
 
-HRESULT CTextEditor::DisplayOptions (VOID)
+HRESULT CTextEditor::DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged)
 {
 	HRESULT hr;
 	CDialogHost dlgHost(m_hInstance);
 	COptionsDlg dlgOptions(m_rgbColorList);
 	HFONT hFont;
 
+	CheckIf(pfChanged && NULL == prgCustom, E_INVALIDARG);
 	CheckIfGetLastError(0 == GetObject(m_uspFontList[0].hFont, sizeof(dlgOptions.m_lfEdit), &dlgOptions.m_lfEdit));
+
+	if(prgCustom)
+	{
+		if(cCustom > ARRAYSIZE(dlgOptions.m_rgbCustColors))
+			cCustom = ARRAYSIZE(dlgOptions.m_rgbCustColors);
+		CopyMemory(dlgOptions.m_rgbCustColors, prgCustom, cCustom * sizeof(COLORREF));
+	}
 
 	Check(dlgHost.Display(m_hwnd, &dlgOptions));
 	CheckIfIgnore(dlgHost.GetReturnValue() != IDOK, E_ABORT);
+
+	if(pfChanged)
+	{
+		*pfChanged = 0 != memcmp(prgCustom, dlgOptions.m_rgbCustColors, cCustom * sizeof(COLORREF));
+		if(*pfChanged)
+			CopyMemory(prgCustom, dlgOptions.m_rgbCustColors, cCustom * sizeof(COLORREF));
+	}
 
 	hFont = CreateFontIndirect(&dlgOptions.m_lfEdit);
 	if(hFont)
@@ -916,6 +931,21 @@ ULONG CTextEditor::GetStyleMask (ULONG uMask)
 	return m_uStyleFlags & uMask;
 }
 
+ULONG CTextEditor::SetStyleMask (ULONG uMask, ULONG uStyles)
+{
+	ULONG oldstyle = m_uStyleFlags;
+
+	m_uStyleFlags  = (m_uStyleFlags & ~uMask) | uStyles;
+
+	ResetLineCache();
+
+	// update display here
+	UpdateMetrics();
+	RefreshWindow();
+
+	return oldstyle;
+}
+
 bool CTextEditor::CheckStyle (ULONG uMask)
 {
 	return (m_uStyleFlags & uMask) ? true : false;
@@ -1143,7 +1173,14 @@ bool CTextEditor::GetLogAttr (ULONG nLineNo, USPCACHE** puspCache, CSCRIPT_LOGAT
 
 INT CTextEditor::LeftMarginWidth (VOID)
 {
-	return m_nLineHeight + 5;
+	INT xSize = 0;
+
+	if(CheckStyle(TXS_SELMARGIN))
+		xSize += 10;
+	if(CheckStyle(TXS_LEFTMARGIN))
+		xSize += m_nLineHeight + 5;
+
+	return xSize;
 }
 
 void CTextEditor::PaintLine (HDC hdc, ULONG nLineNo, int xpos, int ypos, HRGN hrgnUpdate)
@@ -1182,7 +1219,7 @@ void CTextEditor::PaintLine (HDC hdc, ULONG nLineNo, int xpos, int ypos, HRGN hr
 	//
 	//	draw the margin straight over the top
 	//
-	if(xLeftMargin > 0)
+	if(0 < xLeftMargin)
 	{
 		RECT rcMargin = { 0, 0, xLeftMargin, m_nLineHeight };
 		PaintMargin(hdc, nLineNo, rcMargin);
@@ -2562,16 +2599,18 @@ LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
 	{
 		nLineNo = (my / m_nLineHeight) + m_nVScrollPos;
 
-		TVNMARGINCLICK mc;
-		mc.nLineNo = nLineNo;
-		mc.xClick = mx;
-		mc.xMargin = xMargin;
-		mc.fHandled = FALSE;
-		NotifyParent(TVN_MARGIN_CLICK, &mc);
+		// Only send the TVN_MARGIN_CLICK notification when TXS_LEFTMARGIN is enabled.
+		if(CheckStyle(TXS_LEFTMARGIN) && mx < m_nLineHeight + 5)
+		{
+			TVNMARGINCLICK mc;
+			mc.nLineNo = nLineNo;
+			mc.fHandled = FALSE;
+			NotifyParent(TVN_MARGIN_CLICK, &mc);
 
-		// If the parent handled the click, then just return now.
-		if(mc.fHandled)
-			return 0;
+			// If the parent handled the click, then just return now.
+			if(mc.fHandled)
+				return 0;
+		}
 
 		// remove any existing selection
 		InvalidateRange(m_nSelectionStart, m_nSelectionEnd);

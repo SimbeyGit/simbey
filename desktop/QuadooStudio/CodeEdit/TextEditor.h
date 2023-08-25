@@ -138,7 +138,10 @@ public:
 
 	virtual VOID ScrollView (INT xCaret, ULONG nLine);
 	virtual VOID SetDarkMode (bool fDarkMode, bool fUseSystemColors);
-	virtual HRESULT DisplayOptions (VOID);
+	virtual HRESULT DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged);
+
+	virtual ULONG GetStyleMask (ULONG uMask);
+	virtual ULONG SetStyleMask (ULONG uMask, ULONG uStyles);
 
 	// CBaseWindow
 	virtual HINSTANCE GetInstance (VOID);
@@ -159,7 +162,6 @@ private:
 	VOID SendUpdateCommand (VOID);
 	ULONG NotifyParent (UINT nNotifyCode, NMHDR* optional = NULL);
 
-	ULONG GetStyleMask (ULONG uMask);
 	bool CheckStyle (ULONG uMask);
 
 	COLORREF GetColor (UINT idx);

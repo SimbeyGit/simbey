@@ -365,14 +365,6 @@
 					RelativePath="..\..\..\shared\library\util\Formatting.h"
 					>
 				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\Registry.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\shared\library\util\Registry.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Window"

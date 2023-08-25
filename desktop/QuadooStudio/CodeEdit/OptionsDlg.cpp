@@ -3,7 +3,6 @@
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
 #include "Library\Util\Formatting.h"
-#include "Library\Util\Registry.h"
 #include "OptionsDlg.h"
 
 COLORREF RealizeColor (COLORREF col);
@@ -19,23 +18,23 @@ struct _CUSTCOL
 
 } CUSTCOL[NUM_DEFAULT_COLORS] = 
 {
-	{ RGB(255,255,255),	L"Automatic"},
-	{ RGB(0,0,0),		L"Black"},
-	{ RGB(255,255,255),	L"White"},
-	{ RGB(128, 0, 0),	L"Maroon"},
-	{ RGB(0, 128,0),	L"Dark Green"},
-	{ RGB(128,128,0),	L"Olive"},
-	{ RGB(0,0,128),		L"Dark Blue"},
-	{ RGB(128,0,128),	L"Purple"},
-	{ RGB(0,128,128),	L"Aquamarine"},
-	{ RGB(196,196,196),	L"Light Grey"},
-	{ RGB(128,128,128),	L"Dark Grey"},
-	{ RGB(255,0,0),		L"Red"},
-	{ RGB(0,255,0),		L"Green"},
-	{ RGB(255,255,0),	L"Yellow"},
-	{ RGB(0,0,255),		L"Blue"},
-	{ RGB(255,0,255),	L"Magenta"},
-	{ RGB(0,255,255),	L"Cyan"}
+	{ RGB(255,255,255),	L"Automatic" },
+	{ RGB(0,0,0),		L"Black" },
+	{ RGB(255,255,255),	L"White" },
+	{ RGB(128, 0, 0),	L"Maroon" },
+	{ RGB(0, 128,0),	L"Dark Green" },
+	{ RGB(128,128,0),	L"Olive" },
+	{ RGB(0,0,128),		L"Dark Blue" },
+	{ RGB(128,0,128),	L"Purple" },
+	{ RGB(0,128,128),	L"Aquamarine" },
+	{ RGB(196,196,196),	L"Light Grey" },
+	{ RGB(128,128,128),	L"Dark Grey" },
+	{ RGB(255,0,0),		L"Red" },
+	{ RGB(0,255,0),		L"Green" },
+	{ RGB(255,255,0),	L"Yellow" },
+	{ RGB(0,0,255),		L"Blue" },
+	{ RGB(255,0,255),	L"Magenta" },
+	{ RGB(0,255,255),	L"Cyan" }
 };
 
 UINT_PTR COptionsDlg::m_idLastSubclass = 0;
@@ -171,6 +170,7 @@ COptionsDlg::COptionsDlg (COLORREF* prgColors) :
 	m_hBoldFont(NULL),
 	m_idPreviewSubclass(0)
 {
+	ZeroMemory(m_rgbCustColors, sizeof(m_rgbCustColors));
 }
 
 COptionsDlg::~COptionsDlg ()
@@ -541,9 +541,6 @@ VOID COptionsDlg::InitializeFontOptions (VOID)
 
 	CopyMemory(m_rgbTempColorList, m_prgColors, sizeof(m_rgbTempColorList));
 	CopyMemory(m_rgbAutoColorList, m_prgColors, sizeof(m_rgbAutoColorList));
-
-	if(FAILED(Registry::LoadCustomColors(NULL, m_rgbCustColors, &cColors)))
-		ZeroMemory(m_rgbCustColors, sizeof(m_rgbCustColors));
 
 	m_hIcon2 = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON2), IMAGE_ICON, 16, 16, 0);
 	m_hIcon3 = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDI_ICON3), IMAGE_ICON, 16, 16, 0);

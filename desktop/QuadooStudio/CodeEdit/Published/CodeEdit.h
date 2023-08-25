@@ -71,8 +71,6 @@ struct TVNCURSORINFO : NMHDR
 struct TVNMARGINCLICK : NMHDR
 {
 	ULONG	nLineNo;
-	INT		xClick;
-	INT		xMargin;
 	BOOL	fHandled;
 };
 
@@ -107,10 +105,9 @@ struct TVNMCLOSECONTEXT : NMHDR
 //	(set using TXM_SETSTYLE)
 //
 #define TXS_SELMARGIN			1
-#define TXS_LINENUMBERS			2
-#define TXS_TREECTRL			4
-#define TXS_LONGLINES			8
-#define TXS_HIGHLIGHTCURLINE	16
+#define TXS_LEFTMARGIN			2
+#define TXS_LONGLINES			4
+#define TXS_HIGHLIGHTCURLINE	8
 
 // maximum fonts that a TextView can hold
 #define MAX_FONTS 32
@@ -181,7 +178,10 @@ interface __declspec(uuid("CF4C929F-A311-40ec-90D4-45AE343597B7")) ICodeEditor :
 
 	virtual VOID ScrollView (INT xCaret, ULONG nLine) = 0;
 	virtual VOID SetDarkMode (bool fDarkMode, bool fUseSystemColors) = 0;
-	virtual HRESULT DisplayOptions (VOID) = 0;
+	virtual HRESULT DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged) = 0;
+
+	virtual ULONG GetStyleMask (ULONG uMask) = 0;
+	virtual ULONG SetStyleMask (ULONG uMask, ULONG uStyles) = 0;
 };
 
 HRESULT WINAPI CodeEditRegister (VOID);

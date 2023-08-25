@@ -8,6 +8,7 @@
 #include "Library\Util\Formatting.h"
 #include "Library\Util\TextHelpers.h"
 #include "Library\Util\Shell.h"
+#include "Library\Util\Registry.h"
 #include "Library\ChooseFile.h"
 #include "Library\MenuUtil.h"
 #include "Library\Window\DialogHost.h"
@@ -439,7 +440,16 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 		break;
 
 	case ID_VIEW_OPTIONS:
-		hr = m_pEditor->DisplayOptions();
+		{
+			COLORREF crCustom[16];
+			INT cColors = ARRAYSIZE(crCustom);
+			BOOL fChanged;
+
+			Registry::LoadCustomColors(NULL, crCustom, &cColors);
+			hr = m_pEditor->DisplayOptions(crCustom, cColors, &fChanged);
+			if(SUCCEEDED(hr) && fChanged)
+				Registry::SaveCustomColors(NULL, crCustom, cColors);
+		}
 		break;
 
 	default:
@@ -482,6 +492,8 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 				lResult = -1;
 				return TRUE;
 			}
+
+			m_pEditor->SetStyleMask(0, TXS_SELMARGIN);
 		}
 
 		m_pEditor->EnableEditor(FALSE);

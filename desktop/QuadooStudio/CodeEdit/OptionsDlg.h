@@ -8,6 +8,7 @@ class COptionsDlg :
 {
 public:
 	LOGFONT m_lfEdit;
+	COLORREF m_rgbCustColors[16];
 
 private:
 	static UINT_PTR m_idLastSubclass;
@@ -15,7 +16,6 @@ private:
 	COLORREF* m_prgColors;
 	COLORREF m_rgbTempColorList[TXC_MAX_COLORS];
 	COLORREF m_rgbAutoColorList[TXC_MAX_COLORS];
-	COLORREF m_rgbCustColors[16];
 
 	COLORREF m_crPreviewFG, m_crPreviewBG;
 
