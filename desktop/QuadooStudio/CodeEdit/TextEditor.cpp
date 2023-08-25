@@ -8,7 +8,9 @@
 #include <afxres.h>	// If you don't have MFC installed, there is a copy of this file in the "shared" folder
 #include "RichEdit.h"
 #include "Library\Core\CoreDefs.h"
+#include "Library\Window\DialogHost.h"
 #include "Library\Util\Formatting.h"
+#include "OptionsDlg.h"
 #include "TextDocument.h"
 #include "TextEditor.h"
 
@@ -324,6 +326,10 @@ BOOL CTextEditor::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 		lResult = OnPaint();
 		return TRUE;
 
+	case WM_GETFONT:
+		lResult = (LRESULT)m_uspFontList[0].hFont;
+		return TRUE;
+
 	case WM_SETFONT:
 		lResult = OnSetFont((HFONT)wParam);
 		return TRUE;
@@ -491,6 +497,10 @@ BOOL CTextEditor::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 			break;
 		}
 		return TRUE;
+
+	case WM_ENABLE:
+		ResetLineCache();
+		break;
 	}
 
 	return FALSE;
@@ -617,6 +627,29 @@ VOID CTextEditor::SetDarkMode (bool fDarkMode, bool fUseSystemColors)
 		ResetLineCache();
 		RefreshWindow();
 	}
+}
+
+HRESULT CTextEditor::DisplayOptions (VOID)
+{
+	HRESULT hr;
+	CDialogHost dlgHost(m_hInstance);
+	COptionsDlg dlgOptions(m_rgbColorList);
+	HFONT hFont;
+
+	CheckIfGetLastError(0 == GetObject(m_uspFontList[0].hFont, sizeof(dlgOptions.m_lfEdit), &dlgOptions.m_lfEdit));
+
+	Check(dlgHost.Display(m_hwnd, &dlgOptions));
+	CheckIfIgnore(dlgHost.GetReturnValue() != IDOK, E_ABORT);
+
+	hFont = CreateFontIndirect(&dlgOptions.m_lfEdit);
+	if(hFont)
+		SetFont(hFont, 0);
+
+	UpdateView(false);
+	RefreshWindow();
+
+Cleanup:
+	return hr;
 }
 
 BOOL CTextEditor::ForwardDelete (VOID)
@@ -1766,6 +1799,44 @@ VOID CTextEditor::MoveWordNext ()
 	m_nCursorOffset = lineOffset + charPos;
 }
 
+VOID CTextEditor::MoveWordStart ()
+{
+	USPCACHE		* uspCache;
+	CSCRIPT_LOGATTR * logAttr;
+	ULONG			  lineOffset;
+	int				  charPos;
+
+	// get Uniscribe data for current line
+	if(GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
+	{
+		charPos  = m_nCursorOffset - lineOffset;
+
+		while(charPos > 0 && !logAttr[charPos-1].fWhiteSpace)
+			charPos--;
+
+		m_nCursorOffset = lineOffset + charPos;
+	}
+}
+
+VOID CTextEditor::MoveWordEnd ()
+{
+	USPCACHE		* uspCache;
+	CSCRIPT_LOGATTR * logAttr;
+	ULONG			  lineOffset;
+	int				  charPos;
+
+	// get Uniscribe data for current line
+	if(GetLogAttr(m_nCurrentLine, &uspCache, &logAttr, &lineOffset))
+	{
+		charPos  = m_nCursorOffset - lineOffset;
+
+		while(charPos < uspCache->length_CRLF && !logAttr[charPos].fWhiteSpace)
+			charPos++;
+
+		m_nCursorOffset = lineOffset + charPos;
+	}
+}
+
 VOID CTextEditor::MoveCharPrev ()
 {
 	USPCACHE		* uspCache;
@@ -2573,6 +2644,35 @@ LRESULT CTextEditor::OnLButtonUp (UINT nFlags, int x, int y)
 
 LRESULT CTextEditor::OnLButtonDblClick (UINT nFlags, int mx, int my)
 {
+	// remove any existing selection
+	InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
+
+	// regular mouse input - mouse is within scrolling viewport
+	if(mx >= LeftMarginWidth())
+	{
+		ULONG lineno, fileoff;
+		int   xpos;
+
+		// map the mouse-coordinates to a real file-offset-coordinate
+		MouseCoordToFilePos(mx, my, &lineno, &fileoff, &xpos);
+		m_nAnchorPosX = m_nCaretPosX;
+
+		// move selection-start to start of word
+		MoveWordStart();
+		m_nSelectionStart = m_nCursorOffset;
+
+		// move selection-end to end of word
+		MoveWordEnd();
+		m_nSelectionEnd = m_nCursorOffset;
+
+		// update caret position
+		InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
+		UpdateCaretOffset(m_nCursorOffset, TRUE, &m_nCaretPosX, &m_nCurrentLine);
+		m_nAnchorPosX = m_nCaretPosX;
+
+		NotifyParent(TVN_CURSOR_CHANGE);
+	}
+
 	return 0;
 }
 

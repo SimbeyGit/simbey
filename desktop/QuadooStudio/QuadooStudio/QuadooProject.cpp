@@ -349,6 +349,7 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 		case ID_PROJECT_ADDFILE:
 		case ID_PROJECT_NEWFILE:
 		case ID_CONTEXT_REMOVE:
+		case ID_VIEW_OPTIONS:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED | OLECMDF_ENABLED;
 			break;
 		case ID_RUN_SCRIPT:
@@ -435,6 +436,10 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 
 	case ID_PROJECT_COMPILE:
 		hr = ShowProjectCompiler();
+		break;
+
+	case ID_VIEW_OPTIONS:
+		hr = m_pEditor->DisplayOptions();
 		break;
 
 	default:

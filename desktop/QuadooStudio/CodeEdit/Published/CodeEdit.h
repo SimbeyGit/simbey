@@ -181,6 +181,7 @@ interface __declspec(uuid("CF4C929F-A311-40ec-90D4-45AE343597B7")) ICodeEditor :
 
 	virtual VOID ScrollView (INT xCaret, ULONG nLine) = 0;
 	virtual VOID SetDarkMode (bool fDarkMode, bool fUseSystemColors) = 0;
+	virtual HRESULT DisplayOptions (VOID) = 0;
 };
 
 HRESULT WINAPI CodeEditRegister (VOID);

@@ -88,6 +88,10 @@ BEGIN
         MENUITEM "&Add File...",                ID_PROJECT_ADDFILE
         MENUITEM "&New File...",                ID_PROJECT_NEWFILE
     END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Options",                    ID_VIEW_OPTIONS
+    END
 END
 
 IDR_FILE_MENU MENU 

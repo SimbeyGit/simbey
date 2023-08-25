@@ -138,6 +138,7 @@ public:
 
 	virtual VOID ScrollView (INT xCaret, ULONG nLine);
 	virtual VOID SetDarkMode (bool fDarkMode, bool fUseSystemColors);
+	virtual HRESULT DisplayOptions (VOID);
 
 	// CBaseWindow
 	virtual HINSTANCE GetInstance (VOID);
@@ -201,6 +202,8 @@ private:
 
 	VOID MoveWordPrev ();
 	VOID MoveWordNext ();
+	VOID MoveWordStart ();
+	VOID MoveWordEnd ();
 	VOID MoveCharPrev ();
 	VOID MoveCharNext ();
 	VOID MoveLineUp (int numLines);

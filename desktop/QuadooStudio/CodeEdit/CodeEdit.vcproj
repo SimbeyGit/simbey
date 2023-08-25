@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CODEEDIT_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CODEEDIT_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT;REGISTRY_NO_DPI"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SimbeyCore.lib"
+				AdditionalDependencies="comctl32.lib SimbeyCore.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\target\lib\debug"
 				ModuleDefinitionFile="CodeEdit.def"
@@ -121,7 +121,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CODEEDIT_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CODEEDIT_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT;REGISTRY_NO_DPI"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SimbeyCore.lib"
+				AdditionalDependencies="comctl32.lib SimbeyCore.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\target\lib\release"
 				ModuleDefinitionFile="CodeEdit.def"
@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OptionsDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TextDocument.cpp"
 				>
 			</File>
@@ -205,6 +209,14 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\OptionsDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TextDocument.h"
 				>
 			</File>
@@ -218,6 +230,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\CodeEdit.rc"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Published"
@@ -347,6 +363,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\shared\library\util\Formatting.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\util\Registry.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\util\Registry.h"
 					>
 				</File>
 			</Filter>
