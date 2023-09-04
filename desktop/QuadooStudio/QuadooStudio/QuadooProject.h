@@ -14,7 +14,7 @@ class CTabs;
 
 struct TVNSYNTAXHIGHLIGHT;
 
-class CProjectFile
+class CProjectTab
 {
 public:
 	RSTRING m_rstrPath;
@@ -24,29 +24,59 @@ public:
 
 	HTREEITEM m_hItem;
 
-	ITextDocument* m_pTabDocument;
-	TEXT_EDIT_VIEW m_tev;
-
 	bool m_fDefault;
 
 public:
-	CProjectFile (RSTRING rstrPath) :
+	CProjectTab (RSTRING rstrPath) :
 		m_pwzAbsolutePath(NULL),
 		m_cchAbsolutePath(0),
 		m_hItem(NULL),
-		m_pTabDocument(NULL),
 		m_fDefault(false)
 	{
 		RStrSet(m_rstrPath, rstrPath);
-		ZeroMemory(&m_tev, sizeof(m_tev));
 	}
 
-	~CProjectFile ()
+	virtual ~CProjectTab ()
 	{
-		SafeRelease(m_pTabDocument);
 		SafeDeleteArrayCount(m_pwzAbsolutePath, m_cchAbsolutePath);
 		RStrRelease(m_rstrPath);
 	}
+
+	virtual bool IsModified (VOID) = 0;
+	virtual HRESULT SaveFromEditor (ICodeEditor* pEditor) = 0;
+	virtual HRESULT RestoreEditor (ICodeEditor* pEditor) = 0;
+	virtual HRESULT SaveToStorage (ICodeEditor* pEditor, bool fActiveTab) = 0;
+	virtual HRESULT OpenCustomLayout (ICodeEditor* pEditor) = 0;
+	virtual HRESULT ResizeCustomLayout (INT x, INT y, INT nWidth, INT nHeight, __out INT* pnDocHeight) = 0;
+	virtual HRESULT CloseCustomLayout (VOID) = 0;
+};
+
+class CProjectFile : public CProjectTab
+{
+private:
+	ITextDocument* m_pTabDocument;
+	TEXT_EDIT_VIEW m_tev;
+
+public:
+	CProjectFile (RSTRING rstrPath) :
+		CProjectTab(rstrPath),
+		m_pTabDocument(NULL)
+	{
+		ZeroMemory(&m_tev, sizeof(m_tev));
+	}
+
+	virtual ~CProjectFile ()
+	{
+		SafeRelease(m_pTabDocument);
+	}
+
+	virtual bool IsModified (VOID);
+	virtual HRESULT SaveFromEditor (ICodeEditor* pEditor);
+	virtual HRESULT RestoreEditor (ICodeEditor* pEditor);
+	virtual HRESULT SaveToStorage (ICodeEditor* pEditor, bool fActiveTab);
+	virtual HRESULT OpenCustomLayout (ICodeEditor* pEditor) { return S_FALSE; }
+	virtual HRESULT ResizeCustomLayout (INT x, INT y, INT nWidth, INT nHeight, __out INT* pnDocHeight);
+	virtual HRESULT CloseCustomLayout (VOID) { return S_FALSE; }
 };
 
 class CQuadooProject :
@@ -67,7 +97,7 @@ private:
 	HTREEITEM m_hProjectRoot;
 
 	IJSONObject* m_pProject;
-	TRStrMap<CProjectFile*> m_mapFiles;
+	TRStrMap<CProjectTab*> m_mapFiles;
 
 	TNamedMapW<COLORREF> m_mapKeywords;
 	ICodeEditor* m_pEditor;
@@ -124,14 +154,15 @@ public:
 	virtual HRESULT FinalizeAndShow (DWORD dwStyle, INT nCmdShow);
 	virtual BOOL DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 
-	HRESULT SwitchToFile (CProjectFile* pFile);
+	HRESULT SwitchToFile (CProjectTab* pFile);
 
 	HRESULT EditRunParams (VOID);
 	HRESULT AddFilePrompt (VOID);
 	HRESULT NewFilePrompt (VOID);
-	HRESULT AddFile (RSTRING rstrPath, __deref_out CProjectFile** ppFile);
+	HRESULT AddFile (RSTRING rstrPath, __deref_out CProjectTab** ppFile);
 
 private:
+	VOID ResizeEditor (INT nWindowHeight);
 	HRESULT UpdateColors (VOID);
 	INT CustomTrackPopupMenu (HMENU hPopup, UINT uFlags, const POINT& ptScreen);
 
@@ -149,19 +180,21 @@ private:
 	static HRESULT FindActiveQuadoo (__deref_out RSTRING* prstrEngine);
 	BOOL IsWebProject (VOID);
 
-	CProjectFile* GetProjectFromTreeItem (HTREEITEM hItem);
-	CProjectFile* FindDefaultScript (VOID);
+	CProjectTab* GetProjectFromTreeItem (HTREEITEM hItem);
+	CProjectTab* FindDefaultScript (VOID);
 
-	HRESULT SaveTabData (CProjectFile* pFile);
-	HRESULT LoadTabData (CProjectFile* pFile);
+	HRESULT SaveTabData (CProjectTab* pFile);
+	HRESULT LoadTabData (CProjectTab* pFile);
 
 	HRESULT SaveTab (sysint idxTab);
 	BOOL PromptToSaveTab (sysint idxTab);
 	BOOL CloseTab (sysint idxTab);
 
-	VOID RemoveFilePrompt (CProjectFile* pFile);
+	VOID RemoveFilePrompt (CProjectTab* pFile);
 	HRESULT ShowProjectCompiler (VOID);
 	HRESULT CopyWebScripts (VOID);
+
+	HRESULT CreateRelativeProjectPath (__out_ecount(cchMaxRelative) PWSTR pwzRelative, INT cchMaxRelative, PCWSTR pcwzTo, DWORD dwAttrTo);
 
 	static BOOL IsFileOutOfSync (PCWSTR pcwzSource, PCWSTR pcwzTarget);
 };

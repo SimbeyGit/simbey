@@ -24,11 +24,69 @@
 #include "RunWebServiceDlg.h"
 #include "QuadooProject.h"
 
-#ifndef ENM_CLIPFORMAT
-	#define	ENM_CLIPFORMAT	0x00000080
-#endif
-
 const WCHAR c_wzQuadooProjectClass[] = L"QuadooProjectCls";
+
+///////////////////////////////////////////////////////////////////////////////
+// CProjectFile
+///////////////////////////////////////////////////////////////////////////////
+
+bool CProjectFile::IsModified (VOID)
+{
+	return m_pTabDocument->IsModified();
+}
+
+HRESULT CProjectFile::SaveFromEditor (ICodeEditor* pEditor)
+{
+	Assert(NULL == m_pTabDocument);
+
+	SetInterface(m_pTabDocument, pEditor->GetTextDocument());
+	pEditor->GetTextEditView(&m_tev);
+	return S_OK;
+}
+
+HRESULT CProjectFile::RestoreEditor (ICodeEditor* pEditor)
+{
+	HRESULT hr;
+
+	CheckIfIgnore(NULL == m_pTabDocument, S_FALSE);
+	pEditor->SetTextDocument(m_pTabDocument);
+	pEditor->SetTextEditView(&m_tev);
+	SafeRelease(m_pTabDocument);
+	hr = S_OK;
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CProjectFile::SaveToStorage (ICodeEditor* pEditor, bool fActiveTab)
+{
+	HRESULT hr;
+	ITextDocument* pDocument = m_pTabDocument;
+	CMemoryStream stmText;
+
+	if(fActiveTab)
+	{
+		Assert(NULL == pDocument);
+		pDocument = pEditor->GetTextDocument();
+	}
+
+	Check(pDocument->StreamOut(&stmText));
+	Check(Text::SaveToFile(stmText.TGetReadPtr<WCHAR>(), stmText.TDataRemaining<WCHAR>(), m_pwzAbsolutePath));
+	pDocument->ResetModifiedSnapshot();
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CProjectFile::ResizeCustomLayout (INT x, INT y, INT nWidth, INT nHeight, __out INT* pnDocHeight)
+{
+	*pnDocHeight = 0;
+	return S_FALSE;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CQuadooProject
+///////////////////////////////////////////////////////////////////////////////
 
 CQuadooProject::CQuadooProject (HINSTANCE hInstance, CDarkMode* pdm, HWND hwndTree) :
 	m_hInstance(hInstance),
@@ -59,7 +117,7 @@ CQuadooProject::~CQuadooProject()
 	RStrRelease(m_rstrProject);
 }
 
-HRESULT CQuadooProject::Register(HINSTANCE hInstance)
+HRESULT CQuadooProject::Register (HINSTANCE hInstance)
 {
 	WNDCLASSEX wnd = {0};
 
@@ -136,7 +194,7 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	for(sysint i = 0; i < srFiles->Count(); i++)
 	{
 		TStackRef<IJSONObject> srFile;
-		CProjectFile* pFile;
+		CProjectTab* pFile;
 
 		Check(srFiles->GetObject(i, &srFile));
 
@@ -190,7 +248,7 @@ HRESULT CQuadooProject::UpdateFiles (VOID)
 	for(sysint i = 0; i < m_mapFiles.Length(); i++)
 	{
 		TStackRef<IJSONObject> srFile;
-		CProjectFile* pFile = *m_mapFiles.GetValuePtr(i);
+		CProjectTab* pFile = *m_mapFiles.GetValuePtr(i);
 
 		Check(JSONCreateObject(&srFile));
 
@@ -260,7 +318,7 @@ HRESULT CQuadooProject::SetPageScript (INT idScript)
 	sysint idxTab = m_pTabs->GetActiveTab();
 	if(-1 != idxTab)
 	{
-		CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
+		CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
 		m_pTabs->HighlightTab(idxTab, true);
 	}
 
@@ -303,7 +361,7 @@ VOID CQuadooProject::ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen)
 		if(hPopup)
 		{
 			INT nCmd;
-			CProjectFile* pFile = GetProjectFromTreeItem(hItem);
+			CProjectTab* pFile = GetProjectFromTreeItem(hItem);
 
 			if(pFile->m_fDefault)
 				CheckMenuItem(hPopup, ID_CONTEXT_SETDEFAULT, MF_BYCOMMAND | MF_CHECKED);
@@ -324,7 +382,7 @@ VOID CQuadooProject::ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen)
 
 VOID CQuadooProject::ActivateItem (HTREEITEM hItem)
 {
-	CProjectFile* pFile = GetProjectFromTreeItem(hItem);
+	CProjectTab* pFile = GetProjectFromTreeItem(hItem);
 	if(pFile)
 		SwitchToFile(pFile);
 }
@@ -403,12 +461,12 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 
 	case ID_CONTEXT_SETDEFAULT:
 		{
-			CProjectFile* pFile = GetProjectFromTreeItem((HTREEITEM)pvaIn->byref);
+			CProjectTab* pFile = GetProjectFromTreeItem((HTREEITEM)pvaIn->byref);
 
 			hr = S_FALSE;
 			if(pFile)
 			{
-				CProjectFile* pDefault = FindDefaultScript();
+				CProjectTab* pDefault = FindDefaultScript();
 				if(pDefault != pFile)
 				{
 					if(pDefault)
@@ -424,7 +482,7 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 
 	case ID_CONTEXT_REMOVE:
 		{
-			CProjectFile* pFile = GetProjectFromTreeItem((HTREEITEM)pvaIn->byref);
+			CProjectTab* pFile = GetProjectFromTreeItem((HTREEITEM)pvaIn->byref);
 			if(pFile)
 				RemoveFilePrompt(pFile);
 			hr = S_OK;
@@ -527,13 +585,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 
 	case WM_SIZE:
 		m_pTabs->Resize(LOWORD(lParam), HIWORD(lParam));
-
-		{
-			TStackRef<IBaseWindow> srEditorWin;
-			SideAssertHr(m_pEditor->QueryInterface(&srEditorWin));
-			const SIZE* pcszTabs = m_pTabs->GetSize();
-			srEditorWin->Move(1, pcszTabs->cy, pcszTabs->cx - 2, (HIWORD(lParam) - pcszTabs->cy) - 1, TRUE);
-		}
+		ResizeEditor(HIWORD(lParam));
 		break;
 
 	case WM_MOUSEMOVE:
@@ -560,7 +612,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		}
 		else
 		{
-			CProjectFile* pFile = m_pTabs->TFindTabFromPoint<CProjectFile>(LOWORD(lParam), HIWORD(lParam));
+			CProjectTab* pFile = m_pTabs->TFindTabFromPoint<CProjectTab>(LOWORD(lParam), HIWORD(lParam));
 			if(pFile)
 				SwitchToFile(pFile);
 		}
@@ -579,7 +631,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		{
 			sysint idxTab;
 			if(m_pTabs->PopupTabs(m_hwnd, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), &idxTab) && m_pTabs->GetActiveTab() != idxTab)
-				SwitchToFile(m_pTabs->TGetTabData<CProjectFile>(idxTab));
+				SwitchToFile(m_pTabs->TGetTabData<CProjectTab>(idxTab));
 		}
 		break;
 
@@ -660,7 +712,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 				sysint idxTab = m_pTabs->GetActiveTab();
 				if(-1 != idxTab)
 				{
-					CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
+					CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
 					RECT rc;
 
 					m_pTabs->HighlightTab(idxTab, true);
@@ -682,16 +734,21 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 	return __super::DefWindowProc(message, wParam, lParam, lResult);
 }
 
-HRESULT CQuadooProject::SwitchToFile (CProjectFile* pFile)
+HRESULT CQuadooProject::SwitchToFile (CProjectTab* pFile)
 {
 	HRESULT hr;
 	RSTRING rstrLabel = NULL;
 	HDC hdc = NULL;
 	RECT rc;
 	sysint idxTab = m_pTabs->GetActiveTab();
+	bool fResize = false;
 
 	if(-1 != idxTab)
-		SaveTabData(m_pTabs->TGetTabData<CProjectFile>(idxTab));
+	{
+		CProjectTab* pTab = m_pTabs->TGetTabData<CProjectTab>(idxTab);
+		fResize = S_OK == pTab->CloseCustomLayout();
+		SaveTabData(pTab);
+	}
 
 	idxTab = m_pTabs->FindTab(pFile);
 	if(-1 == idxTab)
@@ -710,6 +767,12 @@ HRESULT CQuadooProject::SwitchToFile (CProjectFile* pFile)
 
 	Check(m_pTabs->SetActive(idxTab));
 	Check(LoadTabData(pFile));
+
+	if(S_OK == pFile->OpenCustomLayout(m_pEditor) || fResize)
+	{
+		GetClientRect(m_hwnd, &rc);
+		ResizeEditor(rc.bottom);
+	}
 
 	m_pTabs->GetTabsRect(0, 0, rc);
 	InvalidateRect(m_hwnd, &rc, FALSE);
@@ -767,13 +830,14 @@ HRESULT CQuadooProject::AddFilePrompt (VOID)
 	CChooseFile pick;
 	WCHAR wzRelative[MAX_PATH];
 	RSTRING rstrPath = NULL;
-	CProjectFile* pFile;
+	CProjectTab* pFile;
 
 	Check(pick.Initialize());
 	CheckIfIgnore(!pick.OpenSingleFile(m_hwnd, L"Add Existing File To Project",
 		IsWebProject() ? L"ASP (*.asp)\0*.asp\0" : L"QuadooScript (*.quadoo)\0*.quadoo\0"), E_ABORT);
 
-	if(PathRelativePathToW(wzRelative, RStrToWide(m_rstrProjectDir), FILE_ATTRIBUTE_DIRECTORY, pick.GetFile(0), 0))
+	hr = CreateRelativeProjectPath(wzRelative, ARRAYSIZE(wzRelative), pick.GetFile(0), 0);
+	if(SUCCEEDED(hr))
 	{
 		Check(RStrCreateW(TStrLenAssert(wzRelative), wzRelative, &rstrPath));
 		CheckIf(m_mapFiles.HasItem(rstrPath), E_FAIL);
@@ -788,10 +852,7 @@ HRESULT CQuadooProject::AddFilePrompt (VOID)
 		Check(SwitchToFile(pFile));
 	}
 	else
-	{
-		hr = HrEnsureLastError();
 		MessageBox(m_hwnd, L"The file must be on the same volume as the project file!", L"Path Error", MB_OK);
-	}
 
 Cleanup:
 	RStrRelease(rstrPath);
@@ -804,7 +865,7 @@ HRESULT CQuadooProject::NewFilePrompt (VOID)
 	CChooseFile pick;
 	WCHAR wzRelative[MAX_PATH];
 	RSTRING rstrPath = NULL;
-	CProjectFile* pFile;
+	CProjectTab* pFile;
 	HANDLE hFile = INVALID_HANDLE_VALUE;
 
 	Check(pick.Initialize());
@@ -812,7 +873,8 @@ HRESULT CQuadooProject::NewFilePrompt (VOID)
 	CheckIfIgnore(!pick.SaveFile(m_hwnd, L"Add New File To Project",
 		IsWebProject() ? L"ASP (*.asp)\0*.asp\0" : L"QuadooScript (*.quadoo)\0*.quadoo\0"), E_ABORT);
 
-	if(PathRelativePathToW(wzRelative, RStrToWide(m_rstrProjectDir), FILE_ATTRIBUTE_DIRECTORY, pick.GetFile(0), 0))
+	hr = CreateRelativeProjectPath(wzRelative, ARRAYSIZE(wzRelative), pick.GetFile(0), 0);
+	if(SUCCEEDED(hr))
 	{
 		Check(RStrCreateW(TStrLenAssert(wzRelative), wzRelative, &rstrPath));
 		CheckIf(m_mapFiles.HasItem(rstrPath), E_FAIL);
@@ -831,10 +893,7 @@ HRESULT CQuadooProject::NewFilePrompt (VOID)
 		Check(SwitchToFile(pFile));
 	}
 	else
-	{
-		hr = HrEnsureLastError();
 		MessageBox(m_hwnd, L"The file must be on the same volume as the project file!", L"Path Error", MB_OK);
-	}
 
 Cleanup:
 	SafeCloseFileHandle(hFile);
@@ -842,10 +901,10 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CQuadooProject::AddFile (RSTRING rstrPath, __deref_out CProjectFile** ppFile)
+HRESULT CQuadooProject::AddFile (RSTRING rstrPath, __deref_out CProjectTab** ppFile)
 {
 	HRESULT hr;
-	CProjectFile* pFile = NULL;
+	CProjectTab* pFile = NULL;
 
 	hr = m_mapFiles.Find(rstrPath, ppFile);
 	if(FAILED(hr))
@@ -882,6 +941,25 @@ HRESULT CQuadooProject::AddFile (RSTRING rstrPath, __deref_out CProjectFile** pp
 Cleanup:
 	SafeDelete(pFile);
 	return hr;
+}
+
+VOID CQuadooProject::ResizeEditor (INT nWindowHeight)
+{
+	TStackRef<IBaseWindow> srEditorWin;
+	const SIZE* pcszTabs = m_pTabs->GetSize();
+	INT nEditorHeight, nDocHeight = 0;
+	sysint idxTab = m_pTabs->GetActiveTab();
+
+	SideAssertHr(m_pEditor->QueryInterface(&srEditorWin));
+
+	nEditorHeight = (nWindowHeight - pcszTabs->cy) - 1;
+	if(-1 != idxTab)
+	{
+		CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
+		pFile->ResizeCustomLayout(1, pcszTabs->cy, pcszTabs->cx - 2, nEditorHeight, &nDocHeight);
+	}
+
+	srEditorWin->Move(1, pcszTabs->cy + nDocHeight, pcszTabs->cx - 2, nEditorHeight - nDocHeight, TRUE);
 }
 
 HRESULT CQuadooProject::UpdateColors (VOID)
@@ -983,7 +1061,7 @@ HRESULT CQuadooProject::FindSymbol (VOID)
 	else
 		pcwzFind = m_wzFindSymbol;
 
-	CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxActive);
+	CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxActive);
 
 	Check(QuadooFindDefinitions(pFile->m_pwzAbsolutePath, pcwzFind, &srDefs));
 
@@ -1009,7 +1087,7 @@ HRESULT CQuadooProject::FindSymbol (VOID)
 
 			for(sysint i = 0; i < m_mapFiles.Length(); i++)
 			{
-				CProjectFile* pProjectFile = *m_mapFiles.GetValuePtr(i);
+				CProjectTab* pProjectFile = *m_mapFiles.GetValuePtr(i);
 				if(0 == TStrCmpIAssert(pProjectFile->m_pwzAbsolutePath, RStrToWide(rstrFile)))
 				{
 					pFile = pProjectFile;
@@ -1122,13 +1200,13 @@ HRESULT CQuadooProject::SaveAll (VOID)
 
 	for(sysint idxTab = 0; idxTab < m_pTabs->Tabs(); idxTab++)
 	{
-		CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
+		CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
 		if(idxActive == idxTab)
 		{
 			if(m_pTabs->GetActiveTabHighlight())
 				Check(SaveTab(idxTab));
 		}
-		else if(pFile->m_pTabDocument->IsModified())
+		else if(pFile->IsModified())
 			Check(SaveTab(idxTab));
 	}
 
@@ -1142,7 +1220,7 @@ HRESULT CQuadooProject::RunScript (VOID)
 	RSTRING rstrEngine = NULL, rstrTarget = NULL, rstrArgs = NULL, rstrScriptArgs = NULL, rstrStartDir = NULL;
 	RSTRING rstrBatch = NULL, rstrBatchArgs = NULL;
 	TStackRef<IJSONValue> srv;
-	CProjectFile* pFile = FindDefaultScript();
+	CProjectTab* pFile = FindDefaultScript();
 	PWSTR pwzStartDir = NULL;
 	INT cchStartDir = 0, nCompare;
 	LONG_PTR nResult;
@@ -1367,56 +1445,46 @@ Cleanup:
 	return S_OK == hr;
 }
 
-CProjectFile* CQuadooProject::GetProjectFromTreeItem (HTREEITEM hItem)
+CProjectTab* CQuadooProject::GetProjectFromTreeItem (HTREEITEM hItem)
 {
 	TVITEM tvItem = {0};
 	tvItem.hItem = hItem;
 	tvItem.mask = TVIF_PARAM;
 	if(TreeView_GetItem(m_hwndTree, &tvItem) && tvItem.lParam)
-		return reinterpret_cast<CProjectFile*>(tvItem.lParam);
+		return reinterpret_cast<CProjectTab*>(tvItem.lParam);
 	return NULL;
 }
 
-CProjectFile* CQuadooProject::FindDefaultScript (VOID)
+CProjectTab* CQuadooProject::FindDefaultScript (VOID)
 {
 	for(sysint i = 0; i < m_mapFiles.Length(); i++)
 	{
-		CProjectFile* pFile = *m_mapFiles.GetValuePtr(i);
+		CProjectTab* pFile = *m_mapFiles.GetValuePtr(i);
 		if(pFile->m_fDefault)
 			return pFile;
 	}
 	return NULL;
 }
 
-HRESULT CQuadooProject::SaveTabData (CProjectFile* pFile)
+HRESULT CQuadooProject::SaveTabData (CProjectTab* pFile)
 {
 	HRESULT hr;
 
-	Assert(NULL == pFile->m_pTabDocument);
-
 	CheckIf(NULL == m_pEditor, E_FAIL);
-	SetInterface(pFile->m_pTabDocument, m_pEditor->GetTextDocument());
-	m_pEditor->GetTextEditView(&pFile->m_tev);
-	hr = S_OK;
+	Check(pFile->SaveFromEditor(m_pEditor));
 
 Cleanup:
 	return hr;
 }
 
-HRESULT CQuadooProject::LoadTabData (CProjectFile* pFile)
+HRESULT CQuadooProject::LoadTabData (CProjectTab* pFile)
 {
 	HRESULT hr;
 	PWSTR pwzText = NULL;
 	INT cchText;
 
-	if(pFile->m_pTabDocument)
-	{
-		m_pEditor->SetTextDocument(pFile->m_pTabDocument);
-		m_pEditor->SetTextEditView(&pFile->m_tev);
-		SafeRelease(pFile->m_pTabDocument);
-		hr = S_OK;
-	}
-	else
+	Check(pFile->RestoreEditor(m_pEditor));
+	if(S_FALSE == hr)
 	{
 		Check(Text::LoadFromFile(pFile->m_pwzAbsolutePath, &pwzText, &cchText));
 		Check(m_pEditor->Prepare(pwzText, cchText));
@@ -1431,21 +1499,10 @@ Cleanup:
 HRESULT CQuadooProject::SaveTab (sysint idxTab)
 {
 	HRESULT hr;
-	CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
-	ITextDocument* pDocument = pFile->m_pTabDocument;
-	CMemoryStream stmText;
+	CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
 	RECT rc;
 
-	if(m_pTabs->GetActiveTab() == idxTab)
-	{
-		Assert(NULL == pDocument);
-		pDocument = m_pEditor->GetTextDocument();
-	}
-
-	Check(pDocument->StreamOut(&stmText));
-	Check(Text::SaveToFile(stmText.TGetReadPtr<WCHAR>(), stmText.TDataRemaining<WCHAR>(), pFile->m_pwzAbsolutePath));
-	pDocument->ResetModifiedSnapshot();
-
+	Check(pFile->SaveToStorage(m_pEditor, m_pTabs->GetActiveTab() == idxTab));
 	Check(m_pTabs->HighlightTab(idxTab, false));
 	m_pTabs->GetTabsRect(0, 0, rc);
 	InvalidateRect(m_hwnd, &rc, FALSE);
@@ -1457,7 +1514,7 @@ Cleanup:
 BOOL CQuadooProject::PromptToSaveTab (sysint idxTab)
 {
 	BOOL fProceed = FALSE;
-	CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
+	CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
 	RSTRING rstrPrompt;
 
 	if(SUCCEEDED(RStrFormatW(&rstrPrompt, L"Would you like to save changes to %r?", pFile->m_rstrPath)))
@@ -1486,16 +1543,18 @@ BOOL CQuadooProject::PromptToSaveTab (sysint idxTab)
 
 BOOL CQuadooProject::CloseTab (sysint idxTab)
 {
+	CProjectTab* pActiveFile = NULL;
 	sysint idxActive = m_pTabs->GetActiveTab();
 	if(idxActive == idxTab)
 	{
+		pActiveFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
 		if(m_pTabs->GetActiveTabHighlight() && !PromptToSaveTab(idxTab))
 			return FALSE;
 	}
 	else
 	{
-		CProjectFile* pFile = m_pTabs->TGetTabData<CProjectFile>(idxTab);
-		if(pFile->m_pTabDocument->IsModified() && !PromptToSaveTab(idxTab))
+		CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
+		if(pFile->IsModified() && !PromptToSaveTab(idxTab))
 			return FALSE;
 	}
 
@@ -1505,12 +1564,18 @@ BOOL CQuadooProject::CloseTab (sysint idxTab)
 	m_pTabs->GetTabsRect(0, 0, rc);
 	InvalidateRect(m_hwnd, &rc, FALSE);
 
-	CProjectFile* pNext = m_pTabs->TGetTabData<CProjectFile>(idxTab);
+	CProjectTab* pNext = m_pTabs->TGetTabData<CProjectTab>(idxTab);
 	if(NULL == pNext && 0 < idxTab)
-		pNext = m_pTabs->TGetTabData<CProjectFile>(idxTab - 1);
+		pNext = m_pTabs->TGetTabData<CProjectTab>(idxTab - 1);
 
 	if(NULL == pNext || FAILED(SwitchToFile(pNext)))
 	{
+		if(pActiveFile && S_OK == pActiveFile->CloseCustomLayout())
+		{
+			GetClientRect(m_hwnd, &rc);
+			ResizeEditor(rc.bottom);
+		}
+
 		m_pEditor->Prepare(NULL, 0);
 		m_pEditor->ResetTextEditView();
 		m_pEditor->EnableEditor(FALSE);
@@ -1519,7 +1584,7 @@ BOOL CQuadooProject::CloseTab (sysint idxTab)
 	return TRUE;
 }
 
-VOID CQuadooProject::RemoveFilePrompt (CProjectFile* pFile)
+VOID CQuadooProject::RemoveFilePrompt (CProjectTab* pFile)
 {
 	sysint idxTab = m_pTabs->FindTab(pFile);
 	if(-1 == idxTab || CloseTab(idxTab))
@@ -1537,7 +1602,7 @@ HRESULT CQuadooProject::ShowProjectCompiler (VOID)
 {
 	HRESULT hr;
 	RSTRING rstrTarget = NULL, rstrEngine = NULL;
-	CProjectFile* pDefault = FindDefaultScript();
+	CProjectTab* pDefault = FindDefaultScript();
 	CDialogHost dlgHost(m_hInstance);
 
 	CheckIf(NULL == pDefault, E_UNEXPECTED);
@@ -1571,7 +1636,7 @@ HRESULT CQuadooProject::CopyWebScripts (VOID)
 
 	for(sysint i = 0; i < m_mapFiles.Length(); i++)
 	{
-		CProjectFile* pFile = *m_mapFiles.GetValuePtr(i);
+		CProjectTab* pFile = *m_mapFiles.GetValuePtr(i);
 		PCWSTR pcwzName = TStrRChr(pFile->m_pwzAbsolutePath, L'\\');
 		if(pcwzName) pcwzName++;
 
@@ -1585,6 +1650,28 @@ HRESULT CQuadooProject::CopyWebScripts (VOID)
 Cleanup:
 	RStrRelease(rstrTarget);
 	RStrRelease(rstrCopyPath);
+	return hr;
+}
+
+HRESULT CQuadooProject::CreateRelativeProjectPath (__out_ecount(cchMaxRelative) PWSTR pwzRelative, INT cchMaxRelative, PCWSTR pcwzTo, DWORD dwAttrTo)
+{
+	HRESULT hr;
+
+	CheckIf(cchMaxRelative < MAX_PATH, E_INVALIDARG);
+	CheckIf(!PathRelativePathToW(pwzRelative, RStrToWide(m_rstrProjectDir), FILE_ATTRIBUTE_DIRECTORY, pcwzTo, dwAttrTo), E_FAIL);
+
+	if(L'\\' == *pwzRelative)
+	{
+		// Is this a Windows XP thing?
+		INT cchRelative = TStrLenAssert(pwzRelative) + 1;
+		CheckIf(cchRelative + 1 == cchMaxRelative, HRESULT_FROM_WIN32(ERROR_BUFFER_OVERFLOW));
+		MoveMemory(pwzRelative + 1, pwzRelative, cchRelative * sizeof(WCHAR));
+		*pwzRelative = L'.';
+	}
+
+	hr = S_OK;
+
+Cleanup:
 	return hr;
 }
 
