@@ -25,6 +25,7 @@ CQuadooStudio::CQuadooStudio (HINSTANCE hInstance) :
 	m_hAccel(NULL),
 	m_pGdiPlusStartupInput(NULL),
 	m_gdiplusToken(NULL),
+	m_hwndStatus(NULL),
 	m_hwndTree(NULL),
 	m_hImageList(NULL),
 	m_pCustomMenu(NULL),
@@ -264,10 +265,13 @@ HRESULT CQuadooStudio::OpenProject (PCWSTR pcwzProject)
 {
 	HRESULT hr;
 	CQuadooProject* pProject = NULL;
-	RECT rcSite;
+	RECT rcStatus, rcSite;
 
 	GetClientRect(m_hwnd, &rcSite);
 	rcSite.left += GetTreeWidth() + m_pSplitter->GetWidth();
+
+	GetClientRect(m_hwndStatus, &rcStatus);
+	rcSite.bottom -= (rcStatus.bottom - rcStatus.top);
 
 	pProject = __new CQuadooProject(m_hInstance, &m_dm, m_hwndTree);
 	CheckAlloc(pProject);
@@ -391,12 +395,25 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 		break;
 
 	case WM_SIZE:
+		if(SIZE_MINIMIZED != wParam && SIZE_MAXHIDE != wParam)
 		{
-			RECT rc;
+			RECT rc, rcStatus;
+			INT nParts[4];
 			INT cxTree, cxSplitter = m_pSplitter->GetWidth();
 
 			GetClientRect(m_hwnd, &rc);
 			cxTree = GetTreeWidth();
+
+			GetClientRect(m_hwndStatus, &rcStatus);
+			MoveWindow(m_hwndStatus, 0, rc.bottom - (rcStatus.bottom - rcStatus.top), rc.right - rc.left, rcStatus.bottom - rcStatus.top, TRUE);
+
+			nParts[0] = (rc.right - rc.left) / 2;
+			nParts[1] = nParts[0] + 80;
+			nParts[2] = nParts[1] + 80;
+			nParts[3] = -1;
+			SendMessage(m_hwndStatus, SB_SETPARTS, ARRAYSIZE(nParts), (LPARAM)nParts);
+
+			rc.bottom -= (rcStatus.bottom - rc.top);
 
 			MoveWindow(m_hwndTree, rc.left, rc.top, cxTree, rc.bottom - rc.top, TRUE);
 			m_pSplitter->Move(cxTree, 0, cxSplitter, rc.bottom - rc.top, TRUE);
@@ -434,82 +451,95 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 		}
 
 	case WM_NOTIFY:
-		if(m_pProject)
 		{
 			LPNMHDR pnmh = (LPNMHDR)lParam;
-			if(pnmh->hwndFrom == m_hwndTree)
+			if(TVN_CURSOR_CHANGE == pnmh->code)
 			{
-				HTREEITEM hItem;
+				WCHAR wzStatus[64];
+				TVNCURSORINFO* pci = static_cast<TVNCURSORINFO*>(pnmh);
 
-				switch(pnmh->code)
+				Formatting::TPrintF(wzStatus, ARRAYSIZE(wzStatus), NULL, L"Ln %d", pci->nLineNo + 1);
+				SendMessage(m_hwndStatus, SB_SETTEXT, 1, (LPARAM)wzStatus);
+
+				Formatting::TPrintF(wzStatus, ARRAYSIZE(wzStatus), NULL, L"Col %d", pci->nColumnNo + 1);
+				SendMessage(m_hwndStatus, SB_SETTEXT, 2, (LPARAM)wzStatus);
+			}
+			else if(m_pProject)
+			{
+				if(pnmh->hwndFrom == m_hwndTree)
 				{
-				case NM_CUSTOMDRAW:
-					if(m_dm.IsDarkMode())
+					HTREEITEM hItem;
+
+					switch(pnmh->code)
 					{
-						LPNMTVCUSTOMDRAW pCustomDraw = (LPNMTVCUSTOMDRAW)lParam;
-						switch(pCustomDraw->nmcd.dwDrawStage)
+					case NM_CUSTOMDRAW:
+						if(m_dm.IsDarkMode())
 						{
-						case CDDS_PREPAINT:
-							lResult = CDRF_NOTIFYITEMDRAW;
-							return TRUE;
-						case CDDS_ITEMPREPAINT:
-							if(pCustomDraw->nmcd.uItemState & CDIS_SELECTED)
+							LPNMTVCUSTOMDRAW pCustomDraw = (LPNMTVCUSTOMDRAW)lParam;
+							switch(pCustomDraw->nmcd.dwDrawStage)
 							{
-								pCustomDraw->clrText = RGB(255, 255, 255);
-								pCustomDraw->clrTextBk = RGB(70, 70, 70);
+							case CDDS_PREPAINT:
+								lResult = CDRF_NOTIFYITEMDRAW;
+								return TRUE;
+							case CDDS_ITEMPREPAINT:
+								if(pCustomDraw->nmcd.uItemState & CDIS_SELECTED)
+								{
+									pCustomDraw->clrText = RGB(255, 255, 255);
+									pCustomDraw->clrTextBk = RGB(70, 70, 70);
+								}
+								else
+								{
+									pCustomDraw->clrText = RGB(255, 255, 255);
+									pCustomDraw->clrTextBk = RGB(40, 40, 40);
+								}
+								lResult = 0;
+								return TRUE;
 							}
-							else
-							{
-								pCustomDraw->clrText = RGB(255, 255, 255);
-								pCustomDraw->clrTextBk = RGB(40, 40, 40);
-							}
-							lResult = 0;
-							return TRUE;
 						}
-					}
-					break;
-				case NM_DBLCLK:
-					{
-						POINT pt;
-						GetCursorPos(&pt);
+						break;
+					case NM_DBLCLK:
+						{
+							POINT pt;
+							GetCursorPos(&pt);
 
-						// Convert screen coordinates to client coordinates
-						TVHITTESTINFO tvhti;
-						tvhti.pt = pt;
-						ScreenToClient(m_hwndTree, &tvhti.pt);
+							// Convert screen coordinates to client coordinates
+							TVHITTESTINFO tvhti;
+							tvhti.pt = pt;
+							ScreenToClient(m_hwndTree, &tvhti.pt);
 
-						hItem = TreeView_HitTest(m_hwndTree, &tvhti);
+							hItem = TreeView_HitTest(m_hwndTree, &tvhti);
+							if(hItem)
+							{
+								m_pProject->ActivateItem(hItem);
+								return TRUE;
+							}
+						}
+						break;
+					case NM_RETURN:
+						hItem = TreeView_GetSelection(m_hwndTree);
 						if(hItem)
 						{
 							m_pProject->ActivateItem(hItem);
 							return TRUE;
 						}
-					}
-					break;
-				case NM_RETURN:
-					hItem = TreeView_GetSelection(m_hwndTree);
-					if(hItem)
-					{
-						m_pProject->ActivateItem(hItem);
-						return TRUE;
-					}
-					break;
-				case NM_RCLICK:
-					{
-						// Get the cursor position in screen coordinates
-						POINT pt;
-						GetCursorPos(&pt);
+						break;
+					case NM_RCLICK:
+						{
+							// Get the cursor position in screen coordinates
+							POINT pt;
+							GetCursorPos(&pt);
 
-						// Convert screen coordinates to client coordinates
-						TVHITTESTINFO tvhti;
-						tvhti.pt = pt;
-						ScreenToClient(m_hwndTree, &tvhti.pt);
+							// Convert screen coordinates to client coordinates
+							TVHITTESTINFO tvhti;
+							tvhti.pt = pt;
+							ScreenToClient(m_hwndTree, &tvhti.pt);
 
-						hItem = TreeView_HitTest(m_hwndTree, &tvhti);
-						if(hItem)
-							m_pProject->ShowTreeContext(hItem, pt);
+							hItem = TreeView_HitTest(m_hwndTree, &tvhti);
+							if(hItem)
+								m_pProject->ShowTreeContext(hItem, pt);
+						}
+						break;
 					}
-					break;
 				}
 			}
 		}
@@ -583,6 +613,9 @@ HRESULT CQuadooStudio::OnCreate (VOID)
 
 	if(-1 == cxTree)
 		cxTree = (INT)DPI::Scale(150.0f);
+
+	m_hwndStatus = CreateStatusWindowW(WS_CHILD | WS_VISIBLE, L"Ready", m_hwnd, ID_STATUS_BAR);
+	CheckIfGetLastError(NULL == m_hwndStatus);
 
 	m_hImageList = ImageList_Create(GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), ILC_COLOR32 | ILC_MASK, 3, 1);
 	CheckIfGetLastError(NULL == m_hImageList);

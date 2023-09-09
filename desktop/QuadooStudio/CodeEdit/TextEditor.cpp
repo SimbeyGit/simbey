@@ -190,7 +190,7 @@ CTextEditor::CTextEditor (HINSTANCE hInstance, bool fDarkMode, bool fUseSystemCo
 	SystemParametersInfo(SPI_GETCARETWIDTH, 0, &m_nCaretWidth, 0);
 
 	// Display-related data
-	m_uStyleFlags		= TXS_SELMARGIN;
+	m_uStyleFlags		= 0;
 	m_nLongLineLimit	= 256;
 	if(m_nCaretWidth == 0)
 		m_nCaretWidth = 2;
@@ -265,6 +265,14 @@ HRESULT CTextEditor::Initialize (HWND hwndParent, const RECT& rcSite, INT nTabWi
 	Check(CTextDocument::Create(nTabWidth, &m_pTextDoc));
 
 	Check(Create(0, WS_VSCROLL | WS_HSCROLL | WS_CHILD | WS_VISIBLE, wzClass, NULL, rcSite.left, rcSite.top, rcSite.right - rcSite.left, rcSite.bottom - rcSite.top, hwndParent, SW_NORMAL));
+
+	{
+		TVNCURSORINFO ci;
+		ci.nLineNo = m_nCurrentLine;
+		ci.nColumnNo = GetCurrentColumn();
+		ci.nOffset = m_nCursorOffset;
+		NotifyParent(TVN_CURSOR_CHANGE, &ci);
+	}
 
 Cleanup:
 	return hr;
@@ -706,7 +714,7 @@ BOOL CTextEditor::ForwardDelete (VOID)
 
 		m_pTextDoc->Erase(oldpos, m_nCursorOffset - oldpos);
 		m_nCursorOffset = oldpos;
-		
+
 		//if(tmp[0] == '\r')
 		//	m_pTextDoc->erase_text(m_nCursorOffset, 2);
 		//else
@@ -831,8 +839,12 @@ ULONG CTextEditor::EnterText (PCWSTR pcwzText, ULONG nLength)
 	ResetLineCache();
 	UpdateView(true);
 	RefreshWindow();
-	
-	NotifyParent(TVN_CURSOR_CHANGE);
+
+	TVNCURSORINFO ci;
+	ci.nLineNo = m_nCurrentLine;
+	ci.nColumnNo = GetCurrentColumn();
+	ci.nOffset = m_nCursorOffset;
+	NotifyParent(TVN_CURSOR_CHANGE, &ci);
 
 	return nLength;
 }
@@ -886,6 +898,14 @@ VOID CTextEditor::SetTextEditView (const TEXT_EDIT_VIEW* pctev)
 	m_nAnchorPosX = pctev->nAnchorPosX;
 
 	UpdateMetrics();
+
+	{
+		TVNCURSORINFO ci;
+		ci.nLineNo = m_nCurrentLine;
+		ci.nColumnNo = GetCurrentColumn();
+		ci.nOffset = m_nCursorOffset;
+		NotifyParent(TVN_CURSOR_CHANGE, &ci);
+	}
 }
 
 VOID CTextEditor::ResetTextEditView (VOID)
@@ -1536,6 +1556,13 @@ VOID CTextEditor::UpdateView (bool fAdvancing)
 	RepositionCaret();
 }
 
+INT CTextEditor::GetCurrentColumn ()
+{
+	ULONG nOffset;
+	GetUspData(0, m_nCurrentLine, &nOffset);
+	return m_nCursorOffset - nOffset;
+}
+
 LONG CTextEditor::InvalidateRange (ULONG nStart, ULONG nFinish)
 {
 	ULONG start  = min(nStart, nFinish);
@@ -1679,7 +1706,11 @@ VOID CTextEditor::FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrl
 			ScrollToPosition(m_nCaretPosX, m_nCurrentLine);
 	}
 
-	NotifyParent(TVN_CURSOR_CHANGE);
+	TVNCURSORINFO ci;
+	ci.nLineNo = m_nCurrentLine;
+	ci.nColumnNo = GetCurrentColumn();
+	ci.nOffset = m_nCursorOffset;
+	NotifyParent(TVN_CURSOR_CHANGE, &ci);
 }
 
 VOID CTextEditor::MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* pnFileOffset, int* psnappedX)
@@ -2647,7 +2678,7 @@ LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
 
 	TVNCURSORINFO ci;
 	ci.nLineNo = nLineNo;
-	ci.nColumnNo = 0;
+	ci.nColumnNo = GetCurrentColumn();
 	ci.nOffset = m_nCursorOffset;
 	NotifyParent(TVN_CURSOR_CHANGE, &ci);
 	return 0;
@@ -2709,7 +2740,11 @@ LRESULT CTextEditor::OnLButtonDblClick (UINT nFlags, int mx, int my)
 		UpdateCaretOffset(m_nCursorOffset, TRUE, &m_nCaretPosX, &m_nCurrentLine);
 		m_nAnchorPosX = m_nCaretPosX;
 
-		NotifyParent(TVN_CURSOR_CHANGE);
+		TVNCURSORINFO ci;
+		ci.nLineNo = m_nCurrentLine;
+		ci.nColumnNo = GetCurrentColumn();
+		ci.nOffset = m_nCursorOffset;
+		NotifyParent(TVN_CURSOR_CHANGE, &ci);
 	}
 
 	return 0;
@@ -2807,13 +2842,17 @@ LRESULT CTextEditor::OnMouseMove (UINT nFlags, int mx, int my)
 		if(m_nSelectionMode == SEL_BLOCK)
 			RefreshWindow();
 
-		//m_nCaretPosX = mx+m_nHScrollPos*m_nFontWidth-LeftMarginWidth();
+		// m_nCaretPosX = mx+m_nHScrollPos*m_nFontWidth-LeftMarginWidth();
 		// always set the caret position because we might be scrolling
 		UpdateCaretXY(m_nCaretPosX, m_nCurrentLine);
 
 		if(fCurChanged)
 		{
-			NotifyParent(TVN_CURSOR_CHANGE);
+			TVNCURSORINFO ci;
+			ci.nLineNo = m_nCurrentLine;
+			ci.nColumnNo = GetCurrentColumn();
+			ci.nOffset = m_nCursorOffset;
+			NotifyParent(TVN_CURSOR_CHANGE, &ci);
 		}
 	}
 	// mouse isn't being used for a selection, so set the cursor instead

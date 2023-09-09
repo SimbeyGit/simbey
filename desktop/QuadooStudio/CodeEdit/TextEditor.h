@@ -193,6 +193,7 @@ private:
 	VOID UpdateCaretXY (int xpos, ULONG lineno);
 	VOID RepositionCaret ();
 	VOID UpdateView (bool fAdvancing);
+	INT GetCurrentColumn ();
 
 	LONG InvalidateRange (ULONG nStart, ULONG nFinish);
 	LONG InvalidateLine(ULONG nLineNo, bool forceAnalysis);

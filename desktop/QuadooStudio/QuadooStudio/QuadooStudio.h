@@ -22,6 +22,7 @@ protected:
 	Gdiplus::GdiplusStartupInput* m_pGdiPlusStartupInput;
 	ULONG_PTR m_gdiplusToken;
 
+	HWND m_hwndStatus;
 	HWND m_hwndTree;
 	HIMAGELIST m_hImageList;
 

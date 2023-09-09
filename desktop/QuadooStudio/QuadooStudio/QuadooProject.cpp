@@ -641,6 +641,9 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 
 			switch(pnmhdr->code)
 			{
+			case TVN_CURSOR_CHANGE:
+				SendMessage(GetParent(m_hwnd), WM_NOTIFY, wParam, lParam);
+				break;
 			case TVN_SYNTAX_HIGHLIGHT:
 				{
 					TVNSYNTAXHIGHLIGHT* pHighlight = static_cast<TVNSYNTAXHIGHLIGHT*>(pnmhdr);
