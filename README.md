@@ -3,6 +3,7 @@
 * [Master of Magic Demo Projects](samples/MOMPrototypes)
 * [Neural Circuits Simulator](desktop/NeuralCircuits)
 * [Infinite Wolfenstein Demo](desktop/InfiniteWolfenstein)
+* [Quadoo Studio](desktop/QuadooStudio)
 * [Some of Simbey's common C++ library code and templates](shared/library)
 ## Screenshots:
 ### Master of Magic Combat Demo
@@ -13,3 +14,5 @@
 ![Neural Circuits](screenshots/NeuralCircuits.png)
 ### Infinite Wolfenstein Desktop Demo
 ![Infinite Wolfenstein](screenshots/InfiniteWolfenstein.png)
+### Quadoo Studio ###
+![Quadoo Studio](screenshots/QuadooStudio.png)
