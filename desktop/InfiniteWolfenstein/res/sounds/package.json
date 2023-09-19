@@ -69,6 +69,10 @@
 	},
 	{
 		package: "sound",
+		name: "PickupMachineGun.wav"
+	}
+	{
+		package: "sound",
 		name: "PickupSpear.wav"
 	},
 	{

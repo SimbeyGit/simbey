@@ -630,6 +630,67 @@ HRESULT CSIFModel::GetAnimationByIndex (sysint idxAnimation, __out PCSTR* ppcszA
 	return m_mapAnimations.GetKeyAndValue(idxAnimation, ppcszAnimation, ppAnimation);
 }
 
+HRESULT CSIFModel::AddAnimation (PCSTR pcszAnimation, __out sysint* pidxAnimation)
+{
+	HRESULT hr;
+	CSIFAnimation* pAnimation = __new CSIFAnimation;
+
+	CheckAlloc(pAnimation);
+	Check(m_mapAnimations.Add(pcszAnimation, pAnimation));
+	SideAssert(m_mapAnimations.IndexOf(pcszAnimation, pidxAnimation));
+	pAnimation = NULL;
+
+Cleanup:
+	SafeDelete(pAnimation);
+	return hr;
+}
+
+HRESULT CSIFModel::AddFrameToAnimation (CSIFAnimation* pAnimation, __deref_out CSIFFrame** ppFrame)
+{
+	HRESULT hr;
+	CSIFFrame* pFrame = __new CSIFFrame;
+
+	CheckAlloc(pFrame);
+
+	if(0 == pAnimation->m_aFrames.Length())
+	{
+		for(sysint i = 0; i < m_mapMeshData.Length(); i++)
+		{
+			CSIFMeshData* pMesh = *m_mapMeshData.GetValuePtr(i);
+
+			for(sysint n = 0; n < pMesh->m_mapJoint.Length(); n++)
+			{
+				PCSTR pcszJoint;
+				JOINT joint;
+
+				Check(pMesh->m_mapJoint.GetKeyAndValue(n, &pcszJoint, &joint));
+				Check(pFrame->m_mapJoints.Add(pcszJoint, joint.fRot));
+			}
+		}
+	}
+	else
+	{
+		CSIFFrame* pPrev = pAnimation->m_aFrames[pAnimation->m_aFrames.Length() - 1];
+
+		for(sysint i = 0; i < pPrev->m_mapJoints.Length(); i++)
+		{
+			PCSTR pcszJoint;
+			FPOINT fpt;
+
+			Check(pPrev->m_mapJoints.GetKeyAndValue(i, &pcszJoint, &fpt));
+			Check(pFrame->m_mapJoints.Add(pcszJoint, fpt));
+		}
+	}
+
+	Check(pAnimation->m_aFrames.Append(pFrame));
+	*ppFrame = pFrame;
+	pFrame = NULL;
+
+Cleanup:
+	SafeDelete(pFrame);
+	return hr;
+}
+
 ISimbeyInterchangeFile* CSIFModel::GetSIF (VOID)
 {
 	return m_pSIF;

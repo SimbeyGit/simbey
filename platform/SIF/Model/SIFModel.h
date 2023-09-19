@@ -132,9 +132,12 @@ public:
 	HRESULT GetMeshByIndex (sysint idxMesh, __out PCSTR* ppcszMesh, __deref_out CSIFMeshData** ppMeshData);
 	CModelTemplate* GetTemplate (VOID) { return m_pTemplate; }
 
+	LONG Animations (VOID) { return static_cast<LONG>(m_mapAnimations.Length()); }
 	HRESULT GetAnimation (PCSTR pcszAnimation, __deref_out CSIFAnimation** ppAnimation);
 	BOOL HasAnimation (PCSTR pcszAnimation);
 	HRESULT GetAnimationByIndex (sysint idxAnimation, __out PCSTR* ppcszAnimation, __deref_out CSIFAnimation** ppAnimation);
+	HRESULT AddAnimation (PCSTR pcszAnimation, __out sysint* pidxAnimation);
+	HRESULT AddFrameToAnimation (CSIFAnimation* pAnimation, __deref_out CSIFFrame** ppFrame);
 
 	ISimbeyInterchangeFile* GetSIF (VOID);
 	VOID SetSIF (ISimbeyInterchangeFile* pSIF);

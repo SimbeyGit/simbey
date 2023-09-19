@@ -105,6 +105,14 @@
 		name: "Key.SML"
 	},
 	{
+		package: "sif",
+		name: "MachineGun.SIF"
+	},
+	{
+		package: "model",
+		name: "MachineGun.SML"
+	},
+	{
 		package: "json",
 		name: "models.json",
 		data:
@@ -213,6 +221,15 @@
 					entity: "GoldKey.PNG",
 					pickup: "PickupKey.wav",
 					key: "Gold"
+				},
+				{
+					name: "MachineGun",
+					type: "item",
+					sif: "MachineGun.SIF",
+					model: "MachineGun.SML",
+					entity: "MachineGun.PNG",
+					pickup: "PickupMachineGun.wav",
+					weapon: "MachineGun"
 				},
 				{
 					name: "SecretDoor",
