@@ -807,6 +807,7 @@ HRESULT CQuadooProject::EditRunParams (VOID)
 		{
 			CWebParamsDlg dlgParams(m_pProject, rstrEngine, m_rstrProjectDir);
 			Check(dlgHost.Display(m_hwnd, &dlgParams));
+			CheckIfIgnore(IDCANCEL == dlgHost.GetReturnValue(), E_ABORT);
 		}
 	}
 	else
@@ -1301,7 +1302,7 @@ HRESULT CQuadooProject::RunScript (VOID)
 	}
 
 Cleanup:
-	if(FAILED(hr))
+	if(FAILED(hr) && E_ABORT != hr)
 	{
 		RSTRING rstrError;
 		if(SUCCEEDED(RStrFormatW(&rstrError, L"Failed to run your project due to error %.8X!", hr)))
