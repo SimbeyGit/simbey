@@ -146,70 +146,70 @@ Cleanup:
 
 // ISimbeyInterchangeSprite
 
-HRESULT CSpellBookPage::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
+IFACEMETHODIMP CSpellBookPage::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
 {
 	return S_FALSE;
 }
 
-VOID CSpellBookPage::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
+IFACEMETHODIMP_(VOID) CSpellBookPage::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
 {
 }
 
-VOID CSpellBookPage::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
+IFACEMETHODIMP_(VOID) CSpellBookPage::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
 {
 }
 
-VOID CSpellBookPage::GetCurrentHitBox (__out RECT* prcHitBox)
+IFACEMETHODIMP_(VOID) CSpellBookPage::GetCurrentHitBox (__out RECT* prcHitBox)
 {
 }
 
-VOID CSpellBookPage::UpdateFrameTick (VOID)
+IFACEMETHODIMP_(VOID) CSpellBookPage::UpdateFrameTick (VOID)
 {
 }
 
-VOID CSpellBookPage::SetPosition (INT x, INT y)
+IFACEMETHODIMP_(VOID) CSpellBookPage::SetPosition (INT x, INT y)
 {
 	m_x = x;
 	m_y = y;
 }
 
-VOID CSpellBookPage::GetPosition (__out INT& x, __out INT& y)
+IFACEMETHODIMP_(VOID) CSpellBookPage::GetPosition (__out INT& x, __out INT& y)
 {
 	x = m_x;
 	y = m_y;
 }
 
-BOOL CSpellBookPage::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CSpellBookPage::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	return sifDrawBits32ToDIB24(psifSurface24->pbSurface, m_x, m_y, psifSurface24->xSize, psifSurface24->ySize, m_bits, SPELL_BOOK_PAGE_WIDTH, SPELL_BOOK_PAGE_HEIGHT);
 }
 
-BOOL CSpellBookPage::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
+IFACEMETHODIMP_(BOOL) CSpellBookPage::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
 {
 	return FALSE;
 }
 
-BOOL CSpellBookPage::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CSpellBookPage::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	return DrawMaskedToDIB24(xOffset, yOffset, psifSurface24);
 }
 
-BOOL CSpellBookPage::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CSpellBookPage::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	return DrawMaskedToDIB24(xOffset, yOffset, psifSurface24);
 }
 
-COLORREF CSpellBookPage::GetColorized (VOID)
+IFACEMETHODIMP_(COLORREF) CSpellBookPage::GetColorized (VOID)
 {
 	return 0;
 }
 
-BOOL CSpellBookPage::SetColorized (COLORREF cr)
+IFACEMETHODIMP_(BOOL) CSpellBookPage::SetColorized (COLORREF cr)
 {
 	return FALSE;
 }
 
-VOID CSpellBookPage::GetFrameOffset (__out INT& x, __out INT& y)
+IFACEMETHODIMP_(VOID) CSpellBookPage::GetFrameOffset (__out INT& x, __out INT& y)
 {
 	x = 0;
 	y = 0;

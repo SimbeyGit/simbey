@@ -10,10 +10,10 @@
 
 interface __declspec(uuid("051EC929-A365-483b-9BF8-753C14706359")) ISimbeyInterchangeFileGLFont : IUnknown
 {
-	virtual HRESULT RecreateTexture (BYTE bRed, BYTE bGreen, BYTE bBlue, BYTE iAlpha) = 0;
-	virtual HRESULT MeasureText (PCWSTR pcwzText, __out FLOAT& rWidth, __out FLOAT& rHeight) = 0;
-	virtual HRESULT GetGlyph (CHAR ch, __deref_out ISimbeyInterchangeFileLayer** ppGlyph) = 0;
-	virtual HRESULT DrawTextGL (PCWSTR pcwzText, FLOAT rScale, UINT nFormat) = 0;
+	STDMETHOD(RecreateTexture) (BYTE bRed, BYTE bGreen, BYTE bBlue, BYTE iAlpha) = 0;
+	STDMETHOD(MeasureText) (PCWSTR pcwzText, __out FLOAT& rWidth, __out FLOAT& rHeight) = 0;
+	STDMETHOD(GetGlyph) (CHAR ch, __deref_out ISimbeyInterchangeFileLayer** ppGlyph) = 0;
+	STDMETHOD(DrawTextGL) (PCWSTR pcwzText, FLOAT rScale, UINT nFormat) = 0;
 };
 
 HRESULT WINAPI sifCreateOpenGLTexture (__in_bcount(nWidth * nHeight * 4) PBYTE pBits32, INT nWidth, INT nHeight, __out UINT* pnTexture);

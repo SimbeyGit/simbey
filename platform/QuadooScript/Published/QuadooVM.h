@@ -588,6 +588,7 @@ HRESULT WINAPI QVMCreateLoader (__in_opt IQuadooDebugger* pDebugger, __deref_out
 VOID WINAPI QVMAddRef (QuadooVM::QVARIANT* pqvDest);
 VOID WINAPI QVMSetVariant (__out QuadooVM::QVARIANT* pqvDest, const QuadooVM::QVARIANT* pqvSrc);
 VOID WINAPI QVMSetDWord (__out QuadooVM::QVARIANT* pqvDest, DWORD dwValue);
+VOID WINAPI QVMSetQWord (__out QuadooVM::QVARIANT* pqvDest, DWORDLONG dwlValue);
 VOID WINAPI QVMClearVariant (QuadooVM::QVARIANT* pqv);
 VOID WINAPI QVMReplaceVariant (QuadooVM::QVARIANT* pqvDest, const QuadooVM::QVARIANT* pqvSrc);
 VOID WINAPI QVMReferenceVariant (QuadooVM::QVARIANT* pqvDest, QuadooVM::QVARIANT* pqvSrc);
@@ -681,6 +682,7 @@ HRESULT WINAPI QVMAToU (QuadooVM::QVARIANT* pqvString, QuadooVM::QVARIANT* pqvBa
 HRESULT WINAPI QVMVariantToDouble (const QuadooVM::QVARIANT* pqv, __out DOUBLE* pdbl);
 HRESULT WINAPI QVMVariantToString (const QuadooVM::QVARIANT* pqv, __out RSTRING* prstr);
 HRESULT WINAPI QVMVariantToDWord (const QuadooVM::QVARIANT* pqv, __out DWORD* pdw);
+HRESULT WINAPI QVMVariantToQWord (const QuadooVM::QVARIANT* pqv, __out DWORDLONG* pdwl);
 HRESULT WINAPI QVMMultiAdd (__inout QuadooVM::QVARIANT* pqvSlot, const QuadooVM::QVARIANT* pqv);
 
 HRESULT WINAPI QVMConvertToSigned32 (__inout QuadooVM::QVARIANT* pqv);
@@ -704,3 +706,41 @@ HRESULT WINAPI QVMFindJSONArrayObject (IJSONArray* pJSONArray, QuadooVM::QVARIAN
 HRESULT WINAPI QVMDeleteProperty (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARIANT* pqvProperty, __out QuadooVM::QVARIANT* pqvResult);
 HRESULT WINAPI QVMCreateLineReader (ISequentialStream* pStream, __out QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMMapFind (QuadooVM::QVARIANT* pqvArgs, __out QuadooVM::QVARIANT* pqvResult);
+
+inline HRESULT GetSysIntFromVariant (const QuadooVM::QVARIANT* pqv, __out sysint* pnValue)
+{
+	HRESULT hr = S_OK;
+
+	if(QuadooVM::I4 == pqv->eType)
+		*pnValue = pqv->lVal;
+	else if(QuadooVM::I8 == pqv->eType)
+	{
+#ifndef	_WIN64
+		CheckIf(INT_MAX < pqv->llVal || pqv->llVal < INT_MIN, DISP_E_BADINDEX);
+#endif
+		*pnValue = static_cast<sysint>(pqv->llVal);
+	}
+	else
+		Check(DISP_E_BADVARTYPE);
+
+Cleanup:
+	return hr;
+}
+
+inline VOID SetSysIntToVariant (sysint nValue, __out QuadooVM::QVARIANT* pqv)
+{
+#ifdef	_WIN64
+	if(INT_MAX < nValue || nValue < INT_MIN)
+	{
+		pqv->llVal = nValue;
+		pqv->eType = QuadooVM::I8;
+	}
+	else
+	{
+#endif
+		pqv->lVal = static_cast<LONG>(nValue);
+		pqv->eType = QuadooVM::I4;
+#ifdef	_WIN64
+	}
+#endif
+}

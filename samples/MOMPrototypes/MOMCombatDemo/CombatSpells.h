@@ -42,7 +42,7 @@ public:
 	virtual VOID Update (VOID);
 
 	// ISpriteAnimationCompleted
-	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
+	IFACEMETHOD_(VOID, OnSpriteAnimationCompleted) (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
 
 private:
 	HRESULT Start (VOID);
@@ -72,7 +72,7 @@ public:
 	virtual VOID Update (VOID);
 
 	// ISpriteAnimationCompleted
-	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
+	IFACEMETHOD_(VOID, OnSpriteAnimationCompleted) (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
 
 protected:
 	virtual HRESULT GetAnimationAndSound (__out RSTRING* prstrAnimation, __out RSTRING* prstrSound, __out bool* pfUnderObject) = 0;
@@ -133,7 +133,7 @@ public:
 	virtual VOID Update (VOID);
 
 	// ISpriteAnimationCompleted
-	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
+	IFACEMETHOD_(VOID, OnSpriteAnimationCompleted) (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
 
 private:
 	HRESULT Start (VOID);
@@ -170,7 +170,7 @@ public:
 	virtual VOID Update (VOID);
 
 	// ISpriteAnimationCompleted
-	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
+	IFACEMETHOD_(VOID, OnSpriteAnimationCompleted) (ISimbeyInterchangeSprite* pSprite, INT nAnimation);
 
 private:
 	HRESULT Start (VOID);

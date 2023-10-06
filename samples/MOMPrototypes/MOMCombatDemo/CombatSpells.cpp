@@ -89,7 +89,7 @@ VOID CSummonSpell::Update (VOID)
 
 // ISpriteAnimationCompleted
 
-VOID CSummonSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
+IFACEMETHODIMP_(VOID) CSummonSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
 {
 	m_pCanvas->RemoveSpriteLater(m_nLayer, pSprite);
 	if(0 == --m_cLocks)
@@ -189,7 +189,7 @@ VOID CBaseIrreversibleDamageSpell::Update (VOID)
 
 // ISpriteAnimationCompleted
 
-VOID CBaseIrreversibleDamageSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
+IFACEMETHODIMP_(VOID) CBaseIrreversibleDamageSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
 {
 	if(CheckDestroyUnit(m_pTarget))
 		m_pScreen->DestroyUnit(m_pTarget);
@@ -358,7 +358,7 @@ VOID CHealingSpell::Update (VOID)
 
 // ISpriteAnimationCompleted
 
-VOID CHealingSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
+IFACEMETHODIMP_(VOID) CHealingSpell::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
 {
 	m_pScreen->ApplyHealing(m_pTarget, 5);
 	m_pCanvas->RemoveSpriteLater(m_nLayer, pSprite);
@@ -474,7 +474,7 @@ VOID CSpellAttack::Update (VOID)
 
 // ISpriteAnimationCompleted
 
-VOID CSpellAttack::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
+IFACEMETHODIMP_(VOID) CSpellAttack::OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation)
 {
 	Assert(m_pSprite == pSprite);
 	SafeRelease(m_pSprite);

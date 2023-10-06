@@ -102,157 +102,157 @@ struct SIF_SURFACE
 
 interface __declspec(uuid("4CC1DB43-C86A-4150-BD01-DC1390CCA42A")) ISimbeyInterchangeFileLayer : IUnknown
 {
-	virtual DWORD GetLayerID (VOID) = 0;
+	STDMETHOD_(DWORD, GetLayerID) (VOID) = 0;
 
-	virtual HRESULT GetSize (__out SIZE* pSize) = 0;
-	virtual HRESULT GetPosition (__out RECT* prcPosition) = 0;
-	virtual VOID SetPosition (LONG x, LONG y) = 0;
+	STDMETHOD(GetSize) (__out SIZE* pSize) = 0;
+	STDMETHOD(GetPosition) (__out RECT* prcPosition) = 0;
+	STDMETHOD_(VOID, SetPosition) (LONG x, LONG y) = 0;
 
 	// Z Index is based on the position in the array of layers.
 	// It will always be 0 <= zIndex < NumberOfLayers
-	virtual LONG GetZIndex (VOID) = 0;
-	virtual HRESULT SetZIndex (LONG zIndex) = 0;
+	STDMETHOD_(LONG, GetZIndex) (VOID) = 0;
+	STDMETHOD(SetZIndex) (LONG zIndex) = 0;
 
-	virtual HRESULT GetLayerLocation (__out USHORT* pnSquareSize, __out LONG* px, __out LONG* py, __out USHORT* pnWidth, __out USHORT* pnHeight) = 0;
+	STDMETHOD(GetLayerLocation) (__out USHORT* pnSquareSize, __out LONG* px, __out LONG* py, __out USHORT* pnWidth, __out USHORT* pnHeight) = 0;
 
-	virtual HRESULT GetBitsPtr (__deref_out_bcount(*pcb) PBYTE* ppBits, __out DWORD* pcb) = 0;
-	virtual VOID MarkBitsDirty (VOID) = 0;
+	STDMETHOD(GetBitsPtr) (__deref_out_bcount(*pcb) PBYTE* ppBits, __out DWORD* pcb) = 0;
+	STDMETHOD_(VOID, MarkBitsDirty)(VOID) = 0;
 
-	virtual HRESULT GetName (__out_ecount(cchMaxName) PWSTR pwzName, INT cchMaxName) = 0;
-	virtual HRESULT SetName (__in_opt PCWSTR pcwzName) = 0;
+	STDMETHOD(GetName) (__out_ecount(cchMaxName) PWSTR pwzName, INT cchMaxName) = 0;
+	STDMETHOD(SetName) (__in_opt PCWSTR pcwzName) = 0;
 
-	virtual HRESULT GetAsDIB (__in_opt ISimbeyInterchangeFileLayer* pOverlay, __out HBITMAP* phDIB, __out_opt BITMAPINFOHEADER* pbmih = NULL, __out_opt PBYTE* ppBits = NULL) = 0;
-	virtual HRESULT GetAsDDB (HDC hdc, __out HBITMAP* phDDB) = 0;
+	STDMETHOD(GetAsDIB) (__in_opt ISimbeyInterchangeFileLayer* pOverlay, __out HBITMAP* phDIB, __out_opt BITMAPINFOHEADER* pbmih = NULL, __out_opt PBYTE* ppBits = NULL) = 0;
+	STDMETHOD(GetAsDDB) (HDC hdc, __out HBITMAP* phDDB) = 0;
 
-	virtual HRESULT DrawToDIB32 (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
-	virtual HRESULT DrawToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest) = 0;
+	STDMETHOD(DrawToDIB32) (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
+	STDMETHOD(DrawToDIB24) (SIF_SURFACE* psifSurface24, INT xDest, INT yDest) = 0;
 
-	virtual HRESULT DrawClippedToDIB32 (SIF_SURFACE* psifSurface32, INT xDest, INT yDest, const RECT& rcClip) = 0;
-	virtual HRESULT DrawClippedToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest, const RECT& rcClip) = 0;
+	STDMETHOD(DrawClippedToDIB32) (SIF_SURFACE* psifSurface32, INT xDest, INT yDest, const RECT& rcClip) = 0;
+	STDMETHOD(DrawClippedToDIB24) (SIF_SURFACE* psifSurface24, INT xDest, INT yDest, const RECT& rcClip) = 0;
 
-	virtual HRESULT DrawGrayToDIB32 (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
-	virtual HRESULT DrawGrayToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest) = 0;
+	STDMETHOD(DrawGrayToDIB32) (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
+	STDMETHOD(DrawGrayToDIB24) (SIF_SURFACE* psifSurface24, INT xDest, INT yDest) = 0;
 
-	virtual HRESULT DrawMaskedToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest) = 0;
-	virtual HRESULT DrawTileToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest, SIF_LINE_OFFSET* pslOffsets) = 0;
-	virtual HRESULT DrawColorizedToDIB24 (SIF_SURFACE* psifSurface24, INT xDest, INT yDest, COLORREF cr) = 0;
+	STDMETHOD(DrawMaskedToDIB24) (SIF_SURFACE* psifSurface24, INT xDest, INT yDest) = 0;
+	STDMETHOD(DrawTileToDIB24) (SIF_SURFACE* psifSurface24, INT xDest, INT yDest, SIF_LINE_OFFSET* pslOffsets) = 0;
+	STDMETHOD(DrawColorizedToDIB24) (SIF_SURFACE* psifSurface24, INT xDest, INT yDest, COLORREF cr) = 0;
 
-	virtual HRESULT DrawToBits32 (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
-	virtual HRESULT CopyToBits32 (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
+	STDMETHOD(DrawToBits32) (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
+	STDMETHOD(CopyToBits32) (SIF_SURFACE* psifSurface32, INT xDest, INT yDest) = 0;
 
-	virtual VOID GetTimeStamp (__out FILETIME* pft) = 0;
-	virtual VOID SetTimeStamp (const FILETIME* pcft) = 0;
+	STDMETHOD_(VOID, GetTimeStamp) (__out FILETIME* pft) = 0;
+	STDMETHOD_(VOID, SetTimeStamp) (const FILETIME* pcft) = 0;
 };
 
 interface __declspec(uuid("8D401C1F-B59A-43d4-89CA-2A22D40CFBCE")) ISimbeyInterchangeFile : IUnknown
 {
-	virtual VOID Close (VOID) = 0;
-	virtual HRESULT Save (VOID) = 0;
-	virtual HRESULT SaveAs (PCWSTR pcwzFile, BOOL fOverwriteExisting) = 0;
-	virtual HRESULT GetFileName (__out_ecount(cchMaxFile) PWSTR pwzFile, INT cchMaxFile) = 0;
-	virtual BOOL IsDirty (VOID) = 0;
+	STDMETHOD_(VOID, Close) (VOID) = 0;
+	STDMETHOD(Save) (VOID) = 0;
+	STDMETHOD(SaveAs) (PCWSTR pcwzFile, BOOL fOverwriteExisting) = 0;
+	STDMETHOD(GetFileName) (__out_ecount(cchMaxFile) PWSTR pwzFile, INT cchMaxFile) = 0;
+	STDMETHOD_(BOOL, IsDirty) (VOID) = 0;
 
-	virtual VOID GetCanvasPixelSize (USHORT* pnSquareSize) = 0;
-	virtual USHORT GetCanvasPPI (VOID) = 0;
+	STDMETHOD_(VOID, GetCanvasPixelSize) (USHORT* pnSquareSize) = 0;
+	STDMETHOD_(USHORT, GetCanvasPPI) (VOID) = 0;
 
-	virtual HRESULT SetCanvasPixelSize (USHORT nSquareSize) = 0;
-	virtual HRESULT SetCanvasPPI (USHORT cPixelsPerInch) = 0;
+	STDMETHOD(SetCanvasPixelSize) (USHORT nSquareSize) = 0;
+	STDMETHOD(SetCanvasPPI) (USHORT cPixelsPerInch) = 0;
 
-	virtual PBYTE GetMergedCanvas24 (BYTE bRed, BYTE bGreen, BYTE bBlue) = 0;
-	virtual HRESULT MergeToBits24 (BYTE bRed, BYTE bGreen, BYTE bBlue, __in PBYTE pBits24) = 0;
+	STDMETHOD_(PBYTE, GetMergedCanvas24) (BYTE bRed, BYTE bGreen, BYTE bBlue) = 0;
+	STDMETHOD(MergeToBits24) (BYTE bRed, BYTE bGreen, BYTE bBlue, __in PBYTE pBits24) = 0;
 
-	virtual PBYTE GetMergedCanvas32 (BYTE bRed, BYTE bGreen, BYTE bBlue, BYTE iAlpha) = 0;
-	virtual HRESULT MergeToBits32 (BYTE bRed, BYTE bGreen, BYTE bBlue, BYTE iAlpha, __in PBYTE pBits32) = 0;
+	STDMETHOD_(PBYTE, GetMergedCanvas32) (BYTE bRed, BYTE bGreen, BYTE bBlue, BYTE iAlpha) = 0;
+	STDMETHOD(MergeToBits32) (BYTE bRed, BYTE bGreen, BYTE bBlue, BYTE iAlpha, __in PBYTE pBits32) = 0;
 
-	virtual DWORD GetLayerCount (VOID) = 0;
+	STDMETHOD_(DWORD, GetLayerCount) (VOID) = 0;
 
-	virtual HRESULT GetLayerID (DWORD dwLayerIndex, __out DWORD* pidLayer) = 0;
-	virtual HRESULT GetLayer (DWORD idLayer, __deref_out ISimbeyInterchangeFileLayer** ppLayer) = 0;
-	virtual HRESULT GetLayerByIndex (DWORD dwLayerIndex, __deref_out ISimbeyInterchangeFileLayer** ppLayer) = 0;
-	virtual HRESULT AddLayer (USHORT nWidth, USHORT nHeight, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
-	virtual HRESULT AddLayerFromBits (USHORT nWidth, USHORT nHeight, __in PBYTE pBits, INT cBitsPerPixel, INT cBytesPerRow, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
-	virtual HRESULT RemoveLayer (DWORD idLayer) = 0;
-	virtual HRESULT ChangeLayerID (DWORD idLayer, DWORD idNew) = 0;
+	STDMETHOD(GetLayerID) (DWORD dwLayerIndex, __out DWORD* pidLayer) = 0;
+	STDMETHOD(GetLayer) (DWORD idLayer, __deref_out ISimbeyInterchangeFileLayer** ppLayer) = 0;
+	STDMETHOD(GetLayerByIndex) (DWORD dwLayerIndex, __deref_out ISimbeyInterchangeFileLayer** ppLayer) = 0;
+	STDMETHOD(AddLayer) (USHORT nWidth, USHORT nHeight, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
+	STDMETHOD(AddLayerFromBits) (USHORT nWidth, USHORT nHeight, __in PBYTE pBits, INT cBitsPerPixel, INT cBytesPerRow, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
+	STDMETHOD(RemoveLayer) (DWORD idLayer) = 0;
+	STDMETHOD(ChangeLayerID) (DWORD idLayer, DWORD idNew) = 0;
 
-	virtual HRESULT GetSupportedCanvasSizes (__out_ecount(*pcSizes) USHORT* pnSizes, __inout INT* pcSizes) = 0;
+	STDMETHOD(GetSupportedCanvasSizes) (__out_ecount(*pcSizes) USHORT* pnSizes, __inout INT* pcSizes) = 0;
 
-	virtual HRESULT CreateWICBitmapFromLayer (__in ISimbeyInterchangeFileLayer* pLayer, __deref_out IWICBitmap** ppwicBitmap) = 0;
-	virtual HRESULT FindLayer (PCWSTR pcwzName, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
+	STDMETHOD(CreateWICBitmapFromLayer) (__in ISimbeyInterchangeFileLayer* pLayer, __deref_out IWICBitmap** ppwicBitmap) = 0;
+	STDMETHOD(FindLayer) (PCWSTR pcwzName, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
 
-	virtual HRESULT ImportLayer (ISimbeyInterchangeFileLayer* pImport, __deref_out ISimbeyInterchangeFileLayer** ppLayer) = 0;
+	STDMETHOD(ImportLayer) (ISimbeyInterchangeFileLayer* pImport, __deref_out ISimbeyInterchangeFileLayer** ppLayer) = 0;
 };
 
 interface __declspec(uuid("09E2F236-D840-4c2c-B365-307C2ACBE2F4")) ISimbeyInterchangeFileFont : IUnknown
 {
-	virtual HRESULT MeasureText (PCWSTR pcwzText, __out LONG& rWidth, __out LONG& rHeight) = 0;
-	virtual HRESULT GetGlyph (CHAR ch, __deref_out ISimbeyInterchangeFileLayer** ppGlyph) = 0;
-	virtual HRESULT DrawTextDIB (HBITMAP hbmDIB, PCWSTR pcwzText, INT x, INT y, UINT nFormat) = 0;
-	virtual HRESULT DrawGrayTextDIB (HBITMAP hbmDIB, PCWSTR pcwzText, INT x, INT y, UINT nFormat) = 0;
-	virtual HRESULT DrawTextToSurface (SIF_SURFACE* psifSurface, PCWSTR pcwzText, INT x, INT y, UINT nFormat) = 0;
-	virtual HRESULT DrawGrayTextToSurface (SIF_SURFACE* psifSurface, PCWSTR pcwzText, INT x, INT y, UINT nFormat) = 0;
+	STDMETHOD(MeasureText) (PCWSTR pcwzText, __out LONG& rWidth, __out LONG& rHeight) = 0;
+	STDMETHOD(GetGlyph) (CHAR ch, __deref_out ISimbeyInterchangeFileLayer** ppGlyph) = 0;
+	STDMETHOD(DrawTextDIB) (HBITMAP hbmDIB, PCWSTR pcwzText, INT x, INT y, UINT nFormat) = 0;
+	STDMETHOD(DrawGrayTextDIB) (HBITMAP hbmDIB, PCWSTR pcwzText, INT x, INT y, UINT nFormat) = 0;
+	STDMETHOD(DrawTextToSurface) (SIF_SURFACE* psifSurface, PCWSTR pcwzText, INT x, INT y, UINT nFormat) = 0;
+	STDMETHOD(DrawGrayTextToSurface) (SIF_SURFACE* psifSurface, PCWSTR pcwzText, INT x, INT y, UINT nFormat) = 0;
 };
 
 interface __declspec(uuid("ED064682-5F54-4adf-8CCA-CADC00B2043C")) ISpriteAnimationCompleted : IUnknown
 {
-	virtual VOID OnSpriteAnimationCompleted (ISimbeyInterchangeSprite* pSprite, INT nAnimation) = 0;
+	STDMETHOD_(VOID, OnSpriteAnimationCompleted) (ISimbeyInterchangeSprite* pSprite, INT nAnimation) = 0;
 };
 
 interface __declspec(uuid("F9ED0968-51C0-402c-A999-45CB164B0402")) ISimbeyInterchangeSprite : IUnknown
 {
-	virtual HRESULT SelectAnimation (INT nAnimation, INT nFrame = 0, INT cTicks = -1) = 0;
-	virtual VOID GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks) = 0;
-	virtual VOID GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize) = 0;
-	virtual VOID GetCurrentHitBox (__out RECT* prcHitBox) = 0;
+	STDMETHOD(SelectAnimation) (INT nAnimation, INT nFrame = 0, INT cTicks = -1) = 0;
+	STDMETHOD_(VOID, GetCurrentAnimation) (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks) = 0;
+	STDMETHOD_(VOID, GetCurrentFrameSize) (__out INT* pxSize, __out INT* pySize) = 0;
+	STDMETHOD_(VOID, GetCurrentHitBox) (__out RECT* prcHitBox) = 0;
 
-	virtual VOID UpdateFrameTick (VOID) = 0;
-	virtual VOID SetPosition (INT x, INT y) = 0;
-	virtual VOID GetPosition (__out INT& x, __out INT& y) = 0;
+	STDMETHOD_(VOID, UpdateFrameTick) (VOID) = 0;
+	STDMETHOD_(VOID, SetPosition) (INT x, INT y) = 0;
+	STDMETHOD_(VOID, GetPosition) (__out INT& x, __out INT& y) = 0;
 
-	virtual BOOL DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24) = 0;
-	virtual BOOL DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets) = 0;
-	virtual BOOL DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24) = 0;
-	virtual BOOL DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24) = 0;
+	STDMETHOD_(BOOL, DrawMaskedToDIB24) (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24) = 0;
+	STDMETHOD_(BOOL, DrawTileToDIB24) (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets) = 0;
+	STDMETHOD_(BOOL, DrawBlendedToDIB24) (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24) = 0;
+	STDMETHOD_(BOOL, DrawColorizedToDIB24) (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24) = 0;
 
 	// These methods only affect the DrawColorizedToDIB24() call
-	virtual COLORREF GetColorized (VOID) = 0;
-	virtual BOOL SetColorized (COLORREF cr) = 0;
+	STDMETHOD_(COLORREF, GetColorized) (VOID) = 0;
+	STDMETHOD_(BOOL, SetColorized) (COLORREF cr) = 0;
 
-	virtual HRESULT Clone (__deref_out ISimbeyInterchangeSprite** ppSprite) = 0;
-	virtual VOID GetFrameOffset (__out INT& x, __out INT& y) = 0;
-	virtual HRESULT GetFrameImage (__out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight) = 0;
-	virtual HRESULT SetAnimationCompletedCallback (__in_opt ISpriteAnimationCompleted* pCallback) = 0;
-	virtual HRESULT GetAnimator (__deref_out ISimbeyInterchangeAnimator** ppAnimator) = 0;
+	STDMETHOD(Clone) (__deref_out ISimbeyInterchangeSprite** ppSprite) = 0;
+	STDMETHOD_(VOID, GetFrameOffset) (__out INT& x, __out INT& y) = 0;
+	STDMETHOD(GetFrameImage) (__out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight) = 0;
+	STDMETHOD(SetAnimationCompletedCallback) (__in_opt ISpriteAnimationCompleted* pCallback) = 0;
+	STDMETHOD(GetAnimator) (__deref_out ISimbeyInterchangeAnimator** ppAnimator) = 0;
 };
 
 interface __declspec(uuid("D9578F6E-0FE6-417f-9F35-7D5827940E94")) ISimbeyInterchangeAnimator : IUnknown
 {
-	virtual HRESULT SetImage (INT nImage, BOOL fPremultiply, ISimbeyInterchangeFileLayer* pLayer, BOOL fUsePositionAsOffset) = 0;
-	virtual HRESULT SetImage (INT nImage, BOOL fPremultiply, PBYTE pBits32, INT nWidth, INT nHeight, INT xOffset, INT yOffset) = 0;
+	STDMETHOD(SetImage) (INT nImage, BOOL fPremultiply, ISimbeyInterchangeFileLayer* pLayer, BOOL fUsePositionAsOffset) = 0;
+	STDMETHOD(SetImage) (INT nImage, BOOL fPremultiply, PBYTE pBits32, INT nWidth, INT nHeight, INT xOffset, INT yOffset) = 0;
 
-	virtual HRESULT ConfigureAnimation (INT nAnimation, __in_opt const RECT* pcrcHitBox, INT nNextAnimation) = 0;
-	virtual HRESULT AddFrame (INT nAnimation, INT cTicks, INT nImage, INT xOffset, INT yOffset) = 0;
-	virtual HRESULT CompactFrames (INT nAnimation) = 0;
+	STDMETHOD(ConfigureAnimation) (INT nAnimation, __in_opt const RECT* pcrcHitBox, INT nNextAnimation) = 0;
+	STDMETHOD(AddFrame) (INT nAnimation, INT cTicks, INT nImage, INT xOffset, INT yOffset) = 0;
+	STDMETHOD(CompactFrames) (INT nAnimation) = 0;
 
-	virtual HRESULT CreateSprite (__deref_out ISimbeyInterchangeSprite** ppSprite) = 0;
+	STDMETHOD(CreateSprite) (__deref_out ISimbeyInterchangeSprite** ppSprite) = 0;
 
-	virtual INT GetImageCount (VOID) = 0;
-	virtual HRESULT GetImage (INT nImage, PBYTE* ppBits32P, INT* pnWidth, INT* pnHeight) = 0;
-	virtual HRESULT GetImageOffset (INT nImage, __out INT* pxOffset, __out INT* pyOffset) = 0;
+	STDMETHOD_(INT, GetImageCount) (VOID) = 0;
+	STDMETHOD(GetImage) (INT nImage, PBYTE* ppBits32P, INT* pnWidth, INT* pnHeight) = 0;
+	STDMETHOD(GetImageOffset) (INT nImage, __out INT* pxOffset, __out INT* pyOffset) = 0;
 
-	virtual HRESULT Duplicate (__deref_out ISimbeyInterchangeAnimator** ppAnimator) = 0;
+	STDMETHOD(Duplicate) (__deref_out ISimbeyInterchangeAnimator** ppAnimator) = 0;
 };
 
 interface __declspec(uuid("1F33FDB9-8333-4869-871C-5AA8B0B9C709")) ISimbeyFontCollection : IUnknown
 {
-	virtual HRESULT LoadFontFile (PCWSTR pcwzFontFile) = 0;
-	virtual HRESULT LoadMemoryFont (const VOID* pcvFont, INT cbFont) = 0;
-	virtual HRESULT LoadStreamFont (ISequentialStream* pstmFont, INT cbFont) = 0;
-	virtual INT GetFamilyCount (VOID) = 0;
-	virtual HRESULT GetFamilies (__deref_out PVOID* ppvFamilies, __out INT* pcFamilies) = 0;
-	virtual HRESULT GetFamilyName (PVOID pvFamilies, INT nFamily, __out_ecount(LF_FACESIZE) PWSTR pwzFamilyName) = 0;
-	virtual HRESULT CreateFont (PCWSTR pcwzFamily, FLOAT rSize, INT nFontStyles, __deref_out PVOID* ppvFont) = 0;
-	virtual VOID DeleteFont (PVOID pvFont) = 0;
-	virtual VOID DeleteFamilies (PVOID pvFamilies) = 0;
+	STDMETHOD(LoadFontFile) (PCWSTR pcwzFontFile) = 0;
+	STDMETHOD(LoadMemoryFont) (const VOID* pcvFont, INT cbFont) = 0;
+	STDMETHOD(LoadStreamFont) (ISequentialStream* pstmFont, INT cbFont) = 0;
+	STDMETHOD_(INT, GetFamilyCount) (VOID) = 0;
+	STDMETHOD(GetFamilies) (__deref_out PVOID* ppvFamilies, __out INT* pcFamilies) = 0;
+	STDMETHOD(GetFamilyName) (PVOID pvFamilies, INT nFamily, __out_ecount(LF_FACESIZE) PWSTR pwzFamilyName) = 0;
+	STDMETHOD(CreateFont) (PCWSTR pcwzFamily, FLOAT rSize, INT nFontStyles, __deref_out PVOID* ppvFont) = 0;
+	STDMETHOD_(VOID, DeleteFont) (PVOID pvFont) = 0;
+	STDMETHOD_(VOID, DeleteFamilies) (PVOID pvFamilies) = 0;
 };
 
 HRESULT WINAPI sifCreateNew (__deref_out ISimbeyInterchangeFile** ppSIF);

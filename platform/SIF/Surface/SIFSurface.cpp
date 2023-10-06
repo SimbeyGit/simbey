@@ -23,71 +23,71 @@ CDrawText::~CDrawText ()
 
 // ISimbeyInterchangeSprite
 
-HRESULT CDrawText::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
+IFACEMETHODIMP CDrawText::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
 {
 	return S_FALSE;
 }
 
-VOID CDrawText::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
+IFACEMETHODIMP_(VOID) CDrawText::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
 {
 }
 
-VOID CDrawText::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
+IFACEMETHODIMP_(VOID) CDrawText::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
 {
 }
 
-VOID CDrawText::GetCurrentHitBox (__out RECT* prcHitBox)
+IFACEMETHODIMP_(VOID) CDrawText::GetCurrentHitBox (__out RECT* prcHitBox)
 {
 	ZeroMemory(prcHitBox, sizeof(RECT));
 }
 
-VOID CDrawText::UpdateFrameTick (VOID)
+IFACEMETHODIMP_(VOID) CDrawText::UpdateFrameTick (VOID)
 {
 }
 
-VOID CDrawText::SetPosition (INT x, INT y)
+IFACEMETHODIMP_(VOID) CDrawText::SetPosition (INT x, INT y)
 {
 	m_x = x;
 	m_y = y;
 }
 
-VOID CDrawText::GetPosition (__out INT& x, __out INT& y)
+IFACEMETHODIMP_(VOID) CDrawText::GetPosition (__out INT& x, __out INT& y)
 {
 	x = m_x;
 	y = m_y;
 }
 
-BOOL CDrawText::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawText::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	return SUCCEEDED(m_pFont->DrawTextToSurface(psifSurface24, RStrToWide(m_rstrText), m_x + xOffset, m_y + yOffset, m_fCenter));
 }
 
-BOOL CDrawText::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
+IFACEMETHODIMP_(BOOL) CDrawText::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
 {
 	return FALSE;
 }
 
-BOOL CDrawText::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawText::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	return SUCCEEDED(m_pFont->DrawTextToSurface(psifSurface24, RStrToWide(m_rstrText), m_x + xOffset, m_y + yOffset, m_fCenter));
 }
 
-BOOL CDrawText::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawText::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	return SUCCEEDED(m_pFont->DrawTextToSurface(psifSurface24, RStrToWide(m_rstrText), m_x + xOffset, m_y + yOffset, m_fCenter));
 }
 
-COLORREF CDrawText::GetColorized (VOID)
+IFACEMETHODIMP_(COLORREF) CDrawText::GetColorized (VOID)
 {
 	return 0;
 }
 
-BOOL CDrawText::SetColorized (COLORREF cr)
+IFACEMETHODIMP_(BOOL) CDrawText::SetColorized (COLORREF cr)
 {
 	return FALSE;
 }
 
-VOID CDrawText::GetFrameOffset (__out INT& x, __out INT& y)
+IFACEMETHODIMP_(VOID) CDrawText::GetFrameOffset (__out INT& x, __out INT& y)
 {
 	x = 0;
 	y = 0;
@@ -112,29 +112,29 @@ CDrawSolid::~CDrawSolid ()
 
 // ISimbeyInterchangeSprite
 
-HRESULT CDrawSolid::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
+IFACEMETHODIMP CDrawSolid::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
 {
 	return S_FALSE;
 }
 
-VOID CDrawSolid::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
+IFACEMETHODIMP_(VOID) CDrawSolid::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
 {
 }
 
-VOID CDrawSolid::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
+IFACEMETHODIMP_(VOID) CDrawSolid::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
 {
 }
 
-VOID CDrawSolid::GetCurrentHitBox (__out RECT* prcHitBox)
+IFACEMETHODIMP_(VOID) CDrawSolid::GetCurrentHitBox (__out RECT* prcHitBox)
 {
 	CopyMemory(prcHitBox, &m_rcSolid, sizeof(RECT));
 }
 
-VOID CDrawSolid::UpdateFrameTick (VOID)
+IFACEMETHODIMP_(VOID) CDrawSolid::UpdateFrameTick (VOID)
 {
 }
 
-VOID CDrawSolid::SetPosition (INT x, INT y)
+IFACEMETHODIMP_(VOID) CDrawSolid::SetPosition (INT x, INT y)
 {
 	INT nWidth = m_rcSolid.right - m_rcSolid.left;
 	INT nHeight = m_rcSolid.bottom - m_rcSolid.top;
@@ -144,40 +144,40 @@ VOID CDrawSolid::SetPosition (INT x, INT y)
 	m_rcSolid.bottom = y + nHeight;
 }
 
-VOID CDrawSolid::GetPosition (__out INT& x, __out INT& y)
+IFACEMETHODIMP_(VOID) CDrawSolid::GetPosition (__out INT& x, __out INT& y)
 {
 	x = m_rcSolid.left;
 	y = m_rcSolid.top;
 }
 
-BOOL CDrawSolid::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawSolid::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	BYTE bAlpha = (BYTE)(m_crSolid >> 24);
 	return 0 < bAlpha && DIBDrawing::AlphaFill24(psifSurface24->pbSurface, psifSurface24->xSize, psifSurface24->ySize, psifSurface24->lPitch, &m_rcSolid, m_crSolid, bAlpha);
 }
 
-BOOL CDrawSolid::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
+IFACEMETHODIMP_(BOOL) CDrawSolid::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
 {
 	return FALSE;
 }
 
-BOOL CDrawSolid::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawSolid::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	BYTE bAlpha = (BYTE)(m_crSolid >> 24);
 	return 0 < bAlpha && DIBDrawing::AlphaFill24(psifSurface24->pbSurface, psifSurface24->xSize, psifSurface24->ySize, psifSurface24->lPitch, &m_rcSolid, m_crSolid, bAlpha);
 }
 
-BOOL CDrawSolid::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawSolid::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	return FALSE;
 }
 
-COLORREF CDrawSolid::GetColorized (VOID)
+IFACEMETHODIMP_(COLORREF) CDrawSolid::GetColorized (VOID)
 {
 	return 0;
 }
 
-BOOL CDrawSolid::SetColorized (COLORREF cr)
+IFACEMETHODIMP_(BOOL) CDrawSolid::SetColorized (COLORREF cr)
 {
 	return FALSE;
 }
@@ -192,7 +192,7 @@ VOID CDrawSolid::SetSolidColor (COLORREF cr)
 	m_crSolid = cr;
 }
 
-VOID CDrawSolid::GetFrameOffset (__out INT& x, __out INT& y)
+IFACEMETHODIMP_(VOID) CDrawSolid::GetFrameOffset (__out INT& x, __out INT& y)
 {
 	x = 0;
 	y = 0;
@@ -229,41 +229,41 @@ HRESULT CDrawPattern::Initialize (VOID)
 
 // ISimbeyInterchangeSprite
 
-HRESULT CDrawPattern::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
+IFACEMETHODIMP CDrawPattern::SelectAnimation (INT nAnimation, INT nFrame, INT cTicks)
 {
 	return S_FALSE;
 }
 
-VOID CDrawPattern::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
+IFACEMETHODIMP_(VOID) CDrawPattern::GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks)
 {
 }
 
-VOID CDrawPattern::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
+IFACEMETHODIMP_(VOID) CDrawPattern::GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize)
 {
 }
 
-VOID CDrawPattern::GetCurrentHitBox (__out RECT* prcHitBox)
+IFACEMETHODIMP_(VOID) CDrawPattern::GetCurrentHitBox (__out RECT* prcHitBox)
 {
 	ZeroMemory(prcHitBox, sizeof(RECT));
 }
 
-VOID CDrawPattern::UpdateFrameTick (VOID)
+IFACEMETHODIMP_(VOID) CDrawPattern::UpdateFrameTick (VOID)
 {
 }
 
-VOID CDrawPattern::SetPosition (INT x, INT y)
+IFACEMETHODIMP_(VOID) CDrawPattern::SetPosition (INT x, INT y)
 {
 	m_x = x;
 	m_y = y;
 }
 
-VOID CDrawPattern::GetPosition (__out INT& x, __out INT& y)
+IFACEMETHODIMP_(VOID) CDrawPattern::GetPosition (__out INT& x, __out INT& y)
 {
 	x = m_x;
 	y = m_y;
 }
 
-BOOL CDrawPattern::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawPattern::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	PBYTE pbView;
 	INT xView, yView, xTile, yTile;
@@ -282,17 +282,17 @@ BOOL CDrawPattern::DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psi
 	return TRUE;
 }
 
-BOOL CDrawPattern::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
+IFACEMETHODIMP_(BOOL) CDrawPattern::DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets)
 {
 	return FALSE;
 }
 
-BOOL CDrawPattern::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawPattern::DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	return FALSE;
 }
 
-BOOL CDrawPattern::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
+IFACEMETHODIMP_(BOOL) CDrawPattern::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24)
 {
 	PBYTE pbView;
 	INT xView, yView, xTile, yTile;
@@ -311,18 +311,18 @@ BOOL CDrawPattern::DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* 
 	return TRUE;
 }
 
-COLORREF CDrawPattern::GetColorized (VOID)
+IFACEMETHODIMP_(COLORREF) CDrawPattern::GetColorized (VOID)
 {
 	return m_crColorize;
 }
 
-BOOL CDrawPattern::SetColorized (COLORREF cr)
+IFACEMETHODIMP_(BOOL) CDrawPattern::SetColorized (COLORREF cr)
 {
 	m_crColorize = cr;
 	return TRUE;
 }
 
-VOID CDrawPattern::GetFrameOffset (__out INT& x, __out INT& y)
+IFACEMETHODIMP_(VOID) CDrawPattern::GetFrameOffset (__out INT& x, __out INT& y)
 {
 	x = 0;
 	y = 0;

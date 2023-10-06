@@ -38,28 +38,28 @@ public:
 	HRESULT Initialize (ISimbeyInterchangeFile* pSIF, INT nMagicPower);
 
 	// ISimbeyInterchangeSprite
-	virtual HRESULT SelectAnimation (INT nAnimation, INT nFrame, INT cTicks);
-	virtual VOID GetCurrentAnimation (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks);
-	virtual VOID GetCurrentFrameSize (__out INT* pxSize, __out INT* pySize);
-	virtual VOID GetCurrentHitBox (__out RECT* prcHitBox);
+	IFACEMETHOD(SelectAnimation) (INT nAnimation, INT nFrame, INT cTicks);
+	IFACEMETHOD_(VOID, GetCurrentAnimation) (__out INT* pnAnimation, __out INT* pnFrame, __out INT* pcTicks);
+	IFACEMETHOD_(VOID, GetCurrentFrameSize) (__out INT* pxSize, __out INT* pySize);
+	IFACEMETHOD_(VOID, GetCurrentHitBox) (__out RECT* prcHitBox);
 
-	virtual VOID UpdateFrameTick (VOID);
-	virtual VOID SetPosition (INT x, INT y);
-	virtual VOID GetPosition (__out INT& x, __out INT& y);
+	IFACEMETHOD_(VOID, UpdateFrameTick) (VOID);
+	IFACEMETHOD_(VOID, SetPosition) (INT x, INT y);
+	IFACEMETHOD_(VOID, GetPosition) (__out INT& x, __out INT& y);
 
-	virtual BOOL DrawMaskedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24);
-	virtual BOOL DrawTileToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets);
-	virtual BOOL DrawBlendedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24);
-	virtual BOOL DrawColorizedToDIB24 (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24);
+	IFACEMETHOD_(BOOL, DrawMaskedToDIB24) (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24);
+	IFACEMETHOD_(BOOL, DrawTileToDIB24) (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24, SIF_LINE_OFFSET* pslOffsets);
+	IFACEMETHOD_(BOOL, DrawBlendedToDIB24) (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24);
+	IFACEMETHOD_(BOOL, DrawColorizedToDIB24) (INT xOffset, INT yOffset, SIF_SURFACE* psifSurface24);
 
-	virtual COLORREF GetColorized (VOID);
-	virtual BOOL SetColorized (COLORREF cr);
+	IFACEMETHOD_(COLORREF, GetColorized) (VOID);
+	IFACEMETHOD_(BOOL, SetColorized) (COLORREF cr);
 
-	virtual HRESULT Clone (__deref_out ISimbeyInterchangeSprite** ppSprite) { return E_NOTIMPL; }
-	virtual VOID GetFrameOffset (__out INT& x, __out INT& y);
-	virtual HRESULT GetFrameImage (__out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight) { return E_NOTIMPL; }
-	virtual HRESULT SetAnimationCompletedCallback (__in_opt ISpriteAnimationCompleted* pCallback) { return E_NOTIMPL; }
-	virtual HRESULT GetAnimator (__deref_out ISimbeyInterchangeAnimator** ppAnimator) { return E_NOTIMPL; }
+	IFACEMETHOD(Clone) (__deref_out ISimbeyInterchangeSprite** ppSprite) { return E_NOTIMPL; }
+	IFACEMETHOD_(VOID, GetFrameOffset) (__out INT& x, __out INT& y);
+	IFACEMETHOD(GetFrameImage) (__out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight) { return E_NOTIMPL; }
+	IFACEMETHOD(SetAnimationCompletedCallback) (__in_opt ISpriteAnimationCompleted* pCallback) { return E_NOTIMPL; }
+	IFACEMETHOD(GetAnimator) (__deref_out ISimbeyInterchangeAnimator** ppAnimator) { return E_NOTIMPL; }
 
 private:
 	VOID DrawSpellFiller (INT xFillerStart, INT xFillerEnd, INT yFiller);
