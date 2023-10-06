@@ -34,7 +34,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CTextDocument::Load (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText)
+IFACEMETHODIMP CTextDocument::Load (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText)
 {
 	HRESULT hr;
 
@@ -49,14 +49,14 @@ Cleanup:
 	return hr;
 }
 
-VOID CTextDocument::Clear (VOID)
+IFACEMETHODIMP_(VOID) CTextDocument::Clear (VOID)
 {
 	m_seq.clear();
 	m_aLines.Clear();
 	m_cchLongestLine = 0;
 }
 
-HRESULT CTextDocument::Insert (size_w index, PCWSTR pcwzText, INT cchText)
+IFACEMETHODIMP CTextDocument::Insert (size_w index, PCWSTR pcwzText, INT cchText)
 {
 	HRESULT hr = m_seq.insert(index, pcwzText, cchText);
 	if(SUCCEEDED(hr))
@@ -64,7 +64,7 @@ HRESULT CTextDocument::Insert (size_w index, PCWSTR pcwzText, INT cchText)
 	return hr;
 }
 
-HRESULT CTextDocument::Replace (size_w index, PCWSTR pcwzText, INT cchText, size_w erase_length)
+IFACEMETHODIMP CTextDocument::Replace (size_w index, PCWSTR pcwzText, INT cchText, size_w erase_length)
 {
 	HRESULT hr = m_seq.replace(index, pcwzText, cchText, erase_length);
 	if(SUCCEEDED(hr))
@@ -72,7 +72,7 @@ HRESULT CTextDocument::Replace (size_w index, PCWSTR pcwzText, INT cchText, size
 	return hr;
 }
 
-HRESULT CTextDocument::Erase (size_w index, size_w erase_length)
+IFACEMETHODIMP CTextDocument::Erase (size_w index, size_w erase_length)
 {
 	HRESULT hr = m_seq.erase(index, erase_length);
 	if(SUCCEEDED(hr))
@@ -80,7 +80,7 @@ HRESULT CTextDocument::Erase (size_w index, size_w erase_length)
 	return hr;
 }
 
-HRESULT CTextDocument::Undo (__out ULONG* offset_start, __out ULONG* offset_end)
+IFACEMETHODIMP CTextDocument::Undo (__out ULONG* offset_start, __out ULONG* offset_end)
 {
 	HRESULT hr = m_seq.undo();
 	if(SUCCEEDED(hr))
@@ -93,7 +93,7 @@ HRESULT CTextDocument::Undo (__out ULONG* offset_start, __out ULONG* offset_end)
 	return hr;
 }
 
-HRESULT CTextDocument::Redo (__out ULONG* offset_start, __out ULONG* offset_end)
+IFACEMETHODIMP CTextDocument::Redo (__out ULONG* offset_start, __out ULONG* offset_end)
 {
 	HRESULT hr = m_seq.redo();
 	if(SUCCEEDED(hr))
@@ -106,7 +106,7 @@ HRESULT CTextDocument::Redo (__out ULONG* offset_start, __out ULONG* offset_end)
 	return hr;
 }
 
-bool CTextDocument::IsModified (VOID)
+IFACEMETHODIMP_(bool) CTextDocument::IsModified (VOID)
 {
 	sysint nSnapshotUndo, nSnapshotRedo;
 
@@ -114,12 +114,12 @@ bool CTextDocument::IsModified (VOID)
 	return nSnapshotUndo != m_nSnapshotUndo || nSnapshotRedo != m_nSnapshotRedo;
 }
 
-VOID CTextDocument::ResetModifiedSnapshot (VOID)
+IFACEMETHODIMP_(VOID) CTextDocument::ResetModifiedSnapshot (VOID)
 {
 	m_seq.event_pair(&m_nSnapshotUndo, &m_nSnapshotRedo);
 }
 
-bool CTextDocument::GetLineFromOffset (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset)
+IFACEMETHODIMP_(bool) CTextDocument::GetLineFromOffset (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset)
 {
 	sysint low  = 0;
 	sysint high = LineCount() - 1;
@@ -156,7 +156,7 @@ bool CTextDocument::GetLineFromOffset (size_w index, __out ULONG* pnLine, __out 
 	return true;
 }
 
-size_w CTextDocument::LineLength (ULONG nLine) const
+IFACEMETHODIMP_(size_w) CTextDocument::LineLength (ULONG nLine) const
 {
 	if(nLine < LineCount())
 		return m_aLines[nLine + 1] - m_aLines[nLine];

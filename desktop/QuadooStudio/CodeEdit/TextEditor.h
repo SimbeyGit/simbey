@@ -116,32 +116,32 @@ public:
 	HRESULT Initialize (HWND hwndParent, const RECT& rcSite, INT nTabWidth, DWORD dwClassCookie);
 
 	// ICodeEditor
-	virtual ITextDocument* GetTextDocument (VOID) { return m_pTextDoc; }
-	virtual VOID SetTextDocument (ITextDocument* pDocument);
+	IFACEMETHOD_(ITextDocument*, GetTextDocument) (VOID) { return m_pTextDoc; }
+	IFACEMETHOD_(VOID, SetTextDocument) (ITextDocument* pDocument);
 
-	virtual VOID GetTextEditView (TEXT_EDIT_VIEW* ptev);
-	virtual VOID SetTextEditView (const TEXT_EDIT_VIEW* pctev);
-	virtual VOID ResetTextEditView (VOID);
+	IFACEMETHOD_(VOID, GetTextEditView) (TEXT_EDIT_VIEW* ptev);
+	IFACEMETHOD_(VOID, SetTextEditView) (const TEXT_EDIT_VIEW* pctev);
+	IFACEMETHOD_(VOID, ResetTextEditView) (VOID);
 
-	virtual HRESULT Prepare (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText);
-	virtual VOID EnableEditor (BOOL fEnable);
-	virtual VOID SetFocus (VOID);
+	IFACEMETHOD(Prepare) (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText);
+	IFACEMETHOD_(VOID, EnableEditor) (BOOL fEnable);
+	IFACEMETHOD_(VOID, SetFocus) (VOID);
 
-	virtual bool IsModified (VOID);
-	virtual BOOL Undo (VOID);
-	virtual BOOL Redo (VOID);
-	virtual bool CanUndo (VOID);
-	virtual bool CanRedo (VOID);
+	IFACEMETHOD_(bool, IsModified) (VOID);
+	IFACEMETHOD_(bool, Undo) (VOID);
+	IFACEMETHOD_(bool, Redo) (VOID);
+	IFACEMETHOD_(bool, CanUndo) (VOID);
+	IFACEMETHOD_(bool, CanRedo) (VOID);
 
-	virtual ULONG SelectionSize (VOID);
-	virtual BOOL SelectAll (VOID);
+	IFACEMETHOD_(ULONG, SelectionSize) (VOID);
+	IFACEMETHOD_(bool, SelectAll) (VOID);
 
-	virtual VOID ScrollView (INT xCaret, ULONG nLine);
-	virtual VOID SetDarkMode (bool fDarkMode, bool fUseSystemColors);
-	virtual HRESULT DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged);
+	IFACEMETHOD_(VOID, ScrollView) (INT xCaret, ULONG nLine);
+	IFACEMETHOD_(VOID, SetDarkMode) (bool fDarkMode, bool fUseSystemColors);
+	IFACEMETHOD(DisplayOptions) (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged);
 
-	virtual ULONG GetStyleMask (ULONG uMask);
-	virtual ULONG SetStyleMask (ULONG uMask, ULONG uStyles);
+	IFACEMETHOD_(ULONG, GetStyleMask) (ULONG uMask);
+	IFACEMETHOD_(ULONG, SetStyleMask) (ULONG uMask, ULONG uStyles);
 
 	// CBaseWindow
 	virtual HINSTANCE GetInstance (VOID);

@@ -514,18 +514,18 @@ BOOL CTextEditor::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 	return FALSE;
 }
 
-bool CTextEditor::IsModified (VOID)
+IFACEMETHODIMP_(bool) CTextEditor::IsModified (VOID)
 {
 	return m_pTextDoc->IsModified();
 }
 
-BOOL CTextEditor::Undo (VOID)
+IFACEMETHODIMP_(bool) CTextEditor::Undo (VOID)
 {
 	if(m_nEditMode == MODE_READONLY)
-		return FALSE;
+		return false;
 
 	if(FAILED(m_pTextDoc->Undo(&m_nSelectionStart, &m_nSelectionEnd)))
-		return FALSE;
+		return false;
 
 	m_nCursorOffset = m_nSelectionEnd;
 
@@ -534,16 +534,16 @@ BOOL CTextEditor::Undo (VOID)
 	UpdateView(m_nSelectionStart != m_nSelectionEnd);
 	RefreshWindow();
 
-	return TRUE;
+	return true;
 }
 
-BOOL CTextEditor::Redo (VOID)
+IFACEMETHODIMP_(bool) CTextEditor::Redo (VOID)
 {
 	if(m_nEditMode == MODE_READONLY)
-		return FALSE;
+		return false;
 
 	if(FAILED(m_pTextDoc->Redo(&m_nSelectionStart, &m_nSelectionEnd)))
-		return FALSE;
+		return false;
 
 	m_nCursorOffset = m_nSelectionEnd;
 
@@ -552,27 +552,27 @@ BOOL CTextEditor::Redo (VOID)
 	UpdateView(m_nSelectionStart != m_nSelectionEnd);
 	RefreshWindow();
 
-	return TRUE;
+	return true;
 }
 
-bool CTextEditor::CanUndo (VOID)
+IFACEMETHODIMP_(bool) CTextEditor::CanUndo (VOID)
 {
 	return m_pTextDoc->CanUndo();
 }
 
-bool CTextEditor::CanRedo (VOID)
+IFACEMETHODIMP_(bool) CTextEditor::CanRedo (VOID)
 {
 	return m_pTextDoc->CanRedo();
 }
 
-ULONG CTextEditor::SelectionSize (VOID)
+IFACEMETHODIMP_(ULONG) CTextEditor::SelectionSize (VOID)
 {
 	ULONG s1 = min(m_nSelectionStart, m_nSelectionEnd); 
 	ULONG s2 = max(m_nSelectionStart, m_nSelectionEnd); 
 	return s2 - s1;
 }
 
-BOOL CTextEditor::SelectAll (VOID)
+IFACEMETHODIMP_(bool) CTextEditor::SelectAll (VOID)
 {
 	m_nSelectionStart = 0;
 	m_nSelectionEnd   = m_pTextDoc->Size();
@@ -584,13 +584,13 @@ BOOL CTextEditor::SelectAll (VOID)
 	return m_nSelectionEnd > m_nSelectionStart;
 }
 
-VOID CTextEditor::ScrollView (INT xCaret, ULONG nLine)
+IFACEMETHODIMP_(VOID) CTextEditor::ScrollView (INT xCaret, ULONG nLine)
 {
 	m_nCursorOffset = m_pTextDoc->LineOffset(nLine) + xCaret;
 	UpdateView(false);
 }
 
-VOID CTextEditor::SetDarkMode (bool fDarkMode, bool fUseSystemColors)
+IFACEMETHODIMP_(VOID) CTextEditor::SetDarkMode (bool fDarkMode, bool fUseSystemColors)
 {
 	if(fUseSystemColors || !fDarkMode)
 	{
@@ -637,7 +637,7 @@ VOID CTextEditor::SetDarkMode (bool fDarkMode, bool fUseSystemColors)
 	}
 }
 
-HRESULT CTextEditor::DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged)
+IFACEMETHODIMP CTextEditor::DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged)
 {
 	HRESULT hr;
 	CDialogHost dlgHost(m_hInstance);
@@ -859,7 +859,7 @@ VOID CTextEditor::SetFocus (VOID)
 	::SetFocus(m_hwnd);
 }
 
-VOID CTextEditor::SetTextDocument (ITextDocument* pDocument)
+IFACEMETHODIMP_(VOID) CTextEditor::SetTextDocument (ITextDocument* pDocument)
 {
 	if(m_pTextDoc != pDocument)
 	{
@@ -868,7 +868,7 @@ VOID CTextEditor::SetTextDocument (ITextDocument* pDocument)
 	}
 }
 
-VOID CTextEditor::GetTextEditView (TEXT_EDIT_VIEW* ptev)
+IFACEMETHODIMP_(VOID) CTextEditor::GetTextEditView (TEXT_EDIT_VIEW* ptev)
 {
 	ptev->nVScrollPos = m_nVScrollPos;
 	ptev->nHScrollPos = m_nHScrollPos;
@@ -883,7 +883,7 @@ VOID CTextEditor::GetTextEditView (TEXT_EDIT_VIEW* ptev)
 	ptev->nAnchorPosX = m_nAnchorPosX;
 }
 
-VOID CTextEditor::SetTextEditView (const TEXT_EDIT_VIEW* pctev)
+IFACEMETHODIMP_(VOID) CTextEditor::SetTextEditView (const TEXT_EDIT_VIEW* pctev)
 {
 	m_nVScrollPos = pctev->nVScrollPos;
 	m_nHScrollPos = pctev->nHScrollPos;
@@ -908,7 +908,7 @@ VOID CTextEditor::SetTextEditView (const TEXT_EDIT_VIEW* pctev)
 	}
 }
 
-VOID CTextEditor::ResetTextEditView (VOID)
+IFACEMETHODIMP_(VOID) CTextEditor::ResetTextEditView (VOID)
 {
 	TEXT_EDIT_VIEW tev;
 
@@ -946,12 +946,12 @@ ULONG CTextEditor::NotifyParent (UINT nNotifyCode, NMHDR* optional)
 	return SendMessage(GetParent(m_hwnd), WM_NOTIFY, (WPARAM)nCtrlId, (LPARAM)pnmhdr);
 }
 
-ULONG CTextEditor::GetStyleMask (ULONG uMask)
+IFACEMETHODIMP_(ULONG) CTextEditor::GetStyleMask (ULONG uMask)
 {
 	return m_uStyleFlags & uMask;
 }
 
-ULONG CTextEditor::SetStyleMask (ULONG uMask, ULONG uStyles)
+IFACEMETHODIMP_(ULONG) CTextEditor::SetStyleMask (ULONG uMask, ULONG uStyles)
 {
 	ULONG oldstyle = m_uStyleFlags;
 

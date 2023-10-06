@@ -33,35 +33,35 @@ public:
 	HRESULT Initialize (VOID);
 
 	// ITextDocument
-	virtual HRESULT Load (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText);
-	virtual VOID Clear (VOID);
-	virtual size_w Size () const { return m_seq.size(); }
-	virtual bool IsPrepared (VOID) const { return m_seq.is_prepared(); }
+	IFACEMETHOD(Load) (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText);
+	IFACEMETHOD_(VOID, Clear) (VOID);
+	IFACEMETHOD_(size_w, Size) () const { return m_seq.size(); }
+	IFACEMETHOD_(bool, IsPrepared) (VOID) const { return m_seq.is_prepared(); }
 
-	virtual bool CanUndo (VOID) const { return m_seq.canundo(); }
-	virtual bool CanRedo (VOID) const { return m_seq.canredo(); }
+	IFACEMETHOD_(bool, CanUndo) (VOID) const { return m_seq.canundo(); }
+	IFACEMETHOD_(bool, CanRedo) (VOID) const { return m_seq.canredo(); }
 
-	virtual HRESULT Insert (size_w index, PCWSTR pcwzText, INT cchText);
-	virtual HRESULT Replace (size_w index, PCWSTR pcwzText, INT cchText, size_w erase_length);
-	virtual HRESULT Erase (size_w index, size_w erase_length);
-	virtual VOID Group (VOID) { m_seq.group(); }
-	virtual VOID Ungroup (VOID) { m_seq.ungroup(); }
-	virtual VOID Break (VOID) { m_seq.breakopt(); }
+	IFACEMETHOD(Insert) (size_w index, PCWSTR pcwzText, INT cchText);
+	IFACEMETHOD(Replace) (size_w index, PCWSTR pcwzText, INT cchText, size_w erase_length);
+	IFACEMETHOD(Erase) (size_w index, size_w erase_length);
+	IFACEMETHOD_(VOID, Group) (VOID) { m_seq.group(); }
+	IFACEMETHOD_(VOID, Ungroup) (VOID) { m_seq.ungroup(); }
+	IFACEMETHOD_(VOID, Break) (VOID) { m_seq.breakopt(); }
 
-	virtual HRESULT Undo (__out ULONG* offset_start, __out ULONG* offset_end);
-	virtual HRESULT Redo (__out ULONG* offset_start, __out ULONG* offset_end);
+	IFACEMETHOD(Undo) (__out ULONG* offset_start, __out ULONG* offset_end);
+	IFACEMETHOD(Redo) (__out ULONG* offset_start, __out ULONG* offset_end);
 
-	virtual bool IsModified (VOID);
-	virtual VOID ResetModifiedSnapshot (VOID);
+	IFACEMETHOD_(bool, IsModified) (VOID);
+	IFACEMETHOD_(VOID, ResetModifiedSnapshot) (VOID);
 
-	virtual ULONG LineCount (VOID) const { return 0 < m_aLines.Length() ? static_cast<ULONG>(m_aLines.Length() - 1) : 0; }
-	virtual size_w LongestLine (VOID) const { return m_cchLongestLine; }
-	virtual bool GetLineFromOffset (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset);
-	virtual size_w LineOffset (ULONG nLine) const { return m_aLines[nLine]; }
-	virtual size_w LineLength (ULONG nLine) const;
-	virtual HRESULT Render (size_w index, __out_ecount(len) seqchar_t* buf, size_w len, __out size_w* pnCopied) const { return m_seq.render(index, buf, len, pnCopied); }
-	virtual HRESULT StreamOut (__out ISequentialStream* pstmText) const { return m_seq.StreamOut(pstmText); }
-	virtual INT GetTabWidth (VOID) const { return m_nTabWidth; }
+	IFACEMETHOD_(ULONG, LineCount) (VOID) const { return 0 < m_aLines.Length() ? static_cast<ULONG>(m_aLines.Length() - 1) : 0; }
+	IFACEMETHOD_(size_w, LongestLine) (VOID) const { return m_cchLongestLine; }
+	IFACEMETHOD_(bool, GetLineFromOffset) (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset);
+	IFACEMETHOD_(size_w, LineOffset) (ULONG nLine) const { return m_aLines[nLine]; }
+	IFACEMETHOD_(size_w, LineLength) (ULONG nLine) const;
+	IFACEMETHOD(Render) (size_w index, __out_ecount(len) seqchar_t* buf, size_w len, __out size_w* pnCopied) const { return m_seq.render(index, buf, len, pnCopied); }
+	IFACEMETHOD(StreamOut) (__out ISequentialStream* pstmText) const { return m_seq.StreamOut(pstmText); }
+	IFACEMETHOD_(INT, GetTabWidth) (VOID) const { return m_nTabWidth; }
 
 	CTextIterator Iterate (ULONG offset_chars);
 	CTextIterator IterateLine (ULONG lineno, ULONG* linestart, ULONG* linelen);

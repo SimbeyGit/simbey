@@ -123,65 +123,65 @@ enum SELMODE { SEL_NONE, SEL_NORMAL, SEL_MARGIN, SEL_BLOCK };
 
 interface __declspec(uuid("716C76FE-ED58-43d7-8719-457162C426B4")) ITextDocument : IUnknown
 {
-	virtual HRESULT Load (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText) = 0;
-	virtual VOID Clear (VOID) = 0;
-	virtual size_w Size () const = 0;
-	virtual bool IsPrepared (VOID) const = 0;
+	STDMETHOD(Load) (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText) = 0;
+	STDMETHOD_(VOID, Clear) (VOID) = 0;
+	STDMETHOD_(size_w, Size) () const = 0;
+	STDMETHOD_(bool, IsPrepared) (VOID) const = 0;
 
-	virtual bool CanUndo (VOID) const = 0;
-	virtual bool CanRedo (VOID) const = 0;
+	STDMETHOD_(bool, CanUndo) (VOID) const = 0;
+	STDMETHOD_(bool, CanRedo) (VOID) const = 0;
 
-	virtual HRESULT Insert (size_w index, PCWSTR pcwzText, INT cchText) = 0;
-	virtual HRESULT Replace (size_w index, PCWSTR pcwzText, INT cchText, size_w erase_length) = 0;
-	virtual HRESULT Erase (size_w index, size_w erase_length) = 0;
-	virtual VOID Group (VOID) = 0;
-	virtual VOID Ungroup (VOID) = 0;
-	virtual VOID Break (VOID) = 0;
+	STDMETHOD(Insert) (size_w index, PCWSTR pcwzText, INT cchText) = 0;
+	STDMETHOD(Replace) (size_w index, PCWSTR pcwzText, INT cchText, size_w erase_length) = 0;
+	STDMETHOD(Erase) (size_w index, size_w erase_length) = 0;
+	STDMETHOD_(VOID, Group) (VOID) = 0;
+	STDMETHOD_(VOID, Ungroup) (VOID) = 0;
+	STDMETHOD_(VOID, Break) (VOID) = 0;
 
-	virtual HRESULT Undo (__out ULONG* offset_start, __out ULONG* offset_end) = 0;
-	virtual HRESULT Redo (__out ULONG* offset_start, __out ULONG* offset_end) = 0;
+	STDMETHOD(Undo) (__out ULONG* offset_start, __out ULONG* offset_end) = 0;
+	STDMETHOD(Redo) (__out ULONG* offset_start, __out ULONG* offset_end) = 0;
 
-	virtual bool IsModified (VOID) = 0;
-	virtual VOID ResetModifiedSnapshot (VOID) = 0;
+	STDMETHOD_(bool, IsModified) (VOID) = 0;
+	STDMETHOD_(VOID, ResetModifiedSnapshot) (VOID) = 0;
 
-	virtual ULONG LineCount (VOID) const = 0;
-	virtual size_w LongestLine (VOID) const = 0;
-	virtual bool GetLineFromOffset (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset) = 0;
-	virtual size_w LineOffset (ULONG nLine) const = 0;
-	virtual size_w LineLength (ULONG cLine) const = 0;
-	virtual HRESULT Render (size_w index, __out_ecount(len) seqchar_t* buf, size_w len, __out size_w* pnCopied) const = 0;
-	virtual HRESULT StreamOut (__out ISequentialStream* pstmText) const = 0;
-	virtual INT GetTabWidth (VOID) const = 0;
+	STDMETHOD_(ULONG, LineCount) (VOID) const = 0;
+	STDMETHOD_(size_w, LongestLine) (VOID) const = 0;
+	STDMETHOD_(bool, GetLineFromOffset) (size_w index, __out ULONG* pnLine, __out ULONG* pnOffset) = 0;
+	STDMETHOD_(size_w, LineOffset) (ULONG nLine) const = 0;
+	STDMETHOD_(size_w, LineLength) (ULONG cLine) const = 0;
+	STDMETHOD(Render) (size_w index, __out_ecount(len) seqchar_t* buf, size_w len, __out size_w* pnCopied) const = 0;
+	STDMETHOD(StreamOut) (__out ISequentialStream* pstmText) const = 0;
+	STDMETHOD_(INT, GetTabWidth) (VOID) const = 0;
 };
 
 interface __declspec(uuid("CF4C929F-A311-40ec-90D4-45AE343597B7")) ICodeEditor : IUnknown
 {
-	virtual ITextDocument* GetTextDocument (VOID) = 0;
-	virtual VOID SetTextDocument (ITextDocument* pDocument) = 0;
+	STDMETHOD_(ITextDocument*, GetTextDocument) (VOID) = 0;
+	STDMETHOD_(VOID, SetTextDocument) (ITextDocument* pDocument) = 0;
 
-	virtual VOID GetTextEditView (TEXT_EDIT_VIEW* ptev) = 0;
-	virtual VOID SetTextEditView (const TEXT_EDIT_VIEW* pctev) = 0;
-	virtual VOID ResetTextEditView (VOID) = 0;
+	STDMETHOD_(VOID, GetTextEditView) (TEXT_EDIT_VIEW* ptev) = 0;
+	STDMETHOD_(VOID, SetTextEditView) (const TEXT_EDIT_VIEW* pctev) = 0;
+	STDMETHOD_(VOID, ResetTextEditView) (VOID) = 0;
 
-	virtual HRESULT Prepare (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText) = 0;
-	virtual VOID EnableEditor (BOOL fEnable) = 0;
-	virtual VOID SetFocus (VOID) = 0;
+	STDMETHOD(Prepare) (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText) = 0;
+	STDMETHOD_(VOID, EnableEditor) (BOOL fEnable) = 0;
+	STDMETHOD_(VOID, SetFocus) (VOID) = 0;
 
-	virtual bool IsModified (VOID) = 0;
-	virtual BOOL Undo (VOID) = 0;
-	virtual BOOL Redo (VOID) = 0;
-	virtual bool CanUndo (VOID) = 0;
-	virtual bool CanRedo (VOID) = 0;
+	STDMETHOD_(bool, IsModified) (VOID) = 0;
+	STDMETHOD_(bool, Undo) (VOID) = 0;
+	STDMETHOD_(bool, Redo) (VOID) = 0;
+	STDMETHOD_(bool, CanUndo) (VOID) = 0;
+	STDMETHOD_(bool, CanRedo) (VOID) = 0;
 
-	virtual ULONG SelectionSize (VOID) = 0;
-	virtual BOOL SelectAll (VOID) = 0;
+	STDMETHOD_(ULONG, SelectionSize) (VOID) = 0;
+	STDMETHOD_(bool, SelectAll) (VOID) = 0;
 
-	virtual VOID ScrollView (INT xCaret, ULONG nLine) = 0;
-	virtual VOID SetDarkMode (bool fDarkMode, bool fUseSystemColors) = 0;
-	virtual HRESULT DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged) = 0;
+	STDMETHOD_(VOID, ScrollView) (INT xCaret, ULONG nLine) = 0;
+	STDMETHOD_(VOID, SetDarkMode) (bool fDarkMode, bool fUseSystemColors) = 0;
+	STDMETHOD(DisplayOptions) (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged) = 0;
 
-	virtual ULONG GetStyleMask (ULONG uMask) = 0;
-	virtual ULONG SetStyleMask (ULONG uMask, ULONG uStyles) = 0;
+	STDMETHOD_(ULONG, GetStyleMask) (ULONG uMask) = 0;
+	STDMETHOD_(ULONG, SetStyleMask) (ULONG uMask, ULONG uStyles) = 0;
 };
 
 HRESULT WINAPI CodeEditRegister (VOID);
