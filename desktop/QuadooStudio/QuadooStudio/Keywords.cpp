@@ -146,6 +146,8 @@ const KEYWORD c_rgKeywords[] =
 	{ SLP(L"linereader"), RGB(255, 0, 0), RGB(232, 52, 36) },
 	{ SLP(L"fetch"), RGB(255, 0, 0), RGB(232, 52, 36) },
 	{ SLP(L"mapfind"), RGB(255, 0, 0), RGB(232, 52, 36) },
+	{ SLP(L"strrcmp"), RGB(255, 0, 0), RGB(232, 52, 36) },
+	{ SLP(L"strrcmpi"), RGB(255, 0, 0), RGB(232, 52, 36) },
 	{ SLP(L"typeof"), RGB(255, 0, 0), RGB(232, 52, 36) },
 
 	{ SLP(L"JSONParse"), RGB(64, 128, 192), RGB(120, 240, 70) },
