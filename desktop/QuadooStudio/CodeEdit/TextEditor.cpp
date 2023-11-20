@@ -266,13 +266,7 @@ HRESULT CTextEditor::Initialize (HWND hwndParent, const RECT& rcSite, INT nTabWi
 
 	Check(Create(0, WS_VSCROLL | WS_HSCROLL | WS_CHILD | WS_VISIBLE, wzClass, NULL, rcSite.left, rcSite.top, rcSite.right - rcSite.left, rcSite.bottom - rcSite.top, hwndParent, SW_NORMAL));
 
-	{
-		TVNCURSORINFO ci;
-		ci.nLineNo = m_nCurrentLine;
-		ci.nColumnNo = GetCurrentColumn();
-		ci.nOffset = m_nCursorOffset;
-		NotifyParent(TVN_CURSOR_CHANGE, &ci);
-	}
+	NotifyCursorChange();
 
 Cleanup:
 	return hr;
@@ -840,11 +834,7 @@ ULONG CTextEditor::EnterText (PCWSTR pcwzText, ULONG nLength)
 	UpdateView(true);
 	RefreshWindow();
 
-	TVNCURSORINFO ci;
-	ci.nLineNo = m_nCurrentLine;
-	ci.nColumnNo = GetCurrentColumn();
-	ci.nOffset = m_nCursorOffset;
-	NotifyParent(TVN_CURSOR_CHANGE, &ci);
+	NotifyCursorChange();
 
 	return nLength;
 }
@@ -898,14 +888,7 @@ IFACEMETHODIMP_(VOID) CTextEditor::SetTextEditView (const TEXT_EDIT_VIEW* pctev)
 	m_nAnchorPosX = pctev->nAnchorPosX;
 
 	UpdateMetrics();
-
-	{
-		TVNCURSORINFO ci;
-		ci.nLineNo = m_nCurrentLine;
-		ci.nColumnNo = GetCurrentColumn();
-		ci.nOffset = m_nCursorOffset;
-		NotifyParent(TVN_CURSOR_CHANGE, &ci);
-	}
+	NotifyCursorChange();
 }
 
 IFACEMETHODIMP_(VOID) CTextEditor::ResetTextEditView (VOID)
@@ -946,6 +929,25 @@ ULONG CTextEditor::NotifyParent (UINT nNotifyCode, NMHDR* optional)
 	return SendMessage(GetParent(m_hwnd), WM_NOTIFY, (WPARAM)nCtrlId, (LPARAM)pnmhdr);
 }
 
+VOID CTextEditor::NotifyCursorChange (VOID)
+{
+	TVNCURSORINFO ci;
+	ci.nLineNo = m_nCurrentLine;
+	ci.nColumnNo = GetCurrentColumn();
+	ci.nOffset = m_nCursorOffset;
+	NotifyParent(TVN_CURSOR_CHANGE, &ci);
+}
+
+VOID CTextEditor::NotifyEnterChar (WCHAR wch)
+{
+	TVNENTERCHAR ec;
+	ec.nLineNo = m_nCurrentLine;
+	ec.nColumnNo = GetCurrentColumn();
+	ec.nOffset = m_nCursorOffset;
+	ec.wch = wch;
+	NotifyParent(TVN_ENTER_CHAR, &ec);
+}
+
 IFACEMETHODIMP_(ULONG) CTextEditor::GetStyleMask (ULONG uMask)
 {
 	return m_uStyleFlags & uMask;
@@ -964,6 +966,76 @@ IFACEMETHODIMP_(ULONG) CTextEditor::SetStyleMask (ULONG uMask, ULONG uStyles)
 	RefreshWindow();
 
 	return oldstyle;
+}
+
+IFACEMETHODIMP CTextEditor::AdjustIndentation (ULONG nLine, INT nIndentation)
+{
+	HRESULT hr;
+	size_w idxCur, idxNext, cch;
+	PWSTR pwzLine = NULL, pwzIndentation = NULL;
+	INT cIndents = 0, cSpaces = 0;
+
+	CheckIf(nLine >= m_pTextDoc->LineCount(), HRESULT_FROM_WIN32(ERROR_INVALID_INDEX));
+
+	idxCur = m_pTextDoc->LineOffset(nLine);
+	idxNext = m_pTextDoc->LineOffset(nLine + 1);
+	cch = idxNext - idxCur;
+
+	pwzLine = __new WCHAR[cch + 1];
+	CheckAlloc(pwzLine);
+	Check(m_pTextDoc->Render(idxCur, pwzLine, cch, &cch));
+	pwzLine[cch] = L'\0';
+
+	for(size_w i = 0; i < cch; i++)
+	{
+		WCHAR wch = pwzLine[i];
+		if(L'\t' == wch)
+		{
+			cIndents++;
+			cSpaces++;
+		}
+		else if(L' ' == wch && 0 == TStrCmpNAssert(pwzLine + i + 1, SLP(L"   ")))
+		{
+			cIndents++;
+			cSpaces += 4;
+			i += 3;
+		}
+		else
+			break;
+	}
+
+	if(cIndents != nIndentation)
+	{
+		if(0 == nIndentation)
+			Check(m_pTextDoc->Erase(idxCur, cSpaces));
+		else
+		{
+			pwzIndentation = __new WCHAR[nIndentation + 1];
+			CheckAlloc(pwzIndentation);
+
+			for(INT i = 0; i < nIndentation; i++)
+				pwzIndentation[i] = L'\t';
+			pwzIndentation[nIndentation] = L'\0';
+
+			Check(m_pTextDoc->Replace(idxCur, pwzIndentation, nIndentation, cSpaces));
+		}
+
+		ResetLineCache();
+
+		if(m_nCurrentLine == nLine)
+		{
+			m_nCursorOffset += nIndentation - cSpaces;
+			NotifyCursorChange();
+		}
+
+		UpdateView(true);
+		RefreshWindow();
+	}
+
+Cleanup:
+	__delete_array pwzIndentation;
+	__delete_array pwzLine;
+	return hr;
 }
 
 bool CTextEditor::CheckStyle (ULONG uMask)
@@ -1482,10 +1554,10 @@ VOID CTextEditor::UpdateCaretOffset (ULONG offset, BOOL fTrailing, int* outx, UL
 	{
 		// locate the USPDATA for this line
 		if((uspData = GetUspData(NULL, lineno)) != 0)
-		{	
+		{
 			// convert character-offset to x-coordinate
 			off_chars = m_nCursorOffset - off_chars;
-			
+
 			if(fTrailing && off_chars > 0)
 				UspOffsetToX(uspData, off_chars-1, TRUE, &xpos);
 			else
@@ -1706,11 +1778,7 @@ VOID CTextEditor::FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrl
 			ScrollToPosition(m_nCaretPosX, m_nCurrentLine);
 	}
 
-	TVNCURSORINFO ci;
-	ci.nLineNo = m_nCurrentLine;
-	ci.nColumnNo = GetCurrentColumn();
-	ci.nOffset = m_nCursorOffset;
-	NotifyParent(TVN_CURSOR_CHANGE, &ci);
+	NotifyCursorChange();
 }
 
 VOID CTextEditor::MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* pnFileOffset, int* psnappedX)
@@ -2676,11 +2744,7 @@ LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
 
 	SetCapture(m_hwnd);
 
-	TVNCURSORINFO ci;
-	ci.nLineNo = nLineNo;
-	ci.nColumnNo = GetCurrentColumn();
-	ci.nOffset = m_nCursorOffset;
-	NotifyParent(TVN_CURSOR_CHANGE, &ci);
+	NotifyCursorChange();
 	return 0;
 }
 
@@ -2740,11 +2804,7 @@ LRESULT CTextEditor::OnLButtonDblClick (UINT nFlags, int mx, int my)
 		UpdateCaretOffset(m_nCursorOffset, TRUE, &m_nCaretPosX, &m_nCurrentLine);
 		m_nAnchorPosX = m_nCaretPosX;
 
-		TVNCURSORINFO ci;
-		ci.nLineNo = m_nCurrentLine;
-		ci.nColumnNo = GetCurrentColumn();
-		ci.nOffset = m_nCursorOffset;
-		NotifyParent(TVN_CURSOR_CHANGE, &ci);
+		NotifyCursorChange();
 	}
 
 	return 0;
@@ -2847,13 +2907,7 @@ LRESULT CTextEditor::OnMouseMove (UINT nFlags, int mx, int my)
 		UpdateCaretXY(m_nCaretPosX, m_nCurrentLine);
 
 		if(fCurChanged)
-		{
-			TVNCURSORINFO ci;
-			ci.nLineNo = m_nCurrentLine;
-			ci.nColumnNo = GetCurrentColumn();
-			ci.nOffset = m_nCursorOffset;
-			NotifyParent(TVN_CURSOR_CHANGE, &ci);
-		}
+			NotifyCursorChange();
 	}
 	// mouse isn't being used for a selection, so set the cursor instead
 	else
@@ -2997,12 +3051,17 @@ LRESULT CTextEditor::OnChar (UINT nChar, UINT nFlags)
 		WCHAR wch = (WCHAR)nChar;
 		if(EnterText(&wch, 1))
 		{
+			NotifyEnterChar(wch);
+
 			// change CR into a CR/LF sequence
 			if(nChar == L'\r')
 			{
-				WCHAR wch = L'\n';
+				wch = L'\n';
 				if(EnterText(&wch, 1))
+				{
+					NotifyEnterChar(wch);
 					m_pTextDoc->Break();
+				}
 			}
 
 			SendUpdateCommand();
@@ -3066,7 +3125,7 @@ LRESULT CTextEditor::OnPaint (VOID)
 		PaintLine(hdcMem, i, -m_nHScrollPos * m_nFontWidth, 0, hrgnUpdate);
 
 		// transfer to screen 
-		BitBlt(	ps.hdc, sx, sy, width, m_nLineHeight, hdcMem, 0, 0, SRCCOPY);
+		BitBlt(ps.hdc, sx, sy, width, m_nLineHeight, hdcMem, 0, 0, SRCCOPY);
 	}
 
 	//

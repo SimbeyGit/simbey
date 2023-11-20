@@ -49,6 +49,7 @@ public:
 	virtual HRESULT OpenCustomLayout (ICodeEditor* pEditor) = 0;
 	virtual HRESULT ResizeCustomLayout (INT x, INT y, INT nWidth, INT nHeight, __out INT* pnDocHeight) = 0;
 	virtual HRESULT CloseCustomLayout (VOID) = 0;
+	virtual VOID CheckAutoIndent (ICodeEditor* pEditor, ULONG nLine, WCHAR wchInsert) = 0;
 };
 
 class CProjectFile : public CProjectTab
@@ -77,6 +78,7 @@ public:
 	virtual HRESULT OpenCustomLayout (ICodeEditor* pEditor) { return S_FALSE; }
 	virtual HRESULT ResizeCustomLayout (INT x, INT y, INT nWidth, INT nHeight, __out INT* pnDocHeight);
 	virtual HRESULT CloseCustomLayout (VOID) { return S_FALSE; }
+	virtual VOID CheckAutoIndent (ICodeEditor* pEditor, ULONG nLine, WCHAR wchInsert);
 };
 
 class CQuadooProject :

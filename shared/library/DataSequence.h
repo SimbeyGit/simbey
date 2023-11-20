@@ -218,10 +218,9 @@ public:
 	  }
 
 private:
-
 	span   *next;
 	span   *prev;	// double-link-list 
-	
+
 	size_w  offset;
 	size_w  length;
 	int     buffer;

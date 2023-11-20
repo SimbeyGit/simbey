@@ -45,6 +45,7 @@
 #define TVN_SYNTAX_HIGHLIGHT	(TVN_BASE + 3)
 #define TVN_INIT_CONTEXT_MENU	(TVN_BASE + 4)
 #define	TVN_CLOSE_CONTEXT_MENU	(TVN_BASE + 5)
+#define TVN_ENTER_CHAR			(TVN_BASE + 6)
 
 struct TEXT_EDIT_VIEW
 {
@@ -66,6 +67,11 @@ struct TVNCURSORINFO : NMHDR
 	ULONG	nLineNo;
 	ULONG	nColumnNo;
 	ULONG	nOffset;
+};
+
+struct TVNENTERCHAR : TVNCURSORINFO
+{
+	WCHAR wch;
 };
 
 struct TVNMARGINCLICK : NMHDR
@@ -182,6 +188,8 @@ interface __declspec(uuid("CF4C929F-A311-40ec-90D4-45AE343597B7")) ICodeEditor :
 
 	STDMETHOD_(ULONG, GetStyleMask) (ULONG uMask) = 0;
 	STDMETHOD_(ULONG, SetStyleMask) (ULONG uMask, ULONG uStyles) = 0;
+
+	STDMETHOD(AdjustIndentation) (ULONG nLine, INT nIndentation) = 0;
 };
 
 HRESULT WINAPI CodeEditRegister (VOID);

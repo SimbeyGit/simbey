@@ -520,10 +520,8 @@ CDataSequence::span_range* CDataSequence::stackback(eventstack &source, size_t i
 	{
 		return source[length - idx - 1];
 	}
-	else
-	{
-		return 0;
-	}
+
+	return NULL;
 }
 
 void CDataSequence::record_action (action act, size_w index)
@@ -894,10 +892,14 @@ HRESULT CDataSequence::replace(size_w index, const seqchar_t *buf, size_w length
 	group();
 
 	// first of all remove the range
-	if(remlen > 0 && index < sequence_length && !erase_worker(index, remlen, action_replace))
+	if(remlen > 0 && index < sequence_length)
 	{
-		ungroup();
-		return HRESULT_FROM_WIN32(ERROR_INVALID_INDEX);
+		hr = erase_worker(index, remlen, action_replace);
+		if(FAILED(hr))
+		{
+			ungroup();
+			goto Cleanup;
+		}
 	}
 	
 	// then insert the data
@@ -971,7 +973,7 @@ HRESULT CDataSequence::append (const seqchar_t val)
 VOID CDataSequence::clear ()
 {
 	span *sptr, *tmp;
-	
+
 	// delete all spans in the sequence
 	for(sptr = head->next; sptr != tail; sptr = tmp)
 	{

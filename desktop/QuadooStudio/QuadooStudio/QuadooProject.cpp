@@ -84,6 +84,70 @@ HRESULT CProjectFile::ResizeCustomLayout (INT x, INT y, INT nWidth, INT nHeight,
 	return S_FALSE;
 }
 
+VOID CProjectFile::CheckAutoIndent (ICodeEditor* pEditor, ULONG nLine, WCHAR wchInsert)
+{
+	if(L'\n' == wchInsert || L'}' == wchInsert || L':' == wchInsert)
+	{
+		ITextDocument* pDocument = pEditor->GetTextDocument();
+		size_w idxCur = pDocument->LineOffset(nLine);
+		size_w idxPrev = pDocument->LineOffset(nLine - 1);
+		size_w idxNext = pDocument->LineOffset(nLine + 1);
+		size_w cchPrev = idxCur - idxPrev, cchCur = idxNext - idxCur;
+		PWSTR pwzPrev = __new WCHAR[cchPrev + 1];
+		if(pwzPrev)
+		{
+			if(SUCCEEDED(pDocument->Render(idxPrev, pwzPrev, cchPrev, &cchPrev)))
+			{
+				PWSTR pwzCur = __new WCHAR[cchCur + 1];
+				if(pwzCur)
+				{
+					if(SUCCEEDED(pDocument->Render(idxCur, pwzCur, cchCur, &cchCur)))
+					{
+						INT nIndentation = 0;
+						bool fQuoted = false;
+
+						pwzPrev[cchPrev] = L'\0';
+						pwzCur[cchCur] = L'\0';
+
+						for(size_w i = 0; i < cchPrev; i++)
+						{
+							if(pwzPrev[i] != L'\t')
+								break;
+							nIndentation++;
+						}
+
+						for(size_w i = nIndentation; i < cchPrev; i++)
+						{
+							WCHAR wch = pwzPrev[i];
+							if(wch == L'"')
+								fQuoted = !fQuoted;
+							else if(!fQuoted)
+							{
+								if(L'{' == wch || L':' == wch)
+									nIndentation++;
+								else if(L'}' == wch)
+									nIndentation--;
+								else if(L'/' == wch && L'/' == pwzPrev[i + 1])
+									break;
+							}
+						}
+
+						if(L'}' == wchInsert || L':' == wchInsert)
+							nIndentation--;
+
+						if(0 > nIndentation)
+							nIndentation = 0;
+
+						pEditor->AdjustIndentation(nLine, nIndentation);
+					}
+					__delete_array pwzCur;
+				}
+			}
+			__delete_array pwzPrev;
+		}
+	}
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // CQuadooProject
 ///////////////////////////////////////////////////////////////////////////////
@@ -700,6 +764,17 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 						if(SUCCEEDED(m_pEditor->QueryInterface(&srWindow)))
 							srWindow->DetachSubclassHandler(pCustomMenu);
 						__delete pCustomMenu;
+					}
+				}
+				break;
+			case TVN_ENTER_CHAR:
+				{
+					sysint idxTab = m_pTabs->GetActiveTab();
+					if(-1 != idxTab)
+					{
+						TVNENTERCHAR* pEC = static_cast<TVNENTERCHAR*>(pnmhdr);
+						CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
+						pFile->CheckAutoIndent(m_pEditor, pEC->nLineNo, pEC->wch);
 					}
 				}
 				break;

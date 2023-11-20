@@ -143,6 +143,8 @@ public:
 	IFACEMETHOD_(ULONG, GetStyleMask) (ULONG uMask);
 	IFACEMETHOD_(ULONG, SetStyleMask) (ULONG uMask, ULONG uStyles);
 
+	IFACEMETHOD(AdjustIndentation) (ULONG nLine, INT nIndentation);
+
 	// CBaseWindow
 	virtual HINSTANCE GetInstance (VOID);
 	virtual VOID OnFinalDestroy (HWND hwnd);
@@ -161,6 +163,8 @@ private:
 
 	VOID SendUpdateCommand (VOID);
 	ULONG NotifyParent (UINT nNotifyCode, NMHDR* optional = NULL);
+	VOID NotifyCursorChange (VOID);
+	VOID NotifyEnterChar (WCHAR wch);
 
 	bool CheckStyle (ULONG uMask);
 
