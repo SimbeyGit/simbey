@@ -17,7 +17,11 @@
 #include "QuadooStudio.h"
 
 const WCHAR c_wzQuadooStudioClass[] = L"QuadooStudioCls";
+#ifdef	_WIN64
+const WCHAR c_wzQuadooStudioTitle[] = L"Quadoo Studio (x64)";
+#else
 const WCHAR c_wzQuadooStudioTitle[] = L"Quadoo Studio";
+#endif
 const WCHAR c_wzRegistryKey[] = L"Software\\Simbey\\QuadooStudio";
 
 CQuadooStudio::CQuadooStudio (HINSTANCE hInstance) :

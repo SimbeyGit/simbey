@@ -79,6 +79,8 @@ public:
 	virtual HRESULT ResizeCustomLayout (INT x, INT y, INT nWidth, INT nHeight, __out INT* pnDocHeight);
 	virtual HRESULT CloseCustomLayout (VOID) { return S_FALSE; }
 	virtual VOID CheckAutoIndent (ICodeEditor* pEditor, ULONG nLine, WCHAR wchInsert);
+
+	static INT ScanIndentationSyntax (PCWSTR pcwzCode, size_w cchCode);
 };
 
 class CQuadooProject :

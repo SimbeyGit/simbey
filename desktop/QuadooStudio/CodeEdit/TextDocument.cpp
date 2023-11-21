@@ -85,8 +85,8 @@ IFACEMETHODIMP CTextDocument::Undo (__out ULONG* offset_start, __out ULONG* offs
 	HRESULT hr = m_seq.undo();
 	if(SUCCEEDED(hr))
 	{
-		*offset_start = m_seq.event_index();
-		*offset_end = *offset_start + m_seq.event_length();
+		*offset_start = static_cast<ULONG>(m_seq.event_index());
+		*offset_end = static_cast<ULONG>(*offset_start + m_seq.event_length());
 
 		Update();
 	}
@@ -98,8 +98,8 @@ IFACEMETHODIMP CTextDocument::Redo (__out ULONG* offset_start, __out ULONG* offs
 	HRESULT hr = m_seq.redo();
 	if(SUCCEEDED(hr))
 	{
-		*offset_start = m_seq.event_index();
-		*offset_end = *offset_start + m_seq.event_length();
+		*offset_start = static_cast<ULONG>(m_seq.event_index());
+		*offset_end = static_cast<ULONG>(*offset_start + m_seq.event_length());
 
 		Update();
 	}
@@ -150,8 +150,8 @@ IFACEMETHODIMP_(bool) CTextDocument::GetLineFromOffset (size_w index, __out ULON
 		}
 	}
 
-	if(pnLine)				*pnLine			= line;
-	if(pnOffset)			*pnOffset		= m_aLines[line];
+	if(pnLine)				*pnLine			= static_cast<ULONG>(line);
+	if(pnOffset)			*pnOffset		= static_cast<ULONG>(m_aLines[line]);
 
 	return true;
 }
@@ -165,7 +165,7 @@ IFACEMETHODIMP_(size_w) CTextDocument::LineLength (ULONG nLine) const
 
 CTextIterator CTextDocument::Iterate (ULONG offset_chars)
 {
-	return CTextIterator(offset_chars, m_seq.size() - offset_chars, this);
+	return CTextIterator(offset_chars, static_cast<ULONG>(m_seq.size() - offset_chars), this);
 }
 
 CTextIterator CTextDocument::IterateLine (ULONG lineno, ULONG* linestart, ULONG* linelen)
@@ -177,7 +177,7 @@ CTextIterator CTextDocument::IterateLine (ULONG lineno, ULONG* linestart, ULONG*
 		return CTextIterator();
 	}
 
-	*linelen = LineLength(lineno);
+	*linelen = static_cast<ULONG>(LineLength(lineno));
 	return CTextIterator(*linestart, *linelen, this);
 }
 

@@ -104,7 +104,6 @@ VOID CProjectFile::CheckAutoIndent (ICodeEditor* pEditor, ULONG nLine, WCHAR wch
 					if(SUCCEEDED(pDocument->Render(idxCur, pwzCur, cchCur, &cchCur)))
 					{
 						INT nIndentation = 0;
-						bool fQuoted = false;
 
 						pwzPrev[cchPrev] = L'\0';
 						pwzCur[cchCur] = L'\0';
@@ -116,24 +115,8 @@ VOID CProjectFile::CheckAutoIndent (ICodeEditor* pEditor, ULONG nLine, WCHAR wch
 							nIndentation++;
 						}
 
-						for(size_w i = nIndentation; i < cchPrev; i++)
-						{
-							WCHAR wch = pwzPrev[i];
-							if(wch == L'"')
-								fQuoted = !fQuoted;
-							else if(!fQuoted)
-							{
-								if(L'{' == wch || L':' == wch)
-									nIndentation++;
-								else if(L'}' == wch)
-									nIndentation--;
-								else if(L'/' == wch && L'/' == pwzPrev[i + 1])
-									break;
-							}
-						}
-
-						if(L'}' == wchInsert || L':' == wchInsert)
-							nIndentation--;
+						nIndentation += ScanIndentationSyntax(pwzPrev + nIndentation, cchPrev - nIndentation);
+						nIndentation += ScanIndentationSyntax(pwzCur, cchCur);
 
 						if(0 > nIndentation)
 							nIndentation = 0;
@@ -146,6 +129,29 @@ VOID CProjectFile::CheckAutoIndent (ICodeEditor* pEditor, ULONG nLine, WCHAR wch
 			__delete_array pwzPrev;
 		}
 	}
+}
+
+INT CProjectFile::ScanIndentationSyntax (PCWSTR pcwzCode, size_w cchCode)
+{
+	INT nIndentation = 0;
+	bool fQuoted = false;
+
+	for(size_w i = 0; i < cchCode; i++)
+	{
+		WCHAR wch = pcwzCode[i];
+		if(wch == L'"')
+			fQuoted = !fQuoted;
+		else if(!fQuoted)
+		{
+			if(L'{' == wch || L':' == wch)
+				nIndentation++;
+			else if(L'}' == wch)
+				nIndentation--;
+			else if(L'/' == wch && (L'/' == pcwzCode[i + 1] || L'*' == pcwzCode[i + 1]))
+				break;
+		}
+	}
+	return nIndentation;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

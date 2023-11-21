@@ -184,7 +184,7 @@ HRESULT CDataSequence::alloc_buffer (size_t maxsize, __deref_out CDataSequence::
 
 	bc->length  = 0;
 	bc->maxsize = maxsize;
-	bc->id		= buffer_list.Length();		// assign the id
+	bc->id		= static_cast<int>(buffer_list.Length());	// assign the id
 
 	Check(buffer_list.Append(bc));
 	*ppBuffer = bc;
@@ -1179,7 +1179,7 @@ HRESULT CDataSequence::StreamOut (ISequentialStream* pstmData) const
 		size_w cchSpan = sptr->length;
 		seqchar_t* source = buffer_list[sptr->buffer]->buffer + sptr->offset;
 
-		Check(pstmData->Write(source, cchSpan * sizeof(seqchar_t), &cb));
+		Check(pstmData->Write(source, static_cast<ULONG>(cchSpan * sizeof(seqchar_t)), &cb));
 
 		sptr = sptr->next;
 	}

@@ -39,7 +39,7 @@ private:
 
 	VOID InitializeFontOptions (VOID);
 	BOOL FontCombo_DrawItem (DRAWITEMSTRUCT* dis);
-	BOOL ColorCombo_DrawItem (UINT uCtrlId, DRAWITEMSTRUCT* dis, BOOL fSelectImage);
+	BOOL ColorCombo_DrawItem (UINT_PTR uCtrlId, DRAWITEMSTRUCT* dis, BOOL fSelectImage);
 	VOID OnPreviewPaint (HWND hwndPreview);
 
 	static int CALLBACK EnumFontSizes (ENUMLOGFONTEX* lpelfe, NEWTEXTMETRICEX* lpntme, DWORD FontType, LPARAM lParam);

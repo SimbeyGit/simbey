@@ -458,9 +458,9 @@ BOOL CTabs::PopupTabs (HWND hwnd, LONG x, LONG y, __out sysint* pidxTab)
 
 		for(sysint i = 0; i < aSorted.Length(); i++)
 		{
-			mii.wID = i + 1;
+			mii.wID = static_cast<UINT>(i + 1);
 			mii.dwTypeData = const_cast<PWSTR>(RStrToWide(aSorted[i]->m_rstrLabel));
-			InsertMenuItemW(hMenu, i, TRUE, &mii);
+			InsertMenuItemW(hMenu, static_cast<UINT>(i), TRUE, &mii);
 		}
 
 		UINT nCmd = TrackPopupMenu(hMenu, TPM_RIGHTALIGN | TPM_TOPALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, hwnd, NULL);

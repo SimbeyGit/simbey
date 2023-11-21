@@ -60,16 +60,16 @@ int LogicalToPoints (int nLogical)
 	return nPoints;
 }
 
-DWORD GetCurrentComboData (HWND hwnd, UINT uCtrl)
+DWORD_PTR GetCurrentComboData (HWND hwnd, UINT uCtrl)
 {
-	int idx = SendDlgItemMessage(hwnd, uCtrl, CB_GETCURSEL, 0, 0);
-	return    SendDlgItemMessage(hwnd, uCtrl, CB_GETITEMDATA, idx == -1 ? 0 : idx, 0);
+	LRESULT idx = SendDlgItemMessage(hwnd, uCtrl, CB_GETCURSEL, 0, 0);
+	return SendDlgItemMessage(hwnd, uCtrl, CB_GETITEMDATA, idx == -1 ? 0 : idx, 0);
 }
 
-DWORD GetCurrentListData (HWND hwnd, UINT uCtrl)
+DWORD_PTR GetCurrentListData (HWND hwnd, UINT uCtrl)
 {
-	int idx = SendDlgItemMessage(hwnd, uCtrl, LB_GETCURSEL, 0, 0);
-	return    SendDlgItemMessage(hwnd, uCtrl, LB_GETITEMDATA, idx == -1 ? 0 : idx, 0);
+	LRESULT idx = SendDlgItemMessage(hwnd, uCtrl, LB_GETCURSEL, 0, 0);
+	return SendDlgItemMessage(hwnd, uCtrl, LB_GETITEMDATA, idx == -1 ? 0 : idx, 0);
 }
 
 //
@@ -89,14 +89,14 @@ HFONT EasyCreateFont (int nPointSize, BOOL fBold, DWORD dwQuality, WCHAR* szFace
 void AddColorListItem (HWND hwnd, UINT uItem, int fgIdx, int bgIdx, WCHAR* szName)
 {
 	HWND hwndCtrl = GetDlgItem(hwnd, uItem);
-	int idx = SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LONG)szName);
+	LRESULT idx = SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LONG)szName);
 	SendMessage(hwndCtrl, LB_SETITEMDATA, idx, MAKELONG(fgIdx, bgIdx));
 }
 
 void AddColorComboItem (HWND hwnd, UINT uItem, COLORREF col, WCHAR* szName)
 {
 	HWND hwndCtrl = GetDlgItem(hwnd, uItem);
-	int idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LONG)szName);
+	LRESULT idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LONG)szName);
 	SendMessage(hwndCtrl, CB_SETITEMDATA, idx, col);
 }
 
@@ -235,7 +235,7 @@ BOOL COptionsDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 			if(HIWORD(wParam) == CBN_SELCHANGE)
 			{
 				HWND hwnd;
-				DWORD itemidx;
+				DWORD_PTR itemidx;
 
 				GetWindow(&hwnd);
 				itemidx = GetCurrentListData(hwnd, IDC_ITEMLIST);
@@ -268,10 +268,10 @@ BOOL COptionsDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 				short bgidx = HIWORD(GetCurrentListData(hwnd, IDC_ITEMLIST));
 
 				if(fgidx >= 0)
-					m_rgbTempColorList[fgidx] = GetCurrentComboData(hwnd, IDC_FGCOLCOMBO);
+					m_rgbTempColorList[fgidx] = (COLORREF)GetCurrentComboData(hwnd, IDC_FGCOLCOMBO);
 				
 				if(bgidx >= 0)
-					m_rgbTempColorList[bgidx] = GetCurrentComboData(hwnd, IDC_BGCOLCOMBO);
+					m_rgbTempColorList[bgidx] = (COLORREF)GetCurrentComboData(hwnd, IDC_BGCOLCOMBO);
 
 				PostMessage(hwnd, MSG_UPDATE_PREVIEW, 0, 0);
 			}
@@ -387,7 +387,7 @@ void COptionsDlg::FillFontComboList (HWND hwndCombo)
 {
 	HDC		hdc = GetDC(hwndCombo);
 	LOGFONT lf;
-	int		idx;
+	LRESULT	idx;
 
 	SendMessage(hwndCombo, WM_SETFONT, (WPARAM)m_hNormalFont, 0);
 
@@ -408,9 +408,9 @@ void COptionsDlg::FillFontComboList (HWND hwndCombo)
 void COptionsDlg::UpdatePreviewPane (HWND hwnd)
 {
 	TCHAR szFaceName[200];
-	int idx = SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETCURSEL, 0, 0);
+	LRESULT idx = SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETCURSEL, 0, 0);
 	int size;
-	DWORD data;
+	LRESULT data;
 
 	SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETLBTEXT, idx, (LONG)szFaceName);
 
@@ -443,8 +443,8 @@ void COptionsDlg::InitSizeList (HWND hwnd)
 	// get current font size
 	int cursize = GetDlgItemInt(hwnd, IDC_SIZELIST, 0, 0);
 
-	int item = SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETCURSEL, 0, 0);
-	int i, count, nearest = 0;
+	LRESULT item = SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETCURSEL, 0, 0);
+	LRESULT count, nearest = 0;
 
 	lf.lfCharSet		= DEFAULT_CHARSET;
 	lf.lfPitchAndFamily = 0;
@@ -459,9 +459,9 @@ void COptionsDlg::InitSizeList (HWND hwnd)
 	// set selection to first item
 	count = SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_GETCOUNT, 0, 0);
 
-	for(i = 0; i < count; i++)
+	for(LRESULT i = 0; i < count; i++)
 	{
-		int n = SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_GETITEMDATA, i, 0);
+		LRESULT n = SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_GETITEMDATA, i, 0);
 
 		if(n <= cursize)
 			nearest = i;
@@ -475,7 +475,7 @@ void COptionsDlg::InitSizeList (HWND hwnd)
 void COptionsDlg::SelectColorInList (UINT uComboIdx, short itemIdx)
 {
 	HWND hwndCombo = GetDlgItem(uComboIdx);
-	int  i;
+	LRESULT i;
 
 	if(itemIdx == (short)-1)
 	{
@@ -537,7 +537,11 @@ VOID COptionsDlg::InitializeFontOptions (VOID)
 	INT cColors = ARRAYSIZE(m_rgbCustColors);
 
 	GetWindow(&hwnd);
+#ifdef	_WIN64
+	hInstance = (HINSTANCE)GetWindowLongPtrW(hwnd, GWLP_HINSTANCE);
+#else
 	hInstance = (HINSTANCE)GetWindowLongPtrW(hwnd, GWL_HINSTANCE);
+#endif
 
 	CopyMemory(m_rgbTempColorList, m_prgColors, sizeof(m_rgbTempColorList));
 	CopyMemory(m_rgbAutoColorList, m_prgColors, sizeof(m_rgbAutoColorList));
@@ -604,7 +608,7 @@ VOID COptionsDlg::InitializeFontOptions (VOID)
 BOOL COptionsDlg::FontCombo_DrawItem (DRAWITEMSTRUCT* dis)
 {
 	TCHAR		szText[100];
-	INT			cchText;
+	LRESULT		cchText;
 	
 	BOOL		fFixed		= LOWORD(dis->itemData);
 	BOOL		fTrueType	= HIWORD(dis->itemData);
@@ -663,7 +667,7 @@ BOOL COptionsDlg::FontCombo_DrawItem (DRAWITEMSTRUCT* dis)
 	
 	// draw the text
 	ExtTextOut(dis->hDC, xpos, ypos,
-		ETO_CLIPPED|ETO_OPAQUE, &dis->rcItem, szText, cchText, 0);
+		ETO_CLIPPED|ETO_OPAQUE, &dis->rcItem, szText, static_cast<UINT>(cchText), 0);
 
 	// draw a 'TT' icon if the font is TRUETYPE
 	if(fTrueType)
@@ -685,7 +689,7 @@ BOOL COptionsDlg::FontCombo_DrawItem (DRAWITEMSTRUCT* dis)
 //
 //	Combobox must have the CBS_HASSTRINGS style set!!
 //	
-BOOL COptionsDlg::ColorCombo_DrawItem (UINT uCtrlId, DRAWITEMSTRUCT* dis, BOOL fSelectImage)
+BOOL COptionsDlg::ColorCombo_DrawItem (UINT_PTR uCtrlId, DRAWITEMSTRUCT* dis, BOOL fSelectImage)
 {
 	RECT		rect	= dis->rcItem;
 	int			boxsize = (dis->rcItem.bottom - dis->rcItem.top) - 4;			
@@ -744,9 +748,8 @@ BOOL COptionsDlg::ColorCombo_DrawItem (UINT uCtrlId, DRAWITEMSTRUCT* dis, BOOL f
 	if(dis->itemState & ODS_DISABLED)
 		PaintFrameRect(dis->hDC, &rect, GetSysColor(COLOR_3DSHADOW), GetSysColor(COLOR_3DFACE));
 	else
-		PaintFrameRect(dis->hDC, &rect, RGB(0,0,0), REALIZE_SYSCOL(dis->itemData));
-	
-	
+		PaintFrameRect(dis->hDC, &rect, RGB(0,0,0), REALIZE_SYSCOL(static_cast<COLORREF>(dis->itemData)));
+
 	return TRUE;
 }
 
@@ -782,11 +785,11 @@ int CALLBACK COptionsDlg::EnumFontSizes (ENUMLOGFONTEX* lpelfe, NEWTEXTMETRICEX*
 	BOOL fTrueType = (lpelfe->elfLogFont.lfOutPrecision == OUT_STROKE_PRECIS) ? TRUE : FALSE;
 
 	HWND hwndCombo = (HWND)lParam;
-	int  i, count, idx;
+	LRESULT count, idx;
 
 	if(fTrueType)
 	{
-		for(i = 0; i < (sizeof(ttsizes) / sizeof(ttsizes[0])); i++)
+		for(LRESULT i = 0; i < (sizeof(ttsizes) / sizeof(ttsizes[0])); i++)
 		{
 			Formatting::TInt32ToAsc(ttsizes[i], ach, ARRAYSIZE(ach), 10, NULL);
 			idx = SendMessage(hwndCombo, CB_ADDSTRING, 0, (LPARAM)ach);
@@ -803,9 +806,9 @@ int CALLBACK COptionsDlg::EnumFontSizes (ENUMLOGFONTEX* lpelfe, NEWTEXTMETRICEX*
 		count = SendMessage(hwndCombo, CB_GETCOUNT, 0, 0);
 		idx = count;
 
-		for(i = 0; i < count; i++)
+		for(LRESULT i = 0; i < count; i++)
 		{
-			int nItemSize = SendMessage(hwndCombo, CB_GETITEMDATA, i, 0);
+			LRESULT nItemSize = SendMessage(hwndCombo, CB_GETITEMDATA, i, 0);
 			if(size <= nItemSize)
 			{
 				if(size < nItemSize)
@@ -838,7 +841,7 @@ int CALLBACK COptionsDlg::EnumFontNames (ENUMLOGFONTEX* lpelfe, NEWTEXTMETRICEX*
 	// make sure font doesn't already exist in our list
 	if(SendMessage(hwndCombo, CB_FINDSTRING, 0, (LPARAM)pszName) == CB_ERR)
 	{
-		int		idx;
+		LRESULT	idx;
 		BOOL	fFixed;
 		int		fTrueType;		// 0 = normal, 1 = TrueType, 2 = OpenType
 

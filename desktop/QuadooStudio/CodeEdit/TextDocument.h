@@ -109,25 +109,24 @@ public:
 	{
 		if(text_doc)
 		{
+			size_w nCopied;
+
 			if(buflen > len_bytes)
 				buflen = len_bytes;
 
 			// get text from the TextDocument at the specified byte-offset
-			if(SUCCEEDED(text_doc->m_seq.render(off_bytes, buf, buflen, &buflen)))
+			if(SUCCEEDED(text_doc->m_seq.render(off_bytes, buf, buflen, &nCopied)))
 			{
 				// adjust the iterator's internal position
-				off_bytes += buflen;
-				len_bytes -= buflen;
+				off_bytes += static_cast<ULONG>(nCopied);
+				len_bytes -= static_cast<ULONG>(nCopied);
 			}
 			else
 				buflen = 0;
 
 			return buflen;
 		}
-		else
-		{
-			return 0;
-		}
+		return 0;
 	}
 
 	operator bool()

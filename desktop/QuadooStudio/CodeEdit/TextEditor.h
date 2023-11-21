@@ -162,7 +162,7 @@ private:
 	VOID RefreshWindow (VOID);
 
 	VOID SendUpdateCommand (VOID);
-	ULONG NotifyParent (UINT nNotifyCode, NMHDR* optional = NULL);
+	ULONG_PTR NotifyParent (UINT nNotifyCode, NMHDR* optional = NULL);
 	VOID NotifyCursorChange (VOID);
 	VOID NotifyEnterChar (WCHAR wch);
 
@@ -203,7 +203,7 @@ private:
 	LONG InvalidateLine(ULONG nLineNo, bool forceAnalysis);
 	void UpdateLine (ULONG nLineNo);
 
-	VOID FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrlDown, BOOL fAdvancing);
+	VOID FinalizeNavigation (WPARAM nKeyCode, BOOL fShiftDown, BOOL fCtrlDown, BOOL fAdvancing);
 	VOID MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* pnFileOffset, int* psnappedX);
 	HMENU CreateContextMenu (VOID);
 
@@ -223,7 +223,7 @@ private:
 	VOID UpdateMetrics ();
 	VOID RecalcLineHeight ();
 	VOID SetFont (HFONT hFont, int idx);
-	LRESULT SizeEditor (UINT nFlags, int width, int height);
+	LRESULT SizeEditor (WPARAM nFlags, int width, int height);
 
 	HRGN ScrollRgn (int dx, int dy, bool fReturnUpdateRgn);
 	VOID Scroll (int dx, int dy);
@@ -233,19 +233,19 @@ private:
 
 	static bool IsKeyPressed (UINT nVirtKey);
 
-	LRESULT OnSize (UINT nFlags, int width, int height);
+	LRESULT OnSize (WPARAM nFlags, int width, int height);
 	LRESULT OnVScroll (UINT nSBCode, UINT nPos);
 	LRESULT OnHScroll (UINT nSBCode, UINT nPos);
 	LRESULT OnMouseActivate (HWND hwndTop, UINT nHitTest, UINT nMessage);
 	LRESULT OnContextMenu (HWND wParam, int x, int y);
 	LRESULT OnMouseWheel (int nDelta);
 	LRESULT OnTimer (UINT_PTR nTimer);
-	LRESULT OnLButtonDown (UINT nFlags, int mx, int my);
-	LRESULT OnLButtonUp (UINT nFlags, int mx, int my);
-	LRESULT OnLButtonDblClick (UINT nFlags, int mx, int my);
-	LRESULT OnMouseMove (UINT nFlags, int mx, int my);
-	LRESULT OnKeyDown (UINT nKeyCode, UINT nFlags);
-	LRESULT OnChar (UINT nChar, UINT nFlags);
+	LRESULT OnLButtonDown (WPARAM nFlags, int mx, int my);
+	LRESULT OnLButtonUp (WPARAM nFlags, int mx, int my);
+	LRESULT OnLButtonDblClick (WPARAM nFlags, int mx, int my);
+	LRESULT OnMouseMove (WPARAM nFlags, int mx, int my);
+	LRESULT OnKeyDown (WPARAM nKeyCode, LPARAM nFlags);
+	LRESULT OnChar (WPARAM nChar, LPARAM nFlags);
 	LRESULT OnPaint (VOID);
 	LRESULT OnSetFont (HFONT hFont);
 	LRESULT OnSetFocus (HWND hwndOld);

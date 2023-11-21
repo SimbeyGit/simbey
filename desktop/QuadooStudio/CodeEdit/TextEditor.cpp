@@ -451,7 +451,7 @@ BOOL CTextEditor::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 		return TRUE;
 
 	case WM_GETTEXT:
-		lResult = GetText((PWSTR)lParam, 0, wParam);
+		lResult = GetText((PWSTR)lParam, 0, static_cast<ULONG>(wParam));
 		return TRUE;
 
 	case WM_SETTEXT:
@@ -569,7 +569,7 @@ IFACEMETHODIMP_(ULONG) CTextEditor::SelectionSize (VOID)
 IFACEMETHODIMP_(bool) CTextEditor::SelectAll (VOID)
 {
 	m_nSelectionStart = 0;
-	m_nSelectionEnd   = m_pTextDoc->Size();
+	m_nSelectionEnd   = static_cast<ULONG>(m_pTextDoc->Size());
 	m_nCursorOffset   = m_nSelectionEnd;
 
 	UpdateView(true);
@@ -580,7 +580,7 @@ IFACEMETHODIMP_(bool) CTextEditor::SelectAll (VOID)
 
 IFACEMETHODIMP_(VOID) CTextEditor::ScrollView (INT xCaret, ULONG nLine)
 {
-	m_nCursorOffset = m_pTextDoc->LineOffset(nLine) + xCaret;
+	m_nCursorOffset = static_cast<ULONG>(m_pTextDoc->LineOffset(nLine) + xCaret);
 	UpdateView(false);
 }
 
@@ -914,7 +914,7 @@ VOID CTextEditor::SendUpdateCommand (VOID)
 	SendMessage(GetParent(m_hwnd), WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(m_hwnd), EN_UPDATE), (LPARAM)m_hwnd);
 }
 
-ULONG CTextEditor::NotifyParent (UINT nNotifyCode, NMHDR* optional)
+ULONG_PTR CTextEditor::NotifyParent (UINT nNotifyCode, NMHDR* optional)
 {
 	UINT nCtrlId = GetWindowLong(m_hwnd, GWL_ID);
 	NMHDR nmhdr, *pnmhdr = &nmhdr;
@@ -1132,7 +1132,7 @@ USPCACHE* CTextEditor::GetUspCache (HDC hdc, ULONG nLineNo, ULONG* nOffset)
 	ATTR*	attr;
 	ULONG	colno = 0;
 	ULONG	off_chars = 0;
-	size_w	len;
+	INT		len;
 	HDC		hdcTemp;
 	
 	USPDATA *uspData;
@@ -1178,16 +1178,16 @@ USPCACHE* CTextEditor::GetUspCache (HDC hdc, ULONG nLineNo, ULONG* nOffset)
 	//
 	// get the text for the entire line and apply style attributes
 	//
-	len = m_pTextDoc->LineLength(nLineNo);
+	len = static_cast<INT>(m_pTextDoc->LineLength(nLineNo));
 
-	size_w cbAdvance = len;
+	ULONG cbAdvance = len;
 	if(cbAdvance == 0) cbAdvance = 1;
 
 	if(nLineNo < m_pTextDoc->LineCount() && SUCCEEDED(m_stmTextBuff.TWriteAdvance(&buff, cbAdvance)) && SUCCEEDED(m_stmAttrBuff.TWriteAdvance(&attr, cbAdvance)))
 	{
 		size_w cchCopied;
 
-		off_chars = m_pTextDoc->LineOffset(nLineNo);
+		off_chars = static_cast<ULONG>(m_pTextDoc->LineOffset(nLineNo));
 		m_pTextDoc->Render(off_chars, buff, len, &cchCopied);
 	}
 	else
@@ -1509,7 +1509,7 @@ VOID CTextEditor::SetupScrollbars ()
 	si.nPos  = m_nHScrollPos;		// scrollbar thumb position
 	si.nPage = m_nWindowColumns;	// number of lines in a page
 	si.nMin  = 0;
-	si.nMax  = m_pTextDoc->LongestLine() - 1;	// total number of lines in file
+	si.nMax  = static_cast<INT>(m_pTextDoc->LongestLine() - 1);	// total number of lines in file
 
 	SetScrollInfo(m_hwnd, SB_HORZ, &si, TRUE);
 
@@ -1517,7 +1517,7 @@ VOID CTextEditor::SetupScrollbars ()
 	// range-checking easier. The scrollbars don't use these values, they
 	// are for our own use.
 	m_nVScrollMax = m_pTextDoc->LineCount() - m_nWindowLines;
-	m_nHScrollMax = m_pTextDoc->LongestLine() - m_nWindowColumns;
+	m_nHScrollMax = static_cast<INT>(m_pTextDoc->LongestLine() - m_nWindowColumns);
 }
 
 //
@@ -1529,7 +1529,7 @@ bool CTextEditor::PinToBottomCorner ()
 
 	if(static_cast<size_w>(m_nHScrollPos + m_nWindowColumns) > m_pTextDoc->LongestLine())
 	{
-		m_nHScrollPos = m_pTextDoc->LongestLine() - m_nWindowColumns;
+		m_nHScrollPos = static_cast<INT>(m_pTextDoc->LongestLine() - m_nWindowColumns);
 		repos = true;
 	}
 
@@ -1739,7 +1739,7 @@ void CTextEditor::UpdateLine (ULONG nLineNo)
 	}
 }
 
-VOID CTextEditor::FinalizeNavigation (UINT nKeyCode, BOOL fShiftDown, BOOL fCtrlDown, BOOL fAdvancing)
+VOID CTextEditor::FinalizeNavigation (WPARAM nKeyCode, BOOL fShiftDown, BOOL fCtrlDown, BOOL fAdvancing)
 {
 	ULONG nLine;
 
@@ -1808,7 +1808,7 @@ VOID CTextEditor::MouseCoordToFilePos (int mx, int my, ULONG* pnLineNo, ULONG* p
 	if(nLineNo >= m_pTextDoc->LineCount())
 	{
 		nLineNo   = m_pTextDoc->LineCount() ? m_pTextDoc->LineCount() - 1 : 0;
-		off_chars = m_pTextDoc->Size();
+		off_chars = static_cast<ULONG>(m_pTextDoc->Size());
 	}
 
 	mx += m_nHScrollPos * m_nFontWidth;
@@ -2124,7 +2124,7 @@ VOID CTextEditor::MoveFileStart ()
 
 VOID CTextEditor::MoveFileEnd ()
 {
-	m_nCursorOffset = m_pTextDoc->Size();
+	m_nCursorOffset = static_cast<ULONG>(m_pTextDoc->Size());
 }
 
 VOID CTextEditor::UpdateMetrics ()
@@ -2185,7 +2185,7 @@ VOID CTextEditor::SetFont (HFONT hFont, int idx)
 	ResetLineCache();
 }
 
-LRESULT CTextEditor::SizeEditor (UINT nFlags, int width, int height)
+LRESULT CTextEditor::SizeEditor (WPARAM nFlags, int width, int height)
 {
 	int margin = LeftMarginWidth();
 
@@ -2381,7 +2381,7 @@ bool CTextEditor::IsKeyPressed (UINT nVirtKey)
 	return GetKeyState(nVirtKey) < 0 ? true : false;
 }
 
-LRESULT CTextEditor::OnSize (UINT nFlags, int width, int height)
+LRESULT CTextEditor::OnSize (WPARAM nFlags, int width, int height)
 {
 	return SizeEditor(nFlags, width, height);
 }
@@ -2511,7 +2511,7 @@ LRESULT CTextEditor::OnContextMenu (HWND wParam, int x, int y)
 		if(GetLogAttr(cm.nLine, &uspCache, &logAttr, &lineOffset))
 		{
 			ULONG nStart = cm.nOffset, nEnd = cm.nOffset;
-			ULONG nLineEnd = m_pTextDoc->LineOffset(cm.nLine + 1), cch;
+			ULONG nLineEnd = static_cast<ULONG>(m_pTextDoc->LineOffset(cm.nLine + 1)), cch;
 
 			while(nStart > lineOffset && !logAttr[nStart - lineOffset].fWordStop && !logAttr[nStart - lineOffset].fWhiteSpace)
 				nStart--;
@@ -2643,7 +2643,7 @@ LRESULT CTextEditor::OnTimer (UINT_PTR nTimer)
 	return 0;
 }
 
-LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
+LRESULT CTextEditor::OnLButtonDown (WPARAM nFlags, int mx, int my)
 {
 	ULONG nLineNo;
 	ULONG nFileOff;
@@ -2724,9 +2724,9 @@ LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
 			RefreshWindow();
 		}
 
-		m_nSelectionStart = m_pTextDoc->LineOffset(nLineNo);
-		m_nSelectionEnd = m_nSelectionStart + m_pTextDoc->LineLength(nLineNo);
-		m_nCursorOffset	    = m_nSelectionStart;
+		m_nSelectionStart = static_cast<ULONG>(m_pTextDoc->LineOffset(nLineNo));
+		m_nSelectionEnd = static_cast<ULONG>(m_nSelectionStart + m_pTextDoc->LineLength(nLineNo));
+		m_nCursorOffset	= m_nSelectionStart;
 
 		m_nSelMarginOffset1 = m_nSelectionStart;
 		m_nSelMarginOffset2 = m_nSelectionEnd;
@@ -2748,7 +2748,7 @@ LRESULT CTextEditor::OnLButtonDown (UINT nFlags, int mx, int my)
 	return 0;
 }
 
-LRESULT CTextEditor::OnLButtonUp (UINT nFlags, int x, int y)
+LRESULT CTextEditor::OnLButtonUp (WPARAM nFlags, int x, int y)
 {
 	// shift cursor to end of selection
 	if(m_nSelectionMode == SEL_MARGIN)
@@ -2776,7 +2776,7 @@ LRESULT CTextEditor::OnLButtonUp (UINT nFlags, int x, int y)
 	return 0;
 }
 
-LRESULT CTextEditor::OnLButtonDblClick (UINT nFlags, int mx, int my)
+LRESULT CTextEditor::OnLButtonDblClick (WPARAM nFlags, int mx, int my)
 {
 	// remove any existing selection
 	InvalidateRange(m_nSelectionStart, m_nSelectionEnd);
@@ -2810,7 +2810,7 @@ LRESULT CTextEditor::OnLButtonDblClick (UINT nFlags, int mx, int my)
 	return 0;
 }
 
-LRESULT CTextEditor::OnMouseMove (UINT nFlags, int mx, int my)
+LRESULT CTextEditor::OnMouseMove (WPARAM nFlags, int mx, int my)
 {
 	if(m_nSelectionMode)
 	{
@@ -2875,7 +2875,7 @@ LRESULT CTextEditor::OnMouseMove (UINT nFlags, int mx, int my)
 		fCurChanged = m_nSelectionEnd == nFileOff ? FALSE : TRUE;
 		//if(m_nSelectionEnd != nFileOff)
 		{
-			ULONG linelen = m_pTextDoc->LineLength(nLineNo);
+			ULONG linelen = static_cast<ULONG>(m_pTextDoc->LineLength(nLineNo));
 
 			m_nCursorOffset	= nFileOff;
 
@@ -2926,7 +2926,7 @@ LRESULT CTextEditor::OnMouseMove (UINT nFlags, int mx, int my)
 	return 0;
 }
 
-LRESULT CTextEditor::OnKeyDown (UINT nKeyCode, UINT nFlags)
+LRESULT CTextEditor::OnKeyDown (WPARAM nKeyCode, LPARAM nFlags)
 {
 	bool fCtrlDown	= IsKeyPressed(VK_CONTROL);
 	bool fShiftDown	= IsKeyPressed(VK_SHIFT);
@@ -3044,7 +3044,7 @@ LRESULT CTextEditor::OnKeyDown (UINT nKeyCode, UINT nFlags)
 	return 0;
 }
 
-LRESULT CTextEditor::OnChar (UINT nChar, UINT nFlags)
+LRESULT CTextEditor::OnChar (WPARAM nChar, LPARAM nFlags)
 {
 	if(nChar >= L' ' || nChar == L'\t' || nChar == L'\r')
 	{
@@ -3237,7 +3237,7 @@ BOOL CTextEditor::OnPaste ()
 		if(OpenClipboard(m_hwnd))
 		{
 			HANDLE hMem		= GetClipboardData(CF_UNICODETEXT);
-			ULONG cchText	= GlobalSize(hMem) / sizeof(WCHAR);
+			ULONG cchText	= static_cast<ULONG>(GlobalSize(hMem) / sizeof(WCHAR));
 			PCWSTR pcwzText	= (PCWSTR)GlobalLock(hMem);
 
 			if(pcwzText)
