@@ -7,11 +7,11 @@ namespace Sorting
 {
 	typedef INT(WINAPI* COMPARECALLBACK)(LPVOID, LPVOID, LPVOID);
 
-	VOID QuickSort (LPVOID lpBase, INT cItems, size_t nItemSize, COMPARECALLBACK lpfnCompare, LPVOID lpParam);
+	VOID QuickSort (LPVOID lpBase, sysint cItems, size_t nItemSize, COMPARECALLBACK lpfnCompare, LPVOID lpParam);
 	LPVOID LinkSort (LPVOID p, UINT index, COMPARECALLBACK lpfnCompare, LPVOID lpParam, ULONG* pcount);
 
 	template <typename T>
-	void TQuickSort (T* pBase, int cItems, int (WINAPI* pfnCallback)(T* plhItem, T* prhItem, PVOID pParam), PVOID pParam)
+	void TQuickSort (T* pBase, sysint cItems, int (WINAPI* pfnCallback)(T* plhItem, T* prhItem, PVOID pParam), PVOID pParam)
 	{
 		QuickSort(pBase, cItems, sizeof(T), (COMPARECALLBACK)pfnCallback, pParam);
 	}
@@ -20,14 +20,14 @@ namespace Sorting
 	void TQuickSortTArray (TArray<T>* pArray, int (WINAPI* pfnCallback)(T* plhItem, T* prhItem, PVOID pParam), PVOID pParam)
 	{
 		T* pData;
-		int cData;
+		sysint cData;
 
 		pArray->GetData(&pData, &cData);
 		TQuickSort(pData, cData, pfnCallback, pParam);
 	}
 
 	template <typename T>
-	void TQuickSortPtr (T** ppBase, int cItems, int (WINAPI* pfnCallback)(T** pplhItem, T** pprhItem, PVOID pParam), PVOID pParam)
+	void TQuickSortPtr (T** ppBase, sysint cItems, int (WINAPI* pfnCallback)(T** pplhItem, T** pprhItem, PVOID pParam), PVOID pParam)
 	{
 		QuickSort(ppBase, cItems, sizeof(T*), (COMPARECALLBACK)pfnCallback, pParam);
 	}
@@ -36,7 +36,7 @@ namespace Sorting
 	void TQuickSortTArrayPtr (TArray<T*>* pArray, int (WINAPI* pfnCallback)(T** pplhItem, T** pprhItem, PVOID pParam), PVOID pParam)
 	{
 		T** ppData;
-		int cData;
+		sysint cData;
 
 		pArray->GetData(&ppData, &cData);
 		TQuickSortPtr(ppData, cData, pfnCallback, pParam);

@@ -129,7 +129,7 @@ namespace Sorting
 *
 *******************************************************************************/
 
-	VOID QuickSort (LPVOID lpBase, INT cItems, size_t nItemSize, COMPARECALLBACK lpfnCompare, LPVOID lpParam)
+	VOID QuickSort (LPVOID lpBase, sysint cItems, size_t nItemSize, COMPARECALLBACK lpfnCompare, LPVOID lpParam)
 	{
 		// Note: the number of stack entries required is no more than
 		// 1 + log2(num), so 30 is sufficient for any array
