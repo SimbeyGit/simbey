@@ -89,14 +89,14 @@ HFONT EasyCreateFont (int nPointSize, BOOL fBold, DWORD dwQuality, WCHAR* szFace
 void AddColorListItem (HWND hwnd, UINT uItem, int fgIdx, int bgIdx, WCHAR* szName)
 {
 	HWND hwndCtrl = GetDlgItem(hwnd, uItem);
-	LRESULT idx = SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LONG)szName);
+	LRESULT idx = SendMessage(hwndCtrl, LB_ADDSTRING, 0, (LPARAM)szName);
 	SendMessage(hwndCtrl, LB_SETITEMDATA, idx, MAKELONG(fgIdx, bgIdx));
 }
 
 void AddColorComboItem (HWND hwnd, UINT uItem, COLORREF col, WCHAR* szName)
 {
 	HWND hwndCtrl = GetDlgItem(hwnd, uItem);
-	LRESULT idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LONG)szName);
+	LRESULT idx = SendMessage(hwndCtrl, CB_ADDSTRING, 0, (LPARAM)szName);
 	SendMessage(hwndCtrl, CB_SETITEMDATA, idx, col);
 }
 
@@ -412,7 +412,7 @@ void COptionsDlg::UpdatePreviewPane (HWND hwnd)
 	int size;
 	LRESULT data;
 
-	SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETLBTEXT, idx, (LONG)szFaceName);
+	SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_GETLBTEXT, idx, (LPARAM)szFaceName);
 
 	size = GetDlgItemInt(hwnd, IDC_SIZELIST, 0, FALSE);
 
@@ -454,7 +454,7 @@ void COptionsDlg::InitSizeList (HWND hwnd)
 	SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_RESETCONTENT, 0, 0);
 
 	// enumerate font sizes
-	EnumFontFamiliesEx(hdc, &lf, (FONTENUMPROC)EnumFontSizes, (LONG)GetDlgItem(IDC_SIZELIST), 0);
+	EnumFontFamiliesEx(hdc, &lf, (FONTENUMPROC)EnumFontSizes, (LPARAM)GetDlgItem(IDC_SIZELIST), 0);
 
 	// set selection to first item
 	count = SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_GETCOUNT, 0, 0);
@@ -521,7 +521,7 @@ void COptionsDlg::SelectColorInList (UINT uComboIdx, short itemIdx)
 		// if we didn't match the color, add it as a custom entry
 		if(i == NUM_DEFAULT_COLORS)
 		{
-			i = SendMessage(hwndCombo, CB_ADDSTRING, 0, (LONG)L"Custom");
+			i = SendMessage(hwndCombo, CB_ADDSTRING, 0, (LPARAM)L"Custom");
 			SendMessage(hwndCombo, CB_SETITEMDATA, i, m_rgbTempColorList[itemIdx]);
 			SendMessage(hwndCombo, CB_SETCURSEL, i, 0);
 		}
@@ -597,8 +597,8 @@ VOID COptionsDlg::InitializeFontOptions (VOID)
 	SendDlgItemMessage(hwnd, IDC_BGCOLCOMBO, CB_SETCURSEL, 0, 0);
 
 	Formatting::TInt32ToAsc(m_lfEdit.lfHeight, ach, ARRAYSIZE(ach), 10, NULL);
-	SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_SELECTSTRING, -1, (LONG)ach);
-	SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_SELECTSTRING, -1, (LONG)m_lfEdit.lfFaceName);
+	SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_SELECTSTRING, -1, (LPARAM)ach);
+	SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_SELECTSTRING, -1, (LPARAM)m_lfEdit.lfFaceName);
 
 	CheckDlgButton(hwnd, IDC_BOLD, FW_BOLD <= m_lfEdit.lfWeight ? BST_CHECKED : BST_UNCHECKED);
 
@@ -649,9 +649,9 @@ BOOL COptionsDlg::FontCombo_DrawItem (DRAWITEMSTRUCT* dis)
 	//	Get the item text
 	//
 	if(dis->itemID == -1)
-		cchText = SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LONG)szText);
+		cchText = SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LPARAM)szText);
 	else
-		cchText = SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LONG)szText);
+		cchText = SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LPARAM)szText);
 	
 	//
 	//	Set text color and background based on current state
@@ -712,9 +712,9 @@ BOOL COptionsDlg::ColorCombo_DrawItem (UINT_PTR uCtrlId, DRAWITEMSTRUCT* dis, BO
 	//	Get the item text
 	//
 	if(dis->itemID == -1)
-		SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LONG)szText);
+		SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LPARAM)szText);
 	else
-		SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LONG)szText);
+		SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LPARAM)szText);
 	
 	//
 	//	Set text color and background based on current state
