@@ -631,7 +631,7 @@ IFACEMETHODIMP_(VOID) CTextEditor::SetDarkMode (bool fDarkMode, bool fUseSystemC
 	}
 }
 
-IFACEMETHODIMP CTextEditor::DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged)
+IFACEMETHODIMP CTextEditor::DisplayOptions (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged, __out_opt INT* pnFontSize)
 {
 	HRESULT hr;
 	CDialogHost dlgHost(m_hInstance);
@@ -657,6 +657,9 @@ IFACEMETHODIMP CTextEditor::DisplayOptions (__inout_ecount_opt(cCustom) COLORREF
 		if(*pfChanged)
 			CopyMemory(prgCustom, dlgOptions.m_rgbCustColors, cCustom * sizeof(COLORREF));
 	}
+
+	if(pnFontSize)
+		*pnFontSize = dlgOptions.GetFontPointSize();
 
 	hFont = CreateFontIndirect(&dlgOptions.m_lfEdit);
 	if(hFont)

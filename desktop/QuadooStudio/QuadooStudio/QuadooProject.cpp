@@ -571,17 +571,17 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 	case ID_VIEW_OPTIONS:
 		{
 			COLORREF crCustom[16];
-			INT cColors = ARRAYSIZE(crCustom);
+			INT cColors = ARRAYSIZE(crCustom), nFontSize;
 			BOOL fChanged;
 
 			Registry::LoadCustomColors(NULL, crCustom, &cColors);
-			hr = m_pEditor->DisplayOptions(crCustom, cColors, &fChanged);
+			hr = m_pEditor->DisplayOptions(crCustom, cColors, &fChanged, &nFontSize);
 			if(SUCCEEDED(hr))
 			{
 				if(fChanged)
 					Registry::SaveCustomColors(NULL, crCustom, cColors);
 
-				SaveOrLoadFont(TRUE);
+				SaveDefaultFont(nFontSize);
 			}
 		}
 		break;
@@ -628,7 +628,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 			}
 
 			m_pEditor->SetStyleMask(0, TXS_SELMARGIN);
-			SaveOrLoadFont(FALSE);
+			LoadDefaultFont();
 		}
 
 		m_pEditor->EnableEditor(FALSE);
@@ -1558,42 +1558,81 @@ CProjectTab* CQuadooProject::FindDefaultScript (VOID)
 	return NULL;
 }
 
-HRESULT CQuadooProject::SaveOrLoadFont (BOOL fSave)
+HRESULT CQuadooProject::SaveDefaultFont (INT nFontSize)
 {
 	HRESULT hr;
 	TStackRef<IOleWindow> srWindow;
 	HWND hwndEditor;
-	HKEY hKey = NULL;
 	HFONT hFont;
+	HKEY hKey = NULL;
 	LOGFONT lf;
+	DPI_AWARE_FONT dpiFont;
 
 	Check(m_pEditor->QueryInterface(&srWindow));
 	Check(srWindow->GetWindow(&hwndEditor));
 
-	if(fSave)
-	{
-		hFont = (HFONT)SendMessage(hwndEditor, WM_GETFONT, 0, 0);
+	hFont = (HFONT)SendMessage(hwndEditor, WM_GETFONT, 0, 0);
+	CheckIfGetLastError(GetObject(hFont, sizeof(LOGFONT), &lf) == 0);
 
-		Check(Registry::CreateKey(HKEY_CURRENT_USER, c_wzFontKey, KEY_WRITE, &hKey));
+	dpiFont.lFontSize = nFontSize;
+	dpiFont.lEscapement = lf.lfEscapement;
+	dpiFont.lOrientation = lf.lfOrientation;
+	dpiFont.lWeight = lf.lfWeight;
+	dpiFont.bItalic = lf.lfItalic;
+	dpiFont.bUnderline = lf.lfUnderline;
+	dpiFont.bStrikeOut = lf.lfStrikeOut;
+	dpiFont.bCharSet = lf.lfCharSet;
+	dpiFont.bOutPrecision = lf.lfOutPrecision;
+	dpiFont.bClipPrecision = lf.lfClipPrecision;
+	dpiFont.bQuality = lf.lfQuality;
+	dpiFont.bPitchAndFamily = lf.lfPitchAndFamily;
+	Check(TStrCchCpy(dpiFont.wzFaceName, ARRAYSIZE(dpiFont.wzFaceName), lf.lfFaceName));
 
-		CheckIfGetLastError(GetObject(hFont, sizeof(LOGFONT), &lf) == 0);
-		CheckWin32Error(RegSetValueEx(hKey, L"EditorFont", NULL, REG_BINARY, (LPBYTE)&lf, sizeof(lf)));
-	}
-	else
-	{
-		DWORD cbData = sizeof(lf);
-
-		CheckWin32Error(RegOpenKey(HKEY_CURRENT_USER, c_wzFontKey, &hKey));
-		CheckWin32Error(RegQueryValueEx(hKey, L"EditorFont", NULL, NULL, (LPBYTE)&lf, &cbData));
-
-		hFont = CreateFontIndirect(&lf);
-		CheckIfGetLastError(NULL == hFont);
-		m_pEditor->SetDefaultFont(hFont, true);
-	}
+	Check(Registry::CreateKey(HKEY_CURRENT_USER, c_wzFontKey, KEY_WRITE, &hKey));
+	CheckWin32Error(RegSetValueEx(hKey, L"EditorFont", NULL, REG_BINARY, (LPBYTE)&dpiFont, sizeof(dpiFont)));
 
 Cleanup:
 	if(hKey)
 		RegCloseKey(hKey);
+	return hr;
+}
+
+HRESULT CQuadooProject::LoadDefaultFont (VOID)
+{
+	HRESULT hr;
+	HKEY hKey = NULL;
+	HFONT hFont;
+	LOGFONT lf;
+	DPI_AWARE_FONT dpiFont;
+	DWORD cbData = sizeof(dpiFont);
+	HDC hdc = GetDC(m_hwnd);
+
+	CheckWin32Error(RegOpenKey(HKEY_CURRENT_USER, c_wzFontKey, &hKey));
+	CheckWin32Error(RegQueryValueEx(hKey, L"EditorFont", NULL, NULL, (LPBYTE)&dpiFont, &cbData));
+	CheckIf(cbData != sizeof(dpiFont), HRESULT_FROM_WIN32(ERROR_INVALID_DATA));
+
+	lf.lfHeight = -MulDiv(dpiFont.lFontSize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+	lf.lfEscapement = dpiFont.lEscapement;
+	lf.lfOrientation = dpiFont.lOrientation;
+	lf.lfWeight = dpiFont.lWeight;
+	lf.lfItalic = dpiFont.bItalic;
+	lf.lfUnderline = dpiFont.bUnderline;
+	lf.lfStrikeOut = dpiFont.bStrikeOut;
+	lf.lfCharSet = dpiFont.bCharSet;
+	lf.lfOutPrecision = dpiFont.bOutPrecision;
+	lf.lfClipPrecision = dpiFont.bClipPrecision;
+	lf.lfQuality = dpiFont.bQuality;
+	lf.lfPitchAndFamily = dpiFont.bPitchAndFamily;
+	Check(TStrCchCpy(lf.lfFaceName, ARRAYSIZE(lf.lfFaceName), dpiFont.wzFaceName));
+
+	hFont = CreateFontIndirect(&lf);
+	CheckIfGetLastError(NULL == hFont);
+	m_pEditor->SetDefaultFont(hFont, true);
+
+Cleanup:
+	if(hKey)
+		RegCloseKey(hKey);
+	ReleaseDC(m_hwnd, hdc);
 	return hr;
 }
 

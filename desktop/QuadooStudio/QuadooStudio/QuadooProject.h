@@ -14,6 +14,23 @@ class CTabs;
 
 struct TVNSYNTAXHIGHLIGHT;
 
+struct DPI_AWARE_FONT
+{
+	LONG lFontSize;
+	LONG lEscapement;
+	LONG lOrientation;
+	LONG lWeight;
+	BYTE bItalic;
+	BYTE bUnderline;
+	BYTE bStrikeOut;
+	BYTE bCharSet;
+	BYTE bOutPrecision;
+	BYTE bClipPrecision;
+	BYTE bQuality;
+	BYTE bPitchAndFamily;
+	WCHAR wzFaceName[LF_FACESIZE];
+};
+
 class CProjectTab
 {
 public:
@@ -187,7 +204,9 @@ private:
 	CProjectTab* GetProjectFromTreeItem (HTREEITEM hItem);
 	CProjectTab* FindDefaultScript (VOID);
 
-	HRESULT SaveOrLoadFont (BOOL fSave);
+	HRESULT SaveDefaultFont (INT nFontSize);
+	HRESULT LoadDefaultFont (VOID);
+
 	HRESULT SaveTabData (CProjectTab* pFile);
 	HRESULT LoadTabData (CProjectTab* pFile);
 

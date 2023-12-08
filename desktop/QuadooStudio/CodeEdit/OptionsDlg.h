@@ -23,10 +23,13 @@ private:
 	HFONT m_hNormalFont, m_hBoldFont, m_hPreviewFont;
 
 	UINT_PTR m_idPreviewSubclass;
+	INT m_nFontPointSize;
 
 public:
 	COptionsDlg (COLORREF* prgColors);
 	~COptionsDlg ();
+
+	inline INT GetFontPointSize (VOID) { return m_nFontPointSize; }
 
 	virtual BOOL DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 

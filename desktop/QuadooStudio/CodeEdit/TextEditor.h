@@ -138,7 +138,7 @@ public:
 
 	IFACEMETHOD_(VOID, ScrollView) (INT xCaret, ULONG nLine);
 	IFACEMETHOD_(VOID, SetDarkMode) (bool fDarkMode, bool fUseSystemColors);
-	IFACEMETHOD(DisplayOptions) (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged);
+	IFACEMETHOD(DisplayOptions) (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged, __out_opt INT* pnFontSize);
 
 	IFACEMETHOD_(ULONG, GetStyleMask) (ULONG uMask);
 	IFACEMETHOD_(ULONG, SetStyleMask) (ULONG uMask, ULONG uStyles);

@@ -184,7 +184,7 @@ interface __declspec(uuid("CF4C929F-A311-40ec-90D4-45AE343597B7")) ICodeEditor :
 
 	STDMETHOD_(VOID, ScrollView) (INT xCaret, ULONG nLine) = 0;
 	STDMETHOD_(VOID, SetDarkMode) (bool fDarkMode, bool fUseSystemColors) = 0;
-	STDMETHOD(DisplayOptions) (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged) = 0;
+	STDMETHOD(DisplayOptions) (__inout_ecount_opt(cCustom) COLORREF* prgCustom, INT cCustom, __out_opt BOOL* pfChanged, __out_opt INT* pnFontSize) = 0;
 
 	STDMETHOD_(ULONG, GetStyleMask) (ULONG uMask) = 0;
 	STDMETHOD_(ULONG, SetStyleMask) (ULONG uMask, ULONG uStyles) = 0;

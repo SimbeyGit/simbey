@@ -54,7 +54,7 @@ int PointsToLogical (int nPointSize)
 int LogicalToPoints (int nLogical)
 {
 	HDC hdc      = GetDC(0);
-	int nPoints = MulDiv(nLogical, 72, GetDeviceCaps(hdc, LOGPIXELSY));
+	int nPoints = MulDiv(abs(nLogical), 72, GetDeviceCaps(hdc, LOGPIXELSY));
 	ReleaseDC(0, hdc);
 
 	return nPoints;
@@ -70,20 +70,6 @@ DWORD_PTR GetCurrentListData (HWND hwnd, UINT uCtrl)
 {
 	LRESULT idx = SendDlgItemMessage(hwnd, uCtrl, LB_GETCURSEL, 0, 0);
 	return SendDlgItemMessage(hwnd, uCtrl, LB_GETITEMDATA, idx == -1 ? 0 : idx, 0);
-}
-
-//
-//	Simple wrapper around CreateFont
-//
-HFONT EasyCreateFont (int nPointSize, BOOL fBold, DWORD dwQuality, WCHAR* szFace)
-{
-	return CreateFont(PointsToLogical(nPointSize), 
-					  0, 0, 0, 
-					  fBold ? FW_BOLD : 0,
-					  0,0,0,DEFAULT_CHARSET,0,0,
-					  dwQuality,
-					  0,
-					  szFace);
 }
 
 void AddColorListItem (HWND hwnd, UINT uItem, int fgIdx, int bgIdx, WCHAR* szName)
@@ -168,7 +154,8 @@ COptionsDlg::COptionsDlg (COLORREF* prgColors) :
 	m_hPreviewFont(NULL),
 	m_hNormalFont(NULL),
 	m_hBoldFont(NULL),
-	m_idPreviewSubclass(0)
+	m_idPreviewSubclass(0),
+	m_nFontPointSize(-1)
 {
 	ZeroMemory(m_rgbCustColors, sizeof(m_rgbCustColors));
 }
@@ -332,7 +319,8 @@ BOOL COptionsDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 				GetWindow(&hwnd);
 
 				m_lfEdit.lfWidth = 0;
-				m_lfEdit.lfHeight = GetDlgItemInt(hwnd, IDC_SIZELIST, 0, 0);
+				m_nFontPointSize = GetDlgItemInt(hwnd, IDC_SIZELIST, 0, 0);	// Point Size
+				m_lfEdit.lfHeight = PointsToLogical(m_nFontPointSize);		// Logical Size
 				if(IsDlgButtonChecked(hwnd, IDC_BOLD) & BST_CHECKED)
 					m_lfEdit.lfWeight = FW_BOLD;
 				else
@@ -418,7 +406,13 @@ void COptionsDlg::UpdatePreviewPane (HWND hwnd)
 	size = GetDlgItemInt(hwnd, IDC_SIZELIST, 0, FALSE);
 
 	SafeDeleteGdiObject(m_hPreviewFont);
-	m_hPreviewFont = EasyCreateFont(size, IsDlgButtonChecked(hwnd, IDC_BOLD), m_lfEdit.lfQuality, szFaceName);
+	m_hPreviewFont = CreateFont(PointsToLogical(size), 
+					  0, 0, 0,
+					  IsDlgButtonChecked(hwnd, IDC_BOLD) ? FW_BOLD : 0,
+					  0,0,0,DEFAULT_CHARSET,0,0,
+					  m_lfEdit.lfQuality,
+					  0,
+					  szFaceName);
 
 	idx  = SendDlgItemMessage(hwnd, IDC_ITEMLIST, LB_GETCURSEL, 0, 0);
 	data = SendDlgItemMessage(hwnd, IDC_ITEMLIST, LB_GETITEMDATA, idx, 0);
@@ -597,7 +591,10 @@ VOID COptionsDlg::InitializeFontOptions (VOID)
 	SendDlgItemMessage(hwnd, IDC_FGCOLCOMBO, CB_SETCURSEL, 1, 0);
 	SendDlgItemMessage(hwnd, IDC_BGCOLCOMBO, CB_SETCURSEL, 0, 0);
 
-	Formatting::TInt32ToAsc(m_lfEdit.lfHeight, ach, ARRAYSIZE(ach), 10, NULL);
+	// m_lfEdit must be filled out before showing the dialog box.
+	m_nFontPointSize = LogicalToPoints(m_lfEdit.lfHeight);
+
+	Formatting::TInt32ToAsc(m_nFontPointSize, ach, ARRAYSIZE(ach), 10, NULL);
 	SendDlgItemMessage(hwnd, IDC_SIZELIST, CB_SELECTSTRING, -1, (LPARAM)ach);
 	SendDlgItemMessage(hwnd, IDC_FONTLIST, CB_SELECTSTRING, -1, (LPARAM)m_lfEdit.lfFaceName);
 
@@ -790,7 +787,7 @@ int CALLBACK COptionsDlg::EnumFontSizes (ENUMLOGFONTEX* lpelfe, NEWTEXTMETRICEX*
 
 	if(fTrueType)
 	{
-		for(LRESULT i = 0; i < (sizeof(ttsizes) / sizeof(ttsizes[0])); i++)
+		for(LRESULT i = 0; i < ARRAYSIZE(ttsizes); i++)
 		{
 			Formatting::TInt32ToAsc(ttsizes[i], ach, ARRAYSIZE(ach), 10, NULL);
 			idx = SendMessage(hwndCombo, CB_ADDSTRING, 0, (LPARAM)ach);
