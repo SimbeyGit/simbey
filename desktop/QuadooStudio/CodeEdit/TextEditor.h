@@ -144,6 +144,7 @@ public:
 	IFACEMETHOD_(ULONG, SetStyleMask) (ULONG uMask, ULONG uStyles);
 
 	IFACEMETHOD(AdjustIndentation) (ULONG nLine, INT nIndentation);
+	IFACEMETHOD_(LRESULT, SetDefaultFont)(HFONT hFont, bool fTakeOwnership);
 
 	// CBaseWindow
 	virtual HINSTANCE GetInstance (VOID);
@@ -222,7 +223,7 @@ private:
 
 	VOID UpdateMetrics ();
 	VOID RecalcLineHeight ();
-	VOID SetFont (HFONT hFont, int idx);
+	VOID SetFont (HFONT hFont, bool fDeleteFont, int idx);
 	LRESULT SizeEditor (WPARAM nFlags, int width, int height);
 
 	HRGN ScrollRgn (int dx, int dy, bool fReturnUpdateRgn);
@@ -247,7 +248,6 @@ private:
 	LRESULT OnKeyDown (WPARAM nKeyCode, LPARAM nFlags);
 	LRESULT OnChar (WPARAM nChar, LPARAM nFlags);
 	LRESULT OnPaint (VOID);
-	LRESULT OnSetFont (HFONT hFont);
 	LRESULT OnSetFocus (HWND hwndOld);
 	LRESULT OnKillFocus (HWND hwndNew);
 

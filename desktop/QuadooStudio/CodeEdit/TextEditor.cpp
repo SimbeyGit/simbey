@@ -316,7 +316,7 @@ BOOL CTextEditor::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 	{
 	case WM_CREATE:
 		// Set the default font
-		OnSetFont((HFONT)GetStockObject(ANSI_FIXED_FONT));
+		SetDefaultFont(NULL, false);
 		break;
 
 	case WM_ERASEBKGND:
@@ -333,7 +333,7 @@ BOOL CTextEditor::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 		return TRUE;
 
 	case WM_SETFONT:
-		lResult = OnSetFont((HFONT)wParam);
+		lResult = SetDefaultFont((HFONT)wParam, false /* the WM_SETFONT caller retains ownership */);
 		return TRUE;
 
 	case WM_SIZE:
@@ -660,7 +660,7 @@ IFACEMETHODIMP CTextEditor::DisplayOptions (__inout_ecount_opt(cCustom) COLORREF
 
 	hFont = CreateFontIndirect(&dlgOptions.m_lfEdit);
 	if(hFont)
-		SetFont(hFont, 0);
+		SetFont(hFont, true, 0);
 
 	UpdateView(false);
 	RefreshWindow();
@@ -1036,6 +1036,21 @@ Cleanup:
 	__delete_array pwzIndentation;
 	__delete_array pwzLine;
 	return hr;
+}
+
+IFACEMETHODIMP_(LRESULT) CTextEditor::SetDefaultFont (HFONT hFont, bool fTakeOwnership)
+{
+	if(NULL == hFont)
+	{
+		hFont = (HFONT)GetStockObject(ANSI_FIXED_FONT);
+		fTakeOwnership = false;
+	}
+
+	// default font is always #0
+	SetFont(hFont, fTakeOwnership, 0);
+	UpdateMetrics();
+
+	return 0;
 }
 
 bool CTextEditor::CheckStyle (ULONG uMask)
@@ -1547,7 +1562,7 @@ VOID CTextEditor::UpdateCaretOffset (ULONG offset, BOOL fTrailing, int* outx, UL
 	ULONG		lineno = 0;
 	int			xpos = 0;
 	ULONG		off_chars;
-	USPDATA	  * uspData;
+	USPDATA*	uspData;
 
 	// get line information from cursor-offset
 	if(m_pTextDoc->GetLineFromOffset(offset, &lineno, &off_chars))
@@ -2165,7 +2180,7 @@ VOID CTextEditor::RecalcLineHeight ()
 	}
 }
 
-VOID CTextEditor::SetFont (HFONT hFont, int idx)
+VOID CTextEditor::SetFont (HFONT hFont, bool fDeleteFont, int idx)
 {
 	USPFONT* uspFont = &m_uspFontList[idx];
 
@@ -2174,7 +2189,7 @@ VOID CTextEditor::SetFont (HFONT hFont, int idx)
 
 	// Initialize the font for USPLIB
 	UspFreeFont(uspFont);
-	UspInitFont(uspFont, hdc, hFont);
+	UspInitFont(uspFont, hdc, hFont, fDeleteFont);
 
 	ReleaseDC(m_hwnd, hdc);
 
@@ -3136,15 +3151,6 @@ LRESULT CTextEditor::OnPaint (VOID)
 	DeleteDC(hdcMem);
 	DeleteObject(hbmMem);
 	DeleteObject(hrgnUpdate);
-
-	return 0;
-}
-
-LRESULT CTextEditor::OnSetFont (HFONT hFont)
-{
-	// default font is always #0
-	SetFont(hFont, 0);
-	UpdateMetrics();
 
 	return 0;
 }

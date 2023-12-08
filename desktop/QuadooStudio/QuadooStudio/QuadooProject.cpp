@@ -25,6 +25,7 @@
 #include "QuadooProject.h"
 
 const WCHAR c_wzQuadooProjectClass[] = L"QuadooProjectCls";
+const WCHAR c_wzFontKey[] = L"Software\\Simbey\\QuadooStudio";
 
 ///////////////////////////////////////////////////////////////////////////////
 // CProjectFile
@@ -575,8 +576,13 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 
 			Registry::LoadCustomColors(NULL, crCustom, &cColors);
 			hr = m_pEditor->DisplayOptions(crCustom, cColors, &fChanged);
-			if(SUCCEEDED(hr) && fChanged)
-				Registry::SaveCustomColors(NULL, crCustom, cColors);
+			if(SUCCEEDED(hr))
+			{
+				if(fChanged)
+					Registry::SaveCustomColors(NULL, crCustom, cColors);
+
+				SaveOrLoadFont(TRUE);
+			}
 		}
 		break;
 
@@ -622,6 +628,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 			}
 
 			m_pEditor->SetStyleMask(0, TXS_SELMARGIN);
+			SaveOrLoadFont(FALSE);
 		}
 
 		m_pEditor->EnableEditor(FALSE);
@@ -1549,6 +1556,45 @@ CProjectTab* CQuadooProject::FindDefaultScript (VOID)
 			return pFile;
 	}
 	return NULL;
+}
+
+HRESULT CQuadooProject::SaveOrLoadFont (BOOL fSave)
+{
+	HRESULT hr;
+	TStackRef<IOleWindow> srWindow;
+	HWND hwndEditor;
+	HKEY hKey = NULL;
+	HFONT hFont;
+	LOGFONT lf;
+
+	Check(m_pEditor->QueryInterface(&srWindow));
+	Check(srWindow->GetWindow(&hwndEditor));
+
+	if(fSave)
+	{
+		hFont = (HFONT)SendMessage(hwndEditor, WM_GETFONT, 0, 0);
+
+		Check(Registry::CreateKey(HKEY_CURRENT_USER, c_wzFontKey, KEY_WRITE, &hKey));
+
+		CheckIfGetLastError(GetObject(hFont, sizeof(LOGFONT), &lf) == 0);
+		CheckWin32Error(RegSetValueEx(hKey, L"EditorFont", NULL, REG_BINARY, (LPBYTE)&lf, sizeof(lf)));
+	}
+	else
+	{
+		DWORD cbData = sizeof(lf);
+
+		CheckWin32Error(RegOpenKey(HKEY_CURRENT_USER, c_wzFontKey, &hKey));
+		CheckWin32Error(RegQueryValueEx(hKey, L"EditorFont", NULL, NULL, (LPBYTE)&lf, &cbData));
+
+		hFont = CreateFontIndirect(&lf);
+		CheckIfGetLastError(NULL == hFont);
+		m_pEditor->SetDefaultFont(hFont, true);
+	}
+
+Cleanup:
+	if(hKey)
+		RegCloseKey(hKey);
+	return hr;
 }
 
 HRESULT CQuadooProject::SaveTabData (CProjectTab* pFile)

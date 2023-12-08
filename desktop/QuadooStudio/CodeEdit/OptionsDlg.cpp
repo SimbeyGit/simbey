@@ -331,6 +331,7 @@ BOOL COptionsDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 
 				GetWindow(&hwnd);
 
+				m_lfEdit.lfWidth = 0;
 				m_lfEdit.lfHeight = GetDlgItemInt(hwnd, IDC_SIZELIST, 0, 0);
 				if(IsDlgButtonChecked(hwnd, IDC_BOLD) & BST_CHECKED)
 					m_lfEdit.lfWeight = FW_BOLD;
@@ -692,7 +693,7 @@ BOOL COptionsDlg::FontCombo_DrawItem (DRAWITEMSTRUCT* dis)
 BOOL COptionsDlg::ColorCombo_DrawItem (UINT_PTR uCtrlId, DRAWITEMSTRUCT* dis, BOOL fSelectImage)
 {
 	RECT		rect	= dis->rcItem;
-	int			boxsize = (dis->rcItem.bottom - dis->rcItem.top) - 4;			
+	int			boxsize = (dis->rcItem.bottom - dis->rcItem.top) - 4, cchText;
 	int			xpos;
 	int			ypos;
 	TEXTMETRIC	tm;
@@ -712,9 +713,9 @@ BOOL COptionsDlg::ColorCombo_DrawItem (UINT_PTR uCtrlId, DRAWITEMSTRUCT* dis, BO
 	//	Get the item text
 	//
 	if(dis->itemID == -1)
-		SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LPARAM)szText);
+		cchText = (INT)SendMessage(dis->hwndItem, WM_GETTEXT, 0, (LPARAM)szText);
 	else
-		SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LPARAM)szText);
+		cchText = (INT)SendMessage(dis->hwndItem, CB_GETLBTEXT, dis->itemID, (LPARAM)szText);
 	
 	//
 	//	Set text color and background based on current state
@@ -723,7 +724,7 @@ BOOL COptionsDlg::ColorCombo_DrawItem (UINT_PTR uCtrlId, DRAWITEMSTRUCT* dis, BO
 	
 	//
 	//	Draw the text (centered vertically)
-	//	
+	//
 	hOldFont = SelectObject(dis->hDC, m_hNormalFont);
 
 	GetTextMetrics(dis->hDC, &tm);
@@ -731,7 +732,7 @@ BOOL COptionsDlg::ColorCombo_DrawItem (UINT_PTR uCtrlId, DRAWITEMSTRUCT* dis, BO
 	xpos = dis->rcItem.left + boxsize + 4 + 4;
 	
 	ExtTextOut(dis->hDC, xpos, ypos, 
-		ETO_CLIPPED|ETO_OPAQUE, &rect, szText, lstrlen(szText), 0);
+		ETO_CLIPPED|ETO_OPAQUE, &rect, szText, cchText, 0);
 	
 	if((dis->itemState & ODS_FOCUS) && !(dis->itemState & ODS_NOFOCUSRECT))
 	{

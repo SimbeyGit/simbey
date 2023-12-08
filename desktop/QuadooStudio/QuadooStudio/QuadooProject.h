@@ -187,6 +187,7 @@ private:
 	CProjectTab* GetProjectFromTreeItem (HTREEITEM hItem);
 	CProjectTab* FindDefaultScript (VOID);
 
+	HRESULT SaveOrLoadFont (BOOL fSave);
 	HRESULT SaveTabData (CProjectTab* pFile);
 	HRESULT LoadTabData (CProjectTab* pFile);
 

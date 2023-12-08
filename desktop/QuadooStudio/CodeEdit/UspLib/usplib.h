@@ -14,6 +14,7 @@
 typedef struct _USPFONT
 {
 	HFONT			hFont;				// handle to FONT
+	bool			fDeleteFont;		// Delete the font when finished
 	SCRIPT_CACHE	scriptCache;		// must be initialized to NULL
 	TEXTMETRIC		tm;					//
 	int				yoffset;			// height-adjustment when drawing font (set to zero)
@@ -185,7 +186,8 @@ VOID WINAPI UspSetSelColor (
 VOID WINAPI UspInitFont	(	
 		USPFONT   *	uspFont,		// in/out
 		HDC			hdc,			// in
-		HFONT	    hFont			// in
+		HFONT	    hFont,			// in
+		bool		fDeleteFont		// in
 	);
 
 VOID WINAPI UspFreeFont (	

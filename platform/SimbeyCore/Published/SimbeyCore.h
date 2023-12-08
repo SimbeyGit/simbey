@@ -25,6 +25,8 @@ interface __declspec(uuid("03CAACF8-4C42-464c-901E-C5C0AA8F94F3")) IRStringArray
 	virtual HRESULT STDMETHODCALLTYPE Compact (VOID) = 0;
 
 	virtual HRESULT STDMETHODCALLTYPE IndexOf (RSTRING rstrFind, __out sysint* pidxFound, sysint idxStart = 0) = 0;
+	virtual HRESULT STDMETHODCALLTYPE Clone (__deref_out IRStringArray** ppClone) = 0;
+	virtual HRESULT STDMETHODCALLTYPE Compare (IRStringArray* pOther, __out INT* pnCompare) = 0;
 };
 
 interface __declspec(uuid("F0F4ACB4-A594-46b2-B7E2-FB8E3A88D0E0")) ITempFileSet : IUnknown

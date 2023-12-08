@@ -518,13 +518,15 @@ void WINAPI UspSetSelColor (
 //
 void WINAPI UspInitFont (
 		USPFONT		* uspFont, 
-		HDC			  hdc, 
-		HFONT		  hFont
+		HDC			hdc, 
+		HFONT		hFont,
+		bool		fDeleteFont
 	)
 {
 	ZeroMemory(uspFont, sizeof(USPFONT));
 
 	uspFont->hFont				= hFont;
+	uspFont->fDeleteFont		= fDeleteFont;
 	uspFont->scriptCache		= 0;
 
 	hFont = reinterpret_cast<HFONT>(SelectObject(hdc, hFont));
@@ -540,6 +542,11 @@ void WINAPI UspInitFont (
 //
 void WINAPI UspFreeFont (USPFONT* uspFont)
 {
-//	DeleteObject(uspFont->hFont);
+	if(uspFont->fDeleteFont)
+	{
+		DeleteObject(uspFont->hFont);
+		uspFont->fDeleteFont = false;
+	}
+	uspFont->hFont = NULL;
 	ScriptFreeCache(&uspFont->scriptCache);
 }
