@@ -771,6 +771,7 @@ VOID CNeuralNetApp::OnFinalDestroy (HWND /*hwnd*/)
 HRESULT CNeuralNetApp::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
 {
 	Registry::LoadWindowPosition(m_hwnd, c_szAppKey, "WindowPlacement", &nCmdShow);
+	DragAcceptFiles(m_hwnd, TRUE);
 	return CBaseWindow::FinalizeAndShow(dwStyle,nCmdShow);
 }
 
@@ -875,6 +876,20 @@ BOOL CNeuralNetApp::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, _
 					}
 				}
 				lpAccessible->Release();
+			}
+		}
+		break;
+
+	case WM_DROPFILES:
+		{
+			CHAR szFile[MAX_PATH];
+
+			if(0 < DragQueryFile((HDROP)wParam, 0, szFile, ARRAYSIZE(szFile)))
+			{
+				VARIANTARG vArg;
+				vArg.vt = VT_BYREF | VT_I1;
+				vArg.pcVal = szFile;
+				Exec(NULL, IDM_OPEN, 0, &vArg, NULL);
 			}
 		}
 		break;
