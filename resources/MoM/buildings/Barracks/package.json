@@ -1,0 +1,31 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:barracks",
+			type: "normal",
+			name: "Barracks",
+			cost: 30,
+			start: true,
+			startRaiders: 2,
+			upkeep:
+			[
+			],
+			prereqs:
+			[
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

@@ -1,0 +1,41 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:ship_yard",
+			type: "normal",
+			name: "Ship Yard",
+			cost: 200,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:sawmill"
+				},
+				{
+					type: "building",
+					ref: "mom:shipwrights_guild"
+				}
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

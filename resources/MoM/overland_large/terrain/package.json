@@ -829,6 +829,121 @@
 	},
 	{
 		package: "json",
+		name: "terrain.json",
+		data:
+		{
+			chaosNode:
+			{
+				cities: false,
+				food: 0.0,
+				production: 5.0
+			},
+			chaosNodeMonsters:
+			{
+				cities: false,
+				food: 0.0,
+				production: 5.0
+			},
+			darkForest:
+			{
+				cities: true,
+				food: 0.75,
+				production: 4.0
+			},
+			desert:
+			{
+				cities: true,
+				food: 0.0,
+				production: 3.0
+			},
+			forest:
+			{
+				cities: true,
+				food: 0.5,
+				production: 3.0
+			},
+			grasslands:
+			{
+				cities: true,
+				food: 1.5,
+				production: 0.0
+			},
+			hills:
+			{
+				cities: true,
+				food: 0.5,
+				production: 3.0
+			},
+			mountains:
+			{
+				cities: true,
+				food: 0.25,
+				production: 5.0
+			},
+			natureNode:
+			{
+				cities: false,
+				food: 2.5,
+				production: 3.0
+			},
+			natureNodeMonsters:
+			{
+				cities: false,
+				food: 0.0,
+				production: 0.0
+			},
+			ocean:
+			{
+				cities: false,
+				food: 0.0,
+				production: 0.0
+			},
+			river:
+			{
+				cities: true,
+				food: 2.0,
+				production: 4.0
+			},
+			shore:
+			{
+				cities: false,
+				food: 0.5,
+				production: 0.0
+			},
+			sorceryNode:
+			{
+				cities: false,
+				food: 2.0,
+				production: 0.0
+			},
+			sorceryNodeMonsters:
+			{
+				cities: false,
+				food: 0.0,
+				production: 0.0
+			},
+			swamp:
+			{
+				cities: true,
+				food: 0.5,
+				production: 0.0
+			},
+			tundra:
+			{
+				cities: true,
+				food: 0.0,
+				production: 0.0
+			},
+			volcano:
+			{
+				cities: false,
+				food: 0.0,
+				production: 5.0
+			}
+		}
+	},
+	{
+		package: "json",
 		name: "features.json",
 		data:
 		{

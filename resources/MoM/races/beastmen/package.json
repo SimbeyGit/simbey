@@ -1,0 +1,70 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:beastmen",
+			name: "Beastmen",
+			origin: "Myrran",
+			description: "Beastmen cities receive 1/2 power/population and may not build Fantastic Stables or Shipyards.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.5
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.5
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.5
+			},
+			growth: 0,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"Kempen",
+				"Bantanu",
+				"Saradash",
+				"Tanquil",
+				"Jagan",
+				"Panjang",
+				"Mourndar",
+				"Turlock",
+				"Tetrehahn",
+				"Fortalle",
+				"Tier",
+				"Raban",
+				"Kraang",
+				"Amondon",
+				"Carn Sul",
+				"Mijnduin",
+				"Durwrath",
+				"Lorn",
+				"Caradas",
+				"Rastenford"
+			],
+			no_build:
+			[
+				"mom:fantastic_stable",
+				"mom:ship_yard"
+			]
+		}
+	}
+]

@@ -1,0 +1,49 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:fantastic_stable",
+			type: "normal",
+			name: "Fantastic Stable",
+			cost: 600,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 6
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:temple"
+				},
+				{
+					type: "building",
+					ref: "mom:stables"
+				},
+				{
+					type: "building",
+					ref: "mom:armorers_guild"
+				},
+				{
+					type: "building",
+					ref: "mom:animists_guild"
+				}
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

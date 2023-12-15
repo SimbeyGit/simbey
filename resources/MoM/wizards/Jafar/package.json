@@ -16,6 +16,7 @@
 		name: "wizard.json",
 		data:
 		{
+			ref: "mom:jafar",
 			name: "Jafar",
 			description: "Jafar is a nomad sorcerer of the deep desert. Jafar made a study of Quork Crystals gleaned from the sands and embarked on the path of an Alchemist, a final authority on matter and energy conversions. By transforming his subjects' gold coins into fuel for his spellcraft, he has redoubled his efforts in the practice of sorcery. Having gathered the world's largest-ever collection of ancient tomes on this subject, Jafar may eventually learn every sorcery spell there is.\r\n\r\nJafar is a bearded, middle-aged male of the Nomad race. As a person of sufficient status to retire year-round within walls, he has discarded his kinsmen's desert robes in favor of a tunic and turban, jewelry, and a scimitar.",
 			books:
@@ -27,7 +28,7 @@
 			],
 			retorts:
 			[
-				"Alchemy"
+				"mom:alchemy"
 			],
 			music: [ "MOM80.MID", "MOM81.MID" ]
 		}

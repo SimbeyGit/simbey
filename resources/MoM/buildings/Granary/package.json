@@ -1,0 +1,41 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:granary",
+			type: "normal",
+			name: "Granary",
+			cost: 40,
+			startRaiders: 7,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:builders_hall"
+				}
+			],
+			benefits:
+			{
+				food: 2,
+				pop_growth: 20,
+				pop_max: 2
+			}
+		}
+	}
+]

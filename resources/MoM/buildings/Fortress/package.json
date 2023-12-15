@@ -1,0 +1,30 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:fortress",
+			type: "special",
+			name: "Fortress",
+			cost: 0,
+			start: true,
+			upkeep:
+			[
+			],
+			prereqs:
+			[
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

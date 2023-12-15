@@ -1,0 +1,41 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:maritime_guild",
+			type: "normal",
+			name: "Maritime Guild",
+			cost: 400,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:armory"
+				},
+				{
+					type: "building",
+					ref: "mom:ship_yard"
+				}
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

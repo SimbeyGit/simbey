@@ -1,0 +1,72 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:dwarven",
+			name: "Dwarf",
+			origin: "Myrran",
+			description: "Dwarves double special mine bonuses and taxed gold, grow very slowly (-20 people/turn), and cannot build Parthenons, Shipyards, Stables, or Universities.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.0
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 3.0,
+				power: 0.0
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.0
+			},
+			growth: -20,
+			mining: 2.0,
+			taxes: 2.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"Ebonsway",
+				"Ultigar",
+				"Pyre",
+				"Asengard",
+				"Stonegate",
+				"Blade Stone",
+				"Rockwedge",
+				"Abanax",
+				"Ailearth",
+				"Fire Keep",
+				"Asbraun",
+				"Axhome",
+				"Iron Wall",
+				"Raug Wall",
+				"Stonehome",
+				"Finnrock",
+				"Southold",
+				"Stony Peak",
+				"Crag Keep",
+				"Hearth"
+			],
+			no_build:
+			[
+				"mom:university",
+				"mom:ship_yard",
+				"mom:parthenon",
+				"mom:stables"
+			]
+		}
+	}
+]

@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:Temple",
+			type: "normal",
+			name: "Temple",
+			cost: 200,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:shrine"
+				}
+			],
+			benefits:
+			{
+				mana: 2,
+				unrest: -1
+			}
+		}
+	}
+]

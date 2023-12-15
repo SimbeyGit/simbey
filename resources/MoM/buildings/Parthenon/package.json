@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:parthenon",
+			type: "normal",
+			name: "Parthenon",
+			cost: 400,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 3
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:temple"
+				}
+			],
+			benefits:
+			{
+				mana: 3,
+				unrest: -1
+			}
+		}
+	}
+]

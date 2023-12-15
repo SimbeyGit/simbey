@@ -1,0 +1,65 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:orc",
+			name: "Orc",
+			origin: "Arcanian",
+			description: "",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.0
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.0
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.0
+			},
+			growth: 0,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"Robenaar",
+				"Wrrmwood",
+				"Xanten",
+				"Charack",
+				"Largut",
+				"Bangaak",
+				"Darkpool",
+				"Golcanar",
+				"Skulltop",
+				"Gotartop",
+				"Zuul",
+				"Craagpool",
+				"Krong",
+				"Krag Pool",
+				"Fell Gorge",
+				"Gronk",
+				"Torogaar",
+				"Oxenaak",
+				"Zom",
+				"Rife"
+			]
+		}
+	}
+]

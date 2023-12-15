@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:city_walls",
+			type: "normal",
+			name: "City Walls",
+			cost: 150,
+			startRaiders: 10,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:builders_hall"
+				}
+			],
+			benefits:
+			{
+				sight_range: 3
+			}
+		}
+	}
+]

@@ -1,0 +1,71 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:draconian",
+			name: "Draconian",
+			origin: "Myrran",
+			description: "Draconian cities receive 1/2 power/population, grow slowly (-10 people/turn), and cannot build Fantastic Stables, Maritime Guilds, or Mechanician's Guilds.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.5
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.5
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.5
+			},
+			growth: -10,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"Vallis",
+				"Minnlow",
+				"Mishran",
+				"Alairium",
+				"Dragon Pass",
+				"Doomcastle",
+				"Solanar",
+				"Farmist",
+				"Dragonfall",
+				"Parch",
+				"Arie",
+				"Wynd",
+				"Firepeak",
+				"Azurtfall",
+				"Fangrock",
+				"High Top",
+				"Hillfang",
+				"Sorin",
+				"Straatus",
+				"Icetop"
+			],
+			no_build:
+			[
+				"mom:mechanicians_guild",
+				"mom:maritime_guild",
+				"mom:fantastic_stable"
+			]
+		}
+	}
+]

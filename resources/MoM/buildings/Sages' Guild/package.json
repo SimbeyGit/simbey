@@ -1,0 +1,38 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:sages_guild",
+			type: "normal",
+			name: "Sages' Guild",
+			cost: 120,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:library"
+				}
+			],
+			benefits:
+			{
+				research: 3
+			}
+		}
+	}
+]

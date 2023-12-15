@@ -1,0 +1,37 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:shipwrights_guild",
+			type: "normal",
+			name: "Shipwrights' Guild",
+			cost: 100,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "land",
+					tile: [ "shore" ]
+				}
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

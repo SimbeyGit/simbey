@@ -16,6 +16,7 @@
 		name: "wizard.json",
 		data:
 		{
+			ref: "mom:raven",
 			name: "Raven",
 			description: "Raven is a wandering shaman of the earth and sky. \"Raven\" is so-named by his people for being a messenger of portents from the outer magical realms. Rather than cultivate a special wizarding skill, the shaman has resolutely collected a great trove of lore to minister his animistic religion. After receiving a sign, Raven established a Wizard Fortress and took up a mission of guardianship on behalf of the spirits he serves.\r\n\r\nThe Manual declares Raven to be a native American Indian. His race in the game's context (High Men, Nomad, or Barbarian) can't be established on this basis. His artwork shows a buff, tanned man in his prime, adorned in ceremonial furs.",
 			books:

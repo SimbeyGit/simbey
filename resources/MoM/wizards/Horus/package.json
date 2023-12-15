@@ -16,6 +16,7 @@
 		name: "wizard.json",
 		data:
 		{
+			ref: "mom:horus",
 			name: "Horus",
 			description: "Horus is a young spellcasting prodigy. Wizards must direct a great portion of their efforts each month to honing their fundamental ability to channel mana; the more power the Wizard can manipulate at once, the more spells he can cast in battle and overland. This is the special forte of Horus, an Archmage who already channels mana intuitively and can improve his skill half-again faster than anyone else when he focuses on it.\r\n\r\nHorus appears to be a lad of the High Men. He dresses plainly but sports a fine face with curly golden locks and blue eyes. Horus is quite short, and this has prompted speculation that he is actually a Halfling Wizard. Though, Master of Magic's Halflings are extremely grand in the belly and feet, whereas Horus has a slight and boyish build.",
 			books:
@@ -31,7 +32,7 @@
 			],
 			retorts:
 			[
-				"Archmage"
+				"mom:archmage"
 			],
 			music: [ "MOM92.MID", "MOM93.MID" ]
 		}

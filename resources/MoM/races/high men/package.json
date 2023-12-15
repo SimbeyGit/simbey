@@ -1,0 +1,69 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:high_men",
+			name: "High Men",
+			origin: "Arcanian",
+			description: "High men may not build Fantastic Stables.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.0
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.0
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.0
+			},
+			growth: 0,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"Coventry",
+				"York",
+				"Nottingham",
+				"Birmingham",
+				"Dover",
+				"Liverpool",
+				"Brighton",
+				"Oxford",
+				"Reading",
+				"Exeter",
+				"Cambridge",
+				"Hastings",
+				"Cantebury",
+				"Banbury",
+				"Newcastle",
+				"Haven",
+				"Manchester",
+				"Bremen",
+				"Denislin",
+				"Newland"
+			],
+			no_build:
+			[
+				"mom:fantastic_stable"
+			]
+		}
+	}
+]

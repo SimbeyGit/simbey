@@ -16,6 +16,7 @@
 		name: "wizard.json",
 		data:
 		{
+			ref: "mom:oberic",
 			name: "Oberic",
 			description: "Oberic is an elementalist, a wizard who comprehensively studies Nature, Chaos, and the yin-yang relationship they exhibit in shaping the world. Unlike the powers of Life and Death, these two realms can potentially be wielded by a single person. Mature elementalists display world-impacting prowess, calling down fire and storms and moving the mountains. Oberic is proudly self-reliant; he can evoke elements flexibly and condense Mana Crystals from them with ease.\r\n\r\nOberic is a male of High Men stock. Diverging from his portrait, his full body cutscene artwork indicates that he has total albinism, with ghostly white skin and hair and red eyes. He wears a yellow wizard robe and a dark green sculpted dragon headpiece.",
 			books:
@@ -31,7 +32,7 @@
 			],
 			retorts:
 			[
-				"Mana Focusing"
+				"mom:mana_focusing"
 			],
 			music: [ "MOM82.MID", "MOM83.MID" ]
 		}

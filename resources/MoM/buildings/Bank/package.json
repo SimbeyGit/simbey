@@ -1,0 +1,42 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:bank",
+			type: "normal",
+			name: "Bank",
+			cost: 250,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 3
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:marketplace"
+				},
+				{
+					type: "building",
+					ref: "mom:university"
+				}
+			],
+			benefits:
+			{
+				gold_pct: 50
+			}
+		}
+	}
+]

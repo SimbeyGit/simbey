@@ -1,0 +1,71 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:klackon",
+			name: "Klackon",
+			origin: "Arcanian",
+			description: "Klackon cities grow slowly (-10 people/turn) and cannot build Sage's Guilds, Shipyards, or Temples. If your capitol race is Klackon, unrest in Klackon cities is reduced by -2.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.0
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 3.0,
+				power: 0.0
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.0
+			},
+			growth: -10,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: -2,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"Fa-rul",
+				"Niktock",
+				"Ixtu",
+				"Keltok",
+				"Hsi-raz",
+				"Cai-ru",
+				"Katax",
+				"Ni-aru",
+				"Chu-wak",
+				"Ty-go",
+				"Aiym",
+				"Tar-reash",
+				"Shen-khi",
+				"Li-ray",
+				"Braxus",
+				"Pangor",
+				"Thirock",
+				"Zho",
+				"Tartz",
+				"Rakutal"
+			],
+			no_build:
+			[
+				"mom:sages_guild",
+				"mom:temple",
+				"mom:ship_yard"
+			]
+		}
+	}
+]

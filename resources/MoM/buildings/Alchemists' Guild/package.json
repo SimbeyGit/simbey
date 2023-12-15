@@ -1,0 +1,39 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:alchemists_guild",
+			type: "normal",
+			name: "Alchemists' Guild",
+			cost: 250,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 3
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:sages_guild"
+				}
+			],
+			benefits:
+			{
+				mana: 3,
+				alchemy: true
+			}
+		}
+	}
+]

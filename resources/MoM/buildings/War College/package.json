@@ -1,0 +1,42 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:war_college",
+			type: "normal",
+			name: "War College",
+			cost: 500,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 5
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:university"
+				},
+				{
+					type: "building",
+					ref: "mom:armorers_guild"
+				}
+			],
+			benefits:
+			{
+				exp: 41
+			}
+		}
+	}
+]

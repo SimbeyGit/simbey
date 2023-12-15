@@ -16,6 +16,7 @@
 		name: "wizard.json",
 		data:
 		{
+			ref: "mom:kali",
 			name: "Kali",
 			description: "The ageless witch Kali delves into Sorcery and Death's mysteries such as they pertain to the creation of enchanted tools and armor. Her level of mastery in rune formations, shaping magical fields, binding souls into talismans, and who knows what other weird skills has earned Kali the retort of Artificer. Detecting the presence of other wizards stirring abroad, the witch has suddenly anchored her manor in a city and become wary.\r\n\r\nKali appears as a refined lady of the High Men, with carefully-managed black hair and makeup enhanced by gold jewelry. Based on character concept work done for Kali, her circlet guards her soul from time. Kali wears a cape, evening gown, and opera gloves, all in black.",
 			books:
@@ -31,7 +32,7 @@
 			],
 			retorts:
 			[
-				"Artificer"
+				"mom:artificer"
 			],
 			music: [ "MOM98.MID", "MOM99.MID" ]
 		}

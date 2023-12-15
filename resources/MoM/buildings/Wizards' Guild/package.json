@@ -1,0 +1,42 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:wizards_guild",
+			type: "normal",
+			name: "Wizards' Guild",
+			cost: 1000,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 5
+				},
+				{
+					type: "mana",
+					amount: 3
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:university"
+				}
+			],
+			benefits:
+			{
+				research: 8
+			}
+		}
+	}
+]

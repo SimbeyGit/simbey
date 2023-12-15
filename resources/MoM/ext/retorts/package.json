@@ -1,0 +1,20 @@
+[
+	{
+		package: "json",
+		name: "retorts.json",
+		data:
+		[
+			{
+				ref: "mom_ext:mind_control",
+				name: "Mind Control",
+				description: "Suppresses unrest in every city (-1 unrest per city) and increases production (+50% production bonus).",
+				cost: 1,
+				benefits:
+				{
+					unrest: -1,
+					production: 50
+				}
+			}
+		]
+	}
+]

@@ -16,6 +16,7 @@
 		name: "wizard.json",
 		data:
 		{
+			ref: "mom:freya",
 			name: "Freya",
 			description: "Among the five wizards with Nature ranks, Freya is the specialist, drawing all of her magical might from the land and sea. She learns Nature spells easily, channels about half the usual mana to cast them, and is beloved by Nature Nodes. A long-term thinker, Freya sees herself as a defender of the eternal symmetry between the worlds and the peoples they have nurtured. By becoming the Master of Magic herself, she will prevent another from tearing the realms apart with their caprice.\r\n\r\nFreya is a female High Elf with fair skin, blonde hair, and blue eyes. The Manual describes her in addition to be a nymph, an irresistibly beautiful maiden with a divine ancestor. In spite of these top 1-percentile genetics, she is only ever seen dressed in animal hides and falcon plumes, such as may be needed in her rituals.",
 			books:
@@ -27,7 +28,7 @@
 			],
 			retorts:
 			[
-				"Nature Mastery"
+				"mom:nature_mastery"
 			],
 			music: [ "MOM90.MID", "MOM91.MID" ]
 		}

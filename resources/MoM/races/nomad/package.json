@@ -1,0 +1,70 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:nomad",
+			name: "Nomad",
+			origin: "Arcanian",
+			description: "Nomad cities receive a +50% trade bonus that is treated as a road gold bonus, grow slowly (-10 people/turn), and cannot build Maritime or Wizard's Guilds.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.0
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.0
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.0
+			},
+			growth: -10,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 50,
+			cityNames:
+			[
+				"Mecca",
+				"Naples",
+				"Sidon",
+				"Tyre",
+				"Tarsus",
+				"Issus",
+				"Cunaxa",
+				"Cremona",
+				"Cannae",
+				"Capua",
+				"Torin",
+				"Genoa",
+				"Utica",
+				"Damascus",
+				"Verona",
+				"Salamis",
+				"Blake",
+				"Harold",
+				"Isseme",
+				"Doraat"
+			],
+			no_build:
+			[
+				"mom:maritime_guild",
+				"mom:wizards_guild"
+			]
+		}
+	}
+]

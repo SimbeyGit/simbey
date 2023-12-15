@@ -1,0 +1,40 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			ref: "mom_ext:viephren",
+			name: "Viephren",
+			description: "Out of time and out of space, no one knows the origins of Viephren. The reports of Viephren's activity are few, as those who dare to travel near and spy are usually never seen again.\r\n\r\nViephren's Mind Control retort suppresses unrest (-1 per city) and increases production (+50% production bonus).",
+			books:
+			[
+				{
+					school: "Sorcery",
+					books: 5
+				},
+				{
+					school: "Chaos",
+					books: 5
+				}
+			],
+			retorts:
+			[
+				"mom_ext:mind_control"
+			],
+			music: [ "MOM98.MID", "MOM99.MID" ]
+		}
+	}
+]

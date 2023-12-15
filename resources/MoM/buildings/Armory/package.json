@@ -1,0 +1,42 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:armory",
+			type: "normal",
+			name: "Armory",
+			cost: 80,
+			startRaiders: 5,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:barracks"
+				},
+				{
+					type: "building",
+					ref: "mom:smithy"
+				}
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

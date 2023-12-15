@@ -1,0 +1,38 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:university",
+			type: "normal",
+			name: "University",
+			cost: 300,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 3
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:sages_guild"
+				}
+			],
+			benefits:
+			{
+				research: 5
+			}
+		}
+	}
+]

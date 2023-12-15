@@ -1,0 +1,37 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:armorers_guild",
+			type: "normal",
+			name: "Armorers' Guild",
+			cost: 350,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:fighters_guild"
+				}
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

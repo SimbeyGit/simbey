@@ -1,0 +1,44 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:farmers_market",
+			type: "normal",
+			name: "Farmers' Market",
+			cost: 100,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:granary"
+				},
+				{
+					type: "building",
+					ref: "mom:marketplace"
+				}
+			],
+			benefits:
+			{
+				food: 3,
+				pop_growth: 30,
+				pop_max: 3
+			}
+		}
+	}
+]

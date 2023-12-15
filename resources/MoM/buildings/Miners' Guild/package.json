@@ -1,0 +1,43 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:miners_guild",
+			type: "normal",
+			name: "Miners' Guild",
+			cost: 300,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 3
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:builders_hall"
+				},
+				{
+					type: "land",
+					tile: [ "hills", "mountains", "volcano" ]
+				}
+			],
+			benefits:
+			{
+				minerals_pct: 50,
+				production: 50
+			}
+		}
+	}
+]

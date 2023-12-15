@@ -1,0 +1,72 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:halfling",
+			name: "Halfling",
+			origin: "Arcanian",
+			description: "Halflings cannot build Armorer's Guilds, Stable, Shipyards, or Universities.",
+			farmers:
+			{
+				food: 3.0,
+				production: 0.5,
+				power: 0.0
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.0
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.0
+			},
+			growth: 0,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"Miroban",
+				"Eastway",
+				"Palaor",
+				"Elyndendale",
+				"Cornwell",
+				"Jollyville",
+				"Hickorydale",
+				"Hialanth",
+				"Ethridge",
+				"Myrean",
+				"Mirndale",
+				"Honeypool",
+				"Eventon",
+				"Sunnydale",
+				"Bremen",
+				"Sacred Vale",
+				"Medowdale",
+				"Cornberry",
+				"Hillshire",
+				"Torwell"
+			],
+			no_build:
+			[
+				"mom:stables",
+				"mom:university",
+				"mom:armorers_guild",
+				"mom:ship_yard"
+			]
+		}
+	}
+]

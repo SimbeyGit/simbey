@@ -1,0 +1,42 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:merchants_guild",
+			type: "normal",
+			name: "Merchants' Guild",
+			cost: 600,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 5
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:bank"
+				},
+				{
+					type: "building",
+					ref: "mom:ship_yard"
+				}
+			],
+			benefits:
+			{
+				gold_pct: 100
+			}
+		}
+	}
+]

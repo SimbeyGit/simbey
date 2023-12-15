@@ -16,6 +16,7 @@
 		name: "wizard.json",
 		data:
 		{
+			ref: "mom:merlin",
 			name: "Merlin",
 			description: "Merlin is a great wizard engaged in a relentless personal quest for the Spell of Mastery. A devotee to his library and tomes, Merlin is the world's most capable magical researcher. The sage master aims to grasp all the godlike knowledge needed to weave that ultimate spell. Merlin retains a compassionate frame of mind as a wielder of Nature and Life, and the pursuit of his goal is as fulfilling as its completion.\r\n\r\nMerlin is shown to be an elderly male of the High Men race. He wears long, loose blue mage robes and has flowing grey-white hair and beard on a stern face, with piercing green eyes.",
 			books:
@@ -31,7 +32,7 @@
 			],
 			retorts:
 			[
-				"Sage Master"
+				"mom:sage_master"
 			],
 			music: [ "MOM72.MID", "MOM73.MID" ]
 		}

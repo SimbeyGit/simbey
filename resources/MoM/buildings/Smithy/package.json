@@ -1,0 +1,35 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:smithy",
+			type: "normal",
+			name: "Smithy",
+			cost: 40,
+			start: true,
+			startRaiders: 3,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 1
+				}
+			],
+			prereqs:
+			[
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

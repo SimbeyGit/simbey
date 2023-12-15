@@ -1,0 +1,74 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:lizardmen",
+			name: "Lizardmen",
+			origin: "Arcanian",
+			description: "Lizardman grow quickly (+10 people/turn) and cannot build Animist's Guilds, War Colleges, Builder's Halls, Sage's Guilds, Parthenons, or Ship Wright's Guilds.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.0
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.0
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.0
+			},
+			growth: 10,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"South Wash",
+				"Thorn",
+				"Ulm",
+				"Ulna",
+				"Lizard Caves",
+				"Longrift",
+				"Lizardmarch",
+				"Nar",
+				"Mudspray",
+				"Sawtooth",
+				"Gore",
+				"Dirage",
+				"Sludgehome",
+				"Sedge",
+				"Rashem",
+				"Hob",
+				"Shatterod",
+				"Scacrest",
+				"Shellford",
+				"Hornbrant"
+			],
+			no_build:
+			[
+				"mom:sawmill",
+				"mom:sages_guild",
+				"mom:parthenon",
+				"mom:miners_guild",
+				"mom:shipwrights_guild",
+				"mom:animists_guild"
+			]
+		}
+	}
+]

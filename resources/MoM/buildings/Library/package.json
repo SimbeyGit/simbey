@@ -1,0 +1,38 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:library",
+			type: "normal",
+			name: "Library",
+			cost: 60,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:builders_hall"
+				}
+			],
+			benefits:
+			{
+				research: 2
+			}
+		}
+	}
+]

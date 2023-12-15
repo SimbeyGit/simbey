@@ -1,0 +1,43 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:oracle",
+			type: "normal",
+			name: "Oracle",
+			cost: 500,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 4
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:parthenon"
+				},
+				{
+					type: "building",
+					ref: "mom:university"
+				}
+			],
+			benefits:
+			{
+				sight_range: 4,
+				unrest: -2
+			}
+		}
+	}
+]

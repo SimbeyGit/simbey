@@ -1,0 +1,38 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:sawmill",
+			type: "normal",
+			name: "Sawmill",
+			cost: 100,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "land",
+					tile: [ "forest", "darkForest" ]
+				}
+			],
+			benefits:
+			{
+				production: 25
+			}
+		}
+	}
+]

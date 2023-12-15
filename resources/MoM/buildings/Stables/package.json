@@ -1,0 +1,38 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["b*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:stables",
+			type: "normal",
+			name: "Stables",
+			cost: 80,
+			startRaiders: 8,
+			upkeep:
+			[
+				{
+					type: "gold",
+					amount: 2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:smithy"
+				}
+			],
+			benefits:
+			{
+			}
+		}
+	}
+]

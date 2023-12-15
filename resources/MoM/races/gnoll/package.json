@@ -1,0 +1,73 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:gnoll",
+			name: "Gnoll",
+			origin: "Arcanian",
+			description: "Gnoll cities grow slowly (-10 people/turn), and cannot build Animist's Guilds, Sage's Guilds, Armorer's Guilds, Maritime Guilds, or Parthenons.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.0
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.0
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.0
+			},
+			growth: -10,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			cityNames:
+			[
+				"Basel",
+				"Aachen",
+				"Braunweig",
+				"Breslau",
+				"Brunn",
+				"Dortmond",
+				"Maimz",
+				"Nymax",
+				"Ozenwall",
+				"Posen",
+				"Speger",
+				"Steyr",
+				"Trier",
+				"Vordinax",
+				"Jogrin",
+				"Geras",
+				"Megamoria",
+				"Melegok",
+				"Tiamut",
+				"Creymona"
+			],
+			no_build:
+			[
+				"mom:animists:guild",
+				"mom:sages_guild",
+				"mom:parthenon",
+				"mom:armorers_guild",
+				"mom:maritime_guild"
+			]
+		}
+	}
+]
