@@ -562,7 +562,7 @@ VOID CCADCtrl::MouseMove (KEYS dwKeys, FLOAT x, FLOAT y)
 {
 	if(CAD::None == m_eMouse)
 	{
-		BOOL shouldRedraw = FALSE;
+		BOOL fRedraw = FALSE;
 		switch(m_eMode)
 		{
 		case CAD::Vertex:
@@ -570,21 +570,20 @@ VOID CCADCtrl::MouseMove (KEYS dwKeys, FLOAT x, FLOAT y)
 			{
 				BOOL fLineHover = LineHover(x, y);
 				BOOL fVertexHover = VertexHover(x, y);
-				shouldRedraw = (fLineHover || fVertexHover);
+				fRedraw = (fLineHover || fVertexHover);
 			}
 			break;
 		case CAD::Line:
-			shouldRedraw = LineHover(x, y);
+			fRedraw = LineHover(x, y);
 			m_pHost->InvalidateContainer(m_pGraph);
 			break;
 		case CAD::Polygon:
-			shouldRedraw = PolygonHover(x, y);
+			fRedraw = PolygonHover(x, y);
 			break;
 		}
-		if(shouldRedraw)
-		{
+
+		if(fRedraw)
 			m_pHost->InvalidateContainer(m_pGraph);
-		}
 	}
 	else if(CAD::DrawLine == m_eMouse)
 	{
@@ -666,12 +665,10 @@ VOID CCADCtrl::MouseMove (KEYS dwKeys, FLOAT x, FLOAT y)
 						{
 							sysint nPos;
 
-							if(!aVertices.IndexOf(pCadLine->idVertexA, nPos)) {
+							if(!aVertices.IndexOf(pCadLine->idVertexA, nPos))
 								aVertices.Append(pCadLine->idVertexA);
-							}
-							if(!aVertices.IndexOf(pCadLine->idVertexB, nPos)) {
+							if(!aVertices.IndexOf(pCadLine->idVertexB, nPos))
 								aVertices.Append(pCadLine->idVertexB);
-							}
 						}
 					}
 
@@ -744,7 +741,7 @@ DWORD CCADCtrl::GetPolygonFromPoint (FLOAT x, FLOAT y, DWORD idIgnore)
 
 		if(AnalyzeLine(pCadLine, idIgnore))
 		{
-			CAD_VERTEX* pVertexA, * pVertexB;
+			CAD_VERTEX* pVertexA, *pVertexB;
 			SideAssertHr(m_pVertices->Find(pCadLine->idVertexA, &pVertexA));
 			SideAssertHr(m_pVertices->Find(pCadLine->idVertexB, &pVertexB));
 
@@ -759,7 +756,7 @@ DWORD CCADCtrl::GetPolygonFromPoint (FLOAT x, FLOAT y, DWORD idIgnore)
 
 	if(pClosest)
 	{
-		CAD_VERTEX* pVertexA, * pVertexB;
+		CAD_VERTEX* pVertexA, *pVertexB;
 		SideAssertHr(m_pVertices->Find(pClosest->idVertexA, &pVertexA));
 		SideAssertHr(m_pVertices->Find(pClosest->idVertexB, &pVertexB));
 
@@ -1022,10 +1019,6 @@ BOOL CCADCtrl::PolygonHover (FLOAT x, FLOAT y)
 {
 	BOOL fChanged = FALSE;
 	DWORD idPolygon = GetPolygonFromPoint(x, y, CAD_INVALID);
-	if(idPolygon == CAD_INVALID)
-	{
-		return fChanged;
-	}
 
 	for(sysint i = 0; i < m_pPolygons->Length(); i++)
 	{

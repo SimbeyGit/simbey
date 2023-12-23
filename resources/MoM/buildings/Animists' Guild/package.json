@@ -35,7 +35,7 @@
 			],
 			benefits:
 			{
-				per_farmer_food: true,
+				farmer_food_bonus: 100.0,
 				heal_bonus: 66.7
 			}
 		}
