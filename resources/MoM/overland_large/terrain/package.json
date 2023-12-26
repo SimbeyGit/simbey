@@ -526,7 +526,7 @@
 				},
 				cities:
 				{
-					separation: 3,
+					separation: 4,
 					raiders: 5
 				},
 				rivers: 8,
@@ -555,7 +555,7 @@
 				},
 				cities:
 				{
-					separation: 3,
+					separation: 4,
 					raiders: 10
 				},
 				rivers: 12,
@@ -584,7 +584,7 @@
 				},
 				cities:
 				{
-					separation: 3,
+					separation: 5,
 					raiders: 15
 				},
 				rivers: 20,
@@ -613,7 +613,7 @@
 				},
 				cities:
 				{
-					separation: 3,
+					separation: 6,
 					raiders: 25
 				},
 				rivers: 30,
@@ -642,7 +642,7 @@
 				},
 				cities:
 				{
-					separation: 3,
+					separation: 6,
 					raiders: 35
 				},
 				rivers: 40,
@@ -671,7 +671,7 @@
 				},
 				cities:
 				{
-					separation: 3,
+					separation: 7,
 					raiders: 45
 				},
 				rivers: 40,
@@ -700,7 +700,7 @@
 				},
 				cities:
 				{
-					separation: 3,
+					separation: 7,
 					raiders: 50
 				},
 				rivers: 60,
