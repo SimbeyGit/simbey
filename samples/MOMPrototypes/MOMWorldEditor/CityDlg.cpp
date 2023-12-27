@@ -93,6 +93,7 @@ HRESULT CCityDlg::SaveData (VOID)
 
 	if(BST_CHECKED & SendMessage(GetDlgItem(IDC_WALL), BM_GETCHECK, 0, 0))
 	{
+		srv.Release();
 		Check(JSONParse(NULL, SLP(L"true"), &srv));
 		Check(m_pCity->AddValueW(L"wall", srv));
 	}

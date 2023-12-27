@@ -2104,7 +2104,7 @@ HRESULT CMOMWorldEditor::UpdateVisibleTiles (VOID)
 					else
 						Check(m_aCityTiles[nTile].pNormal[nFlag]->Clone(&srSprite));
 
-					srSprite->SetPosition(x, y);
+					srSprite->SetPosition(x + m_nCityOffset, y + m_nCityOffset);
 					Check(m_pMain->AddSprite(m_nCitiesLayer, srSprite, NULL));
 				}
 			}
@@ -2589,12 +2589,16 @@ HRESULT CMOMWorldEditor::LoadCityTiles (ISimbeyInterchangeFile* pCityTiles)
 		for(INT n = 0; n < ARRAYSIZE(rgcrFlags); n++)
 		{
 			TStackRef<ISimbeyInterchangeFileLayer> srColorized;
+			RECT rcPos;
+
 			Check(ColorizeLayer(srNormal, rgcrFlags[n], srFlags, &srColorized));
-			Check(sifCreateStaticSprite(srColorized, m_nCityOffset, m_nCityOffset, pTile->pNormal + n));
+			Check(srColorized->GetPosition(&rcPos));
+			Check(sifCreateStaticSprite(srColorized, rcPos.left, rcPos.top, pTile->pNormal + n));
 
 			srColorized.Release();
 			Check(ColorizeLayer(srWalled, rgcrFlags[n], srFlags, &srColorized));
-			Check(sifCreateStaticSprite(srColorized, m_nCityOffset, m_nCityOffset, pTile->pWalled + n));
+			Check(srColorized->GetPosition(&rcPos));
+			Check(sifCreateStaticSprite(srColorized, rcPos.left, rcPos.top, pTile->pWalled + n));
 		}
 
 		nTile++;
@@ -2693,6 +2697,7 @@ HRESULT CMOMWorldEditor::ColorizeLayer (ISimbeyInterchangeFileLayer* pLayer, COL
 	Check(pLayer->GetBitsPtr(&pBits, &cb));
 
 	Check(pStorage->AddLayerFromBits(nWidth, nHeight, pBits, 32, nWidth * 4, ppColorized, NULL));
+	(*ppColorized)->SetPosition(x, y);
 	Check((*ppColorized)->GetBitsPtr(&pBits, &cb));
 
 	for(USHORT y = 0; y < nHeight; y++)

@@ -3,7 +3,7 @@
 		"package": "buildsif",
 		"name": "cities.sif",
 		"files": ["*.png"],
-		"trim": false,
+		"trim": true,
 		"canvas": 32
 	}
 ]
