@@ -22,6 +22,14 @@
 	},
 	{
 		package: "sif",
+		name: "ChainGun.SIF"
+	},
+	{
+		package: "model",
+		name: "ChainGun.SML"
+	},
+	{
+		package: "sif",
 		name: "Chalice.SIF"
 	},
 	{
@@ -138,6 +146,16 @@
 					points: 150
 				},
 				{
+					name: "ChainGun",
+					type: "item",
+					sif: "ChainGun.SIF",
+					model: "ChainGun.SML",
+					entity: "ChainGun.PNG",
+					pickup: "PickupChainGun.wav",
+					weapon: "ChainGun",
+					offsetY: 0.2
+				},
+				{
 					name: "Chalice",
 					type: "item",
 					sif: "Chalice.SIF",
@@ -229,7 +247,8 @@
 					model: "MachineGun.SML",
 					entity: "MachineGun.PNG",
 					pickup: "PickupMachineGun.wav",
-					weapon: "MachineGun"
+					weapon: "MachineGun",
+					offsetY: 0.2
 				},
 				{
 					name: "SecretDoor",

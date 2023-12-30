@@ -333,6 +333,15 @@ VOID CLevelRenderer::DrawFrame (VOID)
 	glTranslated(0.0, -20, 0.0);
 	m_pGame->m_pGLFont->DrawTextGL(m_wzScoreLabel, 0.5f, DT_LEFT);
 
+#ifdef	_DEBUG
+	{
+		WCHAR wzPosition[100];
+		glTranslated(0.0, -30, 0.0);
+		Formatting::TPrintF(wzPosition, ARRAYSIZE(wzPosition), NULL, L"X%d  Z%d", static_cast<INT>(m_camera.m_dblPoint.x), static_cast<INT>(m_camera.m_dblPoint.z));
+		m_pGame->m_pGLFont->DrawTextGL(wzPosition, 0.25f, DT_LEFT);
+	}
+#endif
+
 	glPopMatrix();
 
 	DrawCompass();

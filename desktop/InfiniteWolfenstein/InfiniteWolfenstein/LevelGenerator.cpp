@@ -848,6 +848,7 @@ HRESULT CLevelGenerator::AddEntity (CDungeonRegion* pRegion, IJSONObject* pEntit
 	else
 	{
 		CEntity* pItem;
+		DOUBLE dblOffsetY = 0.0;
 
 		if(0 == TStrCmpAssert(pcwzType, L"iw.SecretDoor"))
 			pItem = __new CSecretDoor(m_pWalls);
@@ -860,12 +861,13 @@ HRESULT CLevelGenerator::AddEntity (CDungeonRegion* pRegion, IJSONObject* pEntit
 				pItem = __new CModelObstacle(pModel);
 			else
 				pItem = __new CModelItem(pModel);
+			dblOffsetY = pModel->m_dblOffsetY;
 		}
 		CheckAlloc(pItem);
 
 		pRegion->m_bRegion[z * REGION_WIDTH + x].m_pEntities = pItem;
 		pItem->m_dp.x = static_cast<DOUBLE>(pRegion->m_xRegion) * REGION_WIDTH + x + 0.5;
-		pItem->m_dp.y = 0.0;
+		pItem->m_dp.y = dblOffsetY;
 		pItem->m_dp.z = static_cast<DOUBLE>(pRegion->m_zRegion) * REGION_WIDTH + z + 0.5;
 
 		Check(pRegion->m_aEntities.Append(pItem));

@@ -31,6 +31,7 @@ public:
 	INT m_nPoints;
 
 	CSIFModel* m_pModel;
+	DOUBLE m_dblOffsetY;
 
 public:
 	CModel ();

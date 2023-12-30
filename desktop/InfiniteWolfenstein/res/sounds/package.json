@@ -45,6 +45,10 @@
 	},
 	{
 		package: "sound",
+		name: "PickupChainGun.wav"
+	}
+	{
+		package: "sound",
 		name: "PickupChalice.wav"
 	},
 	{

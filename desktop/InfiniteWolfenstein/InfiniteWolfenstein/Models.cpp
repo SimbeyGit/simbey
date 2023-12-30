@@ -27,7 +27,8 @@ CModel::CModel () :
 	m_fSpear(false),
 	m_eKey(None),
 	m_nPoints(0),
-	m_pModel(NULL)
+	m_pModel(NULL),
+	m_dblOffsetY(0.0)
 {
 }
 
@@ -98,6 +99,12 @@ HRESULT CModel::Load (ISimbeyInterchangeFile* pSIF, CRectPlacement* pPacker, RST
 				m_eKey = Gold;
 		}
 
+		srv.Release();
+	}
+
+	if(SUCCEEDED(pDef->FindNonNullValueW(L"offsetY", &srv)))
+	{
+		Check(srv->GetDouble(&m_dblOffsetY));
 		srv.Release();
 	}
 
