@@ -78,8 +78,9 @@ namespace Geometry
 	BOOL WINAPI SameSide (PFPOINT lpP1, PFPOINT lpP2, PFPOINT lpA, PFPOINT lpB);
 	BOOL WINAPI PointInTriangleOld (PFPOINT lpTest, PFPOINT lpTriangle);
 	BOOL WINAPI PointInTriangleOld (PFPOINT lpTest, PFPOINT lpT1, PFPOINT lpT2, PFPOINT lpT3);
-	BOOL WINAPI PointInTriangleNew (PFPOINT lpTest, PFPOINT lpT1, PFPOINT lpT2, PFPOINT lpT3);
+	BOOL WINAPI PointInTriangleNew (const FPOINT* pcfptTest, PFPOINT lpT1, PFPOINT lpT2, PFPOINT lpT3);
 	BOOL WINAPI PointInSquare (DOUBLE x, DOUBLE y, DOUBLE xSquare, DOUBLE ySquare, DOUBLE dblSize);
+	INT WINAPI PointInArray (const FPOINT* pcfpt, __in_ecount(cList) const FPOINT* pcrgList, INT cList);
 
 	VOID WINAPI RotatePoint (PFPOINT lpPoint, FLOAT fDegrees);
 	VOID WINAPI RotatePointAround (PFPOINT lpPoint, PFPOINT lpCenter, FLOAT fDegrees);

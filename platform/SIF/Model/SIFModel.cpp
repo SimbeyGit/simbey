@@ -251,7 +251,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CSIFMeshData::FindFace (FPOINT* ppt, ULONG* pidFace)
+HRESULT CSIFMeshData::FindFaceFromPoint (const FPOINT* ppt, ULONG* pidFace)
 {
 	HRESULT hr;
 
@@ -265,6 +265,40 @@ HRESULT CSIFMeshData::FindFace (FPOINT* ppt, ULONG* pidFace)
 		Check(m_mapVertex.Find(face.nVertex[1], &fpB));
 		Check(m_mapVertex.Find(face.nVertex[2], &fpC));
 		if(Geometry::PointInTriangleNew(ppt, &fpA, &fpB, &fpC))
+		{
+			*pidFace = m_mapFace.GetKey(i);
+			return S_OK;
+		}
+	}
+
+	hr = HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CSIFMeshData::FindFaceFromVertices (__in_ecount(cVertics) const FPOINT* pcrgVertices, INT cVertices, ULONG* pidFace)
+{
+	HRESULT hr;
+
+	for(sysint i = 0; i < m_mapFace.Length(); i++)
+	{
+		FACE face;
+		bool fMatched = true;
+
+		Check(m_mapFace.GetValueChecked(i, &face));
+		for(INT v = 0; v < cVertices; v++)
+		{
+			FPOINT fpt;
+			Check(m_mapVertex.Find(face.nVertex[v], &fpt));
+			if(-1 == Geometry::PointInArray(&fpt, pcrgVertices, cVertices))
+			{
+				fMatched = false;
+				break;
+			}
+		}
+
+		if(fMatched)
 		{
 			*pidFace = m_mapFace.GetKey(i);
 			return S_OK;
@@ -445,6 +479,7 @@ HRESULT CSIFFrame::SaveToStream (ISequentialStream* pStream)
 
 	Check(pStream->Write(&m_yOffset, sizeof(m_yOffset), &cb));
 	Check(pStream->Write(&m_cTicks, sizeof(m_cTicks), &cb));
+	Check(pStream->Write(&m_fRootRotation, sizeof(m_fRootRotation), &cb));
 
 	CheckIf(cJoints > USHORT_MAX, E_FAIL);
 	USHORT usJoints = static_cast<USHORT>(cJoints);
@@ -474,6 +509,7 @@ HRESULT CSIFFrame::LoadFromStream (ISequentialStream* pStream)
 
 	Check(pStream->Read(&m_yOffset, sizeof(m_yOffset), &cb));
 	Check(pStream->Read(&m_cTicks, sizeof(m_cTicks), &cb));
+	Check(pStream->Read(&m_fRootRotation, sizeof(m_fRootRotation), &cb));
 	Check(pStream->Read(&usJoints, sizeof(usJoints), &cb));
 
 	for(USHORT i = 0; i < usJoints; i++)

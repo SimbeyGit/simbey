@@ -117,22 +117,22 @@ namespace Geometry
 		return FALSE;
 	}
 
-	BOOL WINAPI PointInTriangleNew (PFPOINT lpTest, PFPOINT lpT1, PFPOINT lpT2, PFPOINT lpT3)
+	BOOL WINAPI PointInTriangleNew (const FPOINT* pcfptTest, PFPOINT lpT1, PFPOINT lpT2, PFPOINT lpT3)
 	{
 		FLOAT total_angles = 0.0f;
 		FPOINT v1, v2, v3;
 
-		v1.x = lpTest->x - lpT1->x;
-		v1.y = lpTest->y - lpT1->y;
-		v1.z = lpTest->z - lpT1->z;
+		v1.x = pcfptTest->x - lpT1->x;
+		v1.y = pcfptTest->y - lpT1->y;
+		v1.z = pcfptTest->z - lpT1->z;
 		Normalize(&v1);
-		v2.x = lpTest->x - lpT2->x;
-		v2.y = lpTest->y - lpT2->y;
-		v2.z = lpTest->z - lpT2->z;
+		v2.x = pcfptTest->x - lpT2->x;
+		v2.y = pcfptTest->y - lpT2->y;
+		v2.z = pcfptTest->z - lpT2->z;
 		Normalize(&v2);
-		v3.x = lpTest->x - lpT3->x;
-		v3.y = lpTest->y - lpT3->y;
-		v3.z = lpTest->z - lpT3->z;
+		v3.x = pcfptTest->x - lpT3->x;
+		v3.y = pcfptTest->y - lpT3->y;
+		v3.z = pcfptTest->z - lpT3->z;
 		Normalize(&v3);
 
 		total_angles += (FLOAT)acos(DotProduct(&v1,&v2));
@@ -145,6 +145,18 @@ namespace Geometry
 	BOOL WINAPI PointInSquare (DOUBLE x, DOUBLE y, DOUBLE xSquare, DOUBLE ySquare, DOUBLE dblSize)
 	{
 		return x >= xSquare - dblSize && y >= ySquare - dblSize && x < xSquare + dblSize && y < ySquare + dblSize;
+	}
+
+	INT WINAPI PointInArray (const FPOINT* pcfpt, __in_ecount(cList) const FPOINT* pcrgList, INT cList)
+	{
+		for(INT i = 0; i < cList; i++)
+		{
+			const FPOINT* pcfptVertex = pcrgList + i;
+			if(fabs(pcfpt->x - pcfptVertex->x) <= 0.005 && fabs(pcfpt->y - pcfptVertex->y) <= 0.005 && fabs(pcfpt->z - pcfptVertex->z) <= 0.005)
+				return i;
+		}
+
+		return -1;
 	}
 
 	VOID WINAPI RotatePoint (PFPOINT lpPoint, FLOAT fDegrees)

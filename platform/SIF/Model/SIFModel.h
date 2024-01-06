@@ -54,7 +54,8 @@ public:
 	HRESULT GetJoint (PCSTR pcszJoint, __deref_out JOINT** ppJoint);
 	BOOL HasJoint (PCSTR pcszJoint);
 	HRESULT BuildMirrorFrom (CSIFMeshData* pMesh, TNamedMapA<PCSTR>& mapNodeMirrors);
-	HRESULT FindFace (FPOINT* ppt, ULONG* pidFace);
+	HRESULT FindFaceFromPoint (const FPOINT* ppt, ULONG* pidFace);
+	HRESULT FindFaceFromVertices (__in_ecount(cVertics) const FPOINT* pcrgVertices, INT cVertices, ULONG* pidFace);
 
 	HRESULT SaveToStream (ISequentialStream* pStream);
 	HRESULT LoadFromStream (ISequentialStream* pStream);
