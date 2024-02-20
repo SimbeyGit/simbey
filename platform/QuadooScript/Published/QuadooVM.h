@@ -255,6 +255,11 @@ namespace QuadooVM
 		INT_FETCH,			// fetch(oSource, vParam1, vParam2) - Fetches data using the IQuadooFetch interface, if supported
 		INT_FETCH_EXTRA,	// fetch(oSource, vParam1, vParam2, vExtra) - Fetches data using the IQuadooFetch interface, if supported, with an extra parameter
 		INT_MAPFIND,		// mapfind(oMap, vKey, ref vOut) - Returns true (and sets vOut) if vKey is found in the map, otherwise false
+		INT_STRRCMP,		// strrcmp(string, fragment) - Perform a case-sensitive string comparison of the right-side of string
+		INT_STRRCMPI,		// strrcmpi(string, fragment) - Perform a case-insensitive string comparison of the right-side of string
+		INT_ATAN2,			// atan2(y, x) - Returns the angle in the plane (in radians) between the positive x-axis and the ray from (0, 0) to the point (x, y)
+		INT_DOEVENTS,		// doevents(oEvents, msTimeout) - Processes events (IQuadooWaitForEvents) until the timeout has occurred
+		INT_DOEVENTS_WAIT,	// doevents(oEvents, aHandles, msTimeout) - Processes events (IQuadooWaitForEvents) until the timeout or an event handle has been triggered
 		INT_TYPEOF = 0xFF	// typeof(value) - Return the type of the value using the Type enumeration below
 	};
 
@@ -579,6 +584,7 @@ interface __declspec(uuid("8C32C545-0802-4e32-A830-83EA42BA2870")) IQuadooInstan
 {
 	virtual HRESULT STDMETHODCALLTYPE FindInstance (RSTRING rstrProgramName, __deref_out IUnknown** ppunkCustomData) = 0;
 	virtual HRESULT STDMETHODCALLTYPE AddInstance (RSTRING rstrProgramName, IUnknown* punkCustomData, ISequentialStream* pstmProgram, DWORD cbProgram, __in_opt ISequentialStream* pstmDebug) = 0;
+	virtual HRESULT STDMETHODCALLTYPE AddInstance (RSTRING rstrProgramName, IUnknown* punkCustomData, const BYTE* pcbProgram, DWORD cbProgram, __in_opt ISequentialStream* pstmDebug) = 0;
 	virtual HRESULT STDMETHODCALLTYPE LoadVM (RSTRING rstrProgramName, __out HRESULT* phrRegistered, __deref_out IQuadooVM** ppVM) = 0;
 	virtual HRESULT STDMETHODCALLTYPE RemoveInstance (RSTRING rstrProgramName) = 0;
 	virtual bool STDMETHODCALLTYPE IsUsingDebugger (VOID) = 0;
@@ -678,6 +684,8 @@ HRESULT WINAPI QVMSum (__inout QuadooVM::QVARIANT* pqv, __in_opt QuadooVM::QVARI
 HRESULT WINAPI QVMMin (QuadooVM::QVARIANT* pqvA, QuadooVM::QVARIANT* pqvB, __out QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMMax (QuadooVM::QVARIANT* pqvA, QuadooVM::QVARIANT* pqvB, __out QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMAToU (QuadooVM::QVARIANT* pqvString, QuadooVM::QVARIANT* pqvBase, __out QuadooVM::QVARIANT* pqv);
+HRESULT WINAPI QVMStrRCmp (INT (*pfnStrCmpN)(const WCHAR*, const WCHAR*, INT), QuadooVM::QVARIANT* pqvArgs, __out QuadooVM::QVARIANT* pqvResult);
+HRESULT WINAPI QVMDoEvents (QuadooVM::QVARIANT* pqvEvents, __in_opt QuadooVM::QVARIANT* pqvHandles, QuadooVM::QVARIANT* pqvTimeout, __out QuadooVM::QVARIANT* pqvResult);
 
 HRESULT WINAPI QVMVariantToDouble (const QuadooVM::QVARIANT* pqv, __out DOUBLE* pdbl);
 HRESULT WINAPI QVMVariantToString (const QuadooVM::QVARIANT* pqv, __out RSTRING* prstr);
