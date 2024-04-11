@@ -25,12 +25,28 @@ HRESULT STDMETHODCALLTYPE CQSDemo::Invoke (__in_opt IQuadooVM* pVM, RSTRING rstr
 	{
 		LONG_PTR nResult;
 		Check(HrShellExecute(GetDesktopWindow(), L"open", L"http://www.quadooscript.com/", NULL, NULL, SW_NORMAL, nResult));
-		pqvResult->lVal = nResult;
-		pqvResult->eType = QuadooVM::I4;
+		SetSysIntToVariant(nResult, pqvResult);
 	}
 	else
 		hr = DISP_E_MEMBERNOTFOUND;
 
 Cleanup:
+	return hr;
+}
+
+HRESULT STDMETHODCALLTYPE CQSDemo::GetProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, __out QuadooVM::QVARIANT* pqvResult)
+{
+	HRESULT hr;
+	PCWSTR pcwzProperty = RStrToWide(rstrProperty);
+
+	if(0 == TStrCmpAssert(pcwzProperty, L"TheAnswer"))
+	{
+		pqvResult->lVal = 42;
+		pqvResult->eType = QuadooVM::I4;
+		hr = S_OK;
+	}
+	else
+		hr = DISP_E_UNKNOWNNAME;
+
 	return hr;
 }
