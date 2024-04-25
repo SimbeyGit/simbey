@@ -118,6 +118,9 @@ CGraphCtrl::CGraphCtrl ()
 	m_iMaxSpacing = GRAPH_CTRL_DEF_GRID_MAX;
 	m_iMinSpacing = GRAPH_CTRL_DEF_GRID_MIN;
 
+	m_crPointShade = RGB(0, 162, 232);
+	m_fShadePoint = FALSE;
+
 	ResetPosition();
 }
 
@@ -248,10 +251,10 @@ VOID WINAPI CGraphCtrl::Paint (HDC hdc)
 	rc.right = m_nWidth;
 	rc.bottom = m_nHeight;
 
-	hbrDef = (HBRUSH)SelectObject(hdcBuffer,m_hbBackground);
+	hbrDef = (HBRUSH)SelectObject(hdcBuffer, m_hbBackground);
 	m_pBackground->PaintBackground(hdcBuffer, &rc, m_hbBackground);
 
-	hpnDef = (HPEN)SelectObject(hdcBuffer,m_hpGrid);
+	hpnDef = (HPEN)SelectObject(hdcBuffer, m_hpGrid);
 	DrawGrid(hdcBuffer,0,0);
 
 	SetBkMode(hdcBuffer,TRANSPARENT);
@@ -382,12 +385,22 @@ VOID WINAPI CGraphCtrl::OnInput (__inout QUXInputEvent* pqie)
 					m_pGraphDrag->cx = x;
 					m_pGraphDrag->cy = y;
 
+					if(m_iGridFlags & GRID_FLAG_SHADE_MOUSE_POINT)
+					{
+						ClientToGraph(x - m_rcPos.left, y - m_rcPos.top, fx, fy);
+						UpdateShadePoint(fx, fy);
+					}
+
 					m_fIsDraggingCanvas = TRUE;
 					fHandled = TRUE;
 				}
 				else if(m_lpClient)
 				{
 					ClientToGraph(GET_X_VALUE - m_rcPos.left, GET_Y_VALUE - m_rcPos.top, fx, fy);
+
+					if(m_iGridFlags & GRID_FLAG_SHADE_MOUSE_POINT)
+						UpdateShadePoint(fx, fy);
+
 					m_lpClient->onGraphMouseMove(GET_MODIFIERS, fx, fy);
 					fHandled = TRUE;
 				}
@@ -634,6 +647,14 @@ VOID WINAPI CGraphCtrl::OnInput (__inout QUXInputEvent* pqie)
 					case 'G':
 						ToggleGridType();
 						fHandled = TRUE;
+						break;
+					case '`':
+						if(m_iGridFlags & GRID_FLAG_ENABLE_POINT_SHADER)
+						{
+							SetFlag(GRID_FLAG_SHADE_MOUSE_POINT, 0 == (m_iGridFlags & GRID_FLAG_SHADE_MOUSE_POINT));
+							fHandled = TRUE;
+						}
+						break;
 					}
 
 					if(fHandled)
@@ -822,6 +843,14 @@ VOID CGraphCtrl::DrawLine (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLO
 	GdipDrawLine(m_pcSurface->pgpGraphics, m_rcPos, xClient1, yClient1, xClient2, yClient2, pgpPen);
 }
 
+VOID CGraphCtrl::FillRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpBrush* pgpFill)
+{
+	INT xClient1, yClient1, xClient2, yClient2;
+	PointToClient(x1,y1,z1,xClient1,yClient1);
+	PointToClient(x2,y2,z2,xClient2,yClient2);
+	DllExports::GdipFillRectangleI(m_pcSurface->pgpGraphics, pgpFill, xClient1, yClient1, xClient2 - xClient1, yClient2 - yClient1);
+}
+
 VOID CGraphCtrl::RoundRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, FLOAT rWidth, FLOAT rHeight, GpPen* pgpPen, GpBrush* pgpFill)
 {
 	INT xClient1, yClient1, xClient2, yClient2;
@@ -974,7 +1003,9 @@ EGRAPHTYPE CGraphCtrl::GetGraphType (VOID)
 
 FLOAT CGraphCtrl::GetGridSnap (FLOAT p)
 {
-	return GridPoint(p,m_iGridSpace);
+	FLOAT rGrid = (FLOAT)m_iGridSpace;
+	p /= rGrid;
+	return static_cast<FLOAT>(_copysign(floorf(fabs(p) + 0.5f), p)) * rGrid;
 }
 
 #ifndef GRAPH_CTRL_QUX
@@ -1065,9 +1096,9 @@ VOID CGraphCtrl::SetScale (FLOAT fScale)
 {
 	FLOAT fPrevScale = m_fScale;
 
-	if(fScale >= (FLOAT).001)
+	if(fScale >= 0.001f)
 	{
-		FLOAT fMaxZoom = DPI::Scale(4.0f);
+		FLOAT fMaxZoom = DPI::Scale(50.0f);
 		if(fScale <= fMaxZoom)
 			m_fScale = fScale;
 		else
@@ -1112,8 +1143,8 @@ VOID CGraphCtrl::ClientToGraphGrid (INT x, INT y, FLOAT& fx, FLOAT& fy)
 {
 	ClientToGraph(x,y,fx,fy);
 
-	fx = GridPoint(fx,m_iGridSpace);
-	fy = GridPoint(fy,m_iGridSpace);
+	fx = GetGridSnap(fx);
+	fy = GetGridSnap(fy);
 }
 
 VOID CGraphCtrl::SetGridType (INT iGridType)
@@ -1141,6 +1172,22 @@ VOID CGraphCtrl::ToggleGridType (VOID)
 
 VOID CGraphCtrl::SetFlag (INT iFlag, BOOL fSet)
 {
+	if(GRID_FLAG_SHADE_MOUSE_POINT == iFlag)
+	{
+		if(0 == (m_iGridFlags & GRID_FLAG_ENABLE_POINT_SHADER))
+			return;
+
+		m_fShadePoint = FALSE;
+	}
+	else if(GRID_FLAG_ENABLE_POINT_SHADER == iFlag)
+	{
+		if(!fSet)
+		{
+			m_iGridFlags &= ~GRID_FLAG_SHADE_MOUSE_POINT;
+			m_fShadePoint = FALSE;
+		}
+	}
+
 	if(fSet)
 		m_iGridFlags |= iFlag;
 	else
@@ -1179,6 +1226,44 @@ VOID CGraphCtrl::DrawGrid (INT x, INT y)
 {
 	FLOAT fMove = m_iGridSpace * m_fScale;
 	INT nGridType = (m_iGridFlags & GRID_TYPE_MASK);
+
+	if(m_fShadePoint)
+	{
+		FLOAT rHalfGrid = (FLOAT)m_iGridSpace / 2.0f;
+		FLOAT x1 = m_fxShadePoint - rHalfGrid;
+		FLOAT x2 = m_fxShadePoint + rHalfGrid;
+		FLOAT y1 = m_fyShadePoint - rHalfGrid;
+		FLOAT y2 = m_fyShadePoint + rHalfGrid;
+
+#ifdef	GRAPH_CTRL_QUX
+		GpSolidFill* vPointShade;
+		DllExports::GdipCreateSolidFill(ColorRefToARGB(m_crPointShade), &vPointShade);
+#else
+		HBRUSH vPointShade = CreateSolidBrush(m_crPointShade);
+#endif
+
+		switch(m_gtGraphType)
+		{
+		case GRAPH_XY:
+		case GRAPH_PINNED_Y:
+		case GRAPH_INVERTED_QUAD:
+			FillRect(x1, y1, 0.0f, x2, y2, 0.0f, vPointShade);
+			break;
+		case GRAPH_XZ:
+			FillRect(x1, 0.0f, y1, x2, 0.0f, y2, vPointShade);
+			break;
+		case GRAPH_ZY:
+			FillRect(0.0f, y1, x1, 0.0f, y2, x2, vPointShade);
+			break;
+		}
+
+#ifdef	GRAPH_CTRL_QUX
+		DllExports::GdipDeleteBrush(vPointShade);
+#else
+		DeleteObject(vPointShade);
+#endif
+	}
+
 	if(fMove >= 3.0f || GRID_AXIS == nGridType || GRID_AXIS_POINTS == nGridType)
 	{
 		INT iTemp;
@@ -1387,13 +1472,13 @@ BOOL CGraphCtrl::WheelZoom (SHORT sDistance, FLOAT xGraph, FLOAT yGraph, POINT& 
 						FLOAT xShift, yShift;
 
 						ClientToGraph(ptClient.x, ptClient.y, xGraphAfter, yGraphAfter);
-						xShift = GridPoint(xGraph, m_iGridSpace) - xGraphAfter;
+						xShift = GetGridSnap(xGraph) - xGraphAfter;
 						if(GRAPH_XZ == m_gtGraphType)
-							yShift = yGraphAfter - GridPoint(yGraph, m_iGridSpace);
+							yShift = yGraphAfter - GetGridSnap(yGraph);
 						else if(GRAPH_PINNED_Y == m_gtGraphType)
 							yShift = 0;
 						else
-							yShift = GridPoint(yGraph, m_iGridSpace) - yGraphAfter;
+							yShift = GetGridSnap(yGraph) - yGraphAfter;
 						SetCenter(m_fxCenter + xShift, m_fyCenter + yShift);
 					}
 
@@ -1447,45 +1532,19 @@ VOID CGraphCtrl::RebuildOffsets (VOID)
 	}
 }
 
-INT CGraphCtrl::CloserTo (INT i, INT a, INT b)
+VOID CGraphCtrl::UpdateShadePoint (FLOAT fx, FLOAT fy)
 {
-	INT da = abs(i - a);
-	INT db = abs(i - b);
-	if(da < db)
-		return -1;
-	if(da > db)
-		return 1;
-	return 0;
-}
-
-FLOAT CGraphCtrl::GridPoint (FLOAT p, INT iGrid)
-{
-	INT i;
-	FLOAT dp = p - (FLOAT)((INT)p);
-
-	if(fabs(dp) < 0.5)
-		p -= dp;
-	else if(p > 0)
-		p += (1 - (FLOAT)fabs(dp));
+	if(!m_fShadePoint)
+		m_fShadePoint = TRUE;
 	else
-		p -= (1 - (FLOAT)fabs(dp)); 
-
-	if(p < 0)
 	{
-		i = abs((INT)p) % iGrid;
-		if(CloserTo(i,0,iGrid) >= 0)
-			p -= (iGrid - i);
-		else
-			p += i;
-	}
-	else if(p > 0)
-	{
-		i = (INT)p % iGrid;
-		if(CloserTo(i,0,iGrid) < 0)
-			p -= i;
-		else
-			p += (iGrid - i);
+		fx = GetGridSnap(fx);
+		fy = GetGridSnap(fy);
+		if(fx == m_fxShadePoint && fy == m_fyShadePoint)
+			return;
 	}
 
-	return p;
+	m_fxShadePoint = fx;
+	m_fyShadePoint = fy;
+	m_lpContainer->InvalidateContainer(this);
 }

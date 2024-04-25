@@ -4,22 +4,22 @@
 	#include "..\..\platform\QuadooUI\Published\QUX.h"
 #endif
 
-#define	GRAPH_CTRL_DEF_SCALE		2.0f
-#define	GRAPH_CTRL_DEF_GRID_SPACING	16
-#define	GRAPH_CTRL_DEF_GRID_MIN		2
-#define	GRAPH_CTRL_DEF_GRID_MAX		8192
+#define	GRAPH_CTRL_DEF_SCALE			2.0f
+#define	GRAPH_CTRL_DEF_GRID_SPACING		16
+#define	GRAPH_CTRL_DEF_GRID_MIN			2
+#define	GRAPH_CTRL_DEF_GRID_MAX			8192
 
 #ifndef	GRAPH_CTRL_QUX
 
-#define	GRAPH_CTRL_DEF_BACKGROUND	RGB(0,0,0)
-#define	GRAPH_CTRL_DEF_GRID_COLOR	RGB(0,0,128)
-#define	GRAPH_CTRL_DEF_AXIS_COLOR	RGB(192,192,220)
+#define	GRAPH_CTRL_DEF_BACKGROUND		RGB(0,0,0)
+#define	GRAPH_CTRL_DEF_GRID_COLOR		RGB(0,0,128)
+#define	GRAPH_CTRL_DEF_AXIS_COLOR		RGB(192,192,220)
 
 #else
 
-#define	GRAPH_CTRL_DEF_BACKGROUND	(0xFF << 24) | RGB(0,0,0)
-#define	GRAPH_CTRL_DEF_GRID_COLOR	(0xFF << 24) | RGB(0,0,128)
-#define	GRAPH_CTRL_DEF_AXIS_COLOR	(0xFF << 24) | RGB(192,192,220)
+#define	GRAPH_CTRL_DEF_BACKGROUND		(0xFF << 24) | RGB(0,0,0)
+#define	GRAPH_CTRL_DEF_GRID_COLOR		(0xFF << 24) | RGB(0,0,128)
+#define	GRAPH_CTRL_DEF_AXIS_COLOR		(0xFF << 24) | RGB(192,192,220)
 
 #endif
 
@@ -33,17 +33,19 @@ typedef enum
 	GRAPH_INVERTED_QUAD
 } EGRAPHTYPE;
 
-#define	GRID_NONE					0x00000000
-#define	GRID_POINTS					0x00000001
-#define	GRID_LINES					0x00000002
-#define	GRID_AXIS					0x00000003
-#define	GRID_AXIS_POINTS			0x00000004
+#define	GRID_NONE						0x00000000
+#define	GRID_POINTS						0x00000001
+#define	GRID_LINES						0x00000002
+#define	GRID_AXIS						0x00000003
+#define	GRID_AXIS_POINTS				0x00000004
 
-#define	GRID_TYPE_MASK				0x00000007
+#define	GRID_TYPE_MASK					0x00000007
 
-#define	GRID_FLAG_ZOOM_MOUSE		0x00000008
-#define	GRID_FLAG_ZOOM_ON_SIZE		0x00000010
-#define	GRID_FLAG_ENABLE_ZOOMING	0x00000020
+#define	GRID_FLAG_ZOOM_MOUSE			0x00000008
+#define	GRID_FLAG_ZOOM_ON_SIZE			0x00000010
+#define	GRID_FLAG_ENABLE_ZOOMING		0x00000020
+#define	GRID_FLAG_ENABLE_POINT_SHADER	0x00000040
+#define	GRID_FLAG_SHADE_MOUSE_POINT		0x00000080
 
 interface IAccessible;
 
@@ -72,6 +74,7 @@ interface IGrapher
 	virtual const DIBSURFACE* GetClientSurface (VOID) = 0;
 
 	virtual VOID DrawLine (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpPen* pgpPen) = 0;
+	virtual VOID FillRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpBrush* pgpFill) = 0;
 	virtual VOID RoundRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, FLOAT rWidth, FLOAT rHeight, GpPen* pgpPen, GpBrush* pgpFill) = 0;
 #endif
 
@@ -85,6 +88,10 @@ interface IGrapher
 	virtual VOID GetGraphBounds (__out FLOAT* px1, __out FLOAT* py1, __out FLOAT* px2, __out FLOAT* py2) = 0;
 	virtual EGRAPHTYPE GetGraphType (VOID) = 0;
 	virtual FLOAT GetGridSnap (FLOAT p) = 0;
+	virtual VOID SetFlag (INT iFlag, BOOL fSet) = 0;
+	virtual INT GetFlags (VOID) = 0;
+	virtual VOID SetGridSpacing (INT iSpacing) = 0;
+	virtual INT GetGridSpacing (VOID) = 0;
 };
 
 #ifndef	GRAPH_CTRL_QUX
@@ -168,6 +175,7 @@ private:
 #endif
 	COLORREF m_crGrid;
 	COLORREF m_crAxisPoint;
+	COLORREF m_crPointShade;
 
 	INT m_iGridFlags;
 	INT m_iGridSpace;
@@ -183,6 +191,10 @@ private:
 	SIZE* m_pGraphDrag;
 
 	INT m_iMaxSpacing, m_iMinSpacing;
+
+	// GRID_FLAG_ENABLE_POINT_SHADER and GRID_FLAG_SHADE_MOUSE_POINT
+	BOOL m_fShadePoint;
+	FLOAT m_fxShadePoint, m_fyShadePoint;
 
 public:
 	CGraphCtrl ();
@@ -237,6 +249,7 @@ public:
 	virtual const DIBSURFACE* GetClientSurface (VOID);
 
 	virtual VOID DrawLine (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpPen* pgpPen);
+	virtual VOID FillRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpBrush* pgpFill);
 	virtual VOID RoundRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, FLOAT rWidth, FLOAT rHeight, GpPen* pgpPen, GpBrush* pgpFill);
 #endif
 
@@ -250,6 +263,10 @@ public:
 	virtual VOID GetGraphBounds (__out FLOAT* px1, __out FLOAT* py1, __out FLOAT* px2, __out FLOAT* py2);
 	virtual EGRAPHTYPE GetGraphType (VOID);
 	virtual FLOAT GetGridSnap (FLOAT p);
+	virtual VOID SetFlag (INT iFlag, BOOL fSet);
+	virtual INT GetFlags (VOID);
+	virtual VOID SetGridSpacing (INT iSpacing);
+	virtual INT GetGridSpacing (VOID);
 
 #ifndef	GRAPH_CTRL_QUX
 	// IGraphBackground
@@ -277,12 +294,6 @@ public:
 	INT GetGridType (VOID);
 	VOID ToggleGridType (VOID);
 
-	VOID SetFlag (INT iFlag, BOOL fSet);
-	INT GetFlags (VOID);
-
-	VOID SetGridSpacing (INT iSpacing);
-	INT GetGridSpacing (VOID);
-
 #ifndef	GRAPH_CTRL_QUX
 	VOID DrawGrid (HDC hdc, INT x, INT y);
 #else
@@ -308,7 +319,5 @@ private:
 
 private:
 	VOID RebuildOffsets (VOID);
-
-	static INT CloserTo (INT i, INT a, INT b);
-	static FLOAT GridPoint (FLOAT p, INT iGrid);
+	VOID UpdateShadePoint (FLOAT fx, FLOAT fy);
 };

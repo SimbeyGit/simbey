@@ -72,6 +72,8 @@ CCADCtrl::CCADCtrl (ICADHost* pHost, VertexMap* pVertices, LineMap* pLines,
 	m_pnSelected = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
 	m_pnHover = CreatePen(PS_SOLID, 2, RGB(0, 255, 0));
 	m_pnDrawing = CreatePen(PS_SOLID, 2, RGB(128, 128, 255));
+
+	m_pGraph->SetFlag(GRID_FLAG_ENABLE_POINT_SHADER, CAD::Polygon != eMode);
 }
 
 CCADCtrl::~CCADCtrl ()
@@ -87,6 +89,7 @@ VOID CCADCtrl::SetMode (CAD::Mode eMode)
 {
 	if(eMode != m_eMode)
 	{
+		m_pGraph->SetFlag(GRID_FLAG_ENABLE_POINT_SHADER, CAD::Polygon != eMode);
 		m_eMode = eMode;
 		m_pHost->InvalidateContainer(m_pGraph);
 	}
