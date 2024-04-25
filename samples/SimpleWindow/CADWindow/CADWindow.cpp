@@ -20,6 +20,7 @@ CCADWindow::CCADWindow (HINSTANCE hInstance) :
 	m_graph.SetGraphType(GRAPH_XY);
 	m_graph.SetBGColor(RGB(0,0,0));
 	m_graph.SetGridColor(RGB(160, 160, 160));
+	m_graph.SetMinMaxSpacing(GRAPH_CTRL_DEF_GRID_MAX, 1);
 	m_graph.SetGraphTarget(this);
 }
 
