@@ -116,8 +116,7 @@ VOID CSampleService::StopService (VOID)
 
 VOID CSampleService::Disconnect (VOID)
 {
-	// Perform any memory deletions/cleanup here
-
+	Uninitialize();
 	SafeRelease(m_lpHost);
 }
 

@@ -128,6 +128,8 @@ INT wmain (INT cArgs, __in_ecount(cArgs) PWSTR* ppwzArgs)
 				hr = pHost->RunService(pService);
 			pService->Release();
 		}
+		else
+			hr = E_OUTOFMEMORY;
 		pHost->Release();
 	}
 
