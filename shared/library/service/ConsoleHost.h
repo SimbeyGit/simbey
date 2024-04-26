@@ -27,6 +27,9 @@ public:
 
 	VOID AttachCommandLineArgs (int cArgs, PTSTR* pptzArgs);
 
+	// IServiceStatus
+	virtual BOOL NotifyStatus (DWORD dwStatus, DWORD dwWaitHint);
+
 	// IServiceHost
 	virtual HRESULT Install (IService* pService, PCTSTR pctzInstallPath);
 	virtual HRESULT Uninstall (IService* pService);

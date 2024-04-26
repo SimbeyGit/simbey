@@ -27,6 +27,7 @@ public:
 	IMP_BASE_UNKNOWN
 
 	BEGIN_UNK_MAP
+		UNK_INTERFACE(IServiceStatus)
 		UNK_INTERFACE(IServiceHost)
 	END_UNK_MAP
 
@@ -34,13 +35,15 @@ public:
 	CServiceHost ();
 	virtual ~CServiceHost ();
 
-	// IServiceHostEx
+	// IServiceStatus
+	virtual BOOL NotifyStatus (DWORD dwStatus, DWORD dwWaitHint);
+
+	// IServiceHost
 	virtual HRESULT Install (IService* pService, PCTSTR pctzInstallPath);
 	virtual HRESULT Uninstall (IService* pService);
 	virtual HRESULT RunService (IService* pService);
 
 protected:
-	VOID NotifyStatus (DWORD dwStatus, DWORD dwWaitHint = 0);
 	VOID Start (DWORD cArgs, PTSTR* pptzArgs);
 	VOID Stop (VOID);
 

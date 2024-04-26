@@ -19,6 +19,13 @@ VOID CConsoleHost::AttachCommandLineArgs (int cArgs, PTSTR* pptzArgs)
 	m_pptzArgs = pptzArgs;
 }
 
+// IServiceStatus
+
+BOOL CConsoleHost::NotifyStatus (DWORD dwStatus, DWORD dwWaitHint)
+{
+	return TRUE;
+}
+
 // IServiceHost
 
 HRESULT CConsoleHost::Install (IService* pService, PCTSTR /*pctzInstallPath*/)

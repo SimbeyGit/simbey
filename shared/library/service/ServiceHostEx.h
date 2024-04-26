@@ -26,7 +26,10 @@ public:
 	CServiceHostEx ();
 	virtual ~CServiceHostEx ();
 
-	// IServiceHostEx
+	// IServiceStatus
+	virtual BOOL NotifyStatus (DWORD dwStatus, DWORD dwWaitHint) { return CServiceHost::NotifyStatus(dwStatus, dwWaitHint); }
+
+	// IServiceHost
 	virtual HRESULT Install (IService* pService, PCTSTR pctzInstallPath) { return CServiceHost::Install(pService, pctzInstallPath); }
 	virtual HRESULT Uninstall (IService* pService) { return CServiceHost::Uninstall(pService); }
 	virtual HRESULT RunService (IService* pService) { return CServiceHost::RunService(pService); }

@@ -33,6 +33,28 @@ CServiceHost::~CServiceHost ()
 	m_lpHost = NULL;
 }
 
+// IServiceStatus
+
+BOOL CServiceHost::NotifyStatus (DWORD dwStatus, DWORD dwWaitHint)
+{
+	m_status.dwCurrentState = dwStatus;
+	m_status.dwWaitHint = dwWaitHint;
+
+	switch(dwStatus)
+	{
+	case SERVICE_STOPPED:
+	case SERVICE_START_PENDING:
+	case SERVICE_STOP_PENDING:
+		m_status.dwControlsAccepted = 0;
+		break;
+	default:
+		m_status.dwControlsAccepted = m_lpService->AcceptServiceRequests(dwStatus);
+		break;
+	}
+
+	return ::SetServiceStatus(m_hServiceStatus, &m_status);
+}
+
 // IServiceHost
 
 HRESULT CServiceHost::Install (IService* pService, PCTSTR pctzInstallPath)
@@ -196,18 +218,11 @@ Cleanup:
 	return hr;
 }
 
-VOID CServiceHost::NotifyStatus (DWORD dwStatus, DWORD dwWaitHint)
-{
-	m_status.dwCurrentState = dwStatus;
-	m_status.dwWaitHint = dwWaitHint;
-	::SetServiceStatus(m_hServiceStatus, &m_status);
-}
-
 VOID CServiceHost::Start (DWORD cArgs, PTSTR* pptzArgs)
 {
 	BOOL fStarted = FALSE;
 
-	NotifyStatus(SERVICE_START_PENDING);
+	NotifyStatus(SERVICE_START_PENDING, 0);
 
 	if(RegisterWaitForSingleObject(&m_hStopWaitObject, m_hStopService, _StopService, this, INFINITE, WT_EXECUTELONGFUNCTION | WT_EXECUTEONLYONCE))
 	{
@@ -215,19 +230,19 @@ VOID CServiceHost::Start (DWORD cArgs, PTSTR* pptzArgs)
 		{
 			if(m_lpService->StartService())
 			{
-				NotifyStatus(SERVICE_RUNNING);
+				NotifyStatus(SERVICE_RUNNING, 0);
 				fStarted = TRUE;
 			}
 			else
 			{
-				NotifyStatus(SERVICE_STOP_PENDING);
+				NotifyStatus(SERVICE_STOP_PENDING, 0);
 				m_lpService->Disconnect();
 			}
 		}
 	}
 
 	if(!fStarted)
-		NotifyStatus(SERVICE_STOPPED);
+		NotifyStatus(SERVICE_STOPPED, 0);
 }
 
 VOID CServiceHost::Stop (VOID)
@@ -242,14 +257,14 @@ VOID CServiceHost::Stop (VOID)
 	OnServiceDisconnected(m_lpService);
 
 	// The StartServiceCtrlDispatcher() call will return after SERVICE_STOPPED is sent.
-	NotifyStatus(SERVICE_STOPPED);
+	NotifyStatus(SERVICE_STOPPED, 0);
 }
 
 VOID CServiceHost::ServiceMain (DWORD cArgs, PTSTR* pptzArgs)
 {
 	m_status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
 	m_status.dwCurrentState = SERVICE_STOPPED;
-	m_status.dwControlsAccepted = SERVICE_ACCEPT_STOP | m_lpService->AcceptServiceRequests();
+	m_status.dwControlsAccepted = 0;
 	m_status.dwWin32ExitCode = 0;
 	m_status.dwServiceSpecificExitCode = 0;
 	m_status.dwCheckPoint = 0;

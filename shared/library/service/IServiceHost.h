@@ -15,13 +15,18 @@ interface __declspec(uuid("84F9C6AE-7CDB-4b9c-91B1-46108BF68DE5")) IService : pu
 	virtual BOOL StartService (VOID) = 0;
 	virtual VOID StopService (VOID) = 0;
 	virtual VOID Disconnect (VOID) = 0;
-	virtual DWORD AcceptServiceRequests (VOID) = 0;
+	virtual DWORD AcceptServiceRequests (DWORD dwStatus) = 0;
 	virtual DWORD HandleServiceRequest (DWORD dwControl, DWORD dwEventType, PVOID pvEventData) = 0;
 	virtual HRESULT PostInstall (PCTSTR pctzServiceFilePath, PCTSTR pctzDisplayName) = 0;
 	virtual BOOL QueryStopRequest (BOOL fShutdown, __inout DWORD* pdwResult) = 0;
 };
 
-interface __declspec(uuid("ED299507-7406-4a0f-8D6F-2D845B3FEDFF")) IServiceHost : public IUnknown
+interface __declspec(uuid("CB7DFA8B-CDAC-4f83-B60D-9943ACB64350")) IServiceStatus : public IUnknown
+{
+	virtual BOOL NotifyStatus (DWORD dwStatus, DWORD dwWaitHint) = 0;
+};
+
+interface __declspec(uuid("ED299507-7406-4a0f-8D6F-2D845B3FEDFF")) IServiceHost : public IServiceStatus
 {
 	virtual HRESULT Install (IService* pService, PCTSTR pctzInstallPath) = 0;
 	virtual HRESULT Uninstall (IService* pService) = 0;

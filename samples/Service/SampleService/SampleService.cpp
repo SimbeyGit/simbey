@@ -120,9 +120,9 @@ VOID CSampleService::Disconnect (VOID)
 	SafeRelease(m_lpHost);
 }
 
-DWORD CSampleService::AcceptServiceRequests (VOID)
+DWORD CSampleService::AcceptServiceRequests (DWORD dwStatus)
 {
-	return 0;
+	return SERVICE_ACCEPT_STOP;
 }
 
 DWORD CSampleService::HandleServiceRequest (DWORD dwControl, DWORD dwEventType, PVOID pvEventData)

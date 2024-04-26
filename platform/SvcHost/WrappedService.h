@@ -1,16 +1,15 @@
 #pragma once
 
-#include "Library\Util\RefString.h"
 #include "Library\Service\ServiceHostEx.h"
+#include "Published\SvcHost.h"
 
-class CSampleService :
+class CWrappedService :
 	public CBaseUnknown,
 	public IService
 {
 protected:
-	StringW m_strBasePath;
+	IHostedService* m_pService;
 	IServiceHost* m_lpHost;
-	HINSTANCE m_hInstance;
 
 public:
 	IMP_BASE_UNKNOWN
@@ -20,10 +19,8 @@ public:
 	END_UNK_MAP
 
 public:
-	CSampleService (HINSTANCE hInstance);
-	~CSampleService ();
-
-	static PCWSTR GetServiceRegKey (VOID);
+	CWrappedService (IHostedService* pService);
+	~CWrappedService ();
 
 	virtual HRESULT SetInstallPath (PCWSTR pcwzInstallPath, INT cchInstallPath);
 	virtual HRESULT GetSvcName (PWSTR pwzBuffer, LONG Length);
@@ -44,6 +41,5 @@ public:
 	// To be effective, call SetBasePath() before initializing.
 	HRESULT SetBasePath (PCWSTR pcwzBasePath);
 
-	BOOL Initialize (VOID);
-	VOID Uninitialize (VOID);
+	HRESULT ExecuteCommand (INT cArgs, __in_ecount(cArgs) PWSTR* ppwzArgs, INT idxArg, __out INT* pnSkip, __out BOOL* pfCanStartService);
 };
