@@ -18,7 +18,6 @@ interface __declspec(uuid("76CBA51D-9CC3-4b2d-AAB3-F94209411EE5")) IHostedServic
 	virtual HRESULT WINAPI RegisterInstallation (HKEY hKey, PCWSTR pcwzInstallPath, INT cchInstallPath) = 0;
 	virtual HRESULT WINAPI ExecuteCommand (INT cArgs, __in_ecount(cArgs) PWSTR* ppwzArgs, INT idxArg, __out INT* pnSkip, __out BOOL* pfCanStartService) = 0;
 	virtual HMODULE WINAPI GetServiceModule (VOID) = 0;
-	virtual HRESULT WINAPI GetServiceProperty (SvcHost::Property eProperty, __out_ecount(cchMaxBuffer) PWSTR pwzBuffer, INT cchMaxBuffer) = 0;
 	virtual DWORD WINAPI GetStartType (VOID) = 0;
 	virtual HRESULT WINAPI GetDependencies (__out ISequentialStream* pstmDependencies) = 0;
 	virtual HRESULT WINAPI PostInstall (PCWSTR pcwzServiceFilePath, PCWSTR pcwzDisplayName) = 0;
@@ -28,6 +27,7 @@ interface __declspec(uuid("76CBA51D-9CC3-4b2d-AAB3-F94209411EE5")) IHostedServic
 
 	// Required methods that must be implemented by the user's class
 	virtual PCWSTR WINAPI GetServiceRegKey (VOID) = 0;
+	virtual HRESULT WINAPI GetServiceProperty (SvcHost::Property eProperty, __out_ecount(cchMaxBuffer) PWSTR pwzBuffer, INT cchMaxBuffer) = 0;
 	virtual HRESULT WINAPI SetBasePath (PCWSTR pcwzBasePath) = 0;
 	virtual BOOL WINAPI Initialize (VOID) = 0;
 	virtual BOOL WINAPI Start (VOID) = 0;

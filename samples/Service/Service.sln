@@ -3,6 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleService", "SampleService\SampleService.vcproj", "{734893EA-A85C-4DCF-9A9B-7EBC08AA4EBC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SvcHost", "..\..\platform\SvcHost\SvcHost.vcproj", "{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleHostedSvc", "SampleHostedSvc\SampleHostedSvc.vcproj", "{CB50DACC-803A-450E-A407-F85375196ACD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D} = {537BBDC3-D25C-41CA-925A-5CEF736C9C5D}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +26,22 @@ Global
 		{734893EA-A85C-4DCF-9A9B-7EBC08AA4EBC}.Release|Win32.Build.0 = Release|Win32
 		{734893EA-A85C-4DCF-9A9B-7EBC08AA4EBC}.Release|x64.ActiveCfg = Release|x64
 		{734893EA-A85C-4DCF-9A9B-7EBC08AA4EBC}.Release|x64.Build.0 = Release|x64
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}.Debug|Win32.Build.0 = Debug|Win32
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}.Debug|x64.ActiveCfg = Debug|x64
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}.Debug|x64.Build.0 = Debug|x64
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}.Release|Win32.ActiveCfg = Release|Win32
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}.Release|Win32.Build.0 = Release|Win32
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}.Release|x64.ActiveCfg = Release|x64
+		{537BBDC3-D25C-41CA-925A-5CEF736C9C5D}.Release|x64.Build.0 = Release|x64
+		{CB50DACC-803A-450E-A407-F85375196ACD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CB50DACC-803A-450E-A407-F85375196ACD}.Debug|Win32.Build.0 = Debug|Win32
+		{CB50DACC-803A-450E-A407-F85375196ACD}.Debug|x64.ActiveCfg = Debug|x64
+		{CB50DACC-803A-450E-A407-F85375196ACD}.Debug|x64.Build.0 = Debug|x64
+		{CB50DACC-803A-450E-A407-F85375196ACD}.Release|Win32.ActiveCfg = Release|Win32
+		{CB50DACC-803A-450E-A407-F85375196ACD}.Release|Win32.Build.0 = Release|Win32
+		{CB50DACC-803A-450E-A407-F85375196ACD}.Release|x64.ActiveCfg = Release|x64
+		{CB50DACC-803A-450E-A407-F85375196ACD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
