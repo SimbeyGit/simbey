@@ -198,8 +198,9 @@ Cleanup:
 	return hr;
 }
 
-CAsyncWinHttp::CAsyncWinHttp (CWinHttp* pWinHttp, IAsyncWinHttpCallback* pCallback, HANDLE hCompletion) :
+CAsyncWinHttp::CAsyncWinHttp (CWinHttp* pWinHttp, HANDLE hCompletion) :
 	m_pWinHttp(pWinHttp),
+	m_pCallback(NULL),
 	m_hCompletion(hCompletion),
 	m_hRequest(NULL),
 	m_cHandleLocks(0),
@@ -207,15 +208,12 @@ CAsyncWinHttp::CAsyncWinHttp (CWinHttp* pWinHttp, IAsyncWinHttpCallback* pCallba
 	m_fOwnEvent(FALSE)
 {
 	InitializeCriticalSection(&m_cs);
-
-	SafeAttach(m_pCallback, pCallback, static_cast<IAsyncWinHttp*>(this));
 }
 
 CAsyncWinHttp::~CAsyncWinHttp ()
 {
 	Assert(NULL == m_hRequest);
-
-	SafeDetach(m_pCallback, static_cast<IAsyncWinHttp*>(this));
+	Assert(NULL == m_pCallback);
 
 	if(m_fOwnEvent)
 		SafeCloseHandle(m_hCompletion);
@@ -225,17 +223,23 @@ CAsyncWinHttp::~CAsyncWinHttp ()
 	DeleteCriticalSection(&m_cs);
 }
 
-HRESULT CAsyncWinHttp::OpenRequest (HINTERNET hServer, PCWSTR pcwzVerb, PCWSTR pcwzResource,
+HRESULT CAsyncWinHttp::OpenRequest (IAsyncWinHttpCallback* pCallback,
+									HINTERNET hServer, PCWSTR pcwzVerb, PCWSTR pcwzResource,
 									PCWSTR pcwzReferrer, PCWSTR* ppcwzAcceptTypes, DWORD dwFlags, DWORD dwSecurityFlags,
 									PCWSTR pcwzHeaders, INT cchHeaders,
 									PCWSTR pcwzUserName, INT cchUserName, PCWSTR pcwzPassword, INT cchPassword)
 {
 	HRESULT hr;
-	DWORD cbPostSize = m_pCallback->OnReadPostDataSize();
+	DWORD cbPostSize = pCallback->OnReadPostDataSize();
+	bool fSetCallback = false;
 
 	EnterCriticalSection(&m_cs);
 
 	CheckIf(NULL != m_hRequest, E_UNEXPECTED);
+
+	Assert(NULL == m_pCallback);
+	SafeAttach(m_pCallback, pCallback, static_cast<IAsyncWinHttp*>(this));
+	fSetCallback = true;
 
 	if(NULL == m_hCompletion)
 	{
@@ -289,11 +293,17 @@ HRESULT CAsyncWinHttp::OpenRequest (HINTERNET hServer, PCWSTR pcwzVerb, PCWSTR p
 	hr = S_OK;
 
 Cleanup:
-	if(FAILED(hr) && m_hRequest)
+	if(FAILED(hr))
 	{
-		HANDLE hRequest = m_hRequest;
-		m_hRequest = NULL;
-		m_pWinHttp->CloseHandle(hRequest);
+		if(m_hRequest)
+		{
+			HANDLE hRequest = m_hRequest;
+			m_hRequest = NULL;
+			m_pWinHttp->CloseHandle(hRequest);
+		}
+
+		if(fSetCallback)
+			SafeDetach(m_pCallback, static_cast<IAsyncWinHttp*>(this));
 	}
 
 	LeaveCriticalSection(&m_cs);
@@ -519,6 +529,7 @@ VOID CAsyncWinHttp::AsyncCallback (DWORD dwCode, PVOID pvInfo, DWORD dwLength)
 	case WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING:
 		Assert(NULL == m_hRequest);
 		m_pCallback->OnCompletion(m_hrRequestResult, m_dwStatusCode);
+		SafeDetach(m_pCallback, static_cast<IAsyncWinHttp*>(this));
 		SetEvent(m_hCompletion);
 		Release();
 		break;

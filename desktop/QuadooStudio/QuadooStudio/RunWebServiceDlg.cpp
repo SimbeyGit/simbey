@@ -37,10 +37,10 @@ HRESULT CWebCall::StartAsync (HINTERNET hServer, PCWSTR pcwzVerb, PCWSTR pcwzRes
 	HRESULT hr;
 	PCWSTR prgDefaultAcceptTypes[] = { L"*/*", NULL };
 
-	m_pRequest = __new CAsyncWinHttp(m_pWinHttp, this);
+	m_pRequest = __new CAsyncWinHttp(m_pWinHttp);
 	CheckAlloc(m_pRequest);
 
-	Check(m_pRequest->OpenRequest(hServer, pcwzVerb, pcwzResource, NULL, prgDefaultAcceptTypes,
+	Check(m_pRequest->OpenRequest(this, hServer, pcwzVerb, pcwzResource, NULL, prgDefaultAcceptTypes,
 		fSecure ? WINHTTP_FLAG_SECURE : 0, dwSecurityOptions, pcwzHeaders, cchHeaders,
 		RStrToWide(rstrUser), RStrLen(rstrUser), RStrToWide(rstrPassword), RStrLen(rstrPassword)));
 

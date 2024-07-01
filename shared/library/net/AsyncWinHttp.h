@@ -310,7 +310,8 @@ interface __declspec(uuid("0DE69E10-13A9-4a58-8181-3BE35CA81285")) IAsyncWinHttp
 
 interface __declspec(uuid("CF21BB11-040B-49eb-AD75-C3335E37CD1A")) IAsyncWinHttp : IUnknown
 {
-	virtual HRESULT OpenRequest (HINTERNET hServer, PCWSTR pcwzVerb, PCWSTR pcwzResource,
+	virtual HRESULT OpenRequest (IAsyncWinHttpCallback* pCallback,
+		HINTERNET hServer, PCWSTR pcwzVerb, PCWSTR pcwzResource,
 		PCWSTR pcwzReferrer, PCWSTR* ppcwzAcceptTypes, DWORD dwFlags, DWORD dwSecurityFlags,
 		PCWSTR pcwzHeaders, INT cchHeaders,
 		PCWSTR pcwzUserName, INT cchUserName, PCWSTR pcwzPassword, INT cchPassword) = 0;
@@ -400,10 +401,11 @@ public:
 	static HRESULT CreateAsyncEvent (__out HANDLE* phCompletion);
 
 public:
-	CAsyncWinHttp (CWinHttp* pWinHttp, IAsyncWinHttpCallback* pCallback, HANDLE hCompletion = NULL);
+	CAsyncWinHttp (CWinHttp* pWinHttp, HANDLE hCompletion = NULL);
 	~CAsyncWinHttp ();
 
-	virtual HRESULT OpenRequest (HINTERNET hServer, PCWSTR pcwzVerb, PCWSTR pcwzResource,
+	virtual HRESULT OpenRequest (IAsyncWinHttpCallback* pCallback,
+		HINTERNET hServer, PCWSTR pcwzVerb, PCWSTR pcwzResource,
 		PCWSTR pcwzReferrer, PCWSTR* ppcwzAcceptTypes, DWORD dwFlags, DWORD dwSecurityFlags,
 		PCWSTR pcwzHeaders, INT cchHeaders,
 		PCWSTR pcwzUserName, INT cchUserName, PCWSTR pcwzPassword, INT cchPassword);
