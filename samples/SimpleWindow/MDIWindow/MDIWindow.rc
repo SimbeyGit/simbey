@@ -75,6 +75,14 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_MAIN                ICON                    "Main.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR_ZOOM_IN      CURSOR                  "zoom-in.cur"
+IDC_CURSOR_ZOOM_OUT     CURSOR                  "zoom-out.cur"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
