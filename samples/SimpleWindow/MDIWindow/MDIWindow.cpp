@@ -158,6 +158,7 @@ BOOL CMDIChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResu
 CImageChild::CImageChild (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
 	m_pSIF(NULL),
+	m_hbrTransparent(NULL),
 	m_fZoom(1.0f),
 	m_fZoomStep(0.1f),
 	m_fMinZoom(0.001f),
@@ -173,6 +174,8 @@ CImageChild::CImageChild (HINSTANCE hInstance) :
 
 CImageChild::~CImageChild ()
 {
+	SafeDeleteGdiObject(m_hbrTransparent);
+
 	if(m_pSIF)
 	{
 		m_pSIF->Close();
@@ -209,6 +212,11 @@ HRESULT CImageChild::Unregister (HINSTANCE hInstance)
 HRESULT CImageChild::Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight)
 {
 	HRESULT hr;
+	HBITMAP hbmPattern = (HBITMAP)LoadImage(m_hInstance, MAKEINTRESOURCE(IDB_TRANS_PATTERN), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
+
+	CheckIfGetLastError(NULL == hbmPattern);
+	m_hbrTransparent = CreatePatternBrush(hbmPattern);
+	CheckIfGetLastError(NULL == m_hbrTransparent);
 
 	Check(sifCreateNew(&m_pSIF));
 	Check(AttachToFrame(
@@ -226,6 +234,7 @@ HRESULT CImageChild::Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight)
 	LoadCursors();
 
 Cleanup:
+	SafeDeleteGdiObject(hbmPattern);
 	return hr;
 }
 
@@ -353,9 +362,9 @@ void CImageChild::ZoomToRectangle()
 	int nRectWidth = abs(m_xCurrDrag - m_xStartDrag);
 	int nRectHeight = abs(m_yCurrDrag - m_yStartDrag);
 
-	const int cx = rc.right - rc.left;    
-	const int cy = rc.bottom - rc.top;   
-	const int vx = (int)(m_sLayer.cx * m_fZoom); 
+	const int cx = rc.right - rc.left;
+	const int cy = rc.bottom - rc.top;
+	const int vx = (int)(m_sLayer.cx * m_fZoom);
 	const int vy = (int)(m_sLayer.cy * m_fZoom);
 
 	if(nRectHeight < cy / 10  || nRectWidth < cx / 10)
@@ -410,7 +419,7 @@ void CImageChild::ZoomIn (int nStep, POINT center)
 		}
 		else
 		{
-			for(int i = 0; i < 18; i++)
+			for(int i = 0; i < ARRAYSIZE(ZoomValueList) - 1; i++)
 			{
 				if(m_fZoom < ZoomValueList[i] && m_fZoom >= ZoomValueList[i + 1])
 				{
@@ -474,7 +483,7 @@ void CImageChild::ZoomIn (int nStep, POINT center)
 	Invalidate(FALSE);
 }
 
-void CImageChild::ZoomOut(int nStep, POINT center)
+void CImageChild::ZoomOut (int nStep, POINT center)
 {
 	float tempfZoom = m_fZoom;
 	RECT rc;
@@ -552,7 +561,7 @@ void CImageChild::ZoomOut(int nStep, POINT center)
 
 void CImageChild::CheckZoomValue ()
 {
-	if(m_fZoom > 1.0)
+	if(m_fZoom > 1.0f)
 	{
 		int tempZoom = (int)m_fZoom;
 		m_fZoom = tempZoom * 1.0f;
@@ -580,7 +589,7 @@ void CImageChild::SetClientSize (HWND hwnd, int clientWidth, int clientHeight)
 	DWORD dwExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
 
 	// Adjust the window size to accommodate the desired client area size
-	if (AdjustWindowRectEx(&clientRect, dwStyle, FALSE, dwExStyle))
+	if(AdjustWindowRectEx(&clientRect, dwStyle, FALSE, dwExStyle))
 	{
 		int windowWidth = clientRect.right - clientRect.left;
 		int windowHeight = clientRect.bottom - clientRect.top;
@@ -615,7 +624,8 @@ Cleanup:
 
 int CImageChild::OnSize (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	if(m_bImageLoaded){
+	if(m_bImageLoaded)
+	{
 		_SetScrollSizes();
 		_SetScrollPos(m_hwnd, SB_VERT, m_yScrollPos);
 		_SetScrollPos(m_hwnd, SB_HORZ, m_xScrollPos);
@@ -653,7 +663,7 @@ BOOL CImageChild::OnVScroll (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& l
 	return 0;
 }
 
-BOOL CImageChild::OnHScroll(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+BOOL CImageChild::OnHScroll (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
 	static int xPos;
 	switch (LOWORD(wParam))
@@ -700,8 +710,8 @@ BOOL CImageChild::OnMouseWheel (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT
 			ZoomIn(0, center);
 		return TRUE;
 	}
-	
-	if (GET_KEYSTATE_WPARAM(wParam) & MK_CONTROL)
+
+	if(GET_KEYSTATE_WPARAM(wParam) & MK_CONTROL)
 	{
 		m_xScrollPos -= delta / 10;
 		_SetScrollPos(m_hwnd, SB_HORZ, m_xScrollPos);
@@ -716,7 +726,7 @@ BOOL CImageChild::OnMouseWheel (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT
 	return TRUE;
 }
 
-BOOL CImageChild::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+BOOL CImageChild::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
 	RECT rc;
 	GetClientRect(m_hwnd, &rc);
@@ -763,7 +773,7 @@ BOOL CImageChild::OnKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 	return TRUE;
 }
 
-BOOL CImageChild::OnSysKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+BOOL CImageChild::OnSysKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
 	if(wParam == VK_MENU)
 	{
@@ -806,7 +816,7 @@ BOOL CImageChild::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 		ZoomOut(1, center);
 		return TRUE;
 	}
-	
+
 	m_xStartDrag = m_xCurrDrag = LOWORD(lParam); // Horizontal position of cursor
 	m_yStartDrag = m_yCurrDrag = HIWORD(lParam); // Vertical position of cursor
 	if(m_xStartDrag >= rc.right - 20 || m_yStartDrag >= rc.bottom - 20)

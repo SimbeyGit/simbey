@@ -83,6 +83,14 @@ IDI_MAIN                ICON                    "Main.ico"
 
 IDC_CURSOR_ZOOM_IN      CURSOR                  "zoom-in.cur"
 IDC_CURSOR_ZOOM_OUT     CURSOR                  "zoom-out.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TRANS_PATTERN       BITMAP                  "TransparentPattern.bmp"
+
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

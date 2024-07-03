@@ -46,6 +46,7 @@ class CImageChild :
 protected:
 	HINSTANCE m_hInstance;
 	ISimbeyInterchangeFile* m_pSIF;
+	HBRUSH m_hbrTransparent;
 
 public:
 	IMP_BASE_UNKNOWN
