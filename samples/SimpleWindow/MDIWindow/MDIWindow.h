@@ -80,6 +80,7 @@ public:
 
 	HRESULT Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight);
 	HRESULT AddLayer (PCWSTR pcwzImageFile);
+	HRESULT AddSolidColorLayer (COLORREF cr, SIZE size);
 
 	INT m_nScreenWidth;
 	INT m_nScreenHeight;
@@ -91,7 +92,8 @@ public:
 	INT m_yScrollPos;
 	WCHAR m_wzFileName[MAX_PATH];
 	
-	BOOL m_bLButtonClicked; 
+	BOOL m_bLButtonClicked;
+	BOOL m_fSelectionMode;
 	INT m_xStartDrag;
 	INT m_yStartDrag;
 	INT m_xCurrDrag;

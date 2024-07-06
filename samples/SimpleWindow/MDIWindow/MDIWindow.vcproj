@@ -188,6 +188,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewImageDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -206,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NewImageDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource.h"
 				>
 			</File>
@@ -216,15 +224,15 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\TransparentPattern.bmp"
-				>
-			</File>
-			<File
 				RelativePath=".\main.ico"
 				>
 			</File>
 			<File
 				RelativePath=".\MDIWindow.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\TransparentPattern.bmp"
 				>
 			</File>
 			<File
@@ -348,6 +356,14 @@
 				</File>
 				<File
 					RelativePath="..\..\..\shared\library\window\DialogHost.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\util\WinUtil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\shared\library\util\WinUtil.h"
 					>
 				</File>
 			</Filter>

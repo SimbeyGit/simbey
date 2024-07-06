@@ -91,6 +91,48 @@ IDC_CURSOR_ZOOM_OUT     CURSOR                  "zoom-out.cur"
 
 IDB_TRANS_PATTERN       BITMAP                  "TransparentPattern.bmp"
 
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_NEW_IMAGE DIALOGEX 0, 0, 160, 158
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Image"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Image Size",IDC_STATIC,6,6,144,60
+    EDITTEXT        IDC_IMAGE_WIDTH,90,18,48,14,ES_AUTOHSCROLL
+    LTEXT           "Width:",IDC_STATIC,54,18,22,8
+    EDITTEXT        IDC_IMAGE_HEIGHT,90,42,48,14,ES_AUTOHSCROLL
+    LTEXT           "Height:",IDC_STATIC,54,42,24,8
+    GROUPBOX        "Image Contents",IDC_STATIC,6,72,144,60
+    CONTROL         "White",IDC_WHITE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,90,35,10
+    CONTROL         "Black",IDC_BLACK,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,102,32,10
+    CONTROL         "Transparent",IDC_TRANSPARENT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,18,114,55,10
+    DEFPUSHBUTTON   "OK",IDOK,27,138,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,81,138,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_NEW_IMAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 153
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 151
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

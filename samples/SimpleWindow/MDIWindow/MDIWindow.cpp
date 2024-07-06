@@ -7,6 +7,7 @@
 #include "Library\Window\DialogHost.h"
 #include "Library\ChooseFile.h"
 #include "ImageProc.h"
+#include "NewImageDlg.h"
 #include "MDIWindow.h"
 
 const WCHAR c_wzMDIClass[] = L"MDIWindowCls";
@@ -166,6 +167,7 @@ CImageChild::CImageChild (HINSTANCE hInstance) :
 	m_xScrollPos(0),
 	m_yScrollPos(0),
 	m_bLButtonClicked(FALSE),
+	m_fSelectionMode(TRUE),
 	m_bIsCtrlPressed(FALSE),
 	m_bIsAltPressed(FALSE)
 {
@@ -239,10 +241,11 @@ HRESULT CImageChild::AddLayer (PCWSTR pcwzImageFile)
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 	RECT rcLayer;
+	DWORD idxLayer;
 
-	Check(sifAddImageFileAsLayer(pcwzImageFile, m_pSIF, NULL));
+	Check(sifAddImageFileAsLayer(pcwzImageFile, m_pSIF, &idxLayer));
 	
-	if(SUCCEEDED(m_pSIF->GetLayerByIndex(0, &srLayer)))
+	if(SUCCEEDED(m_pSIF->GetLayerByIndex(idxLayer, &srLayer)))
 	{
 		srLayer->GetPosition(&rcLayer);
 		m_sLayer.cx = rcLayer.right - rcLayer.left;
@@ -265,6 +268,29 @@ HRESULT CImageChild::AddLayer (PCWSTR pcwzImageFile)
 		SetClientSize(m_hwnd, (INT)(m_sLayer.cx * m_fZoom), (INT)(m_sLayer.cy * m_fZoom));
 	}
 	Invalidate(TRUE);
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CImageChild::AddSolidColorLayer (COLORREF cr, SIZE size)
+{
+	HRESULT hr;
+	TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+	DWORD idxIndex, cbBits;
+	PBYTE pBits;
+	BYTE bPixel[4];
+
+	Check(m_pSIF->AddLayer(size.cx, size.cy, &srLayer, &idxIndex));
+	Check(srLayer->GetBitsPtr(&pBits, &cbBits));
+
+	bPixel[0] = GetRValue(cr);
+	bPixel[1] = GetGValue(cr);
+	bPixel[2] = GetBValue(cr);
+	bPixel[3] = (cr & 0xFF000000) >> 24;
+
+	for(DWORD i = 0; i < cbBits; i += sizeof(DWORD))
+		CopyMemory(pBits + i, bPixel, sizeof(bPixel));
 
 Cleanup:
 	return hr;
@@ -601,9 +627,9 @@ HINSTANCE CImageChild::GetInstance (VOID)
 HRESULT CImageChild::UpdateTitleWithZoom (VOID)
 {
 	HRESULT hr;
-	WCHAR wzTitle[MAX_PATH + 20];
+	WCHAR wzTitle[MAX_PATH + 30];
 
-	Check(Formatting::TPrintF(wzTitle, ARRAYSIZE(wzTitle), NULL, L"%ls @ %.1f%%", m_wzFileName, m_fZoom * 100.0f));
+	Check(Formatting::TPrintF(wzTitle, ARRAYSIZE(wzTitle), NULL, L"%ls [%ls] @ %.1f%%", m_wzFileName, m_fSelectionMode ? L"SELECT" : L"MOVE", m_fZoom * 100.0f));
 	SetWindowText(m_hwnd, wzTitle);
 
 Cleanup:
@@ -730,6 +756,11 @@ BOOL CImageChild::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& l
 	{
 		m_bIsAltPressed = TRUE;
 		UpdateCursor();
+	}
+	else if(wParam == 'M')
+	{
+		m_fSelectionMode = !m_fSelectionMode;
+		UpdateTitleWithZoom();
 	}
 
 	bool ctrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
@@ -987,15 +1018,32 @@ HRESULT CMDIWindow::OpenImageWindow (VOID)
 {
 	HRESULT hr;
 	TStackRef<CImageChild> srChild;
-	CChooseFile dlgChooseImage;
+	CDialogHost dlgHost(m_hInstance);
+	CNewImageDlg dlgNewImage;
 
-	Check(dlgChooseImage.Initialize());
-	CheckIfIgnore(!dlgChooseImage.OpenSingleFile(m_hwnd, L"Open Image", L"Image File (*.png, *.bmp, *.jpg)\0*.png;*.bmp;*.jpg\0"), E_ABORT);
+	Check(dlgHost.Display(m_hwnd, &dlgNewImage));
+	CheckIfIgnore(IDOK != dlgHost.GetReturnValue(), E_ABORT);
+
+	// TODO - Initialize the canvas using dlgNewImage.m_size
 
 	srChild.Attach(__new CImageChild(m_hInstance));
 	CheckAlloc(srChild);
 	Check(srChild->Initialize(this, 800, 600));
-	Check(srChild->AddLayer(dlgChooseImage.GetFile(0)));
+
+	if(dlgNewImage.m_cr != 0)
+		Check(srChild->AddSolidColorLayer(dlgNewImage.m_cr, dlgNewImage.m_size));
+
+	// Add multiple image files to the SIF (we'll draw the layers from the SIF)
+	for(;;)
+	{
+		CChooseFile dlgChooseImage;
+
+		Check(dlgChooseImage.Initialize());
+		if(!dlgChooseImage.OpenSingleFile(m_hwnd, L"Add Image", L"Image File (*.png, *.bmp, *.jpg)\0*.png;*.bmp;*.jpg\0"))
+			break;
+
+		Check(srChild->AddLayer(dlgChooseImage.GetFile(0)));
+	}
 
 Cleanup:
 	if(FAILED(hr) && srChild)

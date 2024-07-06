@@ -60,6 +60,24 @@ namespace WinUtil
 		return hr;
 	}
 
+	INT WINAPI ReadIntFromWindow (HWND hwnd)
+	{
+		CHAR szValue[64];
+		return 0 < GetWindowTextA(hwnd,szValue,64) ? Formatting::TAscToInt32(szValue) : 0;
+	}
+
+	HRESULT WINAPI SetWindowInt (HWND hwnd, INT nValue)
+	{
+		HRESULT hr;
+		CHAR szValue[64];
+
+		Check(Formatting::TInt32ToAsc(nValue, szValue, ARRAYSIZE(szValue), 10, NULL));
+		CheckIfGetLastError(!SetWindowTextA(hwnd,szValue));
+
+	Cleanup:
+		return hr;
+	}
+
 	VOID WINAPI SetListViewStyleEx (HWND hwnd, ULONG ulFlags)
 	{
 		ULONG ulStyle = (ULONG)SendMessage(hwnd,LVM_GETEXTENDEDSTYLE,0,0);
