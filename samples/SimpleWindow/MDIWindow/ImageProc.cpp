@@ -2,7 +2,7 @@
 
 RGBQUAD GetPixelColor (BYTE* pImage, int w, int h, int x, int y)
 {
-	int dwEffWidth = (24 * w + 31) / 32 * 4;
+	int dwEffWidth = 4 * w;
 	RGBQUAD rgb;
 	rgb.rgbBlue = 0;
 	rgb.rgbGreen = 0;
@@ -11,10 +11,10 @@ RGBQUAD GetPixelColor (BYTE* pImage, int w, int h, int x, int y)
 	if ((x < 0)||(y < 0)|| (x >= w)||(y >= h)){
 		return rgb;
 	}
-	BYTE* iDst  = pImage + y * dwEffWidth + x * 3;
-	rgb.rgbBlue = *iDst++;
+	BYTE* iDst  = pImage + y * dwEffWidth + x * 4;
+	rgb.rgbRed = *iDst++;
 	rgb.rgbGreen= *iDst++;
-	rgb.rgbRed  = *iDst;
+	rgb.rgbBlue  = *iDst;
 	return rgb;
 }
 
@@ -41,25 +41,25 @@ void CopyBits (BYTE* pSrcBits, int w, int h, BYTE* pDestBits, int w1, int h1, in
 
 	if(newW <= w1 && newH <= h1)
 	{
-		for(int y = yDest; y < h1 - yDest; y++)
+		for(int y = 0; y < newH; y++)
 		{
-			fY = (y - yDest) * yScale;
-			for(int x =  xDest; x < xDest + w * fZoom; x++)
+			fY = y * yScale;
+			for(int x =  0; x < newW; x++)
 			{
-				fX = (x - xDest) * xScale;	
-				SetPixelColor(pDestBits, w1, h1, x, y, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
+				fX = x * xScale;	
+				SetPixelColor(pDestBits, w1, h1, x + xDest, h1 - y - yDest, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
 			}
 		}
 	}
 	else if(newW > w1 && newH <= h1)
 	{
-		for(int y = yDest; y < h1 - yDest; y++)
+		for(int y = 0; y < newH; y++)
 		{
-			fY = (y - yDest) * yScale;
+			fY = y * yScale;
 			for(int x =  xScrollPos; x < xScrollPos + w1; x++)
 			{
 				fX = x * xScale;	
-				SetPixelColor(pDestBits, w1, h1, x - xScrollPos, y, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
+				SetPixelColor(pDestBits, w1, h1, x - xScrollPos, h1 - y - yDest, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
 			}
 		}
 	}
@@ -67,7 +67,7 @@ void CopyBits (BYTE* pSrcBits, int w, int h, BYTE* pDestBits, int w1, int h1, in
 	{
 		for(int y = h1 - 1; y >= 0; y--)
 		{
-			fY = (newH - 1 - yScrollPos - (h1 - 1 - y)) * yScale;
+			fY = ((h1 - 1 - y) + yScrollPos) * yScale;
 			for(int x =  xDest; x < xDest + newW; x++)
 			{
 				fX = (x - xDest) * xScale;
@@ -79,7 +79,7 @@ void CopyBits (BYTE* pSrcBits, int w, int h, BYTE* pDestBits, int w1, int h1, in
 	{
 		for(int y = h1 - 1; y >= 0; y--)
 		{
-			fY = (newH - 1 - yScrollPos - (h1 - 1 - y)) * yScale;
+			fY = ((h1 - 1 - y) + yScrollPos) * yScale;
 			for(int x =  xScrollPos; x < xScrollPos + w1; x++)
 			{
 				fX = x * xScale;

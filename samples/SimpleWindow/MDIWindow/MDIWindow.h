@@ -97,13 +97,9 @@ public:
 	INT m_xCurrDrag;
 	INT m_yCurrDrag;
 
-	TStackRef<ISimbeyInterchangeFileLayer> m_srLayer;
-	SIF_SURFACE m_oriSifSurface;
-	RECT m_rcLayer;
 	SIZE m_sLayer;
 
 	BOOL m_bImageLoaded;
-
 	HCURSOR m_hZoomInCursor;
 	HCURSOR m_hDefaultCursor;
 	HCURSOR m_hZoomOutCursor;
@@ -111,8 +107,9 @@ public:
 	BOOL m_bIsCtrlPressed;
 
 	BOOL m_bWindowsSizeChanged;
-	HBITMAP m_hDIB;
 	SIF_SURFACE m_sifSurface;
+	HBITMAP m_hDIB;
+	
 
 	void LoadCursors();
 	void UpdateCursor();
