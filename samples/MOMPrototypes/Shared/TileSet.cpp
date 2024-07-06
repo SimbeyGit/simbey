@@ -92,6 +92,71 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CTile::CloneTo (CTileSet* pTarget, __deref_out CTile** ppClone)
+{
+	HRESULT hr;
+	TArray<CTile*>* pTiles;
+	CTile* pTile = NULL;
+
+	Check(pTarget->EnsureTilesArray(m_rstrKey, &pTiles));
+
+	if(m_fIsSprite)
+	{
+		TStackRef<ISimbeyInterchangeFile> srSIF;
+		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+		TStackRef<ISimbeyInterchangeSprite> srSprite;
+		PBYTE pBits;
+		INT nWidth, nHeight, xOffset, yOffset;
+		DWORD idxLayer;
+
+		Check(m_pSprite->GetFrameImage(&pBits, &nWidth, &nHeight));
+		Check(sifCreateNew(&srSIF));
+		Check(srSIF->AddLayerFromBits(nWidth, nHeight, pBits, 32, nWidth * sizeof(DWORD), &srLayer, &idxLayer));
+		m_pSprite->GetFrameOffset(xOffset, yOffset);
+		Check(sifCreateStaticSprite(srLayer, xOffset, yOffset, &srSprite));
+		srSIF->Close();
+		pTile = __new CTile(pTarget, m_rstrKey, srSprite);
+	}
+	else
+	{
+		TStackRef<ISimbeyInterchangeAnimator> srAnimator;
+
+		Check(m_pAnimator->Duplicate(&srAnimator));
+		pTile = __new CTile(pTarget, m_rstrKey, srAnimator);
+	}
+
+	CheckAlloc(pTile);
+	CopyMemory(pTile->m_bAverage, m_bAverage, sizeof(m_bAverage));
+	Check(pTiles->Append(pTile));
+	*ppClone = pTile;
+	pTile = NULL;
+
+Cleanup:
+	SafeDelete(pTile);
+	return hr;
+}
+
+INT CTile::GetImageCount (VOID)
+{
+	return m_fIsSprite ? 1 : m_pAnimator->GetImageCount();
+}
+
+HRESULT CTile::GetImage (INT idxImage, __out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight)
+{
+	HRESULT hr;
+
+	if(m_fIsSprite)
+	{
+		CheckIf(0 != idxImage, E_INVALIDARG);
+		hr = m_pSprite->GetFrameImage(ppBits32P, pnWidth, pnHeight);
+	}
+	else
+		hr = m_pAnimator->GetImage(idxImage, ppBits32P, pnWidth, pnHeight);
+
+Cleanup:
+	return hr;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // CTileSet
 ///////////////////////////////////////////////////////////////////////////////

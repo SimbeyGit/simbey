@@ -913,10 +913,10 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		FillRect(hdcDIB, &rc, m_hbrTransparent);
 	}
 
-	if(0 < m_pSIF->GetLayerCount())
+	for(DWORD i = 0; i < m_pSIF->GetLayerCount(); i++)
 	{
 		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
-		if(SUCCEEDED(m_pSIF->GetLayerByIndex(0, &srLayer)))
+		if(SUCCEEDED(m_pSIF->GetLayerByIndex(i, &srLayer)))
 		{
 			PBYTE pRGBA;
 			DWORD cbBits;

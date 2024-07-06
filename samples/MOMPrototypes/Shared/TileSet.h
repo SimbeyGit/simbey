@@ -36,10 +36,16 @@ public:
 
 	HRESULT CalculateAverageColor (VOID);
 	HRESULT CreateSprite (__deref_out ISimbeyInterchangeSprite** ppSprite);
+	HRESULT CloneTo (CTileSet* pTarget, __deref_out CTile** ppClone);
+
+	INT GetImageCount (VOID);
+	HRESULT GetImage (INT idxImage, __out PBYTE* ppBits32P, __out INT* pnWidth, __out INT* pnHeight);
 };
 
 class CTileSet
 {
+	friend CTile;
+
 public:
 	RSTRING m_rstrName;
 	TRStrMap<TArray<CTile*>*> m_mapTiles;
