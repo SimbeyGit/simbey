@@ -1,3 +1,5 @@
+#include <windows.h>
+#include "Published\SIF.h"
 #include "ImageProc.h"
 
 RGBQUAD GetPixelColor (BYTE* pImage, int w, int h, int x, int y)
@@ -14,7 +16,8 @@ RGBQUAD GetPixelColor (BYTE* pImage, int w, int h, int x, int y)
 	BYTE* iDst  = pImage + y * dwEffWidth + x * 4;
 	rgb.rgbRed = *iDst++;
 	rgb.rgbGreen= *iDst++;
-	rgb.rgbBlue  = *iDst;
+	rgb.rgbBlue  = *iDst++;
+	rgb.rgbReserved = *iDst;
 	return rgb;
 }
 
@@ -25,9 +28,19 @@ void SetPixelColor (BYTE* pImage, int w, int h, int x,int y, RGBQUAD c)
 
 	int dwEffWidth = (24 * w + 31) / 32 * 4;
 	BYTE* iDst = pImage + y * dwEffWidth + x * 3;
-	*iDst++ = c.rgbBlue;
-	*iDst++ = c.rgbGreen;
-	*iDst   = c.rgbRed;
+	BYTE bAlpha = c.rgbReserved;
+	if(255 == bAlpha)
+	{
+		*iDst++ = c.rgbBlue;
+		*iDst++ = c.rgbGreen;
+		*iDst   = c.rgbRed;
+	}
+	else
+	{
+		iDst[0] = sifBlendColorComponents(iDst[0], c.rgbBlue, bAlpha);
+		iDst[1] = sifBlendColorComponents(iDst[1], c.rgbGreen, bAlpha);
+		iDst[2] = sifBlendColorComponents(iDst[2], c.rgbRed, bAlpha);
+	}
 }
 
 void CopyBits (BYTE* pSrcBits, int w, int h, BYTE* pDestBits, int w1, int h1, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom)
@@ -36,8 +49,8 @@ void CopyBits (BYTE* pSrcBits, int w, int h, BYTE* pDestBits, int w1, int h1, in
 	xScale = 1.0f  / fZoom;
 	yScale = 1.0f / fZoom;
 
-	int newW = w * fZoom;
-	int newH = h * fZoom;
+	int newW = (int)(w * fZoom);
+	int newH = (int)(h * fZoom);
 
 	if(newW <= w1 && newH <= h1)
 	{

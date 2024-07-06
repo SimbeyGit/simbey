@@ -885,11 +885,15 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 
 	if(newW < cx || newH < cy)
 	{
+		RECT rc = { 0, 0, m_sifSurface.xSize, m_sifSurface.ySize };
 		HBRUSH hBrush = CreateSolidBrush(RGB(192, 192, 192));
-		HBRUSH hOldBrush = (HBRUSH)SelectObject(hdcDIB, hBrush);
-		Rectangle(hdcDIB, 0, 0, m_sifSurface.xSize, m_sifSurface.ySize);
-		SelectObject(hdcDIB, hOldBrush);
+		FillRect(hdcDIB, &rc, hBrush);
 		DeleteObject(hBrush);
+	}
+
+	{
+		RECT rc = { xDest, yDest, xDest + newW, yDest + newH };
+		FillRect(hdcDIB, &rc, m_hbrTransparent);
 	}
 
 	TStackRef<ISimbeyInterchangeFileLayer> srLayer;
