@@ -163,7 +163,6 @@ CImageChild::CImageChild (HINSTANCE hInstance) :
 	m_fZoomStep(0.1f),
 	m_fMinZoom(0.001f),
 	m_fMaxZoom(16.0f),
-	m_bImageLoaded(FALSE),
 	m_xScrollPos(0),
 	m_yScrollPos(0),
 	m_bLButtonClicked(FALSE),
@@ -248,13 +247,6 @@ HRESULT CImageChild::AddLayer (PCWSTR pcwzImageFile)
 		srLayer->GetPosition(&rcLayer);
 		m_sLayer.cx = rcLayer.right - rcLayer.left;
 		m_sLayer.cy = rcLayer.bottom - rcLayer.top;
-		m_bImageLoaded = TRUE;
-		//m_oriSifSurface.xSize = m_sLayer.cx;
-		//m_oriSifSurface.ySize = m_sLayer.cy;
-		//m_oriSifSurface.cBitsPerPixel = 24;
-		//m_oriSifSurface.lPitch = ((m_oriSifSurface.xSize * 3) + 3) & ~3;
-		//m_oriSifSurface.pbSurface = __new BYTE[m_oriSifSurface.ySize * m_oriSifSurface.lPitch];
-		//srLayer->DrawToDIB24(&m_oriSifSurface, 0, 0);
 
 		if(m_sLayer.cx > m_nScreenWidth * 2 / 3 || m_sLayer.cy > m_nScreenHeight * 2 / 3)
 		{
@@ -364,9 +356,6 @@ void CImageChild::ZoomToRectangle()
 	const int vx = (int)(m_sLayer.cx * m_fZoom);
 	const int vy = (int)(m_sLayer.cy * m_fZoom);
 
-	//if(nRectHeight < cy / 10  || nRectWidth < cx / 10)
-	//	return;
-
 	float fZoom = min((float)(rc.right - rc.left) / nRectWidth, (float)(rc.bottom - rc.top) / nRectHeight);
 	m_fZoom *= fZoom;
 	if(m_fZoom > m_fMaxZoom)
@@ -403,6 +392,7 @@ void CImageChild::ZoomIn (int nStep, POINT center)
 {
 	float tempfZoom = m_fZoom;
 	RECT rc;
+
 	GetClientRect(m_hwnd, &rc);
 	int cx = rc.right - rc.left;
 	int cy = rc.bottom - rc.top;
@@ -484,6 +474,7 @@ void CImageChild::ZoomOut (int nStep, POINT center)
 {
 	float tempfZoom = m_fZoom;
 	RECT rc;
+
 	GetClientRect(m_hwnd, &rc);
 	int cx = rc.right - rc.left;
 	int cy = rc.bottom - rc.top;
@@ -621,7 +612,7 @@ Cleanup:
 
 int CImageChild::OnSize (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	if(m_bImageLoaded)
+	if(0 < m_pSIF->GetLayerCount())
 	{
 		_SetScrollSizes();
 		_SetScrollPos(m_hwnd, SB_VERT, m_yScrollPos);
@@ -847,9 +838,6 @@ BOOL CImageChild::OnLButtonUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 
 BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	if(!m_bImageLoaded)
-		return TRUE;
-
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint(m_hwnd, &ps);
 
@@ -860,13 +848,11 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 
 	if(m_bWindowsSizeChanged)
 	{
-		m_sifSurface.xSize = cx;
-		m_sifSurface.ySize = cy;
-		m_sifSurface.cBitsPerPixel = 24;
-		m_sifSurface.lPitch = ((m_sifSurface.xSize * 3) + 3) & ~3;
+		m_xDIB = cx;
+		m_yDIB = cy;
 		if(m_hDIB != NULL)
 			DeleteObject(m_hDIB);
-		sifCreateBlankDIB(hdc, cx, cy, m_sifSurface.cBitsPerPixel, reinterpret_cast<PVOID*>(&m_sifSurface.pbSurface), &m_hDIB);
+		sifCreateBlankDIB(hdc, cx, cy, 24, reinterpret_cast<PVOID*>(&m_pDIB), &m_hDIB);
 		m_bWindowsSizeChanged = FALSE;
 	}
 
@@ -874,8 +860,8 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 	HBITMAP hbmPrev = (HBITMAP)SelectObject(hdcDIB, m_hDIB);
 
 	INT xDest = 0, yDest = 0;
-	int newW = m_sLayer.cx * m_fZoom;
-	int newH = m_sLayer.cy * m_fZoom;
+	int newW = (INT)(m_sLayer.cx * m_fZoom);
+	int newH = (INT)(m_sLayer.cy * m_fZoom);
 
 	if(newW < cx)
 		xDest = (cx - newW) / 2;
@@ -885,7 +871,7 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 
 	if(newW < cx || newH < cy)
 	{
-		RECT rc = { 0, 0, m_sifSurface.xSize, m_sifSurface.ySize };
+		RECT rc = { 0, 0, m_xDIB, m_yDIB };
 		HBRUSH hBrush = CreateSolidBrush(RGB(192, 192, 192));
 		FillRect(hdcDIB, &rc, hBrush);
 		DeleteObject(hBrush);
@@ -896,25 +882,17 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		FillRect(hdcDIB, &rc, m_hbrTransparent);
 	}
 
-	TStackRef<ISimbeyInterchangeFileLayer> srLayer;
-	if(SUCCEEDED(m_pSIF->GetLayerByIndex(0, &srLayer)))
+	if(0 < m_pSIF->GetLayerCount())
 	{
-		PBYTE pRGBA;
-		DWORD cbBits;
-		if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
+		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+		if(SUCCEEDED(m_pSIF->GetLayerByIndex(0, &srLayer)))
 		{
-			CopyBits(pRGBA, m_sLayer.cx, m_sLayer.cy, m_sifSurface.pbSurface, m_sifSurface.xSize, m_sifSurface.ySize, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom);
-			//__delete_array pRGBA;
+			PBYTE pRGBA;
+			DWORD cbBits;
+
+			if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
+				CopyBits(pRGBA, m_sLayer.cx, m_sLayer.cy, m_pDIB, m_xDIB, m_yDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom);
 		}
-		//SIF_SURFACE oriSifSurface;
-		//m_bImageLoaded = TRUE;
-		//oriSifSurface.xSize = m_sLayer.cx;
-		//oriSifSurface.ySize = m_sLayer.cy;
-		//oriSifSurface.cBitsPerPixel = 24;
-		//oriSifSurface.lPitch = ((oriSifSurface.xSize * 3) + 3) & ~3;
-		//oriSifSurface.pbSurface = __new BYTE[oriSifSurface.ySize * oriSifSurface.lPitch];
-		//srLayer->DrawToDIB24(&oriSifSurface, 0, 0);
-		
 	}
 
 	if(m_bLButtonClicked)

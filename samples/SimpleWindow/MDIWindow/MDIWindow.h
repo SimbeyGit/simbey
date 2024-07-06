@@ -99,7 +99,6 @@ public:
 
 	SIZE m_sLayer;
 
-	BOOL m_bImageLoaded;
 	HCURSOR m_hZoomInCursor;
 	HCURSOR m_hDefaultCursor;
 	HCURSOR m_hZoomOutCursor;
@@ -107,8 +106,9 @@ public:
 	BOOL m_bIsCtrlPressed;
 
 	BOOL m_bWindowsSizeChanged;
-	SIF_SURFACE m_sifSurface;
 	HBITMAP m_hDIB;
+	INT m_xDIB, m_yDIB;
+	PBYTE m_pDIB;
 	
 
 	void LoadCursors();
