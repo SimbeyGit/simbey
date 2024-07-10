@@ -43,61 +43,31 @@ void SetPixelColor (BYTE* pImage, int w, int h, int x,int y, RGBQUAD c)
 	}
 }
 
-void CopyBits (const BYTE* pSrcBits, int w, int h, BYTE* pDestBits, int w1, int h1, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom)
+void CopyBits (const BYTE* pSrcBits, int w, int h, int srcXDest, int srcYDest, float srcfZoom, BYTE* pDestBits, int w1, int h1, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight)
 {
+	float fTotalZoom = srcfZoom * fZoom;
 	float xScale, yScale, fX, fY;
-	xScale = 1.0f / fZoom;
-	yScale = 1.0f / fZoom;
+	xScale = 1.0f / fTotalZoom;
+	yScale = 1.0f / fTotalZoom;
 
-	int newW = (int)(w * fZoom);
-	int newH = (int)(h * fZoom);
+	int newW = (int)(w * fTotalZoom);
+	int newH = (int)(h * fTotalZoom);
 
-	if(newW <= w1 && newH <= h1)
+	for(int y = yScrollPos - srcYDest * fZoom; y < newH; y++)
 	{
-		for(int y = 0; y < newH; y++)
+		fY = y * yScale;
+		if(h1 - y - yDest + yScrollPos - srcYDest * fZoom < h1 - yDest - nImageHeight || h1 - y - yDest + yScrollPos - srcYDest * fZoom < 0)
+			break;
+		if(y < 0)
+			continue;
+		for(int x = xScrollPos - srcXDest * fZoom; x < newW; x++)
 		{
-			fY = y * yScale;
-			for(int x =  0; x < newW; x++)
-			{
-				fX = x * xScale;
-				SetPixelColor(pDestBits, w1, h1, x + xDest, h1 - y - yDest, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
-			}
-		}
-	}
-	else if(newW > w1 && newH <= h1)
-	{
-		for(int y = 0; y < newH; y++)
-		{
-			fY = y * yScale;
-			for(int x =  xScrollPos; x < xScrollPos + w1; x++)
-			{
-				fX = x * xScale;
-				SetPixelColor(pDestBits, w1, h1, x - xScrollPos, h1 - y - yDest, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
-			}
-		}
-	}
-	else if(newW <= w1 && newH > h1)
-	{
-		for(int y = h1 - 1; y >= 0; y--)
-		{
-			fY = ((h1 - 1 - y) + yScrollPos) * yScale;
-			for(int x =  xDest; x < xDest + newW; x++)
-			{
-				fX = (x - xDest) * xScale;
-				SetPixelColor(pDestBits, w1, h1, x, y, GetPixelColor(pSrcBits, w, h, (int)fX, (int)fY));
-			}
-		}
-	}
-	else if(newW > w1 && newH > h1)
-	{
-		for(int y = h1 - 1; y >= 0; y--)
-		{
-			fY = ((h1 - 1 - y) + yScrollPos) * yScale;
-			for(int x =  xScrollPos; x < xScrollPos + w1; x++)
-			{
-				fX = x * xScale;
-				SetPixelColor(pDestBits, w1, h1, x - xScrollPos, y, GetPixelColor(pSrcBits, w, h, (int)fX, (int)fY));
-			}
+			if(x < 0)
+				continue;
+			fX = x * xScale;
+			if(x + xDest + srcXDest * fZoom - xScrollPos > xDest + nImageWidth || x + xDest + srcXDest * fZoom - xScrollPos > w1)
+				break;
+			SetPixelColor(pDestBits, w1, h1, x + xDest + srcXDest * fZoom - xScrollPos, h1 - y - yDest + yScrollPos - srcYDest * fZoom, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
 		}
 	}
 }

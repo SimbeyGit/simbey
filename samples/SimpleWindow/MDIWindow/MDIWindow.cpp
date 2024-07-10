@@ -169,7 +169,8 @@ CImageChild::CImageChild (HINSTANCE hInstance) :
 	m_bLButtonClicked(FALSE),
 	m_fSelectionMode(TRUE),
 	m_bIsCtrlPressed(FALSE),
-	m_bIsAltPressed(FALSE)
+	m_bIsAltPressed(FALSE),
+	m_nSelectedLayerIndex(-1)
 {
 }
 
@@ -207,7 +208,7 @@ HRESULT CImageChild::Unregister (HINSTANCE hInstance)
 	return UnregisterClass(c_wzImageChild, hInstance);
 }
 
-HRESULT CImageChild::Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight)
+HRESULT CImageChild::Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight, COLORREF cr)
 {
 	HRESULT hr;
 	HBITMAP hbmPattern = (HBITMAP)LoadImage(m_hInstance, MAKEINTRESOURCE(IDB_TRANS_PATTERN), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
@@ -217,19 +218,34 @@ HRESULT CImageChild::Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight)
 	CheckIfGetLastError(NULL == m_hbrTransparent);
 
 	Check(sifCreateNew(&m_pSIF));
+	
+	m_cr = cr;
+	m_sImage.cx = nWidth;
+	m_sImage.cy = nHeight;
+
+	INT nScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+	INT nScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	if(m_sImage.cx > nScreenWidth * 2 / 3 || m_sImage.cy > nScreenHeight * 2 / 3)
+	{
+		m_fZoom = (FLOAT)min((FLOAT)nScreenWidth * 2.0 / 3.0 / m_sImage.cx, (FLOAT)nScreenHeight * 2.0 / 3.0 / m_sImage.cy);
+		CheckZoomValue();
+	}
+
+	PCWSTR pcwzPtr = L"New Image";
+	Check(TStrCchCpy(m_wzFileName, ARRAYSIZE(m_wzFileName), pcwzPtr));
+
 	Check(AttachToFrame(
 		c_wzImageChild, 
-		L"Image",
+		L"New Image",
 		WS_CHILD | WS_VISIBLE | WS_OVERLAPPEDWINDOW, 
 		CW_USEDEFAULT, 
 		CW_USEDEFAULT,
-		nWidth, 
-		nHeight, 
+		(INT)(nWidth * m_fZoom) + 17, 
+		(INT)(nHeight * m_fZoom) + 40, 
 		pFrame));
-
-	m_nScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-	m_nScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 	LoadCursors();
+	Check(UpdateTitleWithZoom());
 
 Cleanup:
 	SafeDeleteGdiObject(hbmPattern);
@@ -240,32 +256,21 @@ HRESULT CImageChild::AddLayer (PCWSTR pcwzImageFile)
 {
 	HRESULT hr;
 	TStackRef<ISimbeyInterchangeFileLayer> srLayer;
-	RECT rcLayer;
 	DWORD idxLayer;
 
 	Check(sifAddImageFileAsLayer(pcwzImageFile, m_pSIF, &idxLayer));
-	
 	if(SUCCEEDED(m_pSIF->GetLayerByIndex(idxLayer, &srLayer)))
 	{
-		srLayer->GetPosition(&rcLayer);
-		m_sLayer.cx = rcLayer.right - rcLayer.left;
-		m_sLayer.cy = rcLayer.bottom - rcLayer.top;
-
-		if(m_sLayer.cx > m_nScreenWidth * 2 / 3 || m_sLayer.cy > m_nScreenHeight * 2 / 3)
+		m_LayerInfo[idxLayer].fZoom = 1.0;
+		SIZE sLayer;
+		srLayer->GetSize(&sLayer);
+		if(sLayer.cx > m_sImage.cx * 2.0 / 3.0 || sLayer.cy > m_sImage.cy * 2.0 / 3.0)
 		{
-			m_fZoom = (FLOAT)min((DOUBLE)m_nScreenWidth * 2.0 / 3.0 / m_sLayer.cx, (DOUBLE)m_nScreenHeight * 2.0 / 3.0 / m_sLayer.cy);
-			CheckZoomValue();
+			m_LayerInfo[idxLayer].fZoom = (FLOAT)min((FLOAT)m_sImage.cx * 2.0 / 3.0 / sLayer.cx, (FLOAT)m_sImage.cy * 2.0 / 3.0 / sLayer.cy);
 		}
-
-		PCWSTR pcwzPtr = TStrRChr(pcwzImageFile, L'\\');
-		if(pcwzPtr)
-			pcwzPtr++;
-		else
-			pcwzPtr = pcwzImageFile;
-		Check(TStrCchCpy(m_wzFileName, ARRAYSIZE(m_wzFileName), pcwzPtr));
-		Check(UpdateTitleWithZoom());
-
-		SetClientSize(m_hwnd, (INT)(m_sLayer.cx * m_fZoom), (INT)(m_sLayer.cy * m_fZoom));
+		m_LayerInfo[idxLayer].sLayer = sLayer;
+		m_LayerInfo[idxLayer].xDest = rand() % (INT)(m_sImage.cx - sLayer.cx * m_LayerInfo[idxLayer].fZoom);
+		m_LayerInfo[idxLayer].yDest = rand() % (INT)(m_sImage.cy - sLayer.cy * m_LayerInfo[idxLayer].fZoom);
 	}
 	Invalidate(TRUE);
 
@@ -336,13 +341,13 @@ void CImageChild::_SetScrollSizes()
 	si.cbSize = sizeof(si);
 	si.fMask = SIF_RANGE | SIF_PAGE;
 	si.nMin = 0;
-	si.nMax = (INT)(m_sLayer.cy * m_fZoom);
+	si.nMax = (INT)(m_sImage.cy * m_fZoom);
 	si.nPage = windowRect.bottom - windowRect.top - 38;
 	if(si.nPage > si.nMax)
 		m_yScrollPos = 0;
 	SetScrollInfo(m_hwnd, SB_VERT, &si, TRUE);
 
-	si.nMax = m_sLayer.cx * m_fZoom;
+	si.nMax = m_sImage.cx * m_fZoom;
 	si.nPage = windowRect.right - windowRect.left - 15; 
 	if(si.nPage > si.nMax)
 		m_xScrollPos = 0;
@@ -377,12 +382,17 @@ void CImageChild::ZoomToRectangle()
 	int nRectWidth = abs(m_xCurrDrag - m_xStartDrag);
 	int nRectHeight = abs(m_yCurrDrag - m_yStartDrag);
 
+	if(nRectWidth < 10 || nRectHeight < 10)
+		return;
+
 	const int cx = rc.right - rc.left;
 	const int cy = rc.bottom - rc.top;
-	const int vx = (int)(m_sLayer.cx * m_fZoom);
-	const int vy = (int)(m_sLayer.cy * m_fZoom);
+	const int vx = (int)(m_sImage.cx * m_fZoom);
+	const int vy = (int)(m_sImage.cy * m_fZoom);
 
-	float fZoom = min((float)(rc.right - rc.left) / nRectWidth, (float)(rc.bottom - rc.top) / nRectHeight);
+	
+
+	float fZoom = min((float)cx / nRectWidth, (float)cy / nRectHeight);
 	m_fZoom *= fZoom;
 	if(m_fZoom > m_fMaxZoom)
 	{
@@ -455,7 +465,7 @@ void CImageChild::ZoomIn (int nStep, POINT center)
 	UpdateTitleWithZoom();
 	_SetScrollSizes();
 
-	if(m_sLayer.cx * m_fZoom > cx)
+	if(m_sImage.cx * m_fZoom > cx)
 	{
 		int rw = cx / m_fZoom * tempfZoom;
 		int lx = center.x - rw / 2;
@@ -465,7 +475,7 @@ void CImageChild::ZoomIn (int nStep, POINT center)
 		if(rx > cx)
 			lx -= rx - cx;
 		
-		int vx = m_sLayer.cx * tempfZoom;
+		int vx = m_sImage.cx * tempfZoom;
 		if(vx > cx)
 			m_xScrollPos = (int)((m_xScrollPos + lx) * m_fZoom / tempfZoom);
 		else
@@ -474,7 +484,7 @@ void CImageChild::ZoomIn (int nStep, POINT center)
 	}
 	else
 		m_xScrollPos = 0;
-	if(m_sLayer.cy * m_fZoom > cy)
+	if(m_sImage.cy * m_fZoom > cy)
 	{
 		int vh = cy / m_fZoom * tempfZoom;
 		int ty = center.y - vh / 2;
@@ -484,7 +494,7 @@ void CImageChild::ZoomIn (int nStep, POINT center)
 		if(by > cy)
 			ty -= by - cy;
 
-		int vy = m_sLayer.cy * tempfZoom;
+		int vy = m_sImage.cy * tempfZoom;
 		if(vy > cy)
 			m_yScrollPos = (int)((m_yScrollPos + ty) * m_fZoom / tempfZoom);
 		else
@@ -541,7 +551,7 @@ void CImageChild::ZoomOut (int nStep, POINT center)
 	UpdateTitleWithZoom();
 	_SetScrollSizes();
 
-	if(m_sLayer.cx * m_fZoom > cx)
+	if(m_sImage.cx * m_fZoom > cx)
 	{
 		int vx = cx / m_fZoom * tempfZoom;
 		int lx = center.x - vx / 2;
@@ -556,7 +566,7 @@ void CImageChild::ZoomOut (int nStep, POINT center)
 	else
 		m_xScrollPos = 0;
 
-	if(m_sLayer.cy * m_fZoom > cy)
+	if(m_sImage.cy * m_fZoom > cy)
 	{
 		int vy = cy / m_fZoom * tempfZoom;
 		int ty = center.y - vy / 2;
@@ -638,7 +648,7 @@ Cleanup:
 
 int CImageChild::OnSize (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	if(0 < m_pSIF->GetLayerCount())
+	//if(0 < m_pSIF->GetLayerCount())
 	{
 		_SetScrollSizes();
 		_SetScrollPos(m_hwnd, SB_VERT, m_yScrollPos);
@@ -713,7 +723,7 @@ BOOL CImageChild::OnMouseWheel (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT
 	int cy = rc.bottom - rc.top;
 	int delta = GET_WHEEL_DELTA_WPARAM(wParam);
 
-	if(cx > m_sLayer.cx * m_fZoom && cy > m_sLayer.cy * m_fZoom)
+	if(cx > m_sImage.cx * m_fZoom && cy > m_sImage.cy * m_fZoom)
 	{
 		POINT center;
 		center.x = cx / 2;
@@ -763,6 +773,9 @@ BOOL CImageChild::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& l
 		UpdateTitleWithZoom();
 	}
 
+	if(!m_fSelectionMode)
+		return FALSE;
+
 	bool ctrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
 	if (ctrlPressed)
 	{
@@ -779,6 +792,8 @@ BOOL CImageChild::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& l
 
 BOOL CImageChild::OnKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
+	if(!m_fSelectionMode)
+		return FALSE;
 	if (wParam == VK_MENU) // VK_MENU is the virtual-key code for the Alt key
 	{
 		m_bIsAltPressed = FALSE;
@@ -794,6 +809,8 @@ BOOL CImageChild::OnKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 
 BOOL CImageChild::OnSysKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
+	if(!m_fSelectionMode)
+		return FALSE;
 	if(wParam == VK_MENU)
 	{
 		m_bIsAltPressed = TRUE;
@@ -804,6 +821,8 @@ BOOL CImageChild::OnSysKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT
 
 BOOL CImageChild::OnSysKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
+	if(!m_fSelectionMode)
+		return FALSE;
 	if(wParam == VK_MENU) // VK_MENU is the virtual-key code for the Alt key
 	{
 		m_bIsAltPressed = FALSE;
@@ -814,6 +833,9 @@ BOOL CImageChild::OnSysKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& 
 
 BOOL CImageChild::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
+	if(m_bLButtonClicked)
+		return FALSE;
+
 	RECT rc;
 	GetClientRect(m_hwnd, &rc);
 	int cx = rc.right - rc.left;
@@ -822,15 +844,13 @@ BOOL CImageChild::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 	center.x = LOWORD(lParam);
 	center.y = HIWORD(lParam);
 
-	if(m_bLButtonClicked)
-		return FALSE;
-	if(m_bIsCtrlPressed)
+	if(m_bIsCtrlPressed && m_fSelectionMode)
 	{
 		ZoomIn(1, center);
 		return TRUE;
 	}
 
-	if(m_bIsAltPressed)
+	if(m_bIsAltPressed && m_fSelectionMode)
 	{
 		ZoomOut(1, center);
 		return TRUE;
@@ -840,7 +860,31 @@ BOOL CImageChild::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 	m_yStartDrag = m_yCurrDrag = HIWORD(lParam); // Vertical position of cursor
 	if(m_xStartDrag >= rc.right - 20 || m_yStartDrag >= rc.bottom - 20)
 		return FALSE;
+
 	m_bLButtonClicked = TRUE;
+
+	m_nSelectedLayerIndex = -1;
+	INT xDest = 0, yDest = 0;
+	int newW = (INT)(m_sImage.cx * m_fZoom);
+	int newH = (INT)(m_sImage.cy * m_fZoom);
+
+	if(newW < cx)
+		xDest = (cx - newW) / 2;
+
+	if(newH < cy)
+		yDest = (cy - newH) / 2;
+
+	for(DWORD i = m_pSIF->GetLayerCount() - 1; i >= 0; i--)
+	{
+		if(xDest + m_LayerInfo[i].xDest * m_fZoom - m_xScrollPos <= m_xCurrDrag 
+			&& m_xCurrDrag <= xDest + (m_LayerInfo[i].xDest + m_LayerInfo[i].sLayer.cx * m_LayerInfo[i].fZoom) * m_fZoom - m_xScrollPos
+			&& yDest + m_LayerInfo[i].yDest * m_fZoom - m_yScrollPos <= m_yCurrDrag 
+			&& m_yCurrDrag <= yDest + (m_LayerInfo[i].yDest + m_LayerInfo[i].sLayer.cy * m_LayerInfo[i].fZoom) * m_fZoom - m_yScrollPos)
+		{
+			m_nSelectedLayerIndex = i;
+			break;
+		}
+	}
 	return TRUE;
 }
 
@@ -850,7 +894,13 @@ BOOL CImageChild::OnMouseMove (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 		return FALSE;
 	m_xCurrDrag = LOWORD(lParam); // Horizontal position of cursor
 	m_yCurrDrag = HIWORD(lParam); // Vertical position of cursor
-	//_SelectRectangle();
+	if(!m_fSelectionMode && m_nSelectedLayerIndex >= 0)
+	{
+		m_LayerInfo[m_nSelectedLayerIndex].xDest += (m_xCurrDrag - m_xStartDrag) / m_fZoom;
+		m_LayerInfo[m_nSelectedLayerIndex].yDest += (m_yCurrDrag - m_yStartDrag) / m_fZoom;
+		m_xStartDrag = m_xCurrDrag;
+		m_yStartDrag = m_yCurrDrag;
+	}
 	Invalidate(FALSE);
 	return TRUE;
 }
@@ -859,10 +909,47 @@ BOOL CImageChild::OnLButtonUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 {
 	if(!m_bLButtonClicked)
 		return FALSE;
+
 	m_bLButtonClicked = FALSE;
 	m_xCurrDrag = LOWORD(lParam); // Horizontal position of cursor
 	m_yCurrDrag = HIWORD(lParam); // Vertical position of cursor
-	ZoomToRectangle();
+	if(m_fSelectionMode)
+	{
+		int nRectWidth = abs(m_xCurrDrag - m_xStartDrag);
+		int nRectHeight = abs(m_yCurrDrag - m_yStartDrag);
+
+		if(nRectWidth >= 10 && nRectHeight >= 10)
+			ZoomToRectangle();
+	}	
+	else
+	{
+		RECT rc;
+		GetClientRect(m_hwnd, &rc);
+		int cx = rc.right - rc.left;
+		int cy = rc.bottom - rc.top;
+		m_nSelectedLayerIndex = -1;
+		INT xDest = 0, yDest = 0;
+		int newW = (INT)(m_sImage.cx * m_fZoom);
+		int newH = (INT)(m_sImage.cy * m_fZoom);
+
+		if(newW < cx)
+			xDest = (cx - newW) / 2;
+
+		if(newH < cy)
+			yDest = (cy - newH) / 2;
+
+		for(DWORD i = m_pSIF->GetLayerCount() - 1; i >= 0; i--)
+		{
+			if(xDest + m_LayerInfo[i].xDest * m_fZoom - m_xScrollPos <= m_xCurrDrag 
+				&& m_xCurrDrag <= xDest + (m_LayerInfo[i].xDest + m_LayerInfo[i].sLayer.cx * m_LayerInfo[i].fZoom) * m_fZoom - m_xScrollPos
+				&& yDest + m_LayerInfo[i].yDest * m_fZoom - m_yScrollPos <= m_yCurrDrag 
+				&& m_yCurrDrag <= yDest + (m_LayerInfo[i].yDest + m_LayerInfo[i].sLayer.cy * m_LayerInfo[i].fZoom) * m_fZoom - m_yScrollPos)
+			{
+				m_nSelectedLayerIndex = i;
+				break;
+			}
+		}
+	}
 	Invalidate(FALSE);
 	return TRUE;
 }
@@ -891,8 +978,8 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 	HBITMAP hbmPrev = (HBITMAP)SelectObject(hdcDIB, m_hDIB);
 
 	INT xDest = 0, yDest = 0;
-	int newW = (INT)(m_sLayer.cx * m_fZoom);
-	int newH = (INT)(m_sLayer.cy * m_fZoom);
+	int newW = (INT)(m_sImage.cx * m_fZoom);
+	int newH = (INT)(m_sImage.cy * m_fZoom);
 
 	if(newW < cx)
 		xDest = (cx - newW) / 2;
@@ -902,15 +989,20 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 
 	if(newW < cx || newH < cy)
 	{
-		RECT rc = { 0, 0, m_xDIB, m_yDIB };
+		RECT rc = { 0, 0, cx, cy };
 		HBRUSH hBrush = CreateSolidBrush(RGB(192, 192, 192));
 		FillRect(hdcDIB, &rc, hBrush);
 		DeleteObject(hBrush);
 	}
-
+	if(m_cr == 0)
 	{
 		RECT rc = { xDest, yDest, xDest + newW, yDest + newH };
 		FillRect(hdcDIB, &rc, m_hbrTransparent);
+	}else{
+		RECT rc = { xDest, yDest, xDest + newW, yDest + newH };
+		HBRUSH hBrush = CreateSolidBrush(RGB(GetRValue(m_cr), GetGValue(m_cr), GetBValue(m_cr)));
+		FillRect(hdcDIB, &rc, hBrush);
+		DeleteObject(hBrush);
 	}
 
 	for(DWORD i = 0; i < m_pSIF->GetLayerCount(); i++)
@@ -918,15 +1010,36 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 		if(SUCCEEDED(m_pSIF->GetLayerByIndex(i, &srLayer)))
 		{
+			SIZE sLayer;
+			srLayer->GetSize(&sLayer);
 			PBYTE pRGBA;
 			DWORD cbBits;
-
 			if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
-				CopyBits(pRGBA, m_sLayer.cx, m_sLayer.cy, m_pDIB, m_xDIB, m_yDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom);
+				CopyBits(pRGBA, sLayer.cx, sLayer.cy, m_LayerInfo[i].xDest, m_LayerInfo[i].yDest, m_LayerInfo[i].fZoom, m_pDIB, m_xDIB, m_yDIB, xDest , yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
+		}
+		if(i == m_nSelectedLayerIndex)
+		{
+			SetBkMode(hdcDIB, TRANSPARENT);
+			HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
+			HBRUSH hOldBrush = (HBRUSH)SelectObject(hdcDIB, hNullBrush);
+
+			HPEN hPen = CreatePen(PS_DASH, 1, RGB(100, 100, 100));
+			HPEN hOldPen = (HPEN)SelectObject(hdcDIB, hPen);
+
+			Rectangle(hdcDIB, 
+				xDest + m_LayerInfo[m_nSelectedLayerIndex].xDest * m_fZoom - m_xScrollPos - 2, 
+				yDest + m_LayerInfo[m_nSelectedLayerIndex].yDest * m_fZoom - m_yScrollPos - 2, 
+				xDest + (m_LayerInfo[m_nSelectedLayerIndex].xDest + m_LayerInfo[m_nSelectedLayerIndex].sLayer.cx * m_LayerInfo[m_nSelectedLayerIndex].fZoom) * m_fZoom - m_xScrollPos + 2, 
+				yDest + (m_LayerInfo[m_nSelectedLayerIndex].yDest + m_LayerInfo[m_nSelectedLayerIndex].sLayer.cy * m_LayerInfo[m_nSelectedLayerIndex].fZoom) * m_fZoom - m_yScrollPos + 2);
+
+			SelectObject(hdcDIB, hOldPen);
+			SelectObject(hdcDIB, hOldBrush);
+			DeleteObject(hPen);
 		}
 	}
 
-	if(m_bLButtonClicked)
+	
+	if(m_bLButtonClicked && m_fSelectionMode)
 	{
 		SetBkMode(hdcDIB, TRANSPARENT);
 		HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
@@ -1028,10 +1141,10 @@ HRESULT CMDIWindow::OpenImageWindow (VOID)
 
 	srChild.Attach(__new CImageChild(m_hInstance));
 	CheckAlloc(srChild);
-	Check(srChild->Initialize(this, 800, 600));
+	Check(srChild->Initialize(this, dlgNewImage.m_size.cx, dlgNewImage.m_size.cy, dlgNewImage.m_cr));
 
-	if(dlgNewImage.m_cr != 0)
-		Check(srChild->AddSolidColorLayer(dlgNewImage.m_cr, dlgNewImage.m_size));
+	//if(dlgNewImage.m_cr != 0)
+	//	Check(srChild->AddSolidColorLayer(dlgNewImage.m_cr, dlgNewImage.m_size));
 
 	// Add multiple image files to the SIF (we'll draw the layers from the SIF)
 	for(;;)

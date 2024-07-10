@@ -39,6 +39,14 @@ protected:
 	DECL_WM_HANDLER(OnPaint);
 };
 
+struct LayerInfo
+{
+	INT xDest;
+	INT yDest;
+	SIZE sLayer;
+	FLOAT fZoom;
+};
+
 class CImageChild :
 	public CBaseUnknown,
 	public CBaseMDIChild
@@ -78,16 +86,17 @@ public:
 	static HRESULT Register (HINSTANCE hInstance);
 	static HRESULT Unregister (HINSTANCE hInstance);
 
-	HRESULT Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight);
+	HRESULT Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight, COLORREF cr = 0);
 	HRESULT AddLayer (PCWSTR pcwzImageFile);
 	HRESULT AddSolidColorLayer (COLORREF cr, SIZE size);
 
-	INT m_nScreenWidth;
-	INT m_nScreenHeight;
-	float m_fZoom;
-	const float m_fZoomStep;
-	const float m_fMaxZoom;
-	const float m_fMinZoom;
+	SIZE m_sImage;
+	LayerInfo m_LayerInfo[20];
+
+	FLOAT m_fZoom;
+	const FLOAT m_fZoomStep;
+	const FLOAT m_fMaxZoom;
+	const FLOAT m_fMinZoom;
 	INT m_xScrollPos;
 	INT m_yScrollPos;
 	WCHAR m_wzFileName[MAX_PATH];
@@ -98,8 +107,7 @@ public:
 	INT m_yStartDrag;
 	INT m_xCurrDrag;
 	INT m_yCurrDrag;
-
-	SIZE m_sLayer;
+	INT m_nSelectedLayerIndex;
 
 	HCURSOR m_hZoomInCursor;
 	HCURSOR m_hDefaultCursor;
@@ -111,7 +119,7 @@ public:
 	HBITMAP m_hDIB;
 	INT m_xDIB, m_yDIB;
 	PBYTE m_pDIB;
-	
+	COLORREF m_cr;
 
 	void LoadCursors();
 	void UpdateCursor();

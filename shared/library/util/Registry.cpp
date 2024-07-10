@@ -100,6 +100,35 @@ namespace Registry
 		return hr;
 	}
 
+	HRESULT WINAPI AddImplementedCategories (LPCTSTR pctzGuid, __in_ecount(cCategories) const GUID* pcrgCategories, INT cCategories)
+	{
+		HRESULT hr;
+		HKEY hKey = NULL;
+		TCHAR tzCategories[MAX_PATH];
+		LPOLESTR poleCategory = NULL;
+
+		Check(Formatting::TPrintF(tzCategories, ARRAYSIZE(tzCategories), NULL, TEXT("Software\\Classes\\CLSID\\%s\\Implemented Categories"), pctzGuid));
+		Check(CreateKey(HKEY_LOCAL_MACHINE, tzCategories, KEY_ALL_ACCESS, &hKey));
+
+		for(INT i = 0; i < cCategories; i++)
+		{
+			DWORD dwDisposition = 0;
+			HKEY hCategory;
+
+			Check(StringFromCLSID(pcrgCategories[i], &poleCategory));
+			CheckWin32Error(RegCreateKeyExW(hKey, poleCategory, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hCategory, &dwDisposition));
+			RegCloseKey(hCategory);
+
+			CoTaskMemFree(poleCategory); poleCategory = NULL;
+		}
+
+	Cleanup:
+		CoTaskMemFree(poleCategory);
+		if(hKey)
+			RegCloseKey(hKey);
+		return hr;
+	}
+
 	HRESULT WINAPI ApproveShellExt (LPCTSTR pctzGuid, LPCTSTR pctzDescription, BOOL fApprove)
 	{
 		HRESULT hr;
@@ -339,6 +368,30 @@ namespace Registry
 		return hr;
 	}
 
+	HRESULT WINAPI GetModuleFileNameEx (HMODULE hModule, __in_opt PCTSTR pctzPeerFile, __out_ecount_part(nSize, return + 1) PTSTR lpFileName, __in INT nSize, __out INT* pcch)
+	{
+		HRESULT hr;
+
+		*pcch = GetModuleFileName(hModule, lpFileName, nSize);
+		if(pctzPeerFile)
+		{
+			PCTSTR pctzSlash = TStrCchRChr(lpFileName, *pcch, L'\\');
+			if(pctzSlash)
+			{
+				INT cchPath = static_cast<INT>(pctzSlash - lpFileName) + 1;
+				hr = TStrCchCpyLen(lpFileName + cchPath, nSize - cchPath, pctzPeerFile, TStrLenAssert(pctzPeerFile), pcch);
+				if(SUCCEEDED(hr))
+					*pcch += cchPath;
+			}
+			else
+				hr = TStrCchCpyLen(lpFileName, nSize, pctzPeerFile, TStrLenAssert(pctzPeerFile), pcch);
+		}
+		else
+			hr = S_OK;
+
+		return hr;
+	}
+
 	HRESULT WINAPI CopyAndResolve (LPCTSTR pctzText, TCHAR tchEnd, LPTSTR ptzValue, INT cchMaxValue, LPCTSTR* ppctzNext)
 	{
 		HRESULT hr;
@@ -364,17 +417,28 @@ namespace Registry
 				}
 				else
 				{
-					CheckIf(0 != TStrCmpIAssert(tzName, TEXT("MODULE")), E_INVALIDARG);
-					*ptzValue = '"';
-					DWORD cch = GetModuleFileName(NULL, ptzValue + 1, cchMaxValue - 1);
+					INT cch;
 
-					ptzValue += cch + 1;
-					cchMaxValue -= (cch + 1);
+					if('!' == tzName[0])
+					{
+						Check(GetModuleFileNameEx(NULL, 0 == TStrCmpIAssert(tzName, TEXT("MODULE")) ? NULL : tzName + 1, ptzValue, cchMaxValue, &cch));
+						ptzValue += cch;
+						cchMaxValue -= cch;
+					}
+					else
+					{
+						*ptzValue = '"';
 
-					CheckIf(0 == cchMaxValue, STRSAFE_E_INSUFFICIENT_BUFFER);
-					*ptzValue = '"';
-					ptzValue++;
-					cchMaxValue--;
+						Check(GetModuleFileNameEx(NULL, 0 == TStrCmpIAssert(tzName, TEXT("MODULE")) ? NULL : tzName, ptzValue + 1, cchMaxValue - 1, &cch));
+
+						ptzValue += cch + 1;
+						cchMaxValue -= (cch + 1);
+
+						CheckIf(0 == cchMaxValue, STRSAFE_E_INSUFFICIENT_BUFFER);
+						*ptzValue = '"';
+						ptzValue++;
+						cchMaxValue--;
+					}
 				}
 			}
 			else if('\\' == tch)
