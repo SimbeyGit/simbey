@@ -45,15 +45,13 @@ void SetPixelColor (BYTE* pImage, int w, int h, int x,int y, RGBQUAD c)
 	}
 }
 
-void CopyBits (const BYTE* pSrcBits, int w, int h, int srcXDest, int srcYDest, float srcfZoom, BYTE* pDestBits, int w1, int h1, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight)
+void CopyBits (const BYTE* pSrcBits, int w, int h, int srcXDest, int srcYDest, BYTE* pDestBits, int w1, int h1, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight)
 {
-	float fTotalZoom = srcfZoom * fZoom;
 	float xScale, yScale, fX, fY;
-	xScale = 1.0f / fTotalZoom;
-	yScale = 1.0f / fTotalZoom;
+	float rScale = 1.0f / fZoom;
 
-	int newW = (int)(w * fTotalZoom);
-	int newH = (int)(h * fTotalZoom);
+	int newW = (int)(w * fZoom);
+	int newH = (int)(h * fZoom);
 
 	// Precompute the starting position for x
 	int xStart = (int)((float)xScrollPos - (float)srcXDest * fZoom);
@@ -69,13 +67,13 @@ void CopyBits (const BYTE* pSrcBits, int w, int h, int srcXDest, int srcYDest, f
 	{
 		if(h1 - y - yDest + yScrollPos - srcYDest * fZoom < h1 - yDest - nImageHeight || h1 - y - yDest + yScrollPos - srcYDest * fZoom < 0)
 			break;
-		fY = y * yScale;
+		fY = y * rScale;
 
 		for(int x = xStart; x < newW; x++)
 		{
 			if(x + xDest + srcXDest * fZoom - xScrollPos > xDest + nImageWidth || x + xDest + srcXDest * fZoom - xScrollPos > w1)
 				break;
-			fX = x * xScale;
+			fX = x * rScale;
 			SetPixelColor(pDestBits, w1, h1, x + xDest + srcXDest * fZoom - xScrollPos, h1 - y - yDest + yScrollPos - srcYDest * fZoom, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
 		}
 	}

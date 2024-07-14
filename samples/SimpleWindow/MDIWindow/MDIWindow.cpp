@@ -261,16 +261,18 @@ HRESULT CImageChild::AddLayer (PCWSTR pcwzImageFile)
 	Check(sifAddImageFileAsLayer(pcwzImageFile, m_pSIF, &idxLayer));
 	if(SUCCEEDED(m_pSIF->GetLayerByIndex(idxLayer, &srLayer)))
 	{
-		m_LayerInfo[idxLayer].fZoom = 1.0;
 		SIZE sLayer;
 		srLayer->GetSize(&sLayer);
-		if(sLayer.cx > m_sImage.cx * 2.0 / 3.0 || sLayer.cy > m_sImage.cy * 2.0 / 3.0)
-		{
-			m_LayerInfo[idxLayer].fZoom = (FLOAT)min((FLOAT)m_sImage.cx * 2.0 / 3.0 / sLayer.cx, (FLOAT)m_sImage.cy * 2.0 / 3.0 / sLayer.cy);
-		}
 		m_LayerInfo[idxLayer].sLayer = sLayer;
-		m_LayerInfo[idxLayer].xDest = rand() % (INT)(m_sImage.cx - sLayer.cx * m_LayerInfo[idxLayer].fZoom);
-		m_LayerInfo[idxLayer].yDest = rand() % (INT)(m_sImage.cy - sLayer.cy * m_LayerInfo[idxLayer].fZoom);
+
+		if(m_sImage.cx > sLayer.cx)
+			m_LayerInfo[idxLayer].xDest = rand() % (INT)(m_sImage.cx - sLayer.cx);
+		else
+			m_LayerInfo[idxLayer].xDest = 0;
+		if(m_sImage.cy > sLayer.cy)
+			m_LayerInfo[idxLayer].yDest = rand() % (INT)(m_sImage.cy - sLayer.cy);
+		else
+			m_LayerInfo[idxLayer].yDest = 0;
 	}
 	Invalidate(TRUE);
 
@@ -354,7 +356,7 @@ void CImageChild::_SetScrollSizes()
 	SetScrollInfo(m_hwnd, SB_HORZ, &si, TRUE);
 }
 
-void CImageChild::_SetScrollPos(HWND hWnd, int nBar, int pos)
+void CImageChild::_SetScrollPos (HWND hWnd, int nBar, int pos)
 {
 	SCROLLINFO si;
 	si.cbSize = sizeof(si);
@@ -373,7 +375,7 @@ void CImageChild::_SetScrollPos(HWND hWnd, int nBar, int pos)
 	SetScrollInfo(hWnd, nBar, &si, TRUE);
 }
 
-void CImageChild::ZoomToRectangle()
+void CImageChild::ZoomToRectangle ()
 {
 	float tempfZoom = m_fZoom;
 	RECT rc;
@@ -389,8 +391,6 @@ void CImageChild::ZoomToRectangle()
 	const int cy = rc.bottom - rc.top;
 	const int vx = (int)(m_sImage.cx * m_fZoom);
 	const int vy = (int)(m_sImage.cy * m_fZoom);
-
-	
 
 	float fZoom = min((float)cx / nRectWidth, (float)cy / nRectHeight);
 	m_fZoom *= fZoom;
@@ -877,9 +877,9 @@ BOOL CImageChild::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 	for(DWORD i = m_pSIF->GetLayerCount() - 1; i >= 0; i--)
 	{
 		if(xDest + m_LayerInfo[i].xDest * m_fZoom - m_xScrollPos <= m_xCurrDrag 
-			&& m_xCurrDrag <= xDest + (m_LayerInfo[i].xDest + m_LayerInfo[i].sLayer.cx * m_LayerInfo[i].fZoom) * m_fZoom - m_xScrollPos
+			&& m_xCurrDrag <= xDest + (m_LayerInfo[i].xDest + m_LayerInfo[i].sLayer.cx) * m_fZoom - m_xScrollPos
 			&& yDest + m_LayerInfo[i].yDest * m_fZoom - m_yScrollPos <= m_yCurrDrag 
-			&& m_yCurrDrag <= yDest + (m_LayerInfo[i].yDest + m_LayerInfo[i].sLayer.cy * m_LayerInfo[i].fZoom) * m_fZoom - m_yScrollPos)
+			&& m_yCurrDrag <= yDest + (m_LayerInfo[i].yDest + m_LayerInfo[i].sLayer.cy) * m_fZoom - m_yScrollPos)
 		{
 			m_nSelectedLayerIndex = i;
 			break;
@@ -941,9 +941,9 @@ BOOL CImageChild::OnLButtonUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 		for(DWORD i = m_pSIF->GetLayerCount() - 1; i >= 0; i--)
 		{
 			if(xDest + m_LayerInfo[i].xDest * m_fZoom - m_xScrollPos <= m_xCurrDrag 
-				&& m_xCurrDrag <= xDest + (m_LayerInfo[i].xDest + m_LayerInfo[i].sLayer.cx * m_LayerInfo[i].fZoom) * m_fZoom - m_xScrollPos
+				&& m_xCurrDrag <= xDest + (m_LayerInfo[i].xDest + m_LayerInfo[i].sLayer.cx) * m_fZoom - m_xScrollPos
 				&& yDest + m_LayerInfo[i].yDest * m_fZoom - m_yScrollPos <= m_yCurrDrag 
-				&& m_yCurrDrag <= yDest + (m_LayerInfo[i].yDest + m_LayerInfo[i].sLayer.cy * m_LayerInfo[i].fZoom) * m_fZoom - m_yScrollPos)
+				&& m_yCurrDrag <= yDest + (m_LayerInfo[i].yDest + m_LayerInfo[i].sLayer.cy) * m_fZoom - m_yScrollPos)
 			{
 				m_nSelectedLayerIndex = i;
 				break;
@@ -1015,7 +1015,7 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 			PBYTE pRGBA;
 			DWORD cbBits;
 			if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
-				CopyBits(pRGBA, sLayer.cx, sLayer.cy, m_LayerInfo[i].xDest, m_LayerInfo[i].yDest, m_LayerInfo[i].fZoom, m_pDIB, m_xDIB, m_yDIB, xDest , yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
+				CopyBits(pRGBA, sLayer.cx, sLayer.cy, m_LayerInfo[i].xDest, m_LayerInfo[i].yDest, m_pDIB, m_xDIB, m_yDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
 		}
 		if(i == m_nSelectedLayerIndex)
 		{
@@ -1029,8 +1029,8 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 			Rectangle(hdcDIB, 
 				xDest + m_LayerInfo[m_nSelectedLayerIndex].xDest * m_fZoom - m_xScrollPos - 2, 
 				yDest + m_LayerInfo[m_nSelectedLayerIndex].yDest * m_fZoom - m_yScrollPos - 2, 
-				xDest + (m_LayerInfo[m_nSelectedLayerIndex].xDest + m_LayerInfo[m_nSelectedLayerIndex].sLayer.cx * m_LayerInfo[m_nSelectedLayerIndex].fZoom) * m_fZoom - m_xScrollPos + 2, 
-				yDest + (m_LayerInfo[m_nSelectedLayerIndex].yDest + m_LayerInfo[m_nSelectedLayerIndex].sLayer.cy * m_LayerInfo[m_nSelectedLayerIndex].fZoom) * m_fZoom - m_yScrollPos + 2);
+				xDest + (m_LayerInfo[m_nSelectedLayerIndex].xDest + m_LayerInfo[m_nSelectedLayerIndex].sLayer.cx) * m_fZoom - m_xScrollPos + 2, 
+				yDest + (m_LayerInfo[m_nSelectedLayerIndex].yDest + m_LayerInfo[m_nSelectedLayerIndex].sLayer.cy) * m_fZoom - m_yScrollPos + 2);
 
 			SelectObject(hdcDIB, hOldPen);
 			SelectObject(hdcDIB, hOldBrush);

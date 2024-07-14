@@ -44,7 +44,6 @@ struct LayerInfo
 	INT xDest;
 	INT yDest;
 	SIZE sLayer;
-	FLOAT fZoom;
 };
 
 class CImageChild :
