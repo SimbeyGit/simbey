@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "Library\Core\CoreDefs.h"
 #include "Published\SIF.h"
 #include "ImageProc.h"
 
@@ -10,7 +11,8 @@ RGBQUAD GetPixelColor (const BYTE* pImage, int w, int h, int x, int y)
 	rgb.rgbGreen = 0;
 	rgb.rgbRed = 0;
 	rgb.rgbReserved = 0;
-	if((x < 0)||(y < 0)|| (x >= w)||(y >= h))
+
+	if(x >= w || y >= h)
 		return rgb;
 
 	const BYTE* iSrc  = pImage + y * dwEffWidth + x * 4;
@@ -53,20 +55,27 @@ void CopyBits (const BYTE* pSrcBits, int w, int h, int srcXDest, int srcYDest, f
 	int newW = (int)(w * fTotalZoom);
 	int newH = (int)(h * fTotalZoom);
 
-	for(int y = yScrollPos - srcYDest * fZoom; y < newH; y++)
+	// Precompute the starting position for x
+	int xStart = (int)((float)xScrollPos - (float)srcXDest * fZoom);
+	if(xStart < 0)
+		xStart = 0;
+
+	// Precompute the starting position for y
+	int yStart = (int)((float)yScrollPos - (float)srcYDest * fZoom);
+	if(yStart < 0)
+		yStart = 0;
+
+	for(int y = yStart; y < newH; y++)
 	{
-		fY = y * yScale;
 		if(h1 - y - yDest + yScrollPos - srcYDest * fZoom < h1 - yDest - nImageHeight || h1 - y - yDest + yScrollPos - srcYDest * fZoom < 0)
 			break;
-		if(y < 0)
-			continue;
-		for(int x = xScrollPos - srcXDest * fZoom; x < newW; x++)
+		fY = y * yScale;
+
+		for(int x = xStart; x < newW; x++)
 		{
-			if(x < 0)
-				continue;
-			fX = x * xScale;
 			if(x + xDest + srcXDest * fZoom - xScrollPos > xDest + nImageWidth || x + xDest + srcXDest * fZoom - xScrollPos > w1)
 				break;
+			fX = x * xScale;
 			SetPixelColor(pDestBits, w1, h1, x + xDest + srcXDest * fZoom - xScrollPos, h1 - y - yDest + yScrollPos - srcYDest * fZoom, GetPixelColor(pSrcBits, w, h, (int)fX,(int)fY));
 		}
 	}
