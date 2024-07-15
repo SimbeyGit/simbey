@@ -98,6 +98,10 @@ public:
 	INT m_yStartDrag;
 	INT m_xCurrDrag;
 	INT m_yCurrDrag;
+	INT m_xDragLayer;
+	INT m_yDragLayer;
+	INT m_xOriginalDrag;
+	INT m_yOriginalDrag;
 	INT m_nSelectedLayerIndex;
 
 	HCURSOR m_hZoomInCursor;

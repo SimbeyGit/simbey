@@ -885,6 +885,12 @@ BOOL CImageChild::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 			&& yDest + rcLayer.top * m_fZoom - m_yScrollPos <= m_yCurrDrag 
 			&& m_yCurrDrag <= yDest + (rcLayer.bottom) * m_fZoom - m_yScrollPos)
 		{
+			m_xDragLayer = rcLayer.left;
+			m_yDragLayer = rcLayer.top;
+
+			m_xOriginalDrag = m_xStartDrag;
+			m_yOriginalDrag = m_yStartDrag;
+
 			m_nSelectedLayerIndex = i - 1;
 			break;
 		}
@@ -901,14 +907,13 @@ BOOL CImageChild::OnMouseMove (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 	if(!m_fSelectionMode && m_nSelectedLayerIndex >= 0)
 	{
 		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
-		RECT rcLayer;
 
 		SideAssertHr(m_pSIF->GetLayerByIndex(m_nSelectedLayerIndex, &srLayer));
-		SideAssertHr(srLayer->GetPosition(&rcLayer));
 
-		rcLayer.left += (m_xCurrDrag - m_xStartDrag) / m_fZoom;
-		rcLayer.top += (m_yCurrDrag - m_yStartDrag) / m_fZoom;
-		srLayer->SetPosition(rcLayer.left, rcLayer.top);
+		FLOAT rx = (FLOAT)(m_xCurrDrag - m_xOriginalDrag);
+		FLOAT ry = (FLOAT)(m_yCurrDrag - m_yOriginalDrag);
+		srLayer->SetPosition(m_xDragLayer + (LONG)(rx / m_fZoom), m_yDragLayer + (LONG)(ry / m_fZoom));
+
 		m_xStartDrag = m_xCurrDrag;
 		m_yStartDrag = m_yCurrDrag;
 	}

@@ -47,7 +47,7 @@ void SetPixelColor (BYTE* pImage, int w, int h, int x,int y, RGBQUAD c)
 
 void CopyBits (const BYTE* pSrcBits, int w, int h, int srcXDest, int srcYDest, BYTE* pDestBits, int w1, int h1, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight)
 {
-	float xScale, yScale, fX, fY;
+	float fX, fY;
 	float rScale = 1.0f / fZoom;
 
 	int newW = (int)(w * fZoom);
