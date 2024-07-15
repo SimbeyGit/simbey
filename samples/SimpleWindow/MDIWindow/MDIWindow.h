@@ -112,7 +112,7 @@ public:
 
 	BOOL m_bWindowsSizeChanged;
 	HBITMAP m_hDIB;
-	INT m_xDIB, m_yDIB;
+	SIZE m_szDIB;
 	PBYTE m_pDIB;
 
 	void LoadCursors();

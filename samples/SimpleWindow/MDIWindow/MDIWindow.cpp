@@ -989,8 +989,8 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 
 	if(m_bWindowsSizeChanged)
 	{
-		m_xDIB = cx;
-		m_yDIB = cy;
+		m_szDIB.cx = cx;
+		m_szDIB.cy = cy;
 		if(m_hDIB != NULL)
 			DeleteObject(m_hDIB);
 		sifCreateBlankDIB(hdc, cx, cy, 24, reinterpret_cast<PVOID*>(&m_pDIB), &m_hDIB);
@@ -1036,7 +1036,7 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		srLayer->GetPosition(&rcLayer);
 
 		if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
-			CopyBits(pRGBA, sLayer.cx, sLayer.cy, rcLayer.left, rcLayer.top, m_pDIB, m_xDIB, m_yDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
+			CopyBits(pRGBA, sLayer, rcLayer.left, rcLayer.top, m_pDIB, m_szDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
 
 		if(i == m_nSelectedLayerIndex)
 		{

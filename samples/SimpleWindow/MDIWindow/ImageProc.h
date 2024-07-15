@@ -1,5 +1,5 @@
 #pragma once
 
 RGBQUAD GetPixelColor (const BYTE* pImage, int w, int h, int x, int y);
-void SetPixelColor (BYTE* pImage, int w, int h, int x, int y, RGBQUAD c);
-void CopyBits (const BYTE* pSrcBits, int w, int h, int srcXDest, int srcYDest, BYTE* pDestBits, int w1, int h1, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight);
+void SetPixelColor (BYTE* pImage, const SIZE& szDest, int x, int y, RGBQUAD c);
+void CopyBits (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int srcYDest, BYTE* pDestBits, const SIZE& szDest, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight);
