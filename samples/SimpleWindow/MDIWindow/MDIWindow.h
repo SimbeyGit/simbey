@@ -39,13 +39,6 @@ protected:
 	DECL_WM_HANDLER(OnPaint);
 };
 
-struct LayerInfo
-{
-	INT xDest;
-	INT yDest;
-	SIZE sLayer;
-};
-
 class CImageChild :
 	public CBaseUnknown,
 	public CBaseMDIChild
@@ -85,12 +78,11 @@ public:
 	static HRESULT Register (HINSTANCE hInstance);
 	static HRESULT Unregister (HINSTANCE hInstance);
 
-	HRESULT Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight, COLORREF cr = 0);
+	HRESULT Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight);
 	HRESULT AddLayer (PCWSTR pcwzImageFile);
 	HRESULT AddSolidColorLayer (COLORREF cr, SIZE size);
 
 	SIZE m_sImage;
-	LayerInfo m_LayerInfo[20];
 
 	FLOAT m_fZoom;
 	const FLOAT m_fZoomStep;
@@ -118,7 +110,6 @@ public:
 	HBITMAP m_hDIB;
 	INT m_xDIB, m_yDIB;
 	PBYTE m_pDIB;
-	COLORREF m_cr;
 
 	void LoadCursors();
 	void UpdateCursor();

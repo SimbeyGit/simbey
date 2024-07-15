@@ -208,7 +208,7 @@ HRESULT CImageChild::Unregister (HINSTANCE hInstance)
 	return UnregisterClass(c_wzImageChild, hInstance);
 }
 
-HRESULT CImageChild::Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight, COLORREF cr)
+HRESULT CImageChild::Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight)
 {
 	HRESULT hr;
 	HBITMAP hbmPattern = (HBITMAP)LoadImage(m_hInstance, MAKEINTRESOURCE(IDB_TRANS_PATTERN), IMAGE_BITMAP, 0, 0, LR_DEFAULTSIZE);
@@ -219,7 +219,6 @@ HRESULT CImageChild::Initialize (CBaseMDIFrame* pFrame, INT nWidth, INT nHeight,
 
 	Check(sifCreateNew(&m_pSIF));
 	
-	m_cr = cr;
 	m_sImage.cx = nWidth;
 	m_sImage.cy = nHeight;
 
@@ -262,17 +261,16 @@ HRESULT CImageChild::AddLayer (PCWSTR pcwzImageFile)
 	if(SUCCEEDED(m_pSIF->GetLayerByIndex(idxLayer, &srLayer)))
 	{
 		SIZE sLayer;
+		LONG x = 0, y = 0;
+
 		srLayer->GetSize(&sLayer);
-		m_LayerInfo[idxLayer].sLayer = sLayer;
 
 		if(m_sImage.cx > sLayer.cx)
-			m_LayerInfo[idxLayer].xDest = rand() % (INT)(m_sImage.cx - sLayer.cx);
-		else
-			m_LayerInfo[idxLayer].xDest = 0;
+			x = rand() % (INT)(m_sImage.cx - sLayer.cx);
 		if(m_sImage.cy > sLayer.cy)
-			m_LayerInfo[idxLayer].yDest = rand() % (INT)(m_sImage.cy - sLayer.cy);
-		else
-			m_LayerInfo[idxLayer].yDest = 0;
+			y = rand() % (INT)(m_sImage.cy - sLayer.cy);
+
+		srLayer->SetPosition(x, y);
 	}
 	Invalidate(TRUE);
 
@@ -874,14 +872,20 @@ BOOL CImageChild::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 	if(newH < cy)
 		yDest = (cy - newH) / 2;
 
-	for(DWORD i = m_pSIF->GetLayerCount() - 1; i >= 0; i--)
+	for(DWORD i = m_pSIF->GetLayerCount(); i > 0; i--)
 	{
-		if(xDest + m_LayerInfo[i].xDest * m_fZoom - m_xScrollPos <= m_xCurrDrag 
-			&& m_xCurrDrag <= xDest + (m_LayerInfo[i].xDest + m_LayerInfo[i].sLayer.cx) * m_fZoom - m_xScrollPos
-			&& yDest + m_LayerInfo[i].yDest * m_fZoom - m_yScrollPos <= m_yCurrDrag 
-			&& m_yCurrDrag <= yDest + (m_LayerInfo[i].yDest + m_LayerInfo[i].sLayer.cy) * m_fZoom - m_yScrollPos)
+		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+		RECT rcLayer;
+
+		SideAssertHr(m_pSIF->GetLayerByIndex(i - 1, &srLayer));
+		SideAssertHr(srLayer->GetPosition(&rcLayer));
+
+		if(xDest + rcLayer.left * m_fZoom - m_xScrollPos <= m_xCurrDrag 
+			&& m_xCurrDrag <= xDest + (rcLayer.right) * m_fZoom - m_xScrollPos
+			&& yDest + rcLayer.top * m_fZoom - m_yScrollPos <= m_yCurrDrag 
+			&& m_yCurrDrag <= yDest + (rcLayer.bottom) * m_fZoom - m_yScrollPos)
 		{
-			m_nSelectedLayerIndex = i;
+			m_nSelectedLayerIndex = i - 1;
 			break;
 		}
 	}
@@ -896,8 +900,15 @@ BOOL CImageChild::OnMouseMove (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 	m_yCurrDrag = HIWORD(lParam); // Vertical position of cursor
 	if(!m_fSelectionMode && m_nSelectedLayerIndex >= 0)
 	{
-		m_LayerInfo[m_nSelectedLayerIndex].xDest += (m_xCurrDrag - m_xStartDrag) / m_fZoom;
-		m_LayerInfo[m_nSelectedLayerIndex].yDest += (m_yCurrDrag - m_yStartDrag) / m_fZoom;
+		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+		RECT rcLayer;
+
+		SideAssertHr(m_pSIF->GetLayerByIndex(m_nSelectedLayerIndex, &srLayer));
+		SideAssertHr(srLayer->GetPosition(&rcLayer));
+
+		rcLayer.left += (m_xCurrDrag - m_xStartDrag) / m_fZoom;
+		rcLayer.top += (m_yCurrDrag - m_yStartDrag) / m_fZoom;
+		srLayer->SetPosition(rcLayer.left, rcLayer.top);
 		m_xStartDrag = m_xCurrDrag;
 		m_yStartDrag = m_yCurrDrag;
 	}
@@ -938,14 +949,21 @@ BOOL CImageChild::OnLButtonUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 		if(newH < cy)
 			yDest = (cy - newH) / 2;
 
-		for(DWORD i = m_pSIF->GetLayerCount() - 1; i >= 0; i--)
+		for(DWORD i = m_pSIF->GetLayerCount(); i >= 0; i--)
 		{
-			if(xDest + m_LayerInfo[i].xDest * m_fZoom - m_xScrollPos <= m_xCurrDrag 
-				&& m_xCurrDrag <= xDest + (m_LayerInfo[i].xDest + m_LayerInfo[i].sLayer.cx) * m_fZoom - m_xScrollPos
-				&& yDest + m_LayerInfo[i].yDest * m_fZoom - m_yScrollPos <= m_yCurrDrag 
-				&& m_yCurrDrag <= yDest + (m_LayerInfo[i].yDest + m_LayerInfo[i].sLayer.cy) * m_fZoom - m_yScrollPos)
+			TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+			RECT rcLayer;
+			SIZE sLayer;
+
+			SideAssertHr(m_pSIF->GetLayerByIndex(i - 1, &srLayer));
+			SideAssertHr(srLayer->GetPosition(&rcLayer));
+
+			if(xDest + rcLayer.left * m_fZoom - m_xScrollPos <= m_xCurrDrag 
+				&& m_xCurrDrag <= xDest + (rcLayer.right) * m_fZoom - m_xScrollPos
+				&& yDest + rcLayer.top * m_fZoom - m_yScrollPos <= m_yCurrDrag 
+				&& m_yCurrDrag <= yDest + (rcLayer.bottom) * m_fZoom - m_yScrollPos)
 			{
-				m_nSelectedLayerIndex = i;
+				m_nSelectedLayerIndex = i - 1;
 				break;
 			}
 		}
@@ -994,29 +1012,27 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		FillRect(hdcDIB, &rc, hBrush);
 		DeleteObject(hBrush);
 	}
-	if(m_cr == 0)
+
 	{
 		RECT rc = { xDest, yDest, xDest + newW, yDest + newH };
 		FillRect(hdcDIB, &rc, m_hbrTransparent);
-	}else{
-		RECT rc = { xDest, yDest, xDest + newW, yDest + newH };
-		HBRUSH hBrush = CreateSolidBrush(RGB(GetRValue(m_cr), GetGValue(m_cr), GetBValue(m_cr)));
-		FillRect(hdcDIB, &rc, hBrush);
-		DeleteObject(hBrush);
 	}
 
 	for(DWORD i = 0; i < m_pSIF->GetLayerCount(); i++)
 	{
 		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
-		if(SUCCEEDED(m_pSIF->GetLayerByIndex(i, &srLayer)))
-		{
-			SIZE sLayer;
-			srLayer->GetSize(&sLayer);
-			PBYTE pRGBA;
-			DWORD cbBits;
-			if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
-				CopyBits(pRGBA, sLayer.cx, sLayer.cy, m_LayerInfo[i].xDest, m_LayerInfo[i].yDest, m_pDIB, m_xDIB, m_yDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
-		}
+		SIZE sLayer;
+		RECT rcLayer;
+		PBYTE pRGBA;
+		DWORD cbBits;
+
+		SideAssertHr(m_pSIF->GetLayerByIndex(i, &srLayer));
+		srLayer->GetSize(&sLayer);
+		srLayer->GetPosition(&rcLayer);
+
+		if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
+			CopyBits(pRGBA, sLayer.cx, sLayer.cy, rcLayer.left, rcLayer.top, m_pDIB, m_xDIB, m_yDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
+
 		if(i == m_nSelectedLayerIndex)
 		{
 			SetBkMode(hdcDIB, TRANSPARENT);
@@ -1027,10 +1043,10 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 			HPEN hOldPen = (HPEN)SelectObject(hdcDIB, hPen);
 
 			Rectangle(hdcDIB, 
-				xDest + m_LayerInfo[m_nSelectedLayerIndex].xDest * m_fZoom - m_xScrollPos - 2, 
-				yDest + m_LayerInfo[m_nSelectedLayerIndex].yDest * m_fZoom - m_yScrollPos - 2, 
-				xDest + (m_LayerInfo[m_nSelectedLayerIndex].xDest + m_LayerInfo[m_nSelectedLayerIndex].sLayer.cx) * m_fZoom - m_xScrollPos + 2, 
-				yDest + (m_LayerInfo[m_nSelectedLayerIndex].yDest + m_LayerInfo[m_nSelectedLayerIndex].sLayer.cy) * m_fZoom - m_yScrollPos + 2);
+				xDest + rcLayer.left * m_fZoom - m_xScrollPos - 2, 
+				yDest + rcLayer.top * m_fZoom - m_yScrollPos - 2, 
+				xDest + rcLayer.right * m_fZoom - m_xScrollPos + 2, 
+				yDest + rcLayer.bottom * m_fZoom - m_yScrollPos + 2);
 
 			SelectObject(hdcDIB, hOldPen);
 			SelectObject(hdcDIB, hOldBrush);
@@ -1038,7 +1054,6 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		}
 	}
 
-	
 	if(m_bLButtonClicked && m_fSelectionMode)
 	{
 		SetBkMode(hdcDIB, TRANSPARENT);
@@ -1137,14 +1152,12 @@ HRESULT CMDIWindow::OpenImageWindow (VOID)
 	Check(dlgHost.Display(m_hwnd, &dlgNewImage));
 	CheckIfIgnore(IDOK != dlgHost.GetReturnValue(), E_ABORT);
 
-	// TODO - Initialize the canvas using dlgNewImage.m_size
-
 	srChild.Attach(__new CImageChild(m_hInstance));
 	CheckAlloc(srChild);
-	Check(srChild->Initialize(this, dlgNewImage.m_size.cx, dlgNewImage.m_size.cy, dlgNewImage.m_cr));
+	Check(srChild->Initialize(this, dlgNewImage.m_size.cx, dlgNewImage.m_size.cy));
 
-	//if(dlgNewImage.m_cr != 0)
-	//	Check(srChild->AddSolidColorLayer(dlgNewImage.m_cr, dlgNewImage.m_size));
+	if(dlgNewImage.m_cr != 0)
+		Check(srChild->AddSolidColorLayer(dlgNewImage.m_cr, dlgNewImage.m_size));
 
 	// Add multiple image files to the SIF (we'll draw the layers from the SIF)
 	for(;;)

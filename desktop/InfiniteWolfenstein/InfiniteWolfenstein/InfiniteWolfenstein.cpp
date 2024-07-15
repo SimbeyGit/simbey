@@ -1240,7 +1240,7 @@ VOID CInfiniteWolfenstein::Run (VOID)
 		while(PeekMessage(&msg,NULL,0,0,PM_REMOVE))
 		{
 			if(msg.message == WM_QUIT)
-				return;
+				goto Cleanup;
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -1261,6 +1261,7 @@ VOID CInfiniteWolfenstein::Run (VOID)
 			WaitMessage();
 	}
 
+Cleanup:
 	if(m_fTrackMouse)
 	{
 		ShowCursor(TRUE);
