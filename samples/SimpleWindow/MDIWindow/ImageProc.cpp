@@ -12,10 +12,7 @@ RGBQUAD GetPixelColor (const BYTE* pImage, const SIZE& szSource, int x, int y)
 	rgb.rgbRed = 0;
 	rgb.rgbReserved = 0;
 
-	if(x >= szSource.cx || y >= szSource.cy)
-		return rgb;
-
-	const BYTE* iSrc  = pImage + y * dwEffWidth + x * 4;
+	const BYTE* iSrc = pImage + y * dwEffWidth + x * 4;
 	rgb.rgbRed = *iSrc++;
 	rgb.rgbGreen = *iSrc++;
 	rgb.rgbBlue = *iSrc++;
@@ -23,10 +20,10 @@ RGBQUAD GetPixelColor (const BYTE* pImage, const SIZE& szSource, int x, int y)
 	return rgb;
 }
 
-void SetPixelColor (BYTE* pImage, const SIZE& szDest, int x, int y, RGBQUAD c)
+void SetPixelColor (BYTE* pTarget, const SIZE& szDest, int x, int y, RGBQUAD c)
 {
 	int dwEffWidth = (24 * szDest.cx + 31) / 32 * 4;
-	BYTE* iDst = pImage + y * dwEffWidth + x * 3;
+	BYTE* iDst = pTarget + y * dwEffWidth + x * 3;
 	BYTE bAlpha = c.rgbReserved;
 	if(255 == bAlpha)
 	{
@@ -66,21 +63,21 @@ void CopyBits (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int src
 			break;
 
 		int yDestRow = szDest.cy - y - yDest + yScrollPos - srcYDest * fZoom;
-		if(yDestRow >= szDest.cy)
-			break;
-
-		float fY = y * rScale;
-		for(int x = xStart; x < newW; x++)
+		if(yDestRow < szDest.cy)
 		{
-			if(x + xDest + srcXDest * fZoom - xScrollPos > xDest + nImageWidth || x + xDest + srcXDest * fZoom - xScrollPos > szDest.cx)
-				break;
+			float fY = y * rScale;
+			for(int x = xStart; x < newW; x++)
+			{
+				if(x + xDest + srcXDest * fZoom - xScrollPos > xDest + nImageWidth || x + xDest + srcXDest * fZoom - xScrollPos > szDest.cx)
+					break;
 
-			int xDestColumn = x + xDest + srcXDest * fZoom - xScrollPos;
-			if(xDestColumn >= szDest.cx)
-				break;
+				int xDestColumn = x + xDest + srcXDest * fZoom - xScrollPos;
+				if(xDestColumn >= szDest.cx)
+					break;
 
-			float fX = x * rScale;
-			SetPixelColor(pDestBits, szDest, xDestColumn, yDestRow, GetPixelColor(pSrcBits, szSource, (int)fX, (int)fY));
+				float fX = x * rScale;
+				SetPixelColor(pDestBits, szDest, xDestColumn, yDestRow, GetPixelColor(pSrcBits, szSource, (int)fX, (int)fY));
+			}
 		}
 	}
 }
