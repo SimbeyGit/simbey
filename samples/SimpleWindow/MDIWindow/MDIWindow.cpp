@@ -1039,7 +1039,7 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		srLayer->GetPosition(&rcLayer);
 
 		if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
-			CopyBits(pRGBA, sLayer, rcLayer.left, rcLayer.top, m_pDIB, m_szDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
+			CopyBitsToDIB24(pRGBA, sLayer, rcLayer.left, rcLayer.top, m_pDIB, m_szDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
 
 		if(i == m_nSelectedLayerIndex && !m_fZoomMode)
 		{
@@ -1131,8 +1131,8 @@ HINSTANCE CMDIWindow::GetInstance (VOID)
 
 VOID CMDIWindow::OnFinalDestroy (HWND hwnd)
 {
-	PostQuitMessage(0);
 	__super::OnFinalDestroy(hwnd);
+	PostQuitMessage(0);
 }
 
 HRESULT CMDIWindow::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)

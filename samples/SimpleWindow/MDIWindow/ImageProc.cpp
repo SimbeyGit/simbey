@@ -3,44 +3,39 @@
 #include "Published\SIF.h"
 #include "ImageProc.h"
 
-RGBQUAD GetPixelColor (const BYTE* pImage, const SIZE& szSource, int x, int y)
+struct COPY_WIDTHS
 {
-	int dwEffWidth = 4 * szSource.cx;
-	RGBQUAD rgb;
-	rgb.rgbBlue = 0;
-	rgb.rgbGreen = 0;
-	rgb.rgbRed = 0;
-	rgb.rgbReserved = 0;
+	LONG xSource;
+	LONG xTarget;
+};
 
-	const BYTE* iSrc = pImage + y * dwEffWidth + x * 4;
-	rgb.rgbRed = *iSrc++;
-	rgb.rgbGreen = *iSrc++;
-	rgb.rgbBlue = *iSrc++;
-	rgb.rgbReserved = *iSrc;
-	return rgb;
-}
-
-void SetPixelColor (BYTE* pTarget, const SIZE& szDest, int x, int y, RGBQUAD c)
+inline VOID CopyPixelToDIB24 (const COPY_WIDTHS& cw, const BYTE* pSource, INT xSrcPixel, INT ySrcPixel, BYTE* pTarget, INT xTarget, INT yTarget)
 {
-	int dwEffWidth = (24 * szDest.cx + 31) / 32 * 4;
-	BYTE* iDst = pTarget + y * dwEffWidth + x * 3;
-	BYTE bAlpha = c.rgbReserved;
-	if(255 == bAlpha)
+	const BYTE* iSrc = pSource + ySrcPixel * cw.xSource + xSrcPixel * 4;
+
+	BYTE* iDst = pTarget + yTarget * cw.xTarget + xTarget * 3;
+	if(255 == iSrc[3])
 	{
-		*iDst++ = c.rgbBlue;
-		*iDst++ = c.rgbGreen;
-		*iDst   = c.rgbRed;
+		*iDst++ = iSrc[2];
+		*iDst++ = iSrc[1];
+		*iDst   = iSrc[0];
 	}
 	else
 	{
-		iDst[0] = sifBlendColorComponents(iDst[0], c.rgbBlue, bAlpha);
-		iDst[1] = sifBlendColorComponents(iDst[1], c.rgbGreen, bAlpha);
-		iDst[2] = sifBlendColorComponents(iDst[2], c.rgbRed, bAlpha);
+		BYTE bAlpha = iSrc[3];
+		iDst[0] = sifBlendColorComponents(iDst[0], iSrc[2], bAlpha);
+		iDst[1] = sifBlendColorComponents(iDst[1], iSrc[1], bAlpha);
+		iDst[2] = sifBlendColorComponents(iDst[2], iSrc[0], bAlpha);
 	}
 }
 
-void CopyBits (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int srcYDest, BYTE* pDestBits, const SIZE& szDest, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight)
+void CopyBitsToDIB24 (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int srcYDest, BYTE* pDestBits, const SIZE& szDest, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight)
 {
+	COPY_WIDTHS cw =
+	{ 
+		4 * szSource.cx,
+		(24 * szDest.cx + 31) / 32 * 4
+	};
 	float rScale = 1.0f / fZoom;
 
 	int newW = (int)(szSource.cx * fZoom);
@@ -67,7 +62,9 @@ void CopyBits (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int src
 		int yDestRow = szDest.cy - y - yDest + yScrollPos - ryDestZoom;
 		if(yDestRow < szDest.cy)
 		{
-			float fY = y * rScale;
+			float fY = (float)y * rScale;
+			int ySrcPixel = (int)fY;
+
 			for(int x = xStart; x < newW; x++)
 			{
 				if(x + xDest + rxDestZoom - xScrollPos > xDest + nImageWidth || x + xDest + rxDestZoom - xScrollPos > szDest.cx)
@@ -77,8 +74,8 @@ void CopyBits (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int src
 				if(xDestColumn >= szDest.cx)
 					break;
 
-				float fX = x * rScale;
-				SetPixelColor(pDestBits, szDest, xDestColumn, yDestRow, GetPixelColor(pSrcBits, szSource, (int)fX, (int)fY));
+				float fX = (float)x * rScale;
+				CopyPixelToDIB24(cw, pSrcBits, (int)fX, ySrcPixel, pDestBits, xDestColumn, yDestRow);
 			}
 		}
 	}
