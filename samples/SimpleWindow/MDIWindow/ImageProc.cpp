@@ -46,32 +46,34 @@ void CopyBits (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int src
 	int newW = (int)(szSource.cx * fZoom);
 	int newH = (int)(szSource.cy * fZoom);
 
+	float rxDestZoom = srcXDest * fZoom;
+	float ryDestZoom = srcYDest * fZoom;
+
 	// Precompute the starting position for x
-	int xStart = (int)((float)xScrollPos - (float)srcXDest * fZoom);
+	int xStart = (int)((float)xScrollPos - rxDestZoom);
 	if(xStart < 0)
 		xStart = 0;
 
 	// Precompute the starting position for y
-	int yStart = (int)((float)yScrollPos - (float)srcYDest * fZoom);
+	int yStart = (int)((float)yScrollPos - ryDestZoom);
 	if(yStart < 0)
 		yStart = 0;
 
 	for(int y = yStart; y < newH; y++)
 	{
-		// TODO - review these next two bounds checks
-		if(szDest.cy - y - yDest + yScrollPos - srcYDest * fZoom < szDest.cy - yDest - nImageHeight || szDest.cy - y - yDest + yScrollPos - srcYDest * fZoom < 0)
+		if(szDest.cy - y - yDest + yScrollPos - ryDestZoom < szDest.cy - yDest - nImageHeight || szDest.cy - y - yDest + yScrollPos - ryDestZoom < 0)
 			break;
 
-		int yDestRow = szDest.cy - y - yDest + yScrollPos - srcYDest * fZoom;
+		int yDestRow = szDest.cy - y - yDest + yScrollPos - ryDestZoom;
 		if(yDestRow < szDest.cy)
 		{
 			float fY = y * rScale;
 			for(int x = xStart; x < newW; x++)
 			{
-				if(x + xDest + srcXDest * fZoom - xScrollPos > xDest + nImageWidth || x + xDest + srcXDest * fZoom - xScrollPos > szDest.cx)
+				if(x + xDest + rxDestZoom - xScrollPos > xDest + nImageWidth || x + xDest + rxDestZoom - xScrollPos > szDest.cx)
 					break;
 
-				int xDestColumn = x + xDest + srcXDest * fZoom - xScrollPos;
+				int xDestColumn = x + xDest + rxDestZoom - xScrollPos;
 				if(xDestColumn >= szDest.cx)
 					break;
 

@@ -167,7 +167,7 @@ CImageChild::CImageChild (HINSTANCE hInstance) :
 	m_xScrollPos(0),
 	m_yScrollPos(0),
 	m_bLButtonClicked(FALSE),
-	m_fSelectionMode(TRUE),
+	m_fZoomMode(TRUE),
 	m_bIsCtrlPressed(FALSE),
 	m_bIsAltPressed(FALSE),
 	m_nSelectedLayerIndex(-1)
@@ -326,7 +326,8 @@ void CImageChild::UpdateCursor()
 	}
 	if (m_bIsCtrlPressed)
 	{
-		SetCursor(m_hZoomInCursor);
+		if(m_fZoom < 16.f)
+			SetCursor(m_hZoomInCursor);
 		return;
 	}
 	SetCursor(m_hDefaultCursor);
@@ -375,6 +376,8 @@ void CImageChild::_SetScrollPos (HWND hWnd, int nBar, int pos)
 
 void CImageChild::ZoomToRectangle ()
 {
+	if(m_fZoom == 16.f)
+		return;
 	float tempfZoom = m_fZoom;
 	RECT rc;
 	GetClientRect(m_hwnd, &rc);
@@ -396,7 +399,7 @@ void CImageChild::ZoomToRectangle ()
 	{
 		m_fZoom = m_fMaxZoom;
 	}
-
+	fZoom = m_fZoom / tempfZoom;
 	UpdateTitleWithZoom();
 
 	if(vx > cx)
@@ -454,7 +457,7 @@ void CImageChild::ZoomIn (int nStep, POINT center)
 	{
 		m_fZoom += m_fZoomStep;
 	}
-	
+
 	if(m_fZoom > m_fMaxZoom)
 	{
 		m_fZoom = m_fMaxZoom;
@@ -540,7 +543,7 @@ void CImageChild::ZoomOut (int nStep, POINT center)
 	{
 		m_fZoom -= m_fZoomStep;
 	}
-	
+
 	if(m_fZoom < m_fMinZoom)
 	{
 		m_fZoom = m_fMinZoom;
@@ -637,7 +640,7 @@ HRESULT CImageChild::UpdateTitleWithZoom (VOID)
 	HRESULT hr;
 	WCHAR wzTitle[MAX_PATH + 30];
 
-	Check(Formatting::TPrintF(wzTitle, ARRAYSIZE(wzTitle), NULL, L"%ls [%ls] @ %.1f%%", m_wzFileName, m_fSelectionMode ? L"SELECT" : L"MOVE", m_fZoom * 100.0f));
+	Check(Formatting::TPrintF(wzTitle, ARRAYSIZE(wzTitle), NULL, L"%ls [%ls] @ %.1f%%", m_wzFileName, m_fZoomMode ? L"ZOOM" : L"MOVE", m_fZoom * 100.0f));
 	SetWindowText(m_hwnd, wzTitle);
 
 Cleanup:
@@ -767,11 +770,12 @@ BOOL CImageChild::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& l
 	}
 	else if(wParam == 'M')
 	{
-		m_fSelectionMode = !m_fSelectionMode;
+		m_fZoomMode = !m_fZoomMode;
 		UpdateTitleWithZoom();
+		InvalidateRect(m_hwnd, NULL, FALSE);
 	}
 
-	if(!m_fSelectionMode)
+	if(!m_fZoomMode)
 		return FALSE;
 
 	bool ctrlPressed = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
@@ -790,7 +794,7 @@ BOOL CImageChild::OnKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& l
 
 BOOL CImageChild::OnKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	if(!m_fSelectionMode)
+	if(!m_fZoomMode)
 		return FALSE;
 	if (wParam == VK_MENU) // VK_MENU is the virtual-key code for the Alt key
 	{
@@ -807,7 +811,7 @@ BOOL CImageChild::OnKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 
 BOOL CImageChild::OnSysKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	if(!m_fSelectionMode)
+	if(!m_fZoomMode)
 		return FALSE;
 	if(wParam == VK_MENU)
 	{
@@ -819,7 +823,7 @@ BOOL CImageChild::OnSysKeyDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT
 
 BOOL CImageChild::OnSysKeyUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
-	if(!m_fSelectionMode)
+	if(!m_fZoomMode)
 		return FALSE;
 	if(wParam == VK_MENU) // VK_MENU is the virtual-key code for the Alt key
 	{
@@ -842,13 +846,13 @@ BOOL CImageChild::OnLButtonDown (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 	center.x = LOWORD(lParam);
 	center.y = HIWORD(lParam);
 
-	if(m_bIsCtrlPressed && m_fSelectionMode)
+	if(m_bIsCtrlPressed && m_fZoomMode)
 	{
 		ZoomIn(1, center);
 		return TRUE;
 	}
 
-	if(m_bIsAltPressed && m_fSelectionMode)
+	if(m_bIsAltPressed && m_fZoomMode)
 	{
 		ZoomOut(1, center);
 		return TRUE;
@@ -904,7 +908,7 @@ BOOL CImageChild::OnMouseMove (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 		return FALSE;
 	m_xCurrDrag = LOWORD(lParam); // Horizontal position of cursor
 	m_yCurrDrag = HIWORD(lParam); // Vertical position of cursor
-	if(!m_fSelectionMode && m_nSelectedLayerIndex >= 0)
+	if(!m_fZoomMode && m_nSelectedLayerIndex >= 0)
 	{
 		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 
@@ -929,7 +933,7 @@ BOOL CImageChild::OnLButtonUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 	m_bLButtonClicked = FALSE;
 	m_xCurrDrag = LOWORD(lParam); // Horizontal position of cursor
 	m_yCurrDrag = HIWORD(lParam); // Vertical position of cursor
-	if(m_fSelectionMode)
+	if(m_fZoomMode)
 	{
 		int nRectWidth = abs(m_xCurrDrag - m_xStartDrag);
 		int nRectHeight = abs(m_yCurrDrag - m_yStartDrag);
@@ -954,11 +958,10 @@ BOOL CImageChild::OnLButtonUp (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT&
 		if(newH < cy)
 			yDest = (cy - newH) / 2;
 
-		for(DWORD i = m_pSIF->GetLayerCount(); i >= 0; i--)
+		for(DWORD i = m_pSIF->GetLayerCount(); i > 0; i--)
 		{
 			TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 			RECT rcLayer;
-			SIZE sLayer;
 
 			SideAssertHr(m_pSIF->GetLayerByIndex(i - 1, &srLayer));
 			SideAssertHr(srLayer->GetPosition(&rcLayer));
@@ -1038,7 +1041,7 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
 			CopyBits(pRGBA, sLayer, rcLayer.left, rcLayer.top, m_pDIB, m_szDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
 
-		if(i == m_nSelectedLayerIndex)
+		if(i == m_nSelectedLayerIndex && !m_fZoomMode)
 		{
 			SetBkMode(hdcDIB, TRANSPARENT);
 			HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
@@ -1059,7 +1062,7 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		}
 	}
 
-	if(m_bLButtonClicked && m_fSelectionMode)
+	if(m_bLButtonClicked && m_fZoomMode && m_fZoom < 16.f)
 	{
 		SetBkMode(hdcDIB, TRANSPARENT);
 		HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);

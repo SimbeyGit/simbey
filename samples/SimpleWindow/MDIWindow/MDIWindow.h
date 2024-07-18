@@ -93,7 +93,7 @@ public:
 	WCHAR m_wzFileName[MAX_PATH];
 	
 	BOOL m_bLButtonClicked;
-	BOOL m_fSelectionMode;
+	BOOL m_fZoomMode;
 	INT m_xStartDrag;
 	INT m_yStartDrag;
 	INT m_xCurrDrag;
