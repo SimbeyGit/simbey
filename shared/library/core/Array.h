@@ -97,6 +97,19 @@ public:
 		return m_pvItems + nPosition;
 	}
 
+	inline TItem* GetReservedPtr (sysint nPosition)
+	{
+		__if_exists(m_cMaxItems)
+		{
+			Assert(0 <= nPosition && nPosition < m_cMaxItems);
+			return m_pvItems + nPosition;
+		}
+		__if_not_exists(m_cMaxItems)
+		{
+			return GetItemPtr(nPosition);
+		}
+	}
+
 	inline TItem* End (VOID)
 	{
 		return m_pvItems + m_cItems;
@@ -168,14 +181,31 @@ public:
 		}
 		__if_exists(m_cMaxItems)
 		{
-			hr = Reserve(cCommitItems);
-			if(SUCCEEDED(hr))
+			sysint cFreeElements = m_cMaxItems - m_cItems;
+			if(0 < cFreeElements)
 			{
-				ZeroMemory(m_pvItems + m_cItems, sizeof(TItem) * cCommitItems);
-				m_cItems += cCommitItems;
+				if(cFreeElements > cCommitItems)
+					cFreeElements = cCommitItems;
 
-				Assert(m_cItems <= m_cMaxItems);
+				// Some space might have been previously reserved.  Commit those items now.
+				m_cItems += cFreeElements;
+				cCommitItems -= cFreeElements;
 			}
+
+			if(0 < cCommitItems)
+			{
+				// If there are still more items to commit, then they probably need to be allocated too.
+				hr = Reserve(cCommitItems);
+				if(SUCCEEDED(hr))
+				{
+					ZeroMemory(m_pvItems + m_cItems, sizeof(TItem) * cCommitItems);
+					m_cItems += cCommitItems;
+
+					Assert(m_cItems <= m_cMaxItems);
+				}
+			}
+			else
+				hr = S_OK;
 		}
 
 		return hr;

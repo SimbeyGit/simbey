@@ -291,7 +291,7 @@ HRESULT WINAPI sifAddLayerFromGDI (HDC hdc, HBITMAP hBitmap, __in ISimbeyInterch
 HRESULT WINAPI sifCreateTextOutlineLayer (PCWSTR pcwzText, INT cchText, PCWSTR pcwzFont, INT nSize, BOOL fBold, BOOL fItalic, INT nBorderWidth, PCWSTR pcwzBorderStyle, INT nFillType, COLORREF* pcrData, ISimbeyInterchangeFile* pSIF, __out_opt DWORD* pdwLayerIndex);
 HRESULT WINAPI sifCreateTextOutlineLayerUsingFont (PCWSTR pcwzText, INT cchText, ISimbeyFontCollection* pCollection, PVOID pvFamilies, INT nFamily, INT nSize, BOOL fBold, BOOL fItalic, INT nBorderWidth, PCWSTR pcwzBorderStyle, INT nFillType, COLORREF* pcrData, ISimbeyInterchangeFile* pSIF, __out_opt DWORD* pdwLayerIndex);
 HRESULT WINAPI sifCreateFontCollection (__deref_out ISimbeyFontCollection** ppCollection);
-HRESULT WINAPI sifLoadImageDataToBits32 (PBYTE pbData, BITMAPINFOHEADER* pbiInfo, __deref_out PBYTE* ppBits32, __out INT* pnWidth, __out INT* pnHeight);
+HRESULT WINAPI sifLoadImageDataToBits32 (const BYTE* pcbData, const BITMAPINFOHEADER* pcbiInfo, __deref_out PBYTE* ppBits32, __out INT* pnWidth, __out INT* pnHeight);
 HRESULT WINAPI sifResizeImageBits32 (__in_bcount(nWidth * nHeight * 4) const BYTE* pBits32, INT nWidth, INT nHeight, __deref_out_bcount(xResize * yResize * sizeof(DWORD)) PBYTE* ppBits32, INT xResize, INT yResize);
 VOID WINAPI sifPremultiplyAlpha (__in_bcount(nWidth * nHeight * 4) const BYTE* pBits32, __out_bcount(nWidth * nHeight * 4) BYTE* pBits32P, INT nWidth, INT nHeight);
 HRESULT WINAPI sifCreateAnimator (INT cImages, INT cAnimations, __deref_out ISimbeyInterchangeAnimator** ppAnimator);
