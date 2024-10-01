@@ -446,10 +446,6 @@ VOID CCADCtrl::LBtnDown (KEYS dwKeys, FLOAT x, FLOAT y)
 				// reorderLinesOnPolygon(m_idNewPolygon, m_pLines, m_pVertices);
 			}
 		}
-		else
-		{
-			// TODO
-		}
 	}
 	else
 	{
@@ -859,13 +855,13 @@ HRESULT CCADCtrl::FindOrCreateVertex (FLOAT x, FLOAT y, __out DWORD* pidVertex)
 	HRESULT hr;
 	FPOINT vertex;
 
+	SnapCoordinate(x, y);
+
 	LineSelect(x, y, true, false);
 	Check(SplitLine(x, y, pidVertex));
 
 	if(S_FALSE == hr)
 	{
-		SnapCoordinate(x, y);
-
 		vertex.x = x;
 		vertex.y = y;
 		vertex.z = 0.0f;
