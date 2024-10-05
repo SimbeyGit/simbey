@@ -119,14 +119,22 @@ BOOL CBaseWindow::InvokeMessageHandler (BaseWindowMessage::Flag eTarget, UINT uM
 
 	if(eTarget & BaseWindowMessage::SubclassedHandlers)
 	{
-		sysint cSubclasses = m_paSubclasses ? m_paSubclasses->Length() : 0;
-		for(sysint i = 0; i < cSubclasses; i++)
+		if(m_paSubclasses)
 		{
-			if((*m_paSubclasses)[i]->OnSubclassMessage(this, uMsg, wParam, lParam, lResult))
+			sysint i = m_paSubclasses->Length() - 1;
+			do
 			{
-				fHandled = TRUE;
-				break;
-			}
+				if((*m_paSubclasses)[i]->OnSubclassMessage(this, uMsg, wParam, lParam, lResult))
+				{
+					fHandled = TRUE;
+					break;
+				}
+
+				// The subclass handlers could have removed multiple handlers,
+				// and m_paSubclasses could now be NULL.
+				if(i == 0 || NULL == m_paSubclasses)
+					break;
+			} while(--i < m_paSubclasses->Length());
 		}
 	}
 
