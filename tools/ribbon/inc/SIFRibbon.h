@@ -47,6 +47,8 @@ public:
 	HRESULT InvalidateEnabled (VOID);
 	HRESULT InvalidateEnabled (UINT32 commandId);
 	HRESULT UpdateProperty (UINT32 commandId, const PROPERTYKEY* key);
+	HRESULT UpdateValue (UINT32 commandId, const PROPERTYKEY* key);
+	HRESULT ReadProperty (UINT32 commandId, REFPROPERTYKEY key, __out PROPVARIANT* value);
 	HRESULT SaveSettings (VOID);
 
 	HRESULT LoadImageForCommand (UINT32 commandId, REFPROPERTYKEY key, __out PROPVARIANT* pValue);

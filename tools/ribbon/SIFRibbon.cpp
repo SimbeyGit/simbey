@@ -154,6 +154,16 @@ HRESULT CSIFRibbon::UpdateProperty (UINT32 commandId, const PROPERTYKEY* key)
 	return m_pFramework->InvalidateUICommand(commandId, UI_INVALIDATIONS_PROPERTY, key);
 }
 
+HRESULT CSIFRibbon::UpdateValue (UINT32 commandId, const PROPERTYKEY* key)
+{
+	return m_pFramework->InvalidateUICommand(commandId, UI_INVALIDATIONS_VALUE, key);
+}
+
+HRESULT CSIFRibbon::ReadProperty (UINT32 commandId, REFPROPERTYKEY key, __out PROPVARIANT* value)
+{
+	return m_pFramework->GetUICommandProperty(commandId, key, value);
+}
+
 HRESULT CSIFRibbon::SaveSettings (VOID)
 {
 	HRESULT hr;
