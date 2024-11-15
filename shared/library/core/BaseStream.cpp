@@ -25,8 +25,6 @@ HRESULT WINAPI CBaseStream::QueryInterface (REFIID iid, LPVOID* lplpvObject)
 	{
 		if(iid == IID_ISequentialStream)
 			*lplpvObject = static_cast<ISequentialStream*>(this);
-		else if(iid == __uuidof(ISeekableStream))
-			*lplpvObject = static_cast<ISeekableStream*>(this);
 		else if(iid == IID_IUnknown)
 			*lplpvObject = static_cast<IUnknown*>(this);
 		else
@@ -104,52 +102,6 @@ HRESULT WINAPI CBaseStream::Write (VOID const* lpcv, ULONG cb, ULONG* lpcbWritte
 			hr = GrowAndWrite(lpcv, cb, lpcbWritten);
 	}
 	return hr;
-}
-
-// ISeekableStream
-
-HRESULT WINAPI CBaseStream::Seek (LARGE_INTEGER liDistanceToMove, DWORD dwOrigin, __out_opt ULARGE_INTEGER* puliNewPosition)
-{
-	HRESULT hr;
-	ULONG ulPosition;
-
-	if(liDistanceToMove.QuadPart < 0)
-	{
-		CheckIf(liDistanceToMove.QuadPart < INT_MIN, HRESULT_FROM_WIN32(ERROR_FILE_TOO_LARGE));
-		Check(Seek(static_cast<LONG>(liDistanceToMove.QuadPart), dwOrigin, &ulPosition));
-	}
-	else
-	{
-		CheckIf(liDistanceToMove.HighPart != 0, HRESULT_FROM_WIN32(ERROR_FILE_TOO_LARGE));
-		Check(Seek(liDistanceToMove.LowPart, dwOrigin, &ulPosition));
-	}
-
-	if(puliNewPosition)
-	{
-		puliNewPosition->LowPart = ulPosition;
-		puliNewPosition->HighPart = 0;
-	}
-
-Cleanup:
-	return hr;
-}
-
-HRESULT WINAPI CBaseStream::Stat (__out STATSTG* pStatstg, DWORD grfStatFlag)
-{
-	pStatstg->pwcsName = NULL;  // Regardless of grfStatFlag, this implementation does not know the name.
-	pStatstg->cbSize.HighPart = 0;
-	pStatstg->cbSize.LowPart = DataRemaining();
-	pStatstg->type = STGTY_STORAGE;
-	pStatstg->grfMode = grfStatFlag;
-	ZeroMemory(&pStatstg->ctime, sizeof(pStatstg->ctime));
-	ZeroMemory(&pStatstg->atime, sizeof(pStatstg->atime));
-	ZeroMemory(&pStatstg->mtime, sizeof(pStatstg->mtime));
-	return S_OK;
-}
-
-HRESULT WINAPI CBaseStream::Duplicate (__deref_out ISeekableStream** ppDupStream)
-{
-	return E_NOTIMPL;
 }
 
 VOID CBaseStream::Reset (VOID)

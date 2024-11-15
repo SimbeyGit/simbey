@@ -1160,7 +1160,7 @@ T* TStrLwrAssert (T* ptzString)
 template <typename T>
 T* TStrUprAssert (T* ptzString)
 {
-	return TStringCore<SensitiveAssert>::TStrLwr(ptzString);
+	return TStringCore<SensitiveAssert>::TStrUpr(ptzString);
 }
 
 template <typename T>

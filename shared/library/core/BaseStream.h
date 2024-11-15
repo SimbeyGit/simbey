@@ -1,8 +1,6 @@
 #pragma once
 
-#include "ISeekableStream.h"
-
-class CBaseStream : public ISeekableStream
+class CBaseStream : public ISequentialStream
 {
 private:
 	ULONG m_cRef;
@@ -12,6 +10,9 @@ protected:
 	ULONG m_cbMaxBuffer;
 	ULONG m_cbData;
 
+	// IMPORTANT - m_iReadPtr controls the position for reading from the stream!
+	// Writing always occurs at the end of the stream, and writing can condense
+	// the memory stream by removing data that has already been marked read!
 	ULONG m_iReadPtr;
 
 public:
@@ -26,11 +27,6 @@ public:
 	// ISequentialStream
 	HRESULT WINAPI Read (LPVOID lpv, ULONG cb, ULONG* lpcbRead);
 	HRESULT WINAPI Write (VOID const* lpcv, ULONG cb, ULONG* lpcbWritten);
-
-	// ISeekableStream
-	virtual HRESULT WINAPI Seek (LARGE_INTEGER liDistanceToMove, DWORD dwOrigin, __out_opt ULARGE_INTEGER* puliNewPosition);
-	virtual HRESULT WINAPI Stat (__out STATSTG* pStatstg, DWORD grfStatFlag);
-	virtual HRESULT WINAPI Duplicate (__deref_out ISeekableStream** ppDupStream);
 
 	VOID Reset (VOID);
 	ULONG DataRemaining (VOID) const;
