@@ -53,11 +53,15 @@ public:
 	virtual HRESULT WINAPI Stat (__out STATSTG* pStatstg, DWORD grfStatFlag);
 	virtual HRESULT WINAPI Duplicate (__deref_out ISeekableStream** ppDupStream);
 
+	CMemFileData* GetFileData (VOID) const;
+	VOID ReplaceData (CMemFileData* pmfd);
+
+	ULONGLONG GetOffset (VOID) const;
 	ULONGLONG GetSize (VOID) const;
 	ULONGLONG GetRemaining (VOID) const;
 	HRESULT Truncate (VOID);
 	BYTE const* GetReadPtr (VOID) const;
-	PBYTE GetWritePtr (VOID) const;
+	PBYTE GetWritePtr (VOID);
 
 	template <typename T>
 	inline HRESULT TWrite (__in_ecount(cElements) const T* pctv, INT cElements, ULONG* pcbWritten)

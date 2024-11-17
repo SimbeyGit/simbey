@@ -254,6 +254,22 @@ Cleanup:
 	return hr;
 }
 
+CMemFileData* CMemoryFile::GetFileData (VOID) const
+{
+	return m_pmfd;
+}
+
+VOID CMemoryFile::ReplaceData (CMemFileData* pmfd)
+{
+	ReplaceInterface(m_pmfd, pmfd);
+	m_uliPtr.QuadPart = 0;
+}
+
+ULONGLONG CMemoryFile::GetOffset (VOID) const
+{
+	return m_uliPtr.QuadPart;
+}
+
 ULONGLONG CMemoryFile::GetSize (VOID) const
 {
 	return m_pmfd->m_uliData.QuadPart;
@@ -280,7 +296,7 @@ BYTE const* CMemoryFile::GetReadPtr (VOID) const
 	return m_pmfd->m_pBuffer + m_uliPtr.QuadPart;
 }
 
-PBYTE CMemoryFile::GetWritePtr (VOID) const
+PBYTE CMemoryFile::GetWritePtr (VOID)
 {
 	return m_pmfd->m_pBuffer + m_uliPtr.QuadPart;
 }
