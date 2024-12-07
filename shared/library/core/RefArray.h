@@ -35,6 +35,11 @@ public:
 		return m_aItems[n];
 	}
 
+	inline ArrayType* GetArray (VOID)
+	{
+		return &m_aItems;
+	}
+
 	HRESULT Get (sysint nPosition, TItem* pvItem)
 	{
 		HRESULT hr = E_FAIL;

@@ -1,6 +1,9 @@
 #include <windows.h>
 #include "Core\Assert.h"
 #include "Sorting.h"
+#ifdef	USE_SIMBEY_CORE_API_REDIRECT
+	#include "Published\SimbeyCore.h"
+#endif
 
 // Always compile this module for speed, not size
 #pragma optimize("t", on)
@@ -131,6 +134,7 @@ namespace Sorting
 
 	VOID QuickSort (LPVOID lpBase, sysint cItems, size_t nItemSize, COMPARECALLBACK lpfnCompare, LPVOID lpParam)
 	{
+#ifndef	USE_SIMBEY_CORE_API_REDIRECT
 		// Note: the number of stack entries required is no more than
 		// 1 + log2(num), so 30 is sufficient for any array
 	    BYTE *lo, *hi;              // ends of sub-array currently sorting
@@ -330,8 +334,11 @@ recurse:
 	        hi = histk[stkptr];
 		    goto recurse;           /* pop subarray from stack */
 		}
-		else
-			return;                 /* all subarrays done */
+
+		// all subarrays done
+#else
+		ScQuickSort(lpBase, cItems, nItemSize, lpfnCompare, lpParam);
+#endif
 	}
 
 // ************************************
@@ -350,6 +357,7 @@ recurse:
 // ************************************
 	LPVOID LinkSort (LPVOID p, UINT index, COMPARECALLBACK lpfnCompare, LPVOID lpParam, ULONG* pcount)
 	{
+#ifndef	USE_SIMBEY_CORE_API_REDIRECT
 		UINT base;
 		ULONG block_size;
 
@@ -440,5 +448,8 @@ recurse:
 		if(pcount)
 			*pcount = tape[base].count;
 		return tape[base].first;
+#else
+		return ScLinkSort(p, index, lpfnCompare, lpParam, pcount);
+#endif
 	}
 }

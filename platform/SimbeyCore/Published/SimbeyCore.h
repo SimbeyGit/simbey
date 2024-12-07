@@ -2,6 +2,23 @@
 
 #include "..\..\..\Shared\Library\Util\RString.h"
 #include "..\..\..\Shared\Library\Util\StreamCopy.h"
+#include "..\..\..\Shared\Library\Sorting.h"
+
+#define	SEARCH_TYPE_PATH			0
+#define	SEARCH_TYPE_CURRENT_DIR		1
+#define	SEARCH_TYPE_HMODULE			2
+#define	SEARCH_TYPE_SYSTEM_PATHS	3
+
+struct SEARCH_PATH
+{
+	INT nSearchType;
+	INT cLevelsToRemove;
+	union
+	{
+		RSTRING rstrPath;
+		HMODULE hModule;
+	};
+};
 
 interface __declspec(uuid("03CAACF8-4C42-464c-901E-C5C0AA8F94F3")) IRStringArray : IUnknown
 {
@@ -86,3 +103,10 @@ HRESULT WINAPI ScCopyStream (ISequentialStream* pstmDest, ISequentialStream* pst
 HRESULT WINAPI ScRegisterServer (HMODULE hModule, const IID& iidClass, PCWSTR pcwzProgID, PCWSTR pcwzModuleDescription);
 HRESULT WINAPI ScUnregisterServer (const IID& iidClass, PCWSTR pcwzProgID);
 HRESULT WINAPI ScAddImplementedCategories (const IID& iidClass, __in_ecount(cCategories) const GUID* pcrgCategories, INT cCategories);
+
+HRESULT WINAPI ScGetCurrentDirectory (__deref_out RSTRING* prstrCurDir);
+HRESULT WINAPI ScSearchPaths (PCWSTR pcwzFileName, __in_ecount_opt(cchSearchPath) PCWSTR pcwzSearchPath, INT cchSearchPath, INT cLevelsToRemove, BOOL fSearchPaths, __out_ecount(cchMaxFilePath) PWSTR pwzFilePath, INT cchMaxFilePath, __out INT* pcchFilePath);
+HRESULT WINAPI ScSearchPathsEx (PCWSTR pcwzFileName, const SEARCH_PATH* pcrgSearch, INT cSearch, __out_ecount(cchMaxFilePath) PWSTR pwzFilePath, INT cchMaxFilePath, __out INT* pcchFilePath);
+
+VOID WINAPI ScQuickSort (PVOID pvBase, sysint cItems, size_t nItemSize, Sorting::COMPARECALLBACK pfnCompare, PVOID pvParam);
+LPVOID WINAPI ScLinkSort (PVOID p, UINT index, Sorting::COMPARECALLBACK pfnCompare, PVOID pvParam, ULONG* pcount);

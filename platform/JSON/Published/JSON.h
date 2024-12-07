@@ -75,6 +75,7 @@ interface __declspec(uuid("ACAA6168-DEB5-4d80-8BE5-A3622F5383C2")) IJSONArray : 
 	virtual HRESULT STDMETHODCALLTYPE GetString (sysint nItem, __deref_out_opt RSTRING* prstrValue) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Clear (VOID) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Compact (VOID) = 0;
+	virtual VOID STDMETHODCALLTYPE Sort (INT (WINAPI* pfnCallback)(IJSONValue**, IJSONValue**, PVOID pvParam), PVOID pvParam) = 0;
 };
 
 interface __declspec(uuid("817FAB75-C7A0-4894-B221-3132B34AC5AB")) IJSONValue : IUnknown

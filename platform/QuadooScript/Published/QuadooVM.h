@@ -511,6 +511,7 @@ interface __declspec(uuid("E8B88B7C-3FE7-4d6f-AB84-9827882E465E")) IQuadooArray 
 	virtual HRESULT STDMETHODCALLTYPE Splice (sysint nInsertAt, sysint cRemove, const QuadooVM::QVARIANT* pqv) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Slice (sysint nBegin, sysint nEnd, __out QuadooVM::QVARIANT* pqv) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Swap (sysint nItemA, sysint nItemB) = 0;
+	virtual VOID STDMETHODCALLTYPE Sort (INT (WINAPI* pfnCallback)(QuadooVM::QVARIANT* pqvLeft, QuadooVM::QVARIANT* pqvRight, PVOID pvParam), PVOID pvParam) = 0;
 };
 
 interface __declspec(uuid("48A8AD92-4BA4-476f-9BF1-E58F8295FDE5")) IQuadooMap : IQuadooContainer
