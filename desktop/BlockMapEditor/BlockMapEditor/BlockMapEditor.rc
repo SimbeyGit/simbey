@@ -1,0 +1,225 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAIN                ICON                    "main.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// SIF
+//
+
+SIF16_96                SIF                     "RibbonSmall.sif"
+SIF16_144               SIF                     "RibbonSmall144.sif"
+SIF32_96                SIF                     "RibbonLarge.sif"
+SIF32_144               SIF                     "RibbonLarge144.sif"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_EXPORT DIALOGEX 0, 0, 334, 207
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Export Map to Doom"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_CONVERSION,"DlgAdapter",WS_TABSTOP,0,0,330,180
+    LTEXT           "Converting map to Doom format...",IDC_STATUS,7,188,168,8
+    DEFPUSHBUTTON   "Save",IDOK,222,186,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,276,186,50,14
+END
+
+IDD_CONFIG DIALOGEX 0, 0, 214, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Configuration"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Texture Data (PK3) File:",IDC_STATIC,6,6,78,8
+    EDITTEXT        IDC_TEXTURE_DATA,6,18,198,14,ES_AUTOHSCROLL
+    LTEXT           "Behavior and Script Path:",IDC_STATIC,6,42,82,8
+    EDITTEXT        IDC_BEHAVIOR_PATH,6,54,198,14,ES_AUTOHSCROLL
+    LTEXT           "ZDBSP DLL Path:",IDC_STATIC,6,78,54,8
+    EDITTEXT        IDC_ZDBSP_PATH,6,90,198,14,ES_AUTOHSCROLL
+    LTEXT           "Floor Flat Name:",IDC_STATIC,6,114,54,8
+    EDITTEXT        IDC_FLOOR_NAME,6,126,66,14,ES_AUTOHSCROLL
+    LTEXT           "Ceiling Flat Name:",IDC_STATIC,108,114,58,8
+    EDITTEXT        IDC_CEILING_NAME,108,126,66,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,6,156,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,156,50,14
+END
+
+IDD_PROPERTIES DIALOGEX 0, 0, 184, 140
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Map Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Floor Flat Name:",IDC_STATIC,6,6,54,8
+    EDITTEXT        IDC_FLOOR_NAME,6,18,66,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse Floor Flats",IDC_BROWSE_FLOOR,78,18,84,14
+    LTEXT           "Ceiling Flat Name:",IDC_STATIC,6,42,58,8
+    EDITTEXT        IDC_CEILING_NAME,6,54,66,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse Ceiling Flats",IDC_BROWSE_CEILING,78,54,84,14
+    LTEXT           "Lighting Level:",IDC_STATIC,6,78,47,8
+    EDITTEXT        IDC_LIGHTING,6,90,66,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,6,120,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,120,50,14
+END
+
+IDD_DIFFICULTY DIALOGEX 0, 0, 118, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Difficulty Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Easy",IDC_DIFFICULTY_EASY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,6,31,10
+    CONTROL         "Medium",IDC_DIFFICULTY_MEDIUM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,18,40,10
+    CONTROL         "Hard",IDC_DIFFICULTY_HARD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,30,31,10
+    CONTROL         "Ambush",IDC_AMBUSH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,48,41,10
+    DEFPUSHBUTTON   "OK",IDOK,6,66,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,66,50,14
+END
+
+IDD_LOADER DIALOGEX 0, 0, 286, 26
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Loading..."
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Initializing...",IDC_STATUS,6,6,276,8
+END
+
+IDD_SELECT_SIF DIALOGEX 0, 0, 412, 206
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Item"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,6,186,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,186,50,14
+    CONTROL         "",IDC_ITEMS,"DlgAdapter",WS_BORDER | WS_TABSTOP,6,6,402,174
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_EXPORT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 327
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 200
+    END
+
+    IDD_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 207
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
+
+    IDD_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 177
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 133
+    END
+
+    IDD_DIFFICULTY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 111
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 79
+    END
+
+    IDD_LOADER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 279
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 19
+    END
+
+    IDD_SELECT_SIF, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 405
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 199
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

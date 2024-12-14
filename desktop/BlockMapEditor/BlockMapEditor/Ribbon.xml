@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns='http://schemas.microsoft.com/windows/2009/Ribbon'>
+  <Application.Commands />
+  <Application.Views>
+    <Ribbon>
+      <Ribbon.ApplicationMenu>
+        <ApplicationMenu CommandName="ID_APP_MENU">
+          <MenuGroup>
+            <Button CommandName="ID_NEW" LabelTitle="New" LargeBitmap="auto" />
+            <Button CommandName="ID_OPEN" LabelTitle="Open" LargeBitmap="auto" />
+            <Button CommandName="ID_SAVE" LabelTitle="Save" LargeBitmap="auto" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="ID_PROPERTIES" LabelTitle="Properties" LargeBitmap="auto" />
+            <Button CommandName="ID_EXPORT" LabelTitle="Export" LargeBitmap="auto" />
+          </MenuGroup>
+          <MenuGroup>
+            <Button CommandName="ID_EXIT" LabelTitle="Exit" LargeBitmap="auto" />
+          </MenuGroup>
+        </ApplicationMenu>
+      </Ribbon.ApplicationMenu>
+      <Ribbon.Tabs>
+        <Tab CommandName="ID_TAB_MAIN" LabelTitle="Main">
+          <Tab.ScalingPolicy>
+            <ScalingPolicy>
+              <ScalingPolicy.IdealSizes>
+                <Scale Group="ID_GROUP_WALLS" Size="Large"/>
+                <Scale Group="ID_GROUP_OBJECTS" Size="Large"/>
+                <Scale Group="ID_GROUP_SELECTION" Size="Large"/>
+              </ScalingPolicy.IdealSizes>
+              <Scale Group="ID_GROUP_WALLS" Size="Popup"/>
+              <Scale Group="ID_GROUP_OBJECTS" Size="Popup"/>
+              <Scale Group="ID_GROUP_SELECTION" Size="Popup"/>
+            </ScalingPolicy>
+          </Tab.ScalingPolicy>
+          <Group CommandName="ID_GROUP_WALLS" LabelTitle="Walls" SizeDefinition="OneInRibbonGallery">
+            <InRibbonGallery CommandName="ID_WALLS" ItemWidth="32" ItemHeight="32" Type="Items" MaxRows="4" MinColumnsLarge="4" MinColumnsMedium="3" TextPosition="Bottom">
+              <InRibbonGallery.MenuGroups>
+                <MenuGroup>
+                </MenuGroup>
+              </InRibbonGallery.MenuGroups>
+            </InRibbonGallery>
+          </Group>
+          <Group CommandName="ID_GROUP_OBJECTS" LabelTitle="Objects" SizeDefinition="OneInRibbonGallery">
+            <InRibbonGallery CommandName="ID_OBJECTS" ItemWidth="32" ItemHeight="32" Type="Items" MaxRows="4" MinColumnsLarge="4" MinColumnsMedium="3" TextPosition="Bottom">
+              <InRibbonGallery.MenuGroups>
+                <MenuGroup>
+                </MenuGroup>
+              </InRibbonGallery.MenuGroups>
+            </InRibbonGallery>
+          </Group>
+          <Group CommandName="ID_GROUP_SELECTION" LabelTitle="Selection" SizeDefinition="TwoButtons">
+            <DropDownGallery CommandName="ID_PAINT_TYPE" Type="Items" LabelTitle="Tile/Object" Bitmap="" >
+              <DropDownGallery.MenuLayout>
+                <FlowMenuLayout Columns="1" Rows="8" Gripper="None" />
+              </DropDownGallery.MenuLayout>
+            </DropDownGallery>
+            <Button CommandName="ID_ADD_FLOOR" LabelTitle="Add Floor" LargeBitmap="auto" />
+          </Group>
+        </Tab>
+      </Ribbon.Tabs>
+    </Ribbon>
+  </Application.Views>
+</Application>
