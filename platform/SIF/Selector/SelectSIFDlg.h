@@ -9,13 +9,15 @@ class CSelectSIFDlg : public CBaseDialog
 {
 private:
 	CSIFSelector* m_pSelector;
+	UINT m_idItems;
 
 public:
-	CSelectSIFDlg ();
+	CSelectSIFDlg (UINT idDialog, UINT idItems);
 	~CSelectSIFDlg ();
 
 	HRESULT Initialize (VOID);
 	HRESULT AddSIF (RSTRING rstrTitle, ISimbeyInterchangeFile* pSIF);
+	VOID SetSelection (RSTRING rstrTitle, DWORD idLayer);
 	HRESULT GetSelection (__out RSTRING* prstrTitle, __out DWORD* pidSelection);
 
 	virtual BOOL DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);

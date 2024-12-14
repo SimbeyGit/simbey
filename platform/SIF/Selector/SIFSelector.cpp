@@ -311,7 +311,7 @@ BOOL CSIFGroup::SelectItem (INT x, INT y)
 
 BOOL CSIFGroup::SelectItemByIndex (sysint idxItem)
 {
-	if(0 <= idxItem)
+	if(0 <= idxItem && 0 < m_aRows.Length())
 	{
 		sysint cPerRow = m_aRows[0]->m_cItems;
 		sysint nRow = idxItem / cPerRow;
@@ -324,6 +324,21 @@ BOOL CSIFGroup::SelectItemByIndex (sysint idxItem)
 				return TRUE;
 			}
 		}
+	}
+
+	return FALSE;
+}
+
+BOOL CSIFGroup::SelectItemByID (DWORD idLayer)
+{
+	DWORD cLayers = m_pSIF->GetLayerCount();
+
+	for(DWORD i = 0; i < cLayers; i++)
+	{
+		TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+
+		if(SUCCEEDED(m_pSIF->GetLayerByIndex(i, &srLayer)) && idLayer == srLayer->GetLayerID())
+			return SelectItemByIndex(i);
 	}
 
 	return FALSE;
@@ -383,7 +398,9 @@ CSIFSelector::CSIFSelector () :
 	m_pWindow(NULL),
 	m_xClientSize(0),
 	m_yClientSize(0),
-	m_yTotalSize(0)
+	m_yTotalSize(0),
+	m_rstrSelection(NULL),
+	m_idSelection(0)
 {
 	m_sizing.xItemSize = 100;
 	m_sizing.yItemSize = 80;
@@ -395,6 +412,7 @@ CSIFSelector::~CSIFSelector ()
 	Assert(NULL == m_pWindow);
 
 	m_aGroups.DeleteAll();
+	RStrRelease(m_rstrSelection);
 }
 
 HRESULT CSIFSelector::ResizeItems (LONG xItemSize, LONG yItemSize, LONG yTextHeight)
@@ -432,14 +450,34 @@ BOOL CSIFSelector::HasSelection (VOID)
 	return NULL != FindSelectedGroup();
 }
 
+VOID CSIFSelector::DeferSelection (RSTRING rstrTitle, DWORD idLayer)
+{
+	RStrReplace(&m_rstrSelection, rstrTitle);
+	m_idSelection = idLayer;
+}
+
+VOID CSIFSelector::LoadSelection (VOID)
+{
+	CSIFGroup* pSelected = FindSelectedGroup();
+	if(pSelected)
+	{
+		RStrReplace(&m_rstrSelection, pSelected->m_title.m_rstrTitle);
+		m_idSelection = pSelected->m_pSelected->pLayer->GetLayerID();
+	}
+	else
+	{
+		RStrRelease(m_rstrSelection); m_rstrSelection = NULL;
+		m_idSelection = 0;
+	}
+}
+
 HRESULT CSIFSelector::GetSelected (__out RSTRING* prstrTitle, __out DWORD* pidSelection)
 {
 	HRESULT hr;
-	CSIFGroup* pSelected = FindSelectedGroup();
 
-	CheckIfIgnore(NULL == pSelected, E_FAIL);
-	RStrSet(*prstrTitle, pSelected->m_title.m_rstrTitle);
-	*pidSelection = pSelected->m_pSelected->pLayer->GetLayerID();
+	CheckIfIgnore(NULL == m_rstrSelection, E_FAIL);
+	RStrSet(*prstrTitle, m_rstrSelection);
+	*pidSelection = m_idSelection;
 	hr = S_OK;
 
 Cleanup:
@@ -622,6 +660,30 @@ VOID CSIFSelector::OnDetachingAdapter (IBaseWindow* pAdapter)
 	SafeRelease(m_pWindow);
 }
 
+HRESULT CSIFSelector::SetSelection (RSTRING rstrTitle, DWORD idLayer)
+{
+	CSIFGroup* pPrevGroup = FindSelectedGroup();
+
+	for(sysint i = 0; i < m_aGroups.Length(); i++)
+	{
+		CSIFGroup* pGroup = m_aGroups[i];
+		INT nResult;
+
+		if(SUCCEEDED(RStrCompareRStr(pGroup->m_title.m_rstrTitle, rstrTitle, &nResult)) && 0 == nResult)
+		{
+			if(pGroup->SelectItemByID(idLayer))
+			{
+				if(pPrevGroup && pPrevGroup != pGroup)
+					pPrevGroup->m_pSelected = NULL;
+				return S_OK;
+			}
+			return HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+		}
+	}
+
+	return HRESULT_FROM_WIN32(ERROR_SET_NOT_FOUND);
+}
+
 HRESULT CSIFSelector::GetScrollPos (__out INT* pnPos, BOOL fTrackPos)
 {
 	HRESULT hr;
@@ -669,6 +731,13 @@ HRESULT CSIFSelector::Relayout (VOID)
 	{
 		for(sysint i = 0; i < m_aGroups.Length(); i++)
 			Check(m_aGroups[i]->Layout(m_xClientSize, m_yTotalSize, m_sizing, &m_yTotalSize));
+
+		if(m_rstrSelection)
+		{
+			SetSelection(m_rstrSelection, m_idSelection);
+			RStrRelease(m_rstrSelection);
+			m_rstrSelection = NULL;
+		}
 	}
 
 	if(m_pWindow)

@@ -189,14 +189,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SelectSIFDlg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SIFSelector.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -224,14 +216,6 @@
 			</File>
 			<File
 				RelativePath=".\Rooms.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SelectSIFDlg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SIFSelector.h"
 				>
 			</File>
 		</Filter>
@@ -566,6 +550,26 @@
 			</File>
 			<File
 				RelativePath="..\..\..\platform\SIF\Package\SIFPackage.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Selector"
+			>
+			<File
+				RelativePath="..\..\..\platform\SIF\Selector\SelectSIFDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\platform\SIF\Selector\SelectSIFDlg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\platform\SIF\Selector\SIFSelector.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\platform\SIF\Selector\SIFSelector.h"
 				>
 			</File>
 		</Filter>

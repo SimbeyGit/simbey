@@ -80,6 +80,7 @@ public:
 	VOID Paint (HDC hdc, LONG nWidth, LONG nHeight, LONG yScroll, const ITEM_SIZING& sizing);
 	BOOL SelectItem (INT x, INT y);
 	BOOL SelectItemByIndex (sysint idxItem);
+	BOOL SelectItemByID (DWORD idLayer);
 	BOOL NavigateSelection (WPARAM wKey);
 	BOOL GetSelected (__out sysint* pidxRow, __out sysint* pidxItem);
 };
@@ -96,6 +97,10 @@ private:
 
 	ITEM_SIZING m_sizing;
 
+	// Cached selection
+	RSTRING m_rstrSelection;
+	DWORD m_idSelection;
+
 public:
 	IMP_BASE_UNKNOWN
 
@@ -110,6 +115,8 @@ public:
 	HRESULT ResizeItems (LONG xItemSize, LONG yItemSize, LONG yTextHeight);
 	HRESULT AddSIF (RSTRING rstrTitle, ISimbeyInterchangeFile* pSIF);
 	BOOL HasSelection (VOID);
+	VOID DeferSelection (RSTRING rstrTitle, DWORD idLayer);
+	VOID LoadSelection (VOID);
 	HRESULT GetSelected (__out RSTRING* prstrTitle, __out DWORD* pidSelection);
 
 	// IAdapterWindowCallback
@@ -118,6 +125,7 @@ public:
 	virtual VOID OnDetachingAdapter (IBaseWindow* pAdapter);
 
 private:
+	HRESULT SetSelection (RSTRING rstrTitle, DWORD idLayer);
 	HRESULT GetScrollPos (__out INT* pnPos, BOOL fTrackPos);
 	HRESULT UpdateScrollRange (VOID);
 	HRESULT Relayout (VOID);

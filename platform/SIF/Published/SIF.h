@@ -170,7 +170,7 @@ interface __declspec(uuid("8D401C1F-B59A-43d4-89CA-2A22D40CFBCE")) ISimbeyInterc
 	STDMETHOD(GetLayer) (DWORD idLayer, __deref_out ISimbeyInterchangeFileLayer** ppLayer) = 0;
 	STDMETHOD(GetLayerByIndex) (DWORD dwLayerIndex, __deref_out ISimbeyInterchangeFileLayer** ppLayer) = 0;
 	STDMETHOD(AddLayer) (USHORT nWidth, USHORT nHeight, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
-	STDMETHOD(AddLayerFromBits) (USHORT nWidth, USHORT nHeight, __in PBYTE pBits, INT cBitsPerPixel, INT cBytesPerRow, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
+	STDMETHOD(AddLayerFromBits) (USHORT nWidth, USHORT nHeight, __in const BYTE* pcbBits, INT cBitsPerPixel, INT cBytesPerRow, __deref_out ISimbeyInterchangeFileLayer** ppLayer, __out_opt DWORD* pdwLayerIndex) = 0;
 	STDMETHOD(RemoveLayer) (DWORD idLayer) = 0;
 	STDMETHOD(ChangeLayerID) (DWORD idLayer, DWORD idNew) = 0;
 
@@ -258,6 +258,7 @@ interface __declspec(uuid("1F33FDB9-8333-4869-871C-5AA8B0B9C709")) ISimbeyFontCo
 HRESULT WINAPI sifCreateNew (__deref_out ISimbeyInterchangeFile** ppSIF);
 HRESULT WINAPI sifLoad (PCWSTR pcwzSIF, __deref_out ISimbeyInterchangeFile** ppSIF);
 HRESULT WINAPI sifLoadResource (HMODULE hModule, PCWSTR pcwzResName, __deref_out ISimbeyInterchangeFile** ppSIF);
+HRESULT WINAPI sifAlloc (DWORD cbAlloc, __deref_out PBYTE* ppbMem);
 VOID WINAPI sifDeleteMemoryPtr (PVOID pMem);
 BYTE WINAPI sifBlendColorComponents (BYTE bComponentA, BYTE bComponentB, INT nAlpha);
 BOOL WINAPI sifMergeLayer24 (PBYTE pImage24, INT niWidth, INT niHeight, PBYTE pLayer, INT xPos, INT yPos, INT nlWidth, INT nlHeight, INT cBitsPerPixel, PSIFPAL pPalette, INT cEntries, DWORD iTransparent);
@@ -301,6 +302,7 @@ HRESULT WINAPI sifResizeBitsX (__in_bcount(lPitch * nHeight) const BYTE* pcbBits
 HRESULT WINAPI sifTrimBits32 (const BYTE* pcbData, INT xSize, INT ySize, __deref_out_bcount(*pxNew * *pyNew * 4) BYTE** ppbNew, __out INT* pxNew, __out INT* pyNew, __out INT* pxOffset, __out INT* pyOffset);
 BOOL WINAPI sifToggleChannels (SIF_SURFACE* psifSurface);
 HRESULT WINAPI sifCreateStaticSprite (ISimbeyInterchangeFileLayer* pLayer, INT xStaticOffset, INT yStaticOffset, __deref_out ISimbeyInterchangeSprite** ppSprite);
+HRESULT WINAPI sifReadPNGToBits32Stream (const BYTE* pcbPNG, DWORD cbPNG, __out INT* pxSize, __out INT* pySize, __out ISequentialStream* pstmBits32, __out DWORD* pcbBits32);
 
 BOOL WINAPI sifDrawBits32ToDIB32 (__out_bcount(nWidth * nHeight * 4) PBYTE pDIB32, INT xDest, INT yDest, INT nWidth, INT nHeight, __in_bcount(nWidthBits * nHeightBits * 4) const BYTE* pBits, INT nWidthBits, INT nHeightBits);
 BOOL WINAPI sifDrawBits32ToDIB24 (__out PBYTE pDIB24, INT xDest, INT yDest, INT nWidth, INT nHeight, __in_bcount(nWidthBits * nHeightBits * 4) const BYTE* pBits, INT nWidthBits, INT nHeightBits);

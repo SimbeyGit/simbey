@@ -1,10 +1,10 @@
 #include <windows.h>
-#include "resource.h"
 #include "SelectSIFDlg.h"
 
-CSelectSIFDlg::CSelectSIFDlg () :
-	CBaseDialog(IDD_SELECT_SIF),
-	m_pSelector(NULL)
+CSelectSIFDlg::CSelectSIFDlg (UINT idDialog, UINT idItems) :
+	CBaseDialog(idDialog),
+	m_pSelector(NULL),
+	m_idItems(idItems)
 {
 }
 
@@ -30,6 +30,11 @@ HRESULT CSelectSIFDlg::AddSIF (RSTRING rstrTitle, ISimbeyInterchangeFile* pSIF)
 	return m_pSelector->AddSIF(rstrTitle, pSIF);
 }
 
+VOID CSelectSIFDlg::SetSelection (RSTRING rstrTitle, DWORD idLayer)
+{
+	m_pSelector->DeferSelection(rstrTitle, idLayer);
+}
+
 HRESULT CSelectSIFDlg::GetSelection (__out RSTRING* prstrTitle, __out DWORD* pidSelection)
 {
 	return m_pSelector->GetSelected(prstrTitle, pidSelection);
@@ -41,9 +46,9 @@ BOOL CSelectSIFDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 	switch(message)
 	{
 	case WM_INITDIALOG:
-		CDialogControlAdapter::Attach(GetDlgItem(IDC_ITEMS), m_pSelector);
+		CDialogControlAdapter::Attach(GetDlgItem(m_idItems), m_pSelector);
 		CenterHost();
-		SetFocus(GetDlgItem(IDC_ITEMS));
+		SetFocus(GetDlgItem(m_idItems));
 		break;
 	case WM_COMMAND:
 		if(IDCANCEL == LOWORD(wParam))
@@ -51,7 +56,10 @@ BOOL CSelectSIFDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 		else if(IDOK == LOWORD(wParam))
 		{
 			if(m_pSelector->HasSelection())
+			{
+				m_pSelector->LoadSelection();
 				End(TRUE);
+			}
 		}
 		break;
 	}

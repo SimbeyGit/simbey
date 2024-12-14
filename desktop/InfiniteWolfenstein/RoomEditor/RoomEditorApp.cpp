@@ -8,12 +8,12 @@
 #include "Library\ChooseFile.h"
 #include "Library\DPI.h"
 #include "Package\SIFPackage.h"
+#include "Selector\SelectSIFDlg.h"
 #include "Published\JSON.h"
 #include "Ribbon.h"
 #include "RibbonMappings.h"
 #include "Rooms.h"
 #include "RenameRoomDlg.h"
-#include "SelectSIFDlg.h"
 #include "RoomEditorApp.h"
 
 const WCHAR c_wzAppClassName[] = L"RoomEditorAppCls";
@@ -960,7 +960,7 @@ HRESULT CRoomEditorApp::ShowPickWallDialog (__out ULONG* pidxType)
 {
 	HRESULT hr;
 	CDialogHost host(m_hInstance);
-	CSelectSIFDlg dlgSelect;
+	CSelectSIFDlg dlgSelect(IDD_SELECT_SIF, IDC_ITEMS);
 	RSTRING rstrSelectedNamespace = NULL;
 	RSTRING rstrTitle = NULL;
 	PACKAGE_DATA data;
@@ -1039,7 +1039,7 @@ HRESULT CRoomEditorApp::ShowPickEntityDialog (__out ULONG* pidxType)
 {
 	HRESULT hr;
 	CDialogHost host(m_hInstance);
-	CSelectSIFDlg dlgSelect;
+	CSelectSIFDlg dlgSelect(IDD_SELECT_SIF, IDC_ITEMS);
 	RSTRING rstrSelectedNamespace = NULL;
 	RSTRING rstrTitle = NULL, rstrName = NULL;
 	PACKAGE_DATA data;
