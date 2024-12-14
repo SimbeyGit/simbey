@@ -16,3 +16,5 @@
 ![Infinite Wolfenstein](screenshots/InfiniteWolfenstein.png)
 ### Quadoo Studio ###
 ![Quadoo Studio](screenshots/QuadooStudio.png)
+### Block Map Editor ###
+![Block Map Editor](screenshots/BlockMapEditor.png)
