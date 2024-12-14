@@ -62,7 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="SimbeyCore.lib JSON.lib SIF.lib SimbeyZip.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\..\target\lib\debug"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -136,7 +138,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="SimbeyCore.lib JSON.lib SIF.lib SimbeyZip.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\..\target\lib\release"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
