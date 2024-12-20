@@ -195,6 +195,7 @@ private:
 	INT m_iNextPoly;
 	SHORT m_sHorizontal;
 	SHORT m_sVertical;
+	SHORT m_xSpan, m_ySpan;
 	LPPOLY_QUEUE m_lpQueue;
 
 	INT m_iLightLevel;
@@ -230,6 +231,8 @@ public:
 	SHORT AddSector (LPSECTOR lpSector);
 	VOID AddThing (CMapThing* lpThing);
 
+	VOID GetMapSize (__out SHORT& x, __out SHORT& y);
+
 protected:
 	static VOID CopyTexture (PSTR pszTarget, PCWSTR pcwzTexture);
 	static VOID RotatePoints (VERTEX* prgvPoints, INT cPoints);
@@ -258,6 +261,8 @@ protected:
 	VOID BuildPolys (LPWOLFDATA lpMap);
 	VOID FixSidedefs (VOID);
 	VOID BuildVertexList (VOID);
+	VOID CalculateMapSize (LPWOLFDATA lpMap);
+
 	VOID ExtendOutside (SECTOR* pAdjacent, CMapLine* lpLine, INT iDir, PCWSTR pcwzTexture);
 	HRESULT BuildCage (LPWOLFDATA lpMap, INT x, INT y, INT nLine, CMapLine* pLine, CWallCage* pCage);
 	HRESULT BuildWadFile (PCSTR pcszMapName, ISeekableStream* pFile, CConfigDlg* pdlgConfig);
@@ -268,6 +273,8 @@ protected:
 	ULONG SerializeVertices (ISeekableStream* pFile);
 	ULONG SerializeSectors (ISeekableStream* pFile);
 	ULONG SerializeLump (ISeekableStream* pFile, PCWSTR pcwzPath, LPSTR lpszFile);
+
+	static VOID CompareVertexForMapSize (const VERTEX& v, SHORT& xMin, SHORT& yMin, SHORT& xMax, SHORT& yMax);
 };
 
 #endif

@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
 #include "Library\Util\StreamHelpers.h"
+#include "Library\Util\Formatting.h"
 #include "Library\ChooseFile.h"
 #include "ConfigDlg.h"
 #include "MapLine.h"
@@ -226,7 +227,9 @@ CMapConverterView::CMapConverterView (CBlockMap* pBlockMap, PCWSTR pcwzName, INT
 	m_pBlockMap(pBlockMap),
 	m_pdlgConfig(pdlgConfig),
 	m_pConvert(NULL),
-	m_hThread(NULL)
+	m_hThread(NULL),
+	m_xSpan(-1),
+	m_ySpan(-1)
 {
 	PCWSTR pcwzExt = TStrChr(pcwzName, L'.');
 	if(pcwzExt)
@@ -259,6 +262,12 @@ CMapConverterView::~CMapConverterView ()
 	m_aThings.DeleteAll();
 
 	m_Graph.AttachContainer(NULL);
+}
+
+VOID CMapConverterView::GetMapSize (__out SHORT& x, __out SHORT& y)
+{
+	x = m_xSpan;
+	y = m_ySpan;
 }
 
 // IAdapterWindowCallback
@@ -349,7 +358,7 @@ BOOL CMapConverterView::DefWindowProc (UINT message, WPARAM wParam, LPARAM lPara
 
 			CloseConversion();
 			if(SUCCEEDED(m_pAdapter->GetWindow(&hwnd)))
-				PostMessage(GetParent(hwnd), WM_COMMAND, GetDlgCtrlID(hwnd), (HRESULT)lParam);
+				PostMessage(GetParent(hwnd), WM_COMMAND, GetDlgCtrlID(hwnd), lParam);
 		}
 		break;
 
@@ -636,6 +645,7 @@ HRESULT CMapConverterView::ConvertMapAsync (VOID)
 	data.pMap = m_pBlockMap;
 	data.yFloor = 0;
 	Check(m_pConvert->RunConversion(this, m_szLevel, &m_memFile, &data, m_pdlgConfig));
+	m_pConvert->GetMapSize(m_xSpan, m_ySpan);
 	Check(BuildNodes());
 
 Cleanup:
@@ -771,8 +781,14 @@ BOOL CExportDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRES
 			End(IDCANCEL);
 		else if(IDC_CONVERSION == LOWORD(wParam))
 		{
-			if(0 == lParam)
+			if(S_OK == static_cast<HRESULT>(lParam))
 			{
+				SHORT x, y;
+				WCHAR wzSize[32];
+				m_pConverter->GetMapSize(x, y);
+				Formatting::TPrintF(wzSize, ARRAYSIZE(wzSize), NULL, L"%d, %d", x, y);
+				SetWindowText(GetDlgItem(IDC_EXPORT_SIZE), wzSize);
+
 				SetWindowText(GetDlgItem(IDC_STATUS), L"Map conversion successful!");
 				EnableWindow(GetDlgItem(IDOK), TRUE);
 			}

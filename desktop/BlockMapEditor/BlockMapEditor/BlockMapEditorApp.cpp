@@ -181,7 +181,8 @@ CActorDef::CActorDef (RSTRING rstrName) :
 	m_rstrParent(NULL),
 	m_rstrDef(NULL),
 	m_idActor(0),
-	m_fMonster(false)
+	m_fMonster(false),
+	m_fLookAllAround(false)
 {
 	RStrSet(m_rstrName, rstrName);
 }
@@ -1204,12 +1205,18 @@ HRESULT CBlockMapEditorApp::LoadActors (PCWSTR pcwzText, PCWSTR pcwzDeco)
 				}
 				else if(0 == TStrICmpNAssert(pcwzToken, SLP(L"MONSTER")))
 					pActorDef->m_fMonster = true;
+				else if(0 == TStrICmpNAssert(pcwzToken, SLP(L"+LOOKALLAROUND")))
+					pActorDef->m_fLookAllAround = true;
 			}
 			CheckIf(0 != cGroups, E_FAIL);
 
 			// If your parent is a monster, then you're also a monster.
 			if(!pActorDef->m_fMonster && pActorDef->m_pParent && pActorDef->m_pParent->m_fMonster)
 				pActorDef->m_fMonster = true;
+
+			// If your parent looks all around, then you look all around.
+			if(!pActorDef->m_fLookAllAround && pActorDef->m_pParent && pActorDef->m_pParent->m_fLookAllAround)
+				pActorDef->m_fLookAllAround = true;
 
 			Check(RStrCreateW(static_cast<INT>(pcwzDeco - pcwzDef), pcwzDef, &pActorDef->m_rstrDef));
 
@@ -1264,7 +1271,7 @@ HRESULT CBlockMapEditorApp::LoadActors (PCWSTR pcwzText, PCWSTR pcwzDeco)
 					else
 						Check(hrFindTexture);
 
-					if(pActorDef->m_fMonster)
+					if(pActorDef->m_fMonster && !pActorDef->m_fLookAllAround)
 					{
 						Check(AddDirectionalActor(pActorDef->m_rstrName, 0, pActor, true));
 						Check(AddDirectionalActor(pActorDef->m_rstrName, 90, pActor, false));

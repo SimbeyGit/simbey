@@ -112,6 +112,7 @@ HRESULT CMapConvert::RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLe
 	BuildOutsideViews(lpMap);
 	BuildPlayerStarts(lpMap);
 	BuildThings(lpMap);
+	CalculateMapSize(lpMap);
 	BuildPolys(lpMap);
 	FixSidedefs();
 	BuildVertexList();
@@ -447,6 +448,12 @@ VOID CMapConvert::AddThing (CMapThing* lpThing)
 		m_lpThings = lpNew;
 
 	m_pProgress->ReportAddThing(lpThing);
+}
+
+VOID CMapConvert::GetMapSize (__out SHORT& x, __out SHORT& y)
+{
+	x = m_xSpan;
+	y = m_ySpan;
 }
 
 VOID CMapConvert::CopyTexture (PSTR pszTarget, PCWSTR pcwzTexture)
@@ -1739,6 +1746,33 @@ VOID CMapConvert::BuildVertexList (VOID)
 	}
 }
 
+VOID CMapConvert::CalculateMapSize (LPWOLFDATA lpMap)
+{
+	if(m_lpList)
+	{
+		LPLINE_LIST pList = m_lpList;
+
+		SHORT xMin = pList->lpLine->m_vFrom.x;
+		SHORT yMin = pList->lpLine->m_vFrom.y;
+
+		SHORT xMax = xMin;
+		SHORT yMax = yMin;
+
+		CompareVertexForMapSize(pList->lpLine->m_vTo, xMin, yMin, xMax, yMax);
+
+		pList = pList->Next;
+		while(pList)
+		{
+			CompareVertexForMapSize(pList->lpLine->m_vFrom, xMin, yMin, xMax, yMax);
+			CompareVertexForMapSize(pList->lpLine->m_vTo, xMin, yMin, xMax, yMax);
+			pList = pList->Next;
+		}
+
+		m_xSpan = xMax - xMin;
+		m_ySpan = yMax - yMin;
+	}
+}
+
 VOID CMapConvert::ExtendOutside (SECTOR* pAdjacent, CMapLine* lpLine, INT iDir, PCWSTR pcwzTexture)
 {
 	CMapLine Line[9];
@@ -2417,4 +2451,17 @@ ULONG CMapConvert::SerializeLump (ISeekableStream* pFile, PCWSTR pcwzPath, LPSTR
 		}
 	}
 	return iSize;
+}
+
+VOID CMapConvert::CompareVertexForMapSize (const VERTEX& v, SHORT& xMin, SHORT& yMin, SHORT& xMax, SHORT& yMax)
+{
+	if(v.x < xMin)
+		xMin = v.x;
+	else if(v.x > xMax)
+		xMax = v.x;
+
+	if(v.y < yMin)
+		yMin = v.y;
+	else if(v.y > yMax)
+		yMax = v.y;
 }

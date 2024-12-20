@@ -94,6 +94,8 @@ private:
 	TArray<DRAWLINE*> m_aMerges;
 	TArray<DRAWTHING*> m_aThings;
 
+	SHORT m_xSpan, m_ySpan;
+
 public:
 	IMP_BASE_UNKNOWN
 
@@ -107,6 +109,7 @@ public:
 
 	CMemoryStream* GetLogs (VOID) { return &m_stmLogs; }
 	CMemoryFile* GetFile (VOID) { return &m_memFile; }
+	VOID GetMapSize (__out SHORT& x, __out SHORT& y);
 
 	// IAdapterWindowCallback
 	virtual BOOL DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);

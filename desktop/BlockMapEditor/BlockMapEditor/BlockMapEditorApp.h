@@ -35,6 +35,7 @@ public:
 	RSTRING m_rstrDef;
 	INT m_idActor;
 	bool m_fMonster;
+	bool m_fLookAllAround;
 
 public:
 	CActorDef (RSTRING rstrName);
