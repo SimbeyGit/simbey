@@ -738,6 +738,8 @@ BOOL CExportDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRES
 
 			AdjustLayout(rc.right, rc.bottom, FALSE);
 			SetFocus(hwndConversion);
+
+			CenterHost();
 		}
 		break;
 

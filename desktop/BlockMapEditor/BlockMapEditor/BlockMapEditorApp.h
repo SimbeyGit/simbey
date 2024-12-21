@@ -163,7 +163,8 @@ protected:
 	HRESULT ShowProperties (VOID);
 	HRESULT ExportMap (VOID);
 	HRESULT LoadPackage (HWND hwndStatus, PCWSTR pcwzPackage);
-	HRESULT LoadActors (PCWSTR pcwzText, PCWSTR pcwzDeco);
+	HRESULT LoadActors (ISimbeyUnzip* pPackage, PCWSTR pcwzText);
+	HRESULT LoadDecorate (ISimbeyUnzip* pPackage, PCWSTR pcwzLumpPath, TRStrMap<CActorDef*>& mapActors);
 	HRESULT LoadExternal (PCWSTR pcwzSearchPath);
 	HRESULT FindSpriteTexture (PCWSTR pcwzText, PCWSTR pcwzSprite, __deref_out TEXTURE** ppTexture);
 	HRESULT AddDirectionalActor (RSTRING rstrName, INT nDirection, ACTOR* pActor, bool fUseThisActor);

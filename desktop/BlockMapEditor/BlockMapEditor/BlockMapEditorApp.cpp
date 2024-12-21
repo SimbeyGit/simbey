@@ -1110,8 +1110,8 @@ HRESULT CBlockMapEditorApp::LoadPackage (HWND hwndStatus, PCWSTR pcwzPackage)
 	HRESULT hr;
 	TStackRef<IZipFS> srStandardFS;
 	TStackRef<ISimbeyUnzip> srPackage;
-	PWSTR pwzText = NULL, pwzDeco = NULL;
-	INT cchText, cchDeco;
+	PWSTR pwzText = NULL;
+	INT cchText;
 
 	SendMessage(hwndStatus, WM_SETTEXT, 0, (LPARAM)L"Opening package...");
 
@@ -1125,27 +1125,113 @@ HRESULT CBlockMapEditorApp::LoadPackage (HWND hwndStatus, PCWSTR pcwzPackage)
 	Check(LoadTextures(srPackage, SLP(c_wzSpritesSlash), _LoadSprites, &m_mapSprites));
 
 	Check(LoadTextEntry(srPackage, L"TEXTURES", &pwzText, &cchText));
-	Check(LoadTextEntry(srPackage, L"DECORATE", &pwzDeco, &cchDeco));
 
 	SendMessage(hwndStatus, WM_SETTEXT, 0, (LPARAM)L"Parsing decorate script...");
-	Check(LoadActors(pwzText, pwzDeco));
+	Check(LoadActors(srPackage, pwzText));
 
 Cleanup:
 	__delete_array pwzText;
-	__delete_array pwzDeco;
 	return hr;
 }
 
-HRESULT CBlockMapEditorApp::LoadActors (PCWSTR pcwzText, PCWSTR pcwzDeco)
+HRESULT CBlockMapEditorApp::LoadActors (ISimbeyUnzip* pPackage, PCWSTR pcwzText)
 {
 	HRESULT hr = S_FALSE;
 	TRStrMap<CActorDef*> mapActors;
 	RSTRING rstrName = NULL;
 	PCWSTR pcwzToken;
 	INT cchToken;
+	ACTOR* pActor = NULL;
+
+	Check(LoadDecorate(pPackage, L"DECORATE", mapActors));
+
+	// Add the actors with IDs into the actor set.
+	for(sysint i = 0; i < mapActors.Length(); i++)
+	{
+		bool fFoundSpawnSprite = false;
+		CActorDef* pActorDef = *mapActors.GetValuePtr(i);
+		if(0 == pActorDef->m_idActor)
+			continue;
+
+		CActorDef* pDefPtr = pActorDef;
+		do
+		{
+			PCWSTR pcwzDeco = RStrToWide(pDefPtr->m_rstrDef);
+
+			while(ReadToken(pcwzDeco, &pcwzToken, &cchToken))
+			{
+				if((0 == TStrICmpNAssert(pcwzToken, SLP(L"SPAWN")) || 0 == TStrICmpNAssert(pcwzToken, SLP(L"STATIC"))) &&
+					ReadToken(pcwzDeco, &pcwzToken, &cchToken) &&
+					1 == cchToken && L':' == *pcwzToken)
+				{
+					WCHAR wzSprite[8];
+					HRESULT hrFindTexture;
+
+					// Read the sprite name
+					CheckIf(!ReadToken(pcwzDeco, &pcwzToken, &cchToken), E_FAIL);
+
+					pActor = __new ACTOR;
+					CheckAlloc(pActor);
+					pActor->idActor = pActorDef->m_idActor;
+					pActor->nDirection = 0;
+
+					// Copy the sprite name (four characters)
+					Check(TStrCchCpyN(wzSprite, 5, pcwzToken, cchToken));
+
+					// Read the sprite direction
+					CheckIf(!ReadToken(pcwzDeco, &pcwzToken, &cchToken), E_FAIL);
+
+					wzSprite[4] = *pcwzToken;
+					wzSprite[5] = L'0';
+					wzSprite[6] = L'\0';
+
+					hrFindTexture = FindSpriteTexture(pcwzText, wzSprite, &pActor->pTexture);
+					if(HRESULT_FROM_WIN32(ERROR_NOT_FOUND) == hrFindTexture)
+						Check(LoadExternalTexture(pActorDef->m_rstrName, &pActor->pTexture));
+					else
+						Check(hrFindTexture);
+
+					if(pActorDef->m_fMonster && !pActorDef->m_fLookAllAround)
+					{
+						Check(AddDirectionalActor(pActorDef->m_rstrName, 0, pActor, true));
+						Check(AddDirectionalActor(pActorDef->m_rstrName, 90, pActor, false));
+						Check(AddDirectionalActor(pActorDef->m_rstrName, 180, pActor, false));
+						Check(AddDirectionalActor(pActorDef->m_rstrName, 270, pActor, false));
+					}
+					else
+						Check(m_mapActors.Add(pActorDef->m_rstrName, pActor));
+
+					pActor = NULL;
+					fFoundSpawnSprite = true;
+
+					break;
+				}
+			}
+
+			if(fFoundSpawnSprite)
+				break;
+
+			pDefPtr = pDefPtr->m_pParent;
+		} while(pDefPtr);
+	}
+
+Cleanup:
+	mapActors.DeleteAll();
+	return hr;
+}
+
+HRESULT CBlockMapEditorApp::LoadDecorate (ISimbeyUnzip* pPackage, PCWSTR pcwzLumpPath, TRStrMap<CActorDef*>& mapActors)
+{
+	HRESULT hr;
+	PWSTR pwzDecoLump = NULL;
+	PCWSTR pcwzDeco, pcwzToken;
+	INT cchDeco, cchToken;
+	RSTRING rstrName = NULL;
 	CActorDef* pActorDef = NULL;
 	bool fDeleteActorDef = false;
-	ACTOR* pActor = NULL;
+
+	Check(LoadTextEntry(pPackage, pcwzLumpPath, &pwzDecoLump, &cchDeco));
+	pcwzDeco = pwzDecoLump;
 
 	// Use a very basic parsing system to build a hierarchy of actor definitions.
 	while(ReadToken(pcwzDeco, &pcwzToken, &cchToken))
@@ -1219,88 +1305,36 @@ HRESULT CBlockMapEditorApp::LoadActors (PCWSTR pcwzText, PCWSTR pcwzDeco)
 				pActorDef->m_fLookAllAround = true;
 
 			Check(RStrCreateW(static_cast<INT>(pcwzDeco - pcwzDef), pcwzDef, &pActorDef->m_rstrDef));
-
 			RStrRelease(rstrName); rstrName = NULL;
 		}
-	}
-
-	// Add the actors with IDs into the actor set.
-	for(sysint i = 0; i < mapActors.Length(); i++)
-	{
-		bool fFoundSpawnSprite = false;
-
-		pActorDef = *mapActors.GetValuePtr(i);
-		if(0 == pActorDef->m_idActor)
-			continue;
-
-		CActorDef* pDefPtr = pActorDef;
-		do
+		else if(0 == TStrICmpNAssert(pcwzToken, SLP(L"#INCLUDE")))
 		{
-			pcwzDeco = RStrToWide(pDefPtr->m_rstrDef);
+			WCHAR wzPath[MAX_PATH];
+			INT w = 0;
 
-			while(ReadToken(pcwzDeco, &pcwzToken, &cchToken))
+			CheckIf(!ReadToken(pcwzDeco, &pcwzToken, &cchToken), E_FAIL);
+			for(INT i = 0; i < cchToken; i++)
 			{
-				if((0 == TStrICmpNAssert(pcwzToken, SLP(L"SPAWN")) || 0 == TStrICmpNAssert(pcwzToken, SLP(L"STATIC"))) &&
-					ReadToken(pcwzDeco, &pcwzToken, &cchToken) &&
-					1 == cchToken && L':' == *pcwzToken)
+				WCHAR wch = pcwzToken[i];
+				if(L'"' != wch)
 				{
-					WCHAR wzSprite[8];
-					HRESULT hrFindTexture;
-
-					// Read the sprite name
-					CheckIf(!ReadToken(pcwzDeco, &pcwzToken, &cchToken), E_FAIL);
-
-					pActor = __new ACTOR;
-					CheckAlloc(pActor);
-					pActor->idActor = pActorDef->m_idActor;
-					pActor->nDirection = 0;
-
-					// Copy the sprite name (four characters)
-					Check(TStrCchCpyN(wzSprite, 5, pcwzToken, cchToken));
-
-					// Read the sprite direction
-					CheckIf(!ReadToken(pcwzDeco, &pcwzToken, &cchToken), E_FAIL);
-
-					wzSprite[4] = *pcwzToken;
-					wzSprite[5] = L'0';
-					wzSprite[6] = L'\0';
-
-					hrFindTexture = FindSpriteTexture(pcwzText, wzSprite, &pActor->pTexture);
-					if(HRESULT_FROM_WIN32(ERROR_NOT_FOUND) == hrFindTexture)
-						Check(LoadExternalTexture(pActorDef->m_rstrName, &pActor->pTexture));
-					else
-						Check(hrFindTexture);
-
-					if(pActorDef->m_fMonster && !pActorDef->m_fLookAllAround)
-					{
-						Check(AddDirectionalActor(pActorDef->m_rstrName, 0, pActor, true));
-						Check(AddDirectionalActor(pActorDef->m_rstrName, 90, pActor, false));
-						Check(AddDirectionalActor(pActorDef->m_rstrName, 180, pActor, false));
-						Check(AddDirectionalActor(pActorDef->m_rstrName, 270, pActor, false));
-					}
-					else
-						Check(m_mapActors.Add(pActorDef->m_rstrName, pActor));
-
-					pActor = NULL;
-					fFoundSpawnSprite = true;
-
-					break;
+					if(L'/' == wch)
+						wch = L'\\';
+					wzPath[w++] = wch;
+					CheckIf(w == ARRAYSIZE(wzPath), E_FAIL);
 				}
 			}
 
-			if(fFoundSpawnSprite)
-				break;
-
-			pDefPtr = pDefPtr->m_pParent;
-		} while(pDefPtr);
+			wzPath[w] = L'\0';
+			Check(LoadDecorate(pPackage, wzPath, mapActors));
+		}
 	}
 
 Cleanup:
 	if(fDeleteActorDef)
 		__delete pActorDef;
-	__delete pActor;
 	RStrRelease(rstrName);
-	mapActors.DeleteAll();
+	__delete_array pwzDecoLump;
 	return hr;
 }
 
@@ -1595,23 +1629,28 @@ HRESULT CBlockMapEditorApp::LoadTexture (TRStrMap<TEXTURE*>* pmapTextures, RSTRI
 
 	CheckAlloc(pTexture);
 	Check(sifReadPNGToBits32Stream(pcbPNG, cbPNG, &pTexture->xSize, &pTexture->ySize, &pTexture->stmBits32, &cbBits));
-	Check(pmapTextures->Add(rstrFileW, pTexture));
-	pTexture->pcwzName = RStrToWide(rstrFileW);
 
-	pBits = pTexture->stmBits32.TGetReadPtr<BYTE>();
-	for(DWORD i = 0; i < cbBits; i += sizeof(DWORD))
+	// We're only using textures that are 64x64
+	if(64 == pTexture->xSize && 64 == pTexture->ySize)
 	{
-		if(pBits[i + 3])
-		{
-			r += pBits[i];
-			g += pBits[i + 1];
-			b += pBits[i + 2];
-			cPixels++;
-		}
-	}
+		Check(pmapTextures->Add(rstrFileW, pTexture));
+		pTexture->pcwzName = RStrToWide(rstrFileW);
 
-	pTexture->crAverage = RGB(r / cPixels, g / cPixels, b / cPixels);
-	pTexture = NULL;
+		pBits = pTexture->stmBits32.TGetReadPtr<BYTE>();
+		for(DWORD i = 0; i < cbBits; i += sizeof(DWORD))
+		{
+			if(pBits[i + 3])
+			{
+				r += pBits[i];
+				g += pBits[i + 1];
+				b += pBits[i + 2];
+				cPixels++;
+			}
+		}
+
+		pTexture->crAverage = RGB(r / cPixels, g / cPixels, b / cPixels);
+		pTexture = NULL;
+	}
 
 Cleanup:
 	__delete pTexture;
