@@ -356,6 +356,22 @@ Cleanup:
 	return hr;
 }
 
+VOID CBlockMap::ReplaceWall (CPaintItem* pOld, CPaintItem* pNew)
+{
+	MAP_BLOCK* pMap = m_pMap;
+
+	for(INT z = 0; z < MAP_HEIGHT; z++)
+	{
+		for(INT x = 0; x < MAP_WIDTH; x++)
+		{
+			if(pMap->pBlock == pOld)
+				pMap->pBlock = pNew;
+
+			pMap++;
+		}
+	}
+}
+
 HRESULT CBlockMap::LoadItemPalette (IResolveItemPalette* pResolve, ISequentialStream* pPalette, DWORD cbPalette, TArray<CPaintItem*>& aPalette)
 {
 	HRESULT hr;

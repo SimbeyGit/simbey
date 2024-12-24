@@ -227,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ReplaceWallDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\WinMain.cpp"
 				>
 			</File>
@@ -286,6 +290,10 @@
 			</File>
 			<File
 				RelativePath=".\PropertiesDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ReplaceWallDlg.h"
 				>
 			</File>
 			<File

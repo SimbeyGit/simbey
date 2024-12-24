@@ -46,6 +46,7 @@ public:
 	BOOL IsSolid (INT xCell, INT zCell);
 	USHORT GetFloor (INT xCell, INT zCell);
 	HRESULT FindStartSpot (__out INT& xCell, __out INT& zCell);
+	VOID ReplaceWall (CPaintItem* pOld, CPaintItem* pNew);
 
 private:
 	HRESULT LoadItemPalette (IResolveItemPalette* pResolve, ISequentialStream* pPalette, DWORD cbPalette, TArray<CPaintItem*>& aPalette);

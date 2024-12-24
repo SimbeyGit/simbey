@@ -16,6 +16,7 @@
 #include "PropertiesDlg.h"
 #include "ExportDlg.h"
 #include "DifficultyDlg.h"
+#include "ReplaceWallDlg.h"
 #include "BlockMapEditorApp.h"
 
 const WCHAR c_wzAppClassName[] = L"BlockMapEditorAppCls";
@@ -393,6 +394,9 @@ HRESULT STDMETHODCALLTYPE CBlockMapEditorApp::Execute (UINT32 commandId, UI_EXEC
 			break;
 		case ID_PROPERTIES:
 			CheckNoTrace(ShowProperties());
+			break;
+		case ID_REPLACE_WALL:
+			CheckNoTrace(ReplaceWall());
 			break;
 		case ID_EXPORT:
 			CheckNoTrace(ExportMap());
@@ -1071,6 +1075,26 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CBlockMapEditorApp::ReplaceWall (VOID)
+{
+	HRESULT hr;
+	CDialogHost dlgHost(m_hInstance);
+	CReplaceWallDlg dlgReplace(m_mapTextures);
+	TStackRef<CTextureItem> srOldTexture, srNewTexture;
+
+	Check(dlgHost.Display(m_hwnd, &dlgReplace));
+	CheckIfIgnore(IDOK != dlgHost.GetReturnValue(), E_ABORT);
+
+	Check(ResolveTextureToPaintItem(dlgReplace.GetOldTexture(), &srOldTexture));
+	Check(ResolveTextureToPaintItem(dlgReplace.GetNewTexture(), &srNewTexture));
+
+	m_pBlockMap->ReplaceWall(srOldTexture, srNewTexture);
+	Check(Invalidate(FALSE));
+
+Cleanup:
+	return hr;
+}
+
 HRESULT CBlockMapEditorApp::ExportMap (VOID)
 {
 	HRESULT hr;
@@ -1099,7 +1123,7 @@ HRESULT CBlockMapEditorApp::ExportMap (VOID)
 
 	Check(dlgExport.Initialize(m_pBlockMap, pcwzName, &m_dlgConfig));
 	Check(dlgHost.Display(m_hwnd, &dlgExport));
-	CheckIf(IDOK != dlgHost.GetReturnValue(), E_ABORT);
+	CheckIfIgnore(IDOK != dlgHost.GetReturnValue(), E_ABORT);
 
 Cleanup:
 	return hr;
@@ -1535,6 +1559,49 @@ Cleanup:
 	__delete pTexture;
 	SafeCloseFileHandle(hFile);
 	RStrRelease(rstrFile);
+	return hr;
+}
+
+HRESULT CBlockMapEditorApp::ResolveTextureToPaintItem (PCWSTR pcwzTexture, __deref_out CTextureItem** ppTexture)
+{
+	HRESULT hr;
+	TStackRef<IUICollection> srItems;
+	PROPVARIANT value;
+	UINT32 cItems;
+
+	value.vt = VT_EMPTY;
+	value.punkVal = NULL;
+
+	Check(m_pRibbon->ReadProperty(ID_WALLS, UI_PKEY_ItemsSource, &value));
+
+	Check(value.punkVal->QueryInterface(&srItems));
+	Check(srItems->GetCount(&cItems));
+
+	for(UINT32 i = 0; i < cItems; i++)
+	{
+		TStackRef<IUnknown> srUnk;
+		TStackRef<CPaintItem> srItem;
+
+		Check(srItems->GetItem(i, &srUnk));
+		Check(srUnk.QueryInterface(&srItem));
+
+		if(MapCell::Wall == srItem->GetType())
+		{
+			CTextureItem* pTexture = srItem.StaticCast<CTextureItem>();
+
+			if(0 == TStrCmpAssert(pcwzTexture, pTexture->GetTexture()->pcwzName))
+			{
+				*ppTexture = pTexture;
+				srItem.Detach();
+				goto Cleanup;
+			}
+		}
+	}
+
+	hr = HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+
+Cleanup:
+	SafeRelease(value.punkVal);
 	return hr;
 }
 

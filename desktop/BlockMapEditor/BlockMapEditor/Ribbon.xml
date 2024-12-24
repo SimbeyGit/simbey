@@ -12,6 +12,7 @@
           </MenuGroup>
           <MenuGroup>
             <Button CommandName="ID_PROPERTIES" LabelTitle="Properties" LargeBitmap="auto" />
+            <Button CommandName="ID_REPLACE_WALL" LabelTitle="Replace Walls" LargeBitmap="auto" />
             <Button CommandName="ID_EXPORT" LabelTitle="Export" LargeBitmap="auto" />
           </MenuGroup>
           <MenuGroup>
