@@ -1003,15 +1003,15 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 	HDC hdcDIB = CreateCompatibleDC(hdc);
 	HBITMAP hbmPrev = (HBITMAP)SelectObject(hdcDIB, m_hDIB);
 
-	INT xDest = 0, yDest = 0;
+	POINT ptDest = { 0 };
 	int newW = (INT)(m_sImage.cx * m_fZoom);
 	int newH = (INT)(m_sImage.cy * m_fZoom);
 
 	if(newW < cx)
-		xDest = (cx - newW) / 2;
+		ptDest.x = (cx - newW) / 2;
 
 	if(newH < cy)
-		yDest = (cy - newH) / 2;
+		ptDest.y = (cy - newH) / 2;
 
 	if(newW < cx || newH < cy)
 	{
@@ -1022,7 +1022,7 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 	}
 
 	{
-		RECT rc = { xDest, yDest, xDest + newW, yDest + newH };
+		RECT rc = { ptDest.x, ptDest.y, ptDest.x + newW, ptDest.y + newH };
 		FillRect(hdcDIB, &rc, m_hbrTransparent);
 	}
 
@@ -1039,7 +1039,7 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 		srLayer->GetPosition(&rcLayer);
 
 		if(SUCCEEDED(srLayer->GetBitsPtr(&pRGBA, &cbBits)))
-			CopyBitsToDIB24(pRGBA, sLayer, rcLayer.left, rcLayer.top, m_pDIB, m_szDIB, xDest, yDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
+			CopyBitsToDIB24(pRGBA, sLayer, rcLayer.left, rcLayer.top, m_pDIB, m_szDIB, ptDest, m_xScrollPos, m_yScrollPos, m_fZoom, newW, newH);
 
 		if(i == m_nSelectedLayerIndex && !m_fZoomMode)
 		{
@@ -1051,10 +1051,10 @@ BOOL CImageChild::OnPaint (UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRe
 			HPEN hOldPen = (HPEN)SelectObject(hdcDIB, hPen);
 
 			Rectangle(hdcDIB, 
-				xDest + rcLayer.left * m_fZoom - m_xScrollPos - 2, 
-				yDest + rcLayer.top * m_fZoom - m_yScrollPos - 2, 
-				xDest + rcLayer.right * m_fZoom - m_xScrollPos + 2, 
-				yDest + rcLayer.bottom * m_fZoom - m_yScrollPos + 2);
+				ptDest.x + rcLayer.left * m_fZoom - m_xScrollPos - 2, 
+				ptDest.y + rcLayer.top * m_fZoom - m_yScrollPos - 2, 
+				ptDest.x + rcLayer.right * m_fZoom - m_xScrollPos + 2, 
+				ptDest.y + rcLayer.bottom * m_fZoom - m_yScrollPos + 2);
 
 			SelectObject(hdcDIB, hOldPen);
 			SelectObject(hdcDIB, hOldBrush);

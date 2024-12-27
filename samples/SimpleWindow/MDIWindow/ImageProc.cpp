@@ -14,7 +14,8 @@ inline VOID CopyPixelToDIB24 (const COPY_WIDTHS& cw, const BYTE* pSource, INT xS
 	const BYTE* iSrc = pSource + ySrcPixel * cw.xSource + xSrcPixel * 4;
 
 	BYTE* iDst = pTarget + yTarget * cw.xTarget + xTarget * 3;
-	if(255 == iSrc[3])
+	BYTE bAlpha = iSrc[3];
+	if(255 == bAlpha)
 	{
 		*iDst++ = iSrc[2];
 		*iDst++ = iSrc[1];
@@ -22,14 +23,13 @@ inline VOID CopyPixelToDIB24 (const COPY_WIDTHS& cw, const BYTE* pSource, INT xS
 	}
 	else
 	{
-		BYTE bAlpha = iSrc[3];
 		iDst[0] = sifBlendColorComponents(iDst[0], iSrc[2], bAlpha);
 		iDst[1] = sifBlendColorComponents(iDst[1], iSrc[1], bAlpha);
 		iDst[2] = sifBlendColorComponents(iDst[2], iSrc[0], bAlpha);
 	}
 }
 
-void CopyBitsToDIB24 (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int srcYDest, BYTE* pDestBits, const SIZE& szDest, int xDest, int yDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight)
+void CopyBitsToDIB24 (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, int srcYDest, BYTE* pDestBits, const SIZE& szDest, const POINT& ptDest, int xScrollPos, int yScrollPos, float fZoom, int nImageWidth, int nImageHeight)
 {
 	COPY_WIDTHS cw =
 	{ 
@@ -56,10 +56,10 @@ void CopyBitsToDIB24 (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, 
 
 	for(int y = yStart; y < newH; y++)
 	{
-		if(szDest.cy - y - yDest + yScrollPos - ryDestZoom < szDest.cy - yDest - nImageHeight || szDest.cy - y - yDest + yScrollPos - ryDestZoom < 0)
+		if(szDest.cy - y - ptDest.y + yScrollPos - ryDestZoom < szDest.cy - ptDest.y - nImageHeight || szDest.cy - y - ptDest.y + yScrollPos - ryDestZoom < 0)
 			break;
 
-		int yDestRow = szDest.cy - y - yDest + yScrollPos - ryDestZoom;
+		int yDestRow = szDest.cy - y - ptDest.y + yScrollPos - ryDestZoom;
 		if(yDestRow < szDest.cy)
 		{
 			float fY = (float)y * rScale;
@@ -67,10 +67,10 @@ void CopyBitsToDIB24 (const BYTE* pSrcBits, const SIZE& szSource, int srcXDest, 
 
 			for(int x = xStart; x < newW; x++)
 			{
-				if(x + xDest + rxDestZoom - xScrollPos > xDest + nImageWidth || x + xDest + rxDestZoom - xScrollPos > szDest.cx)
+				if(x + ptDest.x + rxDestZoom - xScrollPos > ptDest.x + nImageWidth || x + ptDest.x + rxDestZoom - xScrollPos > szDest.cx)
 					break;
 
-				int xDestColumn = x + xDest + rxDestZoom - xScrollPos;
+				int xDestColumn = x + ptDest.x + rxDestZoom - xScrollPos;
 				if(xDestColumn >= szDest.cx)
 					break;
 
