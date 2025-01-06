@@ -1,6 +1,7 @@
 #include <windows.h>
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
+#include "Library\Util\Formatting.h"
 #include "LoaderDlg.h"
 
 CLoaderDlg::CLoaderDlg (ILoaderThread* pCallback) :
@@ -36,7 +37,17 @@ BOOL CLoaderDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRES
 
 	case WM_COMMAND:
 		if(IDOK == LOWORD(wParam))
+		{
+			if(FAILED((HRESULT)lParam))
+			{
+				HWND hwnd;
+				WCHAR wzError[100];
+				SideAssertHr(GetWindow(&hwnd));
+				Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Failed to load resource package: 0x%.8X", lParam);
+				MessageBox(hwnd, wzError, L"Loader Error", MB_OK);
+			}
 			End(lParam);
+		}
 		break;
 
 	case WM_DESTROY:
