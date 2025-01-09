@@ -33,6 +33,7 @@ BOOL CDifficultyDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 			SendMessage(GetDlgItem(IDC_DIFFICULTY_HARD), BM_SETCHECK, BST_CHECKED, 0);
 		if(m_sObjectFlags & 8)
 			SendMessage(GetDlgItem(IDC_AMBUSH), BM_SETCHECK, BST_CHECKED, 0);
+		SetFocus(GetDlgItem(IDCANCEL));
 		CenterHost();
 		break;
 	case WM_COMMAND:

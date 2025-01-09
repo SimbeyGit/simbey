@@ -1825,9 +1825,12 @@ BOOL CBlockMapEditorApp::DefWindowProc (UINT message, WPARAM wParam, LPARAM lPar
 		fHandled = TRUE;
 		break;
 	case WM_SIZE:
-		GetClientRect(m_hwnd, &m_rcClient);
-		m_rcClient.top = m_pRibbon->GetHeight();
-		SizeWindow();
+		if(SIZE_MINIMIZED != wParam && SIZE_MAXHIDE != wParam)
+		{
+			GetClientRect(m_hwnd, &m_rcClient);
+			m_rcClient.top = m_pRibbon->GetHeight();
+			SizeWindow();
+		}
 		break;
 	case WM_TIMER:
 		if(m_idInfoTimer)
