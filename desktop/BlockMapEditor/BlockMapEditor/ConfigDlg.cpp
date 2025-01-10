@@ -40,7 +40,7 @@ HRESULT CConfigDlg::Load (PCWSTR pcszRegPath)
 	if(ERROR_SUCCESS != RegQueryValueEx(hKey, c_wzBehaviorPath, NULL, &dwType, (PBYTE)m_wzBehaviorPath, &cbData) || 0 == cbData)
 	{
 		INT cchBehaviorPath;
-		ScSearchPaths(L"OUTPUT", NULL, 0, 2, TRUE, m_wzBehaviorPath, ARRAYSIZE(m_wzBehaviorPath), &cchBehaviorPath);
+		ScSearchPaths(L"OUTPUT", NULL, 0, 2, FALSE, m_wzBehaviorPath, ARRAYSIZE(m_wzBehaviorPath), &cchBehaviorPath);
 	}
 
 	cbData = sizeof(m_wzZDBSPPath);
