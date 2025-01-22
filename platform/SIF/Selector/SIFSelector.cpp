@@ -729,6 +729,9 @@ HRESULT CSIFSelector::Relayout (VOID)
 
 	if(0 < m_xClientSize)
 	{
+		if(NULL == m_rstrSelection)
+			LoadSelection();
+
 		for(sysint i = 0; i < m_aGroups.Length(); i++)
 			Check(m_aGroups[i]->Layout(m_xClientSize, m_yTotalSize, m_sizing, &m_yTotalSize));
 
