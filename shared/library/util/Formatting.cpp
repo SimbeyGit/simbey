@@ -69,6 +69,9 @@ namespace Formatting
 					LONG vLong;
 					ULONG vULong;
 					DOUBLE vDouble;
+#ifdef	_WIN64
+					ULARGE_INTEGER vULIPtr;
+#endif
 					union
 					{
 						PCSTR vString;
@@ -79,9 +82,7 @@ namespace Formatting
 					if(ch == '.')
 					{
 						pctzFormat++;
-						cchCopy = TAscToInt32(pctzFormat);
-						while(*pctzFormat >= '0' && *pctzFormat <= '9')
-							pctzFormat++;
+						cchCopy = TAscToXUInt32(pctzFormat, 10, &pctzFormat);
 					}
 
 					ch = *pctzFormat;
@@ -200,6 +201,23 @@ namespace Formatting
 						break;
 					case 'p':
 					case 'P':
+#ifdef	_WIN64
+						CheckIf(cchMaxOutput <= 17, STRSAFE_E_INSUFFICIENT_BUFFER);
+
+						vULIPtr.QuadPart = va_arg(vArgs, ULONGLONG);
+						Check(TCopyULong(ptzOutput, cchMaxOutput, vULIPtr.HighPart, 8, 16, &cchCopy));
+						ptzOutput[8] = ':';
+						Check(TCopyULong(ptzOutput + 9, cchMaxOutput - 9, vULIPtr.LowPart, 8, 16, &cchCopy));
+
+						if(ch == 'P')
+						{
+							ptzOutput[17] = '\0';
+							TStrUpr(ptzOutput);
+						}
+
+						cchMaxOutput -= 17;
+						ptzOutput += 17;
+#else
 						CheckIf(cchMaxOutput <= 9, STRSAFE_E_INSUFFICIENT_BUFFER);
 
 						vULong = va_arg(vArgs,ULONG);
@@ -215,6 +233,7 @@ namespace Formatting
 
 						cchMaxOutput -= 9;
 						ptzOutput += 9;
+#endif
 						break;
 					case 'h':
 						ch = *pctzFormat;
@@ -275,8 +294,8 @@ namespace Formatting
 							ptzOutput += cchCopy;
 						}
 						break;
-#ifdef	FORMAT_MONEY
 					case 'm':
+#ifdef	FORMAT_MONEY
 						if(-1 == cchCopy)
 						{
 							CMoney* pMoney = va_arg(vArgs, CMoney*);
@@ -284,8 +303,17 @@ namespace Formatting
 							ptzOutput += cchCopy;
 							cchMaxOutput -= cchCopy;
 						}
-						break;
+#else
+						{
+							FORMAT_CALLBACKA pfnCallback = va_arg(vArgs, FORMAT_CALLBACKA);
+							INT cArgs = va_arg(vArgs, INT);
+							INT* pnArgs = (INT*)vArgs; vArgs += cArgs * sizeof(INT);
+							Check(pfnCallback(cArgs, pnArgs, cchCopy, ptzOutput, cchMaxOutput, &cchCopy));
+							ptzOutput += cchCopy;
+							cchMaxOutput -= cchCopy;
+						}
 #endif
+						break;
 					case 'n':
 #ifdef	_WIN64
 	Int64_Copy:
@@ -397,6 +425,9 @@ namespace Formatting
 					LONG vLong;
 					ULONG vULong;
 					DOUBLE vDouble;
+#ifdef	_WIN64
+					ULARGE_INTEGER vULIPtr;
+#endif
 					union
 					{
 						PCWSTR vString;
@@ -407,9 +438,7 @@ namespace Formatting
 					if(ch == L'.')
 					{
 						pctzFormat++;
-						cchCopy = TAscToInt32(pctzFormat);
-						while(*pctzFormat >= L'0' && *pctzFormat <= L'9')
-							pctzFormat++;
+						cchCopy = TAscToXUInt32(pctzFormat, 10, &pctzFormat);
 					}
 
 					ch = *pctzFormat;
@@ -528,6 +557,23 @@ namespace Formatting
 						break;
 					case L'p':
 					case L'P':
+#ifdef	_WIN64
+						CheckIf(cchMaxOutput <= 17, STRSAFE_E_INSUFFICIENT_BUFFER);
+
+						vULIPtr.QuadPart = va_arg(vArgs, ULONGLONG);
+						Check(TCopyULong(ptzOutput, cchMaxOutput, vULIPtr.HighPart, 8, 16, &cchCopy));
+						ptzOutput[8] = ':';
+						Check(TCopyULong(ptzOutput + 9, cchMaxOutput - 9, vULIPtr.LowPart, 8, 16, &cchCopy));
+
+						if(ch == 'P')
+						{
+							ptzOutput[17] = '\0';
+							TStrUpr(ptzOutput);
+						}
+
+						cchMaxOutput -= 17;
+						ptzOutput += 17;
+#else
 						CheckIf(cchMaxOutput <= 9, STRSAFE_E_INSUFFICIENT_BUFFER);
 
 						vULong = va_arg(vArgs,ULONG);
@@ -543,6 +589,7 @@ namespace Formatting
 
 						cchMaxOutput -= 9;
 						ptzOutput += 9;
+#endif
 						break;
 					case L'h':
 						ch = *pctzFormat;
@@ -603,8 +650,8 @@ namespace Formatting
 							ptzOutput += cchCopy;
 						}
 						break;
-#ifdef	FORMAT_MONEY
 					case L'm':
+#ifdef	FORMAT_MONEY
 						if(-1 == cchCopy)
 						{
 							CMoney* pMoney = va_arg(vArgs, CMoney*);
@@ -612,8 +659,17 @@ namespace Formatting
 							ptzOutput += cchCopy;
 							cchMaxOutput -= cchCopy;
 						}
-						break;
+#else
+						{
+							FORMAT_CALLBACKW pfnCallback = va_arg(vArgs, FORMAT_CALLBACKW);
+							INT cArgs = va_arg(vArgs, INT);
+							INT* pnArgs = (INT*)vArgs; vArgs += cArgs * sizeof(INT);
+							Check(pfnCallback(cArgs, pnArgs, cchCopy, ptzOutput, cchMaxOutput, &cchCopy));
+							ptzOutput += cchCopy;
+							cchMaxOutput -= cchCopy;
+						}
 #endif
+						break;
 					case 'n':
 #ifdef	_WIN64
 	Int64_Copy:

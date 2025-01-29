@@ -33,6 +33,11 @@ namespace Formatting
 	__declspec(selectany) extern const CHAR c_szNullFmt[] = "(null)";
 	__declspec(selectany) extern const WCHAR c_wzNullFmt[] = L"(null)";
 
+#ifndef	FORMAT_MONEY
+	typedef HRESULT (WINAPI* FORMAT_CALLBACKA)(INT cArgs, const INT* pcnArgs, INT cchCopyArg, PSTR pszOutput, INT cchMaxOutput, __out INT* pcchFormatted);
+	typedef HRESULT (WINAPI* FORMAT_CALLBACKW)(INT cArgs, const INT* pcnArgs, INT cchCopyArg, PWSTR pwzOutput, INT cchMaxOutput, __out INT* pcchFormatted);
+#endif
+
 	///////////////////////////////////////////////////////////////////////////
 	// 64-bit Integers to Strings
 	///////////////////////////////////////////////////////////////////////////

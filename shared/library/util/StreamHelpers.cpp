@@ -134,9 +134,7 @@ namespace Stream
 						if(tch == '.')
 						{
 							pctzFormat++;
-							cchCopy = Formatting::TAscToInt32(pctzFormat);
-							while(*pctzFormat >= '0' && *pctzFormat <= '9')
-								pctzFormat++;
+							cchCopy = Formatting::TAscToXUInt32(pctzFormat, 10, &pctzFormat);
 						}
 
 						tch = *pctzFormat;
@@ -466,9 +464,7 @@ namespace Stream
 						if(tch == L'.')
 						{
 							pctzFormat++;
-							cchCopy = Formatting::TAscToInt32(pctzFormat);
-							while(*pctzFormat >= L'0' && *pctzFormat <= L'9')
-								pctzFormat++;
+							cchCopy = Formatting::TAscToXUInt32(pctzFormat, 10, &pctzFormat);
 						}
 
 						tch = *pctzFormat;
