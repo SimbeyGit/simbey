@@ -117,7 +117,7 @@ HRESULT CMapConvert::RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLe
 	FixSidedefs();
 	BuildVertexList();
 
-	CheckIf(NULL == m_lpList, E_FAIL);
+	CheckIf(NULL == m_lpList, HRESULT_FROM_WIN32(ERROR_EMPTY));
 	Check(BuildWadFile(pcszLevel, pFile, pdlgConfig));
 
 Cleanup:
@@ -610,7 +610,7 @@ HRESULT CMapConvert::BuildLineStructure (LPWOLFDATA lpMap)
 						}
 					}
 					else
-						Check(E_FAIL);
+						Check(HRESULT_FROM_WIN32(ERROR_DEVICE_DOOR_OPEN));
 
 					BuildDoor(lpMap, x, y, iType, bDir, bSilence, pDoor);
 				}
@@ -684,7 +684,7 @@ HRESULT CMapConvert::BuildCages (LPWOLFDATA lpMap)
 					if(pLine)
 					{
 						// Make sure there is only one line for this block!
-						CheckIf(0 != nEntranceLine, E_FAIL);
+						CheckIf(0 != nEntranceLine, HRESULT_FROM_WIN32(ERROR_FILE_EXISTS));
 						nEntranceLine = nLine;
 						pEntranceLine = pLine;
 					}
@@ -733,7 +733,7 @@ HRESULT CMapConvert::BuildSecretDoors (LPWOLFDATA lpMap)
 					PositionLine(lpMap, &Line, x, y, nLine);
 
 					pLine = FindLine(&Line.m_vFrom, &Line.m_vTo);
-					CheckIf(NULL == pLine, E_FAIL);
+					CheckIf(NULL == pLine, HRESULT_FROM_WIN32(ERROR_INVALID_COMMAND_LINE));
 					rgLines[nLine - 1] = pLine;
 
 					if(pLine->m_sRight.Sector == -1)
@@ -752,7 +752,9 @@ HRESULT CMapConvert::BuildSecretDoors (LPWOLFDATA lpMap)
 
 				{
 					CMapThing Secret;
-					LPPOLY_QUEUE lpNew = new POLY_QUEUE;
+					LPPOLY_QUEUE lpNew = __new POLY_QUEUE;
+
+					CheckAlloc(lpNew);
 
 					if(bDir)	// North/South
 					{
@@ -920,7 +922,7 @@ HRESULT CMapConvert::AssignEndSpotTrigger (LPWOLFDATA lpMap, BOOL* pfEndMap, INT
 			if(pLine)
 			{
 				// If it's a double-sided line, then the map is built wrong.
-				CheckIf(pLine->m_Flags & 4, E_FAIL);
+				CheckIf(pLine->m_Flags & 4, HRESULT_FROM_WIN32(ERROR_ARENA_TRASHED));
 
 				pLine->m_sRight.Sector = nSector;
 			}
@@ -995,7 +997,7 @@ HRESULT CMapConvert::AssignSkyLightTrigger (LPWOLFDATA lpMap, BOOL* pfSkyMap, IN
 			if(pLine)
 			{
 				// If it's a double-sided line, then the map is built wrong.
-				CheckIf(pLine->m_Flags & 4, E_FAIL);
+				CheckIf(pLine->m_Flags & 4, HRESULT_FROM_WIN32(ERROR_ARENA_TRASHED));
 
 				pLine->m_sRight.Sector = nSector;
 				pLine->m_sRight.yOffset = -16;

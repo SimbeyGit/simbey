@@ -621,7 +621,7 @@ HRESULT CMapConverterView::BuildNodes (VOID)
 
 	args.pFS = &zdbspfs;
 	args.pLogger = &zdbspfs;
-	CheckIf(0 != pfnzdbsp_core(&args), E_FAIL);
+	CheckIf(0 != pfnzdbsp_core(&args), HRESULT_FROM_WIN32(ERROR_CANNOT_MAKE));
 
 	Check(zdbspfs.GetFileData("output.wad", &pmfdOutput));
 	m_memFile.ReplaceData(pmfdOutput);
@@ -796,7 +796,11 @@ BOOL CExportDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRES
 			}
 			else
 			{
-				SetWindowText(GetDlgItem(IDC_STATUS), L"The map could not be converted!");
+				WCHAR wzError[64];
+				if(SUCCEEDED(Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Map conversion error: 0x%X", static_cast<HRESULT>(lParam))))
+					SetWindowText(GetDlgItem(IDC_STATUS), wzError);
+				else
+					SetWindowText(GetDlgItem(IDC_STATUS), L"The map could not be converted!");
 				CheckZDBSPLogs();
 			}
 		}
