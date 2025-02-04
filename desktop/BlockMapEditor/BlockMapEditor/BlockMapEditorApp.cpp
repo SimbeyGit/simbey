@@ -201,6 +201,7 @@ CActorDef::~CActorDef ()
 
 CBlockMapEditorApp::CBlockMapEditorApp (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
+	m_hAccel(NULL),
 	m_pRibbon(NULL),
 	m_rstrFile(NULL),
 	m_pBlockMap(NULL),
@@ -238,6 +239,9 @@ CBlockMapEditorApp::~CBlockMapEditorApp ()
 	RStrRelease(m_rstrFile);
 	SafeDelete(m_pBlockMap);
 	SafeRelease(m_pRibbon);
+
+	if(m_hAccel)
+		DestroyAcceleratorTable(m_hAccel);
 }
 
 HRESULT CBlockMapEditorApp::Register (HINSTANCE hInstance)
@@ -272,6 +276,9 @@ HRESULT CBlockMapEditorApp::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 	Check(dlgHost.Display(GetDesktopWindow(), &dlgLoader));
 	Check((HRESULT)dlgHost.GetReturnValue());
 
+	m_hAccel = LoadAccelerators(m_hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR));
+	CheckIfGetLastError(NULL == m_hAccel);
+
 	Check(CSIFRibbon::Create(DPI::Scale, &m_pRibbon));
 	Check(CreateBlockMap(&m_pBlockMap));
 	Check(InitializePaintItems(m_pBlockMap));
@@ -281,6 +288,11 @@ HRESULT CBlockMapEditorApp::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 
 Cleanup:
 	return hr;
+}
+
+BOOL CBlockMapEditorApp::TranslateMsg (MSG* pMsg)
+{
+	return TranslateAccelerator(m_hwnd, m_hAccel, pMsg);
 }
 
 HRESULT CBlockMapEditorApp::AddFloorItem (USHORT nFloor)
@@ -421,6 +433,16 @@ HRESULT STDMETHODCALLTYPE CBlockMapEditorApp::Execute (UINT32 commandId, UI_EXEC
 			m_pRibbon->UpdateProperty(ID_PAINT_TYPE, &UI_PKEY_ItemsSource);
 			m_pRibbon->UpdateProperty(ID_PAINT_TYPE, &UI_PKEY_LargeImage);
 			break;
+		case ID_UNDO:
+		case ID_REDO:
+			if(ID_UNDO == commandId)
+				Check(m_pBlockMap->Undo());
+			else
+				Check(m_pBlockMap->Redo());
+			m_pRibbon->InvalidateEnabled(ID_UNDO);
+			m_pRibbon->InvalidateEnabled(ID_REDO);
+			Check(Invalidate(FALSE));
+			break;
 		}
 	}
 
@@ -439,9 +461,19 @@ HRESULT STDMETHODCALLTYPE CBlockMapEditorApp::UpdateProperty (UINT32 commandId, 
 	{
 		if(UI_PKEY_Enabled == key)
 		{
-			//switch(commandId)
-			newValue->boolVal = VARIANT_TRUE;
 			newValue->vt = VT_BOOL;
+			switch(commandId)
+			{
+			case ID_UNDO:
+				newValue->boolVal = (m_pBlockMap && m_pBlockMap->CanUndo()) ? VARIANT_TRUE : VARIANT_FALSE;
+				break;
+			case ID_REDO:
+				newValue->boolVal = (m_pBlockMap && m_pBlockMap->CanRedo()) ? VARIANT_TRUE : VARIANT_FALSE;
+				break;
+			default:
+				newValue->boolVal = VARIANT_TRUE;
+				break;
+			}
 			hr = S_OK;
 		}
 		else if(UI_PKEY_ItemsSource == key)
@@ -656,7 +688,13 @@ VOID CBlockMapEditorApp::onGraphLBtnDown (DWORD dwKeys, FLOAT x, FLOAT y)
 				CDifficultyDlg dlgDifficulty(sObjectFlags);
 
 				if(SUCCEEDED(dlgHost.Display(m_hwnd, &dlgDifficulty)) && IDOK == dlgHost.GetReturnValue())
-					m_pBlockMap->SetObjectFlags(xCell, yCell, dlgDifficulty.GetObjectFlags());
+				{
+					if(S_FALSE != m_pBlockMap->SetObjectFlags(xCell, yCell, dlgDifficulty.GetObjectFlags()))
+					{
+						m_pRibbon->InvalidateEnabled(ID_UNDO);
+						m_pRibbon->InvalidateEnabled(ID_REDO);
+					}
+				}
 			}
 		}
 	}
@@ -1750,6 +1788,11 @@ HRESULT CBlockMapEditorApp::SetCellData (FLOAT x, FLOAT z)
 
 	CheckIfIgnore(NULL == m_pSelection, HRESULT_FROM_WIN32(ERROR_EMPTY));
 	Check(m_pBlockMap->SetCellData(x, z, m_pSelection));
+	if(S_FALSE != hr)
+	{
+		m_pRibbon->InvalidateEnabled(ID_UNDO);
+		m_pRibbon->InvalidateEnabled(ID_REDO);
+	}
 	Check(Invalidate(FALSE));
 
 Cleanup:
@@ -1840,6 +1883,17 @@ BOOL CBlockMapEditorApp::DefWindowProc (UINT message, WPARAM wParam, LPARAM lPar
 		}
 		m_fInfoBalloon = TRUE;
 		InvalidateRect(m_hwnd, NULL, FALSE);
+		break;
+	case WM_COMMAND:
+		switch(LOWORD(wParam))
+		{
+		case ID_ACCEL_UNDO:
+			Execute(ID_UNDO, UI_EXECUTIONVERB_EXECUTE, NULL, NULL, NULL);
+			break;
+		case ID_ACCEL_REDO:
+			Execute(ID_REDO, UI_EXECUTIONVERB_EXECUTE, NULL, NULL, NULL);
+			break;
+		}
 		break;
 	case WM_CLOSE:
 		Registry::SaveWindowPosition(m_hwnd, c_wzAppKey, L"WindowPlacement");

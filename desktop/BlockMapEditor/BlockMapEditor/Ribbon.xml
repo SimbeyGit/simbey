@@ -28,7 +28,9 @@
                 <Scale Group="ID_GROUP_WALLS" Size="Large"/>
                 <Scale Group="ID_GROUP_OBJECTS" Size="Large"/>
                 <Scale Group="ID_GROUP_SELECTION" Size="Large"/>
+                <Scale Group="ID_GROUP_UNDOREDO" Size="Large"/>
               </ScalingPolicy.IdealSizes>
+              <Scale Group="ID_GROUP_UNDOREDO" Size="Popup"/>
               <Scale Group="ID_GROUP_WALLS" Size="Popup"/>
               <Scale Group="ID_GROUP_OBJECTS" Size="Popup"/>
               <Scale Group="ID_GROUP_SELECTION" Size="Popup"/>
@@ -57,6 +59,10 @@
               </DropDownGallery.MenuLayout>
             </DropDownGallery>
             <Button CommandName="ID_ADD_FLOOR" LabelTitle="Add Floor" LargeBitmap="auto" />
+          </Group>
+          <Group CommandName="ID_GROUP_UNDOREDO" LabelTitle="Undo/Redo" SizeDefinition="TwoButtons">
+            <Button CommandName="ID_UNDO" LabelTitle="Undo" LargeBitmap="auto" />
+            <Button CommandName="ID_REDO" LabelTitle="Redo" LargeBitmap="auto" />
           </Group>
         </Tab>
       </Ribbon.Tabs>

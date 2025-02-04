@@ -36,8 +36,11 @@ INT WINAPI wWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 
 		while(GetMessage(&msg,NULL,0,0) > 0)
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			if(!pApp->TranslateMsg(&msg))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
 
 	Cleanup:

@@ -232,6 +232,18 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR ACCELERATORS 
+BEGIN
+    "Z",            ID_ACCEL_UNDO,          VIRTKEY, CONTROL, NOINVERT
+    "Y",            ID_ACCEL_REDO,          VIRTKEY, CONTROL, NOINVERT
+END
+
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

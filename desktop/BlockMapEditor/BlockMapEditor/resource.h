@@ -10,6 +10,7 @@
 #define IDD_LOADER                      106
 #define IDD_SELECT_SIF                  107
 #define IDD_REPLACE_WALLS               108
+#define IDR_ACCELERATOR                 109
 #define IDC_CONVERSION                  1001
 #define IDC_STATUS                      1002
 #define IDC_TEXTURE_DATA                1003
@@ -30,13 +31,15 @@
 #define IDC_NEW_TEXTURE                 1018
 #define IDC_SELECT_OLD_TEXTURE          1019
 #define IDC_SELECT_NEW_TEXTURE          1020
+#define ID_ACCEL_UNDO                   40001
+#define ID_ACCEL_REDO                   40002
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        109
-#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_RESOURCE_VALUE        110
+#define _APS_NEXT_COMMAND_VALUE         40003
 #define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

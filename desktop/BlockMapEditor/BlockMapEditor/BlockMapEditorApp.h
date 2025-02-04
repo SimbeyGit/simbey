@@ -56,6 +56,7 @@ protected:
 	HINSTANCE m_hInstance;
 
 	RECT m_rcClient;
+	HACCEL m_hAccel;
 	CSIFRibbon* m_pRibbon;
 	CGraphCtrl m_Graph;
 
@@ -97,6 +98,7 @@ public:
 	static HRESULT Register (HINSTANCE hInstance);
 
 	HRESULT Initialize (LPWSTR lpCmdLine, INT nCmdShow);
+	BOOL TranslateMsg (MSG* pMsg);
 
 	HRESULT AddFloorItem (USHORT nFloor);
 	VOID ClearPaintItems (VOID);

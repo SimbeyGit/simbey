@@ -5,15 +5,42 @@
 #include "PaintItems.h"
 #include "BlockMap.h"
 
+VOID CUndoRedoObjectFlags::Undo (class CBlockMap* pMap)
+{
+	pMap->InternalSetObjectFlags(m_idxCell, m_nOldObjectFlags);
+}
+
+VOID CUndoRedoObjectFlags::Redo (class CBlockMap* pMap)
+{
+	pMap->InternalSetObjectFlags(m_idxCell, m_nNewObjectFlags);
+}
+
+VOID CUndoRedoCellData::Undo (class CBlockMap* pMap)
+{
+	for(sysint i = 0; i < m_aOld.Length(); i++)
+	{
+		CELLDATA& data = m_aOld[i];
+		pMap->InternalSetCellData(data.idxCell, data.pOld);
+	}
+}
+
+VOID CUndoRedoCellData::Redo (class CBlockMap* pMap)
+{
+	for(sysint i = 0; i < m_aOld.Length(); i++)
+		pMap->InternalSetCellData(m_aOld[i].idxCell, m_pNew);
+}
+
 CBlockMap::CBlockMap () :
 	m_nLighting(192),
 	m_nHighestFloor(0),
-	m_pMap(NULL)
+	m_pMap(NULL),
+	m_idxChangePtr(0)
 {
 }
 
 CBlockMap::~CBlockMap ()
 {
+	m_aChangeStack.DeleteAll();
 	__delete_array m_pMap;
 }
 
@@ -95,8 +122,10 @@ HRESULT CBlockMap::Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR p
 	MAP_BLOCK* pMap = m_pMap;
 	INT cch;
 
-	Check(CFileStream::Open(pcwzFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL, &srFile, NULL));
+	m_aChangeStack.DeleteAll();
+	m_idxChangePtr = 0;
 
+	Check(CFileStream::Open(pcwzFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL, &srFile, NULL));
 	Check(srFile->Read(&m_nLighting, sizeof(m_nLighting), &cb));
 
 	Check(srFile->Read(&cch, sizeof(cch), &cb));
@@ -212,6 +241,8 @@ USHORT CBlockMap::AddFloor (VOID)
 HRESULT CBlockMap::SetCellData (FLOAT x, FLOAT z, CPaintItem* pType)
 {
 	HRESULT hr;
+	CUndoRedoCellData* pCellData = NULL;
+	CUndoRedoCellData::CELLDATA* pData;
 
 	x /= CELL_SCALE;
 	z /= CELL_SCALE;
@@ -227,32 +258,23 @@ HRESULT CBlockMap::SetCellData (FLOAT x, FLOAT z, CPaintItem* pType)
 
 	INT idxCell = zCell * MAP_WIDTH + xCell;
 
-	switch(pType->GetType())
-	{
-	case MapCell::Void:
-		if(m_pMap[idxCell].pObject)
-			m_pMap[idxCell].pObject = NULL;
-		else
-			m_pMap[idxCell].pBlock = NULL;
-		break;
-	case MapCell::Wall:
-	case MapCell::Floor:
-	case MapCell::Elevator:
-	case MapCell::WallCage:
-		m_pMap[idxCell].pBlock = pType;
-		break;
-	case MapCell::Object:
-	case MapCell::Door:
-	case MapCell::Start:
-	case MapCell::SecretDoor:
-	case MapCell::End:
-	case MapCell::Sky:
-		m_pMap[idxCell].pObject = pType;
-		break;
-	}
-	hr = S_OK;
+	pCellData = __new CUndoRedoCellData(pType);
+	CheckAlloc(pCellData);
+
+	Check(pCellData->m_aOld.AppendSlot(&pData));
+	pData->idxCell = idxCell;
+	pData->pOld = InternalSetCellData(idxCell, pType);
+	CheckIfIgnore(pData->pOld == pType, S_FALSE);
+
+	Check(InsertUndoItem(pCellData));
+	pCellData = NULL;
 
 Cleanup:
+	if(pCellData)
+	{
+		pCellData->Undo(this);
+		__delete pCellData;
+	}
 	return hr;
 }
 
@@ -290,15 +312,23 @@ Cleanup:
 HRESULT CBlockMap::SetObjectFlags (INT xCell, INT zCell, SHORT nObjectFlags)
 {
 	HRESULT hr;
+	CUndoRedoObjectFlags* pFlags = NULL;
 
 	CheckIfIgnore(xCell < 0 || xCell >= MAP_WIDTH, DISP_E_BADINDEX);
 	CheckIfIgnore(zCell < 0 || zCell >= MAP_HEIGHT, DISP_E_BADINDEX);
 
 	INT idxCell = zCell * MAP_WIDTH + xCell;
-	m_pMap[idxCell].nObjectFlags = nObjectFlags;
-	hr = S_OK;
+	CheckIfIgnore(m_pMap[idxCell].nObjectFlags == nObjectFlags, S_FALSE);
+
+	pFlags = __new CUndoRedoObjectFlags(idxCell, m_pMap[idxCell].nObjectFlags, nObjectFlags);
+	CheckAlloc(pFlags);
+	Check(InsertUndoItem(pFlags));
+	pFlags = NULL;
+
+	InternalSetObjectFlags(idxCell, nObjectFlags);
 
 Cleanup:
+	SafeDelete(pFlags);
 	return hr;
 }
 
@@ -356,20 +386,130 @@ Cleanup:
 	return hr;
 }
 
-VOID CBlockMap::ReplaceWall (CPaintItem* pOld, CPaintItem* pNew)
+HRESULT CBlockMap::ReplaceWall (CPaintItem* pOld, CPaintItem* pNew)
 {
+	HRESULT hr;
+	CUndoRedoCellData* pCellData = __new CUndoRedoCellData(pNew);
 	MAP_BLOCK* pMap = m_pMap;
+
+	CheckAlloc(pCellData);
 
 	for(INT z = 0; z < MAP_HEIGHT; z++)
 	{
 		for(INT x = 0; x < MAP_WIDTH; x++)
 		{
 			if(pMap->pBlock == pOld)
+			{
+				CUndoRedoCellData::CELLDATA* pData;
+
+				Check(pCellData->m_aOld.AppendSlot(&pData));
+				pData->idxCell = z * MAP_WIDTH + x;
+				pData->pOld = pMap->pBlock;
+
 				pMap->pBlock = pNew;
+			}
 
 			pMap++;
 		}
 	}
+
+	CheckIf(0 == pCellData->m_aOld.Length(), S_FALSE);
+	Check(InsertUndoItem(pCellData));
+	pCellData = NULL;
+
+Cleanup:
+	if(pCellData)
+	{
+		pCellData->Undo(this);
+		__delete pCellData;
+	}
+	return hr;
+}
+
+HRESULT CBlockMap::Undo (VOID)
+{
+	HRESULT hr;
+
+	CheckIf(!CanUndo(), E_FAIL);
+	m_aChangeStack[--m_idxChangePtr]->Undo(this);
+	hr = S_OK;
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CBlockMap::Redo (VOID)
+{
+	HRESULT hr;
+
+	CheckIf(!CanRedo(), E_FAIL);
+	m_aChangeStack[m_idxChangePtr++]->Redo(this);
+	hr = S_OK;
+
+Cleanup:
+	return hr;
+}
+
+CPaintItem* CBlockMap::InternalSetCellData (INT idxCell, __in_opt CPaintItem* pType)
+{
+	CPaintItem* pOld = NULL;
+	MapCell::Type eType = pType ? pType->GetType() : MapCell::Void;
+
+	switch(eType)
+	{
+	case MapCell::Void:
+		if(m_pMap[idxCell].pObject)
+		{
+			pOld = m_pMap[idxCell].pObject;
+			m_pMap[idxCell].pObject = NULL;
+		}
+		else
+		{
+			pOld = m_pMap[idxCell].pBlock;
+			m_pMap[idxCell].pBlock = NULL;
+		}
+		break;
+	case MapCell::Wall:
+	case MapCell::Floor:
+	case MapCell::Elevator:
+	case MapCell::WallCage:
+		pOld = m_pMap[idxCell].pBlock;
+		m_pMap[idxCell].pBlock = pType;
+		break;
+	case MapCell::Object:
+	case MapCell::Door:
+	case MapCell::Start:
+	case MapCell::SecretDoor:
+	case MapCell::End:
+	case MapCell::Sky:
+		pOld = m_pMap[idxCell].pObject;
+		m_pMap[idxCell].pObject = pType;
+		break;
+	}
+	return pOld;
+}
+
+VOID CBlockMap::InternalSetObjectFlags (INT idxCell, SHORT nObjectFlags)
+{
+	m_pMap[idxCell].nObjectFlags = nObjectFlags;
+}
+
+HRESULT CBlockMap::InsertUndoItem (CBaseUndoRedo* pItem)
+{
+	HRESULT hr;
+
+	Check(m_aChangeStack.InsertAt(pItem, m_idxChangePtr));
+	m_idxChangePtr++;
+
+	while(m_aChangeStack.Length() > m_idxChangePtr)
+	{
+		CBaseUndoRedo* pRemoved;
+		m_aChangeStack.Remove(m_aChangeStack.Length() - 1, &pRemoved);
+		__delete pRemoved;
+	}
+
+Cleanup:
+	return hr;
 }
 
 HRESULT CBlockMap::LoadItemPalette (IResolveItemPalette* pResolve, ISequentialStream* pPalette, DWORD cbPalette, TArray<CPaintItem*>& aPalette)
