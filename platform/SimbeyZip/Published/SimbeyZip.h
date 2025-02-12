@@ -219,6 +219,7 @@ interface __declspec(uuid("B89FA89A-D9DD-4962-98D7-7A886AF264A5")) ISimbeyZip : 
 
 HRESULT WINAPI szCreateStandardFS (__deref_out IZipFS** ppStandardFS);
 HRESULT WINAPI szUnzipOpen (IZipFS* pFS, PCWSTR pcwzPath, __deref_out ISimbeyUnzip** ppUnzip);
+HRESULT WINAPI szUnzipFile (IZipFile* pZipFile, __deref_out ISimbeyUnzip** ppUnzip);
 HRESULT WINAPI szZipOpen (IZipFS* pFS, PCWSTR pcwzPath, SimbeyZip::Append eAppend, __deref_out ISimbeyZip** ppZip);
 HRESULT WINAPI szCreateMemoryFile (HANDLE hHeap, PBYTE pbData, ULONG cbData, __deref_out IZipFile** ppFile);
 

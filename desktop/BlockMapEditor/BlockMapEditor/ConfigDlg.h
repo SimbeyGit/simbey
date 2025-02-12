@@ -23,6 +23,8 @@ public:
 	virtual BOOL DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 
 private:
+	static HRESULT FindAnyPK3 (PCWSTR pcwzFolder, __out_ecount(cchMaxPK3) PWSTR pwzPK3, INT cchMaxPK3);
+
 	HRESULT ReadFromDialog (VOID);
 	HRESULT ReadAndVerifyPath (INT idControl, PWSTR pwzPath);
 };

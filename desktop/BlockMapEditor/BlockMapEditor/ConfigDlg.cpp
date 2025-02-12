@@ -34,7 +34,11 @@ HRESULT CConfigDlg::Load (PCWSTR pcszRegPath)
 	Check(Registry::CreateKey(HKEY_CURRENT_USER, pcszRegPath, KEY_READ, &hKey));
 
 	cbData = sizeof(m_wzTexturePath);
-	RegQueryValueEx(hKey, c_wzTexturePath, NULL, &dwType, (PBYTE)m_wzTexturePath, &cbData);
+	if(ERROR_SUCCESS != RegQueryValueEx(hKey, c_wzTexturePath, NULL, &dwType, (PBYTE)m_wzTexturePath, &cbData))
+	{
+		// If we don't have a saved texture asset path, then let's try to find any PK3 file in the OUTPUT folder.
+		FindAnyPK3(L"OUTPUT", m_wzTexturePath, ARRAYSIZE(m_wzTexturePath));
+	}
 
 	cbData = sizeof(m_wzBehaviorPath);
 	if(ERROR_SUCCESS != RegQueryValueEx(hKey, c_wzBehaviorPath, NULL, &dwType, (PBYTE)m_wzBehaviorPath, &cbData) || 0 == cbData)
@@ -127,6 +131,28 @@ BOOL CConfigDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRES
 	}
 
 	return fHandled;
+}
+
+HRESULT CConfigDlg::FindAnyPK3 (PCWSTR pcwzFolder, __out_ecount(cchMaxPK3) PWSTR pwzPK3, INT cchMaxPK3)
+{
+	HRESULT hr;
+	INT cchFolderPath;
+	WIN32_FIND_DATA FindData;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+
+	Check(ScSearchPaths(pcwzFolder, NULL, 0, 2, FALSE, pwzPK3, cchMaxPK3, &cchFolderPath));
+	pwzPK3[cchFolderPath++] = L'\\';
+	Check(TStrCchCpy(pwzPK3 + cchFolderPath, cchMaxPK3 - cchFolderPath, L"*.pk3"));
+
+	hFind = FindFirstFile(pwzPK3, &FindData);
+	CheckIfGetLastError(INVALID_HANDLE_VALUE == hFind);
+
+	Check(TStrCchCpy(pwzPK3 + cchFolderPath, cchMaxPK3 - cchFolderPath, FindData.cFileName));
+
+Cleanup:
+	if(INVALID_HANDLE_VALUE != hFind)
+		FindClose(hFind);
+	return hr;
 }
 
 HRESULT CConfigDlg::ReadFromDialog (VOID)
