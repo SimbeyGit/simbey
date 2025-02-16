@@ -194,13 +194,17 @@ public:
 	};
 
 	CBlockMap* m_pMap;
+	TEXTURE* m_pAltTexture;
 	DoorType m_eType;
 
-	static HRESULT Create (CSIFRibbon* pRibbon, CBlockMap* pMap, TEXTURE* pTexture, DoorType eType, __deref_out CDoorObject** ppItem);
+	static HRESULT Create (CSIFRibbon* pRibbon, CBlockMap* pMap, TEXTURE* pTexture, TEXTURE* pAltTexture, DoorType eType, __deref_out CDoorObject** ppItem);
 
 protected:
-	CDoorObject (CSIFRibbon* pRibbon, CBlockMap* pMap, TEXTURE* pTexture, DoorType eType);
+	CDoorObject (CSIFRibbon* pRibbon, CBlockMap* pMap, TEXTURE* pTexture, TEXTURE* pAltTexture, DoorType eType);
 	~CDoorObject ();
+
+public:
+	inline const TEXTURE* GetAltTexture (VOID) { return m_pAltTexture; }
 
 	// CPaintItem
 	virtual MapCell::Type GetType (VOID) { return MapCell::Door; }

@@ -769,8 +769,9 @@ HRESULT CMapConvert::BuildSecretDoors (LPWOLFDATA lpMap)
 
 					lpNew->iType = DOOR_SECRET;
 					lpNew->bDir = bDir;
-					lpNew->iPoly = m_iNextPoly++;;
+					lpNew->iPoly = m_iNextPoly++;
 					lpNew->pTexture = srBlock.StaticCast<CTextureItem>()->GetTexture();
+					lpNew->pAltTexture = NULL;
 					lpNew->Next = NULL;
 
 					if(m_lpQueue)
@@ -1209,6 +1210,7 @@ VOID CMapConvert::BuildDoor (LPWOLFDATA lpMap, INT x, INT y, INT iType, INT bDir
 		lpNew->bDir = bDir;
 		lpNew->iPoly = m_iNextPoly++;
 		lpNew->pTexture = pDoor->GetTexture();
+		lpNew->pAltTexture = pDoor->GetAltTexture();
 		lpNew->Next = NULL;
 
 		if(m_lpQueue)
@@ -1271,7 +1273,7 @@ VOID CMapConvert::BuildDoor (LPWOLFDATA lpMap, INT x, INT y, INT iType, INT bDir
 	}
 }
 
-VOID CMapConvert::BuildPolyDoor (LPWOLFDATA lpMap, CMapLine* lpDoor1, CMapLine* lpDoor2, INT iType, INT bDir, const TEXTURE* pTexture, INT iPoly)
+VOID CMapConvert::BuildPolyDoor (LPWOLFDATA lpMap, CMapLine* lpDoor1, CMapLine* lpDoor2, INT iType, INT bDir, const TEXTURE* pTexture1, const TEXTURE* pTexture2, INT iPoly)
 {
 	CMapBox box;
 	CMapThing Anchor, Start;
@@ -1326,16 +1328,16 @@ VOID CMapConvert::BuildPolyDoor (LPWOLFDATA lpMap, CMapLine* lpDoor1, CMapLine* 
 
 	PrepareBox(&box, rcBox.left, rcBox.top, rcBox.right, rcBox.bottom, sSector, TRUE);
 
-	CopyTexture(box.m_Box[idxDoor1].m_sRight.szMiddle, pTexture->pcwzName);
-	CopyTexture(box.m_Box[idxDoor2].m_sRight.szMiddle, pTexture->pcwzName);
+	CopyTexture(box.m_Box[idxDoor1].m_sRight.szMiddle, pTexture1->pcwzName);
+	CopyTexture(box.m_Box[idxDoor2].m_sRight.szMiddle, pTexture2->pcwzName);
 	box.m_Box[idxDoor1].m_sRight.xOffset = lpDoor1->m_sRight.xOffset;
 	box.m_Box[idxDoor1].m_sRight.yOffset = lpDoor1->m_sRight.yOffset;
 	box.m_Box[idxDoor2].m_sRight.xOffset = lpDoor2->m_sRight.xOffset;
 	box.m_Box[idxDoor2].m_sRight.yOffset = lpDoor2->m_sRight.yOffset;
 	if(iType == DOOR_SECRET)
 	{
-		CopyTexture(box.m_Box[idxStop1].m_sRight.szMiddle, pTexture->pcwzName);
-		CopyTexture(box.m_Box[idxStop2].m_sRight.szMiddle, pTexture->pcwzName);
+		CopyTexture(box.m_Box[idxStop1].m_sRight.szMiddle, pTexture1->pcwzName);
+		CopyTexture(box.m_Box[idxStop2].m_sRight.szMiddle, pTexture2->pcwzName);
 	}
 	else
 	{
@@ -1689,7 +1691,12 @@ VOID CMapConvert::BuildPolys (LPWOLFDATA lpMap)
 		m_lpQueue = m_lpQueue->Next;
 		lpDoor1 = new CMapLine(&lpPoly->Door1);
 		lpDoor2 = new CMapLine(&lpPoly->Door2);
-		BuildPolyDoor(lpMap,lpDoor1,lpDoor2,lpPoly->iType,lpPoly->bDir,lpPoly->pTexture,lpPoly->iPoly);
+
+		if(lpPoly->pAltTexture)
+			BuildPolyDoor(lpMap,lpDoor1,lpDoor2,lpPoly->iType,lpPoly->bDir,lpPoly->pTexture,lpPoly->pAltTexture,lpPoly->iPoly);
+		else
+			BuildPolyDoor(lpMap,lpDoor1,lpDoor2,lpPoly->iType,lpPoly->bDir,lpPoly->pTexture,lpPoly->pTexture,lpPoly->iPoly);
+
 		delete lpDoor2;
 		delete lpDoor1;
 		delete lpPoly;
@@ -2235,6 +2242,7 @@ HRESULT CMapConvert::BuildCage (LPWOLFDATA lpMap, INT x, INT y, INT nLine, CMapL
 	lpNew->bDir = LINE_ABOVE == nLine || LINE_BELOW == nLine;
 	lpNew->iPoly = m_iNextPoly++;
 	lpNew->pTexture = pCage->GetTexture();
+	lpNew->pAltTexture = NULL;
 	lpNew->Next = NULL;
 
 	if(m_lpQueue)

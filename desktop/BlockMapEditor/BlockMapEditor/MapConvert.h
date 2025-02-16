@@ -132,6 +132,7 @@ typedef struct tagPOLY_QUEUE
 	INT bDir;
 	INT iPoly;
 	const TEXTURE* pTexture;
+	const TEXTURE* pAltTexture;
 	struct tagPOLY_QUEUE* Next;
 } POLY_QUEUE, *LPPOLY_QUEUE;
 
@@ -249,7 +250,7 @@ protected:
 	HRESULT AssignEndSpotTrigger (LPWOLFDATA lpMap, BOOL* pfEndMap, INT x, INT y, SHORT nSector);
 	HRESULT AssignSkyLightTrigger (LPWOLFDATA lpMap, BOOL* pfSkyMap, INT x, INT y, SHORT nSector);
 	VOID BuildDoor (LPWOLFDATA lpMap, INT x, INT y, INT iType, INT bDir, INT bSilence, CDoorObject* pDoor);
-	VOID BuildPolyDoor (LPWOLFDATA lpMap, CMapLine* lpDoor1, CMapLine* lpDoor2, INT iType, INT bDir, const TEXTURE* pTexture, INT iPoly);
+	VOID BuildPolyDoor (LPWOLFDATA lpMap, CMapLine* lpDoor1, CMapLine* lpDoor2, INT iType, INT bDir, const TEXTURE* pTexture1, const TEXTURE* pTexture2, INT iPoly);
 	VOID BuildSectors (LPWOLFDATA lpMap);
 	VOID BuildOutsideViews (LPWOLFDATA lpMap);
 	VOID BuildPlayerStarts (LPWOLFDATA lpMap);

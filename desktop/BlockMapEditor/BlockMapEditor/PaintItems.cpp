@@ -555,13 +555,13 @@ BOOL CElevatorSwitch::Deserialize (const BYTE* pcb, DWORD cb)
 // CDoorObject
 ///////////////////////////////////////////////////////////////////////////////
 
-HRESULT CDoorObject::Create (CSIFRibbon* pRibbon, CBlockMap* pMap, TEXTURE* pTexture, DoorType eType, __deref_out CDoorObject** ppItem)
+HRESULT CDoorObject::Create (CSIFRibbon* pRibbon, CBlockMap* pMap, TEXTURE* pTexture, TEXTURE* pAltTexture, DoorType eType, __deref_out CDoorObject** ppItem)
 {
 	HRESULT hr;
 
 	CheckIf(NULL == pRibbon, E_INVALIDARG);
 
-	*ppItem = __new CDoorObject(pRibbon, pMap, pTexture, eType);
+	*ppItem = __new CDoorObject(pRibbon, pMap, pTexture, pAltTexture, eType);
 	CheckAlloc(*ppItem);
 
 	switch(eType)
@@ -589,9 +589,10 @@ Cleanup:
 	return hr;
 }
 
-CDoorObject::CDoorObject (CSIFRibbon* pRibbon, CBlockMap* pMap, TEXTURE* pTexture, DoorType eType) :
+CDoorObject::CDoorObject (CSIFRibbon* pRibbon, CBlockMap* pMap, TEXTURE* pTexture, TEXTURE* pAltTexture, DoorType eType) :
 	CTextureItem(pRibbon, pTexture),
 	m_pMap(pMap),
+	m_pAltTexture(pAltTexture),
 	m_eType(eType)
 {
 }

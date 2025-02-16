@@ -787,7 +787,7 @@ HRESULT CBlockMapEditorApp::InitializePaintItems (CBlockMap* pMap)
 	TStackRef<CSecretDoor> srSecret;
 	TStackRef<CEndSpot> srEndSpot;
 	TStackRef<CSkyLight> srSkyLight;
-	TEXTURE* pTexture;
+	TEXTURE* pTexture, *pAltTexture;
 
 	ClearPaintItems();
 
@@ -851,27 +851,31 @@ HRESULT CBlockMapEditorApp::InitializePaintItems (CBlockMap* pMap)
 	srVoidItem.Release();
 
 	Check(m_mapTextures.Find(RSTRING_CAST(L"DOORNORM"), &pTexture));
+	Check(m_mapTextures.Find(RSTRING_CAST(L"DOORNRM2"), &pAltTexture));
 
-	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, CDoorObject::Normal, &srDoor));
+	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, pAltTexture, CDoorObject::Normal, &srDoor));
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
 	srDoor.Release();
 
 	Check(m_mapTextures.Find(RSTRING_CAST(L"LOCKDOOR"), &pTexture));
+	Check(m_mapTextures.Find(RSTRING_CAST(L"LOCKDOR2"), &pAltTexture));
 
-	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, CDoorObject::SilverKey, &srDoor));
+	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, pAltTexture, CDoorObject::SilverKey, &srDoor));
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
 	srDoor.Release();
 
-	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, CDoorObject::GoldKey, &srDoor));
+	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, pAltTexture, CDoorObject::GoldKey, &srDoor));
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
 	srDoor.Release();
 
-	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, CDoorObject::RubyKey, &srDoor));
+	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, pAltTexture, CDoorObject::RubyKey, &srDoor));
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
 	srDoor.Release();
 
 	Check(m_mapTextures.Find(RSTRING_CAST(L"ELVRDOOR"), &pTexture));
-	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, CDoorObject::Elevator, &srDoor));
+	Check(m_mapTextures.Find(RSTRING_CAST(L"ELVRDOR2"), &pAltTexture));
+
+	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, pAltTexture, CDoorObject::Elevator, &srDoor));
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
 	srDoor.Release();
 
