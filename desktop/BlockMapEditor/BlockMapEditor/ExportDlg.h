@@ -166,6 +166,7 @@ private:
 	INT m_xSaveRight, m_xCancelRight;
 	INT m_yButtonsDelta;
 	INT m_xStatus, m_yStatusDelta;
+	INT m_nExportSizeWidth, m_yExportSizeDelta;
 	SIZE m_sizeMin;
 
 public:

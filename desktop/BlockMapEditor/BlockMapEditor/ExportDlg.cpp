@@ -733,6 +733,10 @@ BOOL CExportDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRES
 			m_xStatus = rcLabel.left;
 			m_yStatusDelta = rcLabel.top - rcConversion.bottom;
 
+			GetLocalWindowRect(GetDlgItem(IDC_EXPORT_SIZE), &rcLabel);
+			m_nExportSizeWidth = rcLabel.right - rcLabel.left;
+			m_yExportSizeDelta = rcLabel.top - rcConversion.bottom;
+
 			m_sizeMin.cx = (rcButtons.right - rcButtons.left) * 3;
 			m_sizeMin.cy = (rcButtons.bottom - rcButtons.top) * 2;
 
@@ -813,7 +817,8 @@ BOOL CExportDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRES
 VOID CExportDlg::AdjustLayout (INT xSize, INT ySize, BOOL fRepaint)
 {
 	RECT rc;
-	INT xSave;
+	INT xExportSize, xSave;
+	HWND hwnd;
 
 	INT yConversion = ySize - m_nBottomMargin;
 	MoveWindow(GetDlgItem(IDC_CONVERSION), 0, 0, xSize, yConversion, fRepaint);
@@ -825,8 +830,21 @@ VOID CExportDlg::AdjustLayout (INT xSize, INT ySize, BOOL fRepaint)
 	GetLocalWindowRect(GetDlgItem(IDCANCEL), &rc);
 	MoveWindow(GetDlgItem(IDCANCEL), xSize - m_xCancelRight, yConversion + m_yButtonsDelta, rc.right - rc.left, rc.bottom - rc.top, fRepaint);
 
+	xExportSize = (xSave - m_nExportSizeWidth) - 4;
+	GetLocalWindowRect(GetDlgItem(IDC_EXPORT_SIZE), &rc);
+	MoveWindow(GetDlgItem(IDC_EXPORT_SIZE), xExportSize, yConversion + m_yExportSizeDelta, m_nExportSizeWidth, rc.bottom - rc.top, fRepaint);
+
 	GetLocalWindowRect(GetDlgItem(IDC_STATUS), &rc);
-	MoveWindow(GetDlgItem(IDC_STATUS), m_xStatus, yConversion + m_yStatusDelta, xSave - m_xStatus, rc.bottom - rc.top, fRepaint);
+	MoveWindow(GetDlgItem(IDC_STATUS), m_xStatus, yConversion + m_yStatusDelta, (xExportSize - m_xStatus) - 4, rc.bottom - rc.top, fRepaint);
+
+	if(fRepaint && SUCCEEDED(GetWindow(&hwnd)))
+	{
+		rc.left = 0;
+		rc.top = yConversion;
+		rc.bottom = ySize;
+		rc.right = xSize; 
+		InvalidateRect(hwnd, &rc, FALSE);
+	}
 }
 
 VOID CExportDlg::CheckZDBSPLogs (VOID)
