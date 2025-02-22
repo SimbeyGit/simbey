@@ -44,7 +44,7 @@ BOOL CLoaderDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRES
 				WCHAR wzError[100];
 				SideAssertHr(GetWindow(&hwnd));
 				Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Failed to load resource package: 0x%.8X", lParam);
-				MessageBox(hwnd, wzError, L"Loader Error", MB_OK);
+				MessageBox(hwnd, wzError, L"Loader Error", MB_OK | MB_ICONERROR);
 			}
 			End(lParam);
 		}

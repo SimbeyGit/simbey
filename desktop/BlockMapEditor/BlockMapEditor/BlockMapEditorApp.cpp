@@ -287,6 +287,12 @@ HRESULT CBlockMapEditorApp::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 	Check(UpdateAppTitle());
 
 Cleanup:
+	if(FAILED(hr))
+	{
+		WCHAR wzError[100];
+		Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Initialize() failed: 0x%.8X", hr);
+		MessageBox(m_hwnd, wzError, L"Loader Error", MB_OK | MB_ICONERROR);
+	}
 	return hr;
 }
 
@@ -934,6 +940,12 @@ HRESULT CBlockMapEditorApp::InitializePaintItems (CBlockMap* pMap)
 	m_pRibbon->UpdateProperty(ID_PAINT_TYPE, &UI_PKEY_LargeImage);
 
 Cleanup:
+	if(FAILED(hr))
+	{
+		WCHAR wzError[100];
+		Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"InitializePaintItems() failed: 0x%.8X", hr);
+		MessageBox(m_hwnd, wzError, L"Loader Error", MB_OK | MB_ICONERROR);
+	}
 	return hr;
 }
 
