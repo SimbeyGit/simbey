@@ -856,15 +856,15 @@ HRESULT CBlockMapEditorApp::InitializePaintItems (CBlockMap* pMap)
 	ReplaceInterface(m_pSelection, srVoidItem.StaticCast<CPaintItem>());
 	srVoidItem.Release();
 
-	Check(m_mapTextures.Find(RSTRING_CAST(L"DOORNORM"), &pTexture));
-	Check(m_mapTextures.Find(RSTRING_CAST(L"DOORNRM2"), &pAltTexture));
+	Check(FindRequiredTexture(L"DOORNORM", &pTexture));
+	Check(FindRequiredTexture(L"DOORNRM2", &pAltTexture));
 
 	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, pAltTexture, CDoorObject::Normal, &srDoor));
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
 	srDoor.Release();
 
-	Check(m_mapTextures.Find(RSTRING_CAST(L"LOCKDOOR"), &pTexture));
-	Check(m_mapTextures.Find(RSTRING_CAST(L"LOCKDOR2"), &pAltTexture));
+	Check(FindRequiredTexture(L"LOCKDOOR", &pTexture));
+	Check(FindRequiredTexture(L"LOCKDOR2", &pAltTexture));
 
 	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, pAltTexture, CDoorObject::SilverKey, &srDoor));
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
@@ -878,14 +878,14 @@ HRESULT CBlockMapEditorApp::InitializePaintItems (CBlockMap* pMap)
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
 	srDoor.Release();
 
-	Check(m_mapTextures.Find(RSTRING_CAST(L"ELVRDOOR"), &pTexture));
-	Check(m_mapTextures.Find(RSTRING_CAST(L"ELVRDOR2"), &pAltTexture));
+	Check(FindRequiredTexture(L"ELVRDOOR", &pTexture));
+	Check(FindRequiredTexture(L"ELVRDOR2", &pAltTexture));
 
 	Check(CDoorObject::Create(m_pRibbon, pMap, pTexture, pAltTexture, CDoorObject::Elevator, &srDoor));
 	Check(RegisterPaintItem(srDoor, PAINT_ITEM::Special));
 	srDoor.Release();
 
-	Check(m_mapTextures.Find(RSTRING_CAST(L"ELVRDOWN"), &pTexture));
+	Check(FindRequiredTexture(L"ELVRDOWN", &pTexture));
 
 	Check(CElevatorSwitch::Create(m_pRibbon, pTexture, false /* normal */, &srElevator));
 	Check(RegisterPaintItem(srElevator, PAINT_ITEM::Special));
@@ -940,12 +940,6 @@ HRESULT CBlockMapEditorApp::InitializePaintItems (CBlockMap* pMap)
 	m_pRibbon->UpdateProperty(ID_PAINT_TYPE, &UI_PKEY_LargeImage);
 
 Cleanup:
-	if(FAILED(hr))
-	{
-		WCHAR wzError[100];
-		Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"InitializePaintItems() failed: 0x%.8X", hr);
-		MessageBox(m_hwnd, wzError, L"Loader Error", MB_OK | MB_ICONERROR);
-	}
 	return hr;
 }
 
@@ -1656,6 +1650,18 @@ HRESULT CBlockMapEditorApp::ResolveTextureToPaintItem (PCWSTR pcwzTexture, __der
 
 Cleanup:
 	SafeRelease(value.punkVal);
+	return hr;
+}
+
+HRESULT CBlockMapEditorApp::FindRequiredTexture (PCWSTR pcwzTexture, __deref_out TEXTURE** ppTexture)
+{
+	HRESULT hr = m_mapTextures.Find(RSTRING_CAST(pcwzTexture), ppTexture);
+	if(FAILED(hr))
+	{
+		WCHAR wzError[100];
+		Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Missing required texture: %ls", pcwzTexture);
+		MessageBox(m_hwnd, wzError, L"Missing Texture", MB_OK | MB_ICONERROR);
+	}
 	return hr;
 }
 

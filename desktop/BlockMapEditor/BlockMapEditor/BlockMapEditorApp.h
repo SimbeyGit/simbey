@@ -173,6 +173,7 @@ protected:
 	HRESULT AddDirectionalActor (RSTRING rstrName, INT nDirection, ACTOR* pActor, bool fUseThisActor);
 	HRESULT LoadExternalTexture (RSTRING rstrName, __deref_out TEXTURE** ppTexture);
 	HRESULT ResolveTextureToPaintItem (PCWSTR pcwzTexture, __deref_out CTextureItem** ppTexture);
+	HRESULT FindRequiredTexture (PCWSTR pcwzTexture, __deref_out TEXTURE** ppTexture);
 
 	static HRESULT LoadFile (ISimbeyUnzip* pPackage, PCWSTR pcwzFile, __out CMemoryStream* pstmFile);
 	static HRESULT LoadTextEntry (ISimbeyUnzip* pPackage, PCWSTR pcwzName, PWSTR* ppwzText, INT* pcchText);
