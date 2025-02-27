@@ -287,7 +287,7 @@ HRESULT CBlockMapEditorApp::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 	Check(UpdateAppTitle());
 
 Cleanup:
-	if(FAILED(hr))
+	if(FAILED(hr) && E_ABORT != hr)
 	{
 		WCHAR wzError[100];
 		Formatting::TPrintF(wzError, ARRAYSIZE(wzError), NULL, L"Initialize() failed: 0x%.8X", hr);
