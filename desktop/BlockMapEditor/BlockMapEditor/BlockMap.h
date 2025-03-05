@@ -2,8 +2,10 @@
 
 #include "Library\Core\Map.h"
 #include "Library\Core\MemoryStream.h"
+#include "Library\Util\FileStream.h"
 #include "Library\GraphCtrl.h"
 
+interface IJSONObject;
 interface IResolveItemPalette;
 
 class CPaintItem;
@@ -79,8 +81,8 @@ public:
 	INT GetLighting (VOID) { return m_nLighting; }
 	VOID SetLighting (INT nLighting) { m_nLighting = nLighting; }
 	VOID Paint (IGrapher* pGraph);
-	HRESULT Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR pwzCeiling, PWSTR pwzFloor);
-	HRESULT Save (PCWSTR pcwzFile, PCWSTR pcwzCeiling, PCWSTR pcwzFloor);
+	HRESULT Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR pwzCeiling, PWSTR pwzFloor, PWSTR pwzCutout);
+	HRESULT Save (PCWSTR pcwzFile, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, PCWSTR pcwzCutout);
 	USHORT GetHighestFloor (VOID);
 	USHORT AddFloor (VOID);
 	HRESULT SetCellData (FLOAT x, FLOAT z, CPaintItem* pType);
@@ -104,6 +106,10 @@ public:
 private:
 	HRESULT InsertUndoItem (CBaseUndoRedo* pItem);
 	HRESULT LoadItemPalette (IResolveItemPalette* pResolve, ISequentialStream* pPalette, DWORD cbPalette, TArray<CPaintItem*>& aPalette);
+
+	HRESULT SerializeProperties (CMemoryStream* pProperties, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, PCWSTR pcwzCutout);
+	HRESULT ReadJSONProperties (CFileStream* pFile, PWSTR pwzCeiling, PWSTR pwzFloor, PWSTR pwzCutout);
+	static HRESULT CopyPropertyTo (IJSONObject* pProperties, PCWSTR pcwzName, __out_ecount(cchMaxTarget) PWSTR pwzTarget, INT cchMaxTarget);
 
 	static HRESULT InsertStream (ISequentialStream* pstmTarget, CMemoryStream* pstmSource);
 	static HRESULT SerializeItem (TMap<CPaintItem*, DWORD>& mapPalette, TArray<CPaintItem*>& aPalette, CMemoryStream* pstmData, CPaintItem* pItem);

@@ -11,6 +11,7 @@ const WCHAR c_wzBehaviorPath[] = L"BehaviorPath";
 const WCHAR c_wzZDBSPPath[] = L"ZDBSPPath";
 const WCHAR c_wzFloorName[] = L"FloorName";
 const WCHAR c_wzCeilingName[] = L"CeilingName";
+const WCHAR c_wzCutoutName[] = L"CutoutName";
 
 CConfigDlg::CConfigDlg () : CBaseDialog(IDD_CONFIG)
 {
@@ -19,6 +20,7 @@ CConfigDlg::CConfigDlg () : CBaseDialog(IDD_CONFIG)
 	m_wzZDBSPPath[0] = L'\0';
 	m_wzFloorName[0] = L'\0';
 	m_wzCeilingName[0] = L'\0';
+	m_wzCutoutName[0] = L'\0';
 }
 
 CConfigDlg::~CConfigDlg ()
@@ -60,6 +62,9 @@ HRESULT CConfigDlg::Load (PCWSTR pcszRegPath)
 	cbData = sizeof(m_wzCeilingName);
 	RegQueryValueEx(hKey, c_wzCeilingName, NULL, &dwType, (PBYTE)m_wzCeilingName, &cbData);
 
+	cbData = sizeof(m_wzCutoutName);
+	RegQueryValueEx(hKey, c_wzCutoutName, NULL, &dwType, (PBYTE)m_wzCutoutName, &cbData);
+
 Cleanup:
 	if(hKey)
 		RegCloseKey(hKey);
@@ -88,6 +93,9 @@ HRESULT CConfigDlg::Save (PCWSTR pcszRegPath)
 
 	cbData = (TStrLenAssert(m_wzCeilingName) + 1) * sizeof(WCHAR);
 	RegSetValueExW(hKey, c_wzCeilingName, 0, REG_SZ, (PBYTE)m_wzCeilingName, cbData);
+
+	cbData = (TStrLenAssert(m_wzCutoutName) + 1) * sizeof(WCHAR);
+	RegSetValueExW(hKey, c_wzCutoutName, 0, REG_SZ, (PBYTE)m_wzCutoutName, cbData);
 
 Cleanup:
 	if(hKey)
@@ -167,6 +175,9 @@ HRESULT CConfigDlg::ReadFromDialog (VOID)
 		Check(TStrCchCpy(m_wzFloorName, ARRAYSIZE(m_wzFloorName), L"FLAT5_4"));
 	if(0 == GetWindowText(GetDlgItem(IDC_CEILING_NAME), m_wzCeilingName, ARRAYSIZE(m_wzCeilingName)))
 		Check(TStrCchCpy(m_wzCeilingName, ARRAYSIZE(m_wzCeilingName), L"CEIL3_5"));
+
+	if(L'\0' == m_wzCutoutName[0])
+		Check(TStrCchCpy(m_wzCutoutName, ARRAYSIZE(m_wzCutoutName), L"LTGRAYB0"));
 
 Cleanup:
 	return hr;

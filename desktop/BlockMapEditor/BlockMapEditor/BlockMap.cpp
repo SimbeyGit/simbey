@@ -1,7 +1,8 @@
 #include <windows.h>
 #include <math.h>
 #include "Library\Core\CoreDefs.h"
-#include "Library\Util\FileStream.h"
+#include "Published\SimbeyCore.h"
+#include "Published\JSON.h"
 #include "PaintItems.h"
 #include "BlockMap.h"
 
@@ -113,11 +114,12 @@ VOID CBlockMap::Paint (IGrapher* pGraph)
 	}
 }
 
-HRESULT CBlockMap::Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR pwzCeiling, PWSTR pwzFloor)
+HRESULT CBlockMap::Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR pwzCeiling, PWSTR pwzFloor, PWSTR pwzCutout)
 {
 	HRESULT hr;
 	TStackRef<CFileStream> srFile;
 	DWORD cbPalette, cbData, cb;
+	BYTE bFormat[4];
 	TArray<CPaintItem*> aPalette;
 	MAP_BLOCK* pMap = m_pMap;
 	INT cch;
@@ -126,20 +128,28 @@ HRESULT CBlockMap::Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR p
 	m_idxChangePtr = 0;
 
 	Check(CFileStream::Open(pcwzFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL, &srFile, NULL));
-	Check(srFile->Read(&m_nLighting, sizeof(m_nLighting), &cb));
+	Check(srFile->Read(&bFormat, sizeof(bFormat), &cb));
 
-	Check(srFile->Read(&cch, sizeof(cch), &cb));
-	if(0 < cb)
+	if(bFormat[0] == 'J' && bFormat[1] == 'S' && bFormat[2] == 'O' && bFormat[3] == 'N')
+		Check(ReadJSONProperties(srFile, pwzCeiling, pwzFloor, pwzCutout));
+	else
 	{
-		Check(srFile->Read(pwzCeiling, cch * sizeof(WCHAR), &cb));
-		pwzCeiling[cch] = L'\0';
-	}
+		// Old format
+		CopyMemory(&m_nLighting, bFormat, sizeof(m_nLighting));
 
-	Check(srFile->Read(&cch, sizeof(cch), &cb));
-	if(0 < cb)
-	{
-		Check(srFile->Read(pwzFloor, cch * sizeof(WCHAR), &cb));
-		pwzFloor[cch] = L'\0';
+		Check(srFile->Read(&cch, sizeof(cch), &cb));
+		if(0 < cb)
+		{
+			Check(srFile->Read(pwzCeiling, cch * sizeof(WCHAR), &cb));
+			pwzCeiling[cch] = L'\0';
+		}
+
+		Check(srFile->Read(&cch, sizeof(cch), &cb));
+		if(0 < cb)
+		{
+			Check(srFile->Read(pwzFloor, cch * sizeof(WCHAR), &cb));
+			pwzFloor[cch] = L'\0';
+		}
 	}
 
 	Check(srFile->Read(&cbPalette, sizeof(cbPalette), &cb));
@@ -175,17 +185,17 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CBlockMap::Save (PCWSTR pcwzFile, PCWSTR pcwzCeiling, PCWSTR pcwzFloor)
+HRESULT CBlockMap::Save (PCWSTR pcwzFile, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, PCWSTR pcwzCutout)
 {
 	HRESULT hr;
 	MAP_BLOCK* pMap = m_pMap;
-	CMemoryStream stmPalette, stmPalItem;
+	BYTE bFormat[4];
+	CMemoryStream stmProperties, stmPalette, stmPalItem;
 	TMap<CPaintItem*, DWORD> mapPalette;
 	TArray<CPaintItem*> aPalette;
 	CMemoryStream stmData;
 	TStackRef<CFileStream> srFile;
 	DWORD cb;
-	INT cch;
 
 	for(INT z = 0; z < MAP_HEIGHT; z++)
 	{
@@ -209,17 +219,14 @@ HRESULT CBlockMap::Save (PCWSTR pcwzFile, PCWSTR pcwzCeiling, PCWSTR pcwzFloor)
 
 	Check(CFileStream::Open(pcwzFile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL, &srFile, NULL));
 
-	Check(srFile->Write(&m_nLighting, sizeof(m_nLighting), &cb));
+	bFormat[0] = 'J';
+	bFormat[1] = 'S';
+	bFormat[2] = 'O';
+	bFormat[3] = 'N';
+	Check(srFile->Write(bFormat, sizeof(bFormat), &cb));
 
-	cch = TStrLenChecked(pcwzCeiling);
-	Check(srFile->Write(&cch, sizeof(cb), &cb));
-	if(pcwzCeiling)
-		Check(srFile->Write(pcwzCeiling, cch * sizeof(WCHAR), &cb));
-
-	cch = TStrLenChecked(pcwzFloor);
-	Check(srFile->Write(&cch, sizeof(cb), &cb));
-	if(pcwzFloor)
-		Check(srFile->Write(pcwzFloor, cch * sizeof(WCHAR), &cb));
+	Check(SerializeProperties(&stmProperties, pcwzCeiling, pcwzFloor, pcwzCutout));
+	Check(InsertStream(srFile, &stmProperties));
 
 	Check(InsertStream(srFile, &stmPalette));
 	Check(InsertStream(srFile, &stmData));
@@ -554,6 +561,88 @@ HRESULT CBlockMap::LoadItemPalette (IResolveItemPalette* pResolve, ISequentialSt
 
 Cleanup:
 	__delete_array pbData;
+	return hr;
+}
+
+HRESULT CBlockMap::SerializeProperties (CMemoryStream* pProperties, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, PCWSTR pcwzCutout)
+{
+	HRESULT hr;
+	TStackRef<IJSONObject> srProperties;
+	TStackRef<IJSONValue> srv;
+	CMemoryStream stmPropertiesW;
+
+	Check(JSONCreateObject(&srProperties));
+
+	Check(JSONCreateInteger(m_nLighting, &srv));
+	Check(srProperties->AddValueW(L"lighting", srv));
+	srv.Release();
+
+	Check(JSONCreateStringW(pcwzCeiling, TStrLenAssert(pcwzCeiling), &srv));
+	Check(srProperties->AddValueW(L"ceiling", srv));
+	srv.Release();
+
+	Check(JSONCreateStringW(pcwzFloor, TStrLenAssert(pcwzFloor), &srv));
+	Check(srProperties->AddValueW(L"floor", srv));
+	srv.Release();
+
+	Check(JSONCreateStringW(pcwzCutout, TStrLenAssert(pcwzCutout), &srv));
+	Check(srProperties->AddValueW(L"cutout", srv));
+	srv.Release();
+
+	Check(JSONSerializeObject(srProperties, &stmPropertiesW));
+	Check(ScCopyWideToStreamA(CP_UTF8, pProperties, stmPropertiesW.TGetReadPtr<WCHAR>(), stmPropertiesW.TDataRemaining<WCHAR>(), -1));
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CBlockMap::ReadJSONProperties (CFileStream* pFile, PWSTR pwzCeiling, PWSTR pwzFloor, PWSTR pwzCutout)
+{
+	HRESULT hr;
+	DWORD cbJSON, cb;
+	PSTR pszJSON = NULL;
+	RSTRING rstrJSONW = NULL;
+	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONObject> srProperties;
+
+	Check(pFile->Read(&cbJSON, sizeof(cbJSON), &cb));
+	pszJSON = __new CHAR[cbJSON + 1];
+	CheckAlloc(pszJSON);
+	Check(pFile->Read(pszJSON, cbJSON, &cb));
+	pszJSON[cbJSON] = '\0';
+
+	Check(RStrConvertToW(CP_UTF8, cbJSON, pszJSON, &rstrJSONW));
+	Check(JSONParse(NULL, RStrToWide(rstrJSONW), RStrLen(rstrJSONW), &srv));
+	Check(srv->GetObject(&srProperties));
+	srv.Release();
+
+	Check(srProperties->FindNonNullValueW(L"lighting", &srv));
+	Check(srv->GetInteger(&m_nLighting));
+
+	Check(CopyPropertyTo(srProperties, L"ceiling", pwzCeiling, 12));
+	Check(CopyPropertyTo(srProperties, L"floor", pwzFloor, 12));
+	Check(CopyPropertyTo(srProperties, L"cutout", pwzCutout, 12));
+
+Cleanup:
+	RStrRelease(rstrJSONW);
+	__delete_array pszJSON;
+	return hr;
+}
+
+HRESULT CBlockMap::CopyPropertyTo (IJSONObject* pProperties, PCWSTR pcwzName, __out_ecount(cchMaxTarget) PWSTR pwzTarget, INT cchMaxTarget)
+{
+	HRESULT hr;
+	RSTRING rstrValueW = NULL;
+	TStackRef<IJSONValue> srv;
+
+	Check(pProperties->FindNonNullValueW(pcwzName, &srv));
+	Check(srv->GetString(&rstrValueW));
+	srv.Release();
+
+	Check(RStrCopyToW(rstrValueW, cchMaxTarget, pwzTarget, NULL));
+
+Cleanup:
+	RStrRelease(rstrValueW);
 	return hr;
 }
 

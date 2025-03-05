@@ -1065,7 +1065,7 @@ HRESULT CBlockMapEditorApp::OpenMap (VOID)
 	Check(RStrCreateW(TStrLenAssert(pcwzFile), pcwzFile, &rstrFile));
 
 	Check(CreateBlockMap(&pBlockMap));
-	Check(pBlockMap->Load(this, pcwzFile, m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName));
+	Check(pBlockMap->Load(this, pcwzFile, m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName));
 
 	SwapData(m_pBlockMap, pBlockMap);
 	SwapData(m_rstrFile, rstrFile);
@@ -1094,13 +1094,13 @@ HRESULT CBlockMapEditorApp::SaveMap (VOID)
 		PCWSTR pcwzFile = choose.GetFile(0);
 		Check(RStrCreateW(TStrLenAssert(pcwzFile), pcwzFile, &rstrFile));
 
-		Check(m_pBlockMap->Save(pcwzFile, m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName));
+		Check(m_pBlockMap->Save(pcwzFile, m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName));
 
 		m_rstrFile = rstrFile;
 		rstrFile = NULL;
 	}
 	else
-		Check(m_pBlockMap->Save(RStrToWide(m_rstrFile), m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName));
+		Check(m_pBlockMap->Save(RStrToWide(m_rstrFile), m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName));
 
 	Check(UpdateAppTitle());
 

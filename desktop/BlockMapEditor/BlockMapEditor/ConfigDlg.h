@@ -12,6 +12,7 @@ public:
 
 	WCHAR m_wzFloorName[12];
 	WCHAR m_wzCeilingName[12];
+	WCHAR m_wzCutoutName[12];
 
 public:
 	CConfigDlg ();

@@ -31,6 +31,9 @@ BOOL CPropertiesDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 
 		SetDlgItemText(hwnd, IDC_CEILING_NAME, m_pdlgConfig->m_wzCeilingName);
 		SetDlgItemText(hwnd, IDC_FLOOR_NAME, m_pdlgConfig->m_wzFloorName);
+		SetDlgItemText(hwnd, IDC_CUTOUT_NAME, m_pdlgConfig->m_wzCutoutName);
+
+		SetFocus(GetDlgItem(IDC_FLOOR_NAME));
 
 		CenterHost();
 		break;
@@ -44,6 +47,9 @@ BOOL CPropertiesDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		case IDC_BROWSE_CEILING:
 			BrowseFlats(IDC_CEILING_NAME, L"CEIL");
 			break;
+		case IDC_BROWSE_CUTOUT:
+			BrowseFlats(IDC_CUTOUT_NAME, NULL);
+			break;
 		case IDOK:
 			{
 				BOOL fSuccess;
@@ -54,6 +60,7 @@ BOOL CPropertiesDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 					break;
 				GetDlgItemText(hwnd, IDC_CEILING_NAME, m_pdlgConfig->m_wzCeilingName, ARRAYSIZE(m_pdlgConfig->m_wzCeilingName));
 				GetDlgItemText(hwnd, IDC_FLOOR_NAME, m_pdlgConfig->m_wzFloorName, ARRAYSIZE(m_pdlgConfig->m_wzFloorName));
+				GetDlgItemText(hwnd, IDC_CUTOUT_NAME, m_pdlgConfig->m_wzCutoutName, ARRAYSIZE(m_pdlgConfig->m_wzCutoutName));
 			}
 			__fallthrough;
 		case IDCANCEL:
@@ -90,7 +97,7 @@ HRESULT CPropertiesDlg::BrowseFlats (UINT idField, PCWSTR pcwzPrefix)
 
 		Check(m_mapTextures.GetKeyAndValue(i, &rstrName, &pTexture));
 
-		if(TCompareLeftIAssert(pTexture->pcwzName, pcwzPrefix))
+		if(NULL == pcwzPrefix || TCompareLeftIAssert(pTexture->pcwzName, pcwzPrefix))
 		{
 			TStackRef<ISimbeyInterchangeFileLayer> srLayer;
 			Check(srSIF->AddLayerFromBits(pTexture->xSize, pTexture->ySize, pTexture->stmBits32.TGetReadPtr<BYTE>(), 32, pTexture->xSize * 4, &srLayer, NULL));
@@ -101,7 +108,7 @@ HRESULT CPropertiesDlg::BrowseFlats (UINT idField, PCWSTR pcwzPrefix)
 		}
 	}
 
-	Check(RStrFormatW(&rstrTitle, L"Tiles: %ls", pcwzPrefix));
+	Check(RStrFormatW(&rstrTitle, L"Tiles: %ls", pcwzPrefix ? pcwzPrefix : L"All Textures"));
 	Check(dlgSelect.Initialize());
 	Check(dlgSelect.AddSIF(rstrTitle, srSIF));
 	if(0 != idLayer)

@@ -20,8 +20,9 @@ CMapConvert::CMapConvert ()
 	m_iNextSector = 0;
 	m_lpAssign = NULL;
 
-	lstrcpyA(m_szCeiling,"FLAT19");
-	lstrcpyA(m_szFloor,"FLOOR7_1");
+	lstrcpyA(m_szCeiling, "FLAT19");
+	lstrcpyA(m_szFloor, "FLOOR7_1");
+	lstrcpyA(m_szCutout, "LTGRAYB0");
 
 	m_iVertStrip = 0;
 	m_iHorzStrip = 0;
@@ -95,6 +96,7 @@ HRESULT CMapConvert::RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLe
 
 	CopyTexture(m_szFloor, pdlgConfig->m_wzFloorName);
 	CopyTexture(m_szCeiling, pdlgConfig->m_wzCeilingName);
+	CopyTexture(m_szCutout, pdlgConfig->m_wzCutoutName);
 
 	m_lpSectorTable = __new USHORT[cSectorTable];
 	CheckAlloc(m_lpSectorTable);
@@ -1009,12 +1011,12 @@ HRESULT CMapConvert::AssignSkyLightTrigger (LPWOLFDATA lpMap, BOOL* pfSkyMap, IN
 				Line.m_sRight.Sector = m_lpSectorTable[y * lpMap->xSize + x];
 				Line.m_sLeft.Sector = nSector;
 
-				lstrcpyA(Line.m_sRight.szUpper,"-");
-				lstrcpyA(Line.m_sRight.szMiddle,"-");
-				lstrcpyA(Line.m_sRight.szLower,"-");
-				CopyTexture(Line.m_sLeft.szUpper,L"LTGRAYB0");
-				lstrcpyA(Line.m_sLeft.szMiddle,"-");
-				lstrcpyA(Line.m_sLeft.szLower,"-");
+				lstrcpyA(Line.m_sRight.szUpper, "-");
+				lstrcpyA(Line.m_sRight.szMiddle, "-");
+				lstrcpyA(Line.m_sRight.szLower, "-");
+				lstrcpyA(Line.m_sLeft.szUpper, m_szCutout);
+				lstrcpyA(Line.m_sLeft.szMiddle, "-");
+				lstrcpyA(Line.m_sLeft.szLower, "-");
 
 				FlipLinedef(&Line, FALSE);
 				Check(AddLine(&Line));

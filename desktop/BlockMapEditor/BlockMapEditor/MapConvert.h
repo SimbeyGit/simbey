@@ -185,6 +185,7 @@ private:
 
 	CHAR m_szCeiling[16];
 	CHAR m_szFloor[16];
+	CHAR m_szCutout[16];
 
 	// ZDoom specific
 	SHORT m_iVertStrip;
