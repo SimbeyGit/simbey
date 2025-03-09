@@ -1000,7 +1000,11 @@ HRESULT CMapConvert::AssignSkyLightTrigger (LPWOLFDATA lpMap, BOOL* pfSkyMap, IN
 			if(pLine)
 			{
 				// If it's a double-sided line, then the map is built wrong.
-				CheckIf(pLine->m_Flags & 4, HRESULT_FROM_WIN32(ERROR_ARENA_TRASHED));
+				bool fIsDoor = srAdjObject && srAdjObject->GetType() == MapCell::Door;
+				CheckIf((pLine->m_Flags & 4) && !fIsDoor, HRESULT_FROM_WIN32(ERROR_ARENA_TRASHED));
+
+				if(fIsDoor)
+					lstrcpyA(pLine->m_sRight.szUpper, m_szCutout);
 
 				pLine->m_sRight.Sector = nSector;
 				pLine->m_sRight.yOffset = -16;
