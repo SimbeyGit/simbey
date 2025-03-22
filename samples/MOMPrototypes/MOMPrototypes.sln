@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MOMCombatDemo", "MOMCombatD
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MOMWorldEditor", "MOMWorldEditor\MOMWorldEditor.vcproj", "{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LargeCombatRenderer", "LargeCombatRenderer\LargeCombatRenderer.vcproj", "{42BFAE50-1B8A-446C-B05E-9967B878A757}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}.Debug|Win32.Build.0 = Debug|Win32
 		{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}.Release|Win32.ActiveCfg = Release|Win32
 		{06E47CBF-FBF9-4896-8759-C5AB41C6D1D2}.Release|Win32.Build.0 = Release|Win32
+		{42BFAE50-1B8A-446C-B05E-9967B878A757}.Debug|Win32.ActiveCfg = Debug|Win32
+		{42BFAE50-1B8A-446C-B05E-9967B878A757}.Debug|Win32.Build.0 = Debug|Win32
+		{42BFAE50-1B8A-446C-B05E-9967B878A757}.Release|Win32.ActiveCfg = Release|Win32
+		{42BFAE50-1B8A-446C-B05E-9967B878A757}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
