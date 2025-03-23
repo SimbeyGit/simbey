@@ -1,0 +1,888 @@
+[
+	{
+		package: "json",
+		name: "rules.json",
+		data:
+		{
+			standard:
+			{
+				smoothing: "SS1",
+				same:
+				[
+					"standard"
+				],
+				border:
+				[
+					"darkened",
+					"ridge"
+				]
+			},
+			darkened:
+			{
+				smoothing: "SS13",
+				same:
+				[
+					"darkened"
+				],
+				border:
+				[
+					"standard",
+					"ridge"
+				]
+			},
+			ridge:
+			{
+				smoothing: "SS15",
+				same:
+				[
+					"ridge"
+				],
+				border:
+				[
+					"darkened",
+					"standard"
+				]
+			}
+		}
+	},
+	{
+		package: "json",
+		name: "generators.json",
+		data:
+		[
+			{
+				name: "darkForest",
+				tiles: "darkForest",
+				dark: 40,
+				ridge: 30,
+				features: 70
+			},
+			{
+				name: "desert",
+				tiles: "desert",
+				dark: 40,
+				ridge: 40,
+				features: 15
+			},
+			{
+				name: "forest",
+				tiles: "default",
+				dark: 35,
+				ridge: 25,
+				features: 70
+			},
+			{
+				name: "grasslands",
+				tiles: "default",
+				dark: 30,
+				ridge: 20,
+				features: 20
+			},
+			{
+				name: "hills",
+				tiles: "default",
+				dark: 25,
+				ridge: 60,
+				features: 30
+			},
+			{
+				name: "mountains",
+				tiles: "mountains",
+				dark: 40,
+				ridge: 60,
+				features: 15
+			},
+			{
+				name: "ocean",
+				tiles: "ocean",
+				dark: 0,
+				ridge: 0,
+				features: 0
+			},
+			{
+				name: "river",
+				tiles: "default",
+				dark: 30,
+				ridge: 20,
+				features: 20
+			},
+			{
+				name: "shore",
+				tiles: "ocean",
+				dark: 0,
+				ridge: 0,
+				features: 0
+			},
+			{
+				name: "swamp",
+				tiles: "swamp",
+				dark: 250,
+				ridge: 8,
+				features: 30
+			},
+			{
+				name: "tundra",
+				tiles: "tundra",
+				dark: 30,
+				ridge: 30,
+				features: 20
+			}
+		]
+	},
+	{
+		package: "json",
+		name: "smoothing.json",
+		data:
+		{
+			SS1:
+			{
+				description: "Single tile (no smoothing at all)"
+				maxValueEachDirection: 0
+			},
+			SS13:
+			{
+				description: "13 tile set for smoothing edges of darkened areas"
+				maxValueEachDirection: 1,
+				reductions:
+				[
+					{
+						"description":"No tile with grass left-right but dark top-bottom, so fill out",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									3,
+									7
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":1,
+								"value":1
+							},
+							{
+								"direction":5,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"No tile with grass top-bottom but dark left-right, so fill out",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									1,
+									5
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":3,
+								"value":1
+							},
+							{
+								"direction":7,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Grass on a long edge implies grass at the two corners",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									8
+								],
+								"repetitions":1,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":1,
+								"value":1
+							},
+							{
+								"direction":7,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Grass on a long edge implies grass at the two corners",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									6
+								],
+								"repetitions":1,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":7,
+								"value":1
+							},
+							{
+								"direction":5,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Grass on a long edge implies grass at the two corners",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									4
+								],
+								"repetitions":1,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":5,
+								"value":1
+							},
+							{
+								"direction":3,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Grass on a long edge implies grass at the two corners",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									2
+								],
+								"repetitions":1,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":3,
+								"value":1
+							},
+							{
+								"direction":1,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Grass on two adjacent corners implies grass on the long edge in between",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									1,
+									3
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":2,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Grass on two adjacent corners implies grass on the long edge in between",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									3,
+									5
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":4,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Grass on two adjacent corners implies grass on the long edge in between",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									5,
+									7
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":6,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Grass on two adjacent corners implies grass on the long edge in between",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									7,
+									1
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":8,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"No tile for a single cell of darkness surrounded by grass, so set an arbitrary direction back to dark, part 1",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									2,
+									4,
+									6,
+									8
+								],
+								"repetitions":4,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":1,
+								"value":0
+							}
+						]
+					},
+					{
+						"description":"No tile for a single cell of darkness surrounded by grass, so set an arbitrary direction back to dark, part 2",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									2,
+									4,
+									6,
+									8
+								],
+								"repetitions":4,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":2,
+								"value":0
+							},
+							{
+								"direction":8,
+								"value":0
+							}
+						]
+					}
+				]
+			},
+			SS15:
+			{
+				description: "15 tile set for linking together adjacent hills or mountains"
+				maxValueEachDirection: 1,
+				reductions:
+				[
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if two adjacent edges are grass, assume the corner between is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									2,
+									4
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":3,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if two adjacent edges are grass, assume the corner between is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									4,
+									6
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":5,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if two adjacent edges are grass, assume the corner between is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									6,
+									8
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":7,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if two adjacent edges are grass, assume the corner between is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									8,
+									2
+								],
+								"repetitions":2,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":1,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if two adjacent edges are mountains, assume the corner between them is also mountains",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									2,
+									4
+								],
+								"repetitions":2,
+								"value":0
+							}
+						],
+						"set":
+						[
+							{
+								"direction":3,
+								"value":0
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if two adjacent edges are mountains, assume the corner between them is also mountains",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									4,
+									6
+								],
+								"repetitions":2,
+								"value":0
+							}
+						],
+						"set":
+						[
+							{
+								"direction":5,
+								"value":0
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if two adjacent edges are mountains, assume the corner between them is also mountains",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									6,
+									8
+								],
+								"repetitions":2,
+								"value":0
+							}
+						],
+						"set":
+						[
+							{
+								"direction":7,
+								"value":0
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if two adjacent edges are mountains, assume the corner between them is also mountains",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									8,
+									2
+								],
+								"repetitions":2,
+								"value":0
+							}
+						],
+						"set":
+						[
+							{
+								"direction":1,
+								"value":0
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if one edge is mountains and an adjacent edge is grass, assume the corner between them is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									2
+								],
+								"repetitions":1,
+								"value":1
+							},
+							{
+								"directions":
+								[
+									4
+								],
+								"repetitions":1,
+								"value":0
+							}
+						],
+						"set":
+						[
+							{
+								"direction":3,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if one edge is mountains and an adjacent edge is grass, assume the corner between them is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									4
+								],
+								"repetitions":1,
+								"value":1
+							},
+							{
+								"directions":
+								[
+									6
+								],
+								"repetitions":1,
+								"value":0
+							}
+						],
+						"set":
+						[
+							{
+								"direction":5,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if one edge is mountains and an adjacent edge is grass, assume the corner between them is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									6
+								],
+								"repetitions":1,
+								"value":1
+							},
+							{
+								"directions":
+								[
+									8
+								],
+								"repetitions":1,
+								"value":0
+							}
+						],
+						"set":
+						[
+							{
+								"direction":7,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if one edge is mountains and an adjacent edge is grass, assume the corner between them is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									8
+								],
+								"repetitions":1,
+								"value":1
+							},
+							{
+								"directions":
+								[
+									2
+								],
+								"repetitions":1,
+								"value":0
+							}
+						],
+						"set":
+						[
+							{
+								"direction":1,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if one edge is mountains and an adjacent edge is grass, assume the corner between them is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									2
+								],
+								"repetitions":1,
+								"value":0
+							},
+							{
+								"directions":
+								[
+									4
+								],
+								"repetitions":1,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":3,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if one edge is mountains and an adjacent edge is grass, assume the corner between them is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									4
+								],
+								"repetitions":1,
+								"value":0
+							},
+							{
+								"directions":
+								[
+									6
+								],
+								"repetitions":1,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":5,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if one edge is mountains and an adjacent edge is grass, assume the corner between them is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									6
+								],
+								"repetitions":1,
+								"value":0
+							},
+							{
+								"directions":
+								[
+									8
+								],
+								"repetitions":1,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":7,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"Mountain lines are never drawn crossing corners - so if one edge is mountains and an adjacent edge is grass, assume the corner between them is also grass",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									8
+								],
+								"repetitions":1,
+								"value":0
+							},
+							{
+								"directions":
+								[
+									2
+								],
+								"repetitions":1,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":1,
+								"value":1
+							}
+						]
+					},
+					{
+						"description":"No tile for a single cell of ridge surrounded by grass, so set an arbitrary direction back to dark",
+						"conditions":
+						[
+							{
+								"directions":
+								[
+									1,
+									2,
+									3,
+									4,
+									5,
+									6,
+									7,
+									8
+								],
+								"repetitions":8,
+								"value":1
+							}
+						],
+						"set":
+						[
+							{
+								"direction":2,
+								"value":0
+							}
+						]
+					}
+				]
+			}
+		}
+	}
+]

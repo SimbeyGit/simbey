@@ -1,0 +1,48 @@
+#include "..\Shared\BuildTileSets.quadoo"
+
+function DoubleFeatureSprites (oFeature)
+{
+	var strFile = oFeature.GetPathOf("package.json");
+	var oPackage = JSONParse(Host.ReadTextFile(strFile));
+	JSONSetValue(oPackage, "[package:buildsif]:double", true);
+
+	var aKeys = JSONGetValue(oPackage, "[package:json]:data:keys");
+	for(int i = 0; i < len(aKeys); i++)
+	{
+		var aSizes = aKeys[i].sizes;
+		for(int n = 0; n < len(aSizes); n++)
+		{
+			var aSize = aSizes[n];
+			aSize[0] = aSize[0] * 2;
+			aSize[1] = aSize[1] * 2;
+		}
+	}
+
+	Host.WriteTextFile((string)oPackage, strFile);
+}
+
+function main ()
+{
+	var oTerrain = Host.OpenFolder("..\\..\\..\\resources\\MoM\\combat_large\\terrain");
+
+	println("Building large combat terrain animators (Arcanus)...");
+	BuildCombatAnimators(oTerrain, "Arcanus");
+	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\default\\feature"));
+	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\desert\\feature"));
+	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\mountains\\feature"));
+	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\swamp\\feature"));
+	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\tundra\\feature"));
+	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\darkForest\\feature"));
+
+	var oPackager = Host.CreateProcess("..\\..\\..\\target\\release\\SIFPackage.exe", "Assets Assets.pkg");
+	oPackager.Wait();
+
+	var nResult = oPackager.GetExitCode();
+	if(nResult == 0)
+		println("Successfully built the package!");
+	else
+	{
+		println("Error building the package!");
+		println("Error code: 0x" + hex(nResult));
+	}
+}

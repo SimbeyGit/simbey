@@ -1,6 +1,11 @@
 #include <windows.h>
 #include <mmsystem.h>
 #include "Library\Core\CoreDefs.h"
+#include "Library\Util\Formatting.h"
+#include "Library\Util\Options.h"
+#include "..\Shared\HeightMapGenerator.h"
+#include "..\Shared\TileRules.h"
+#include "..\Shared\TileSetLoader.h"
 #include "LargeCombatRenderer.h"
 
 #define	GAME_TICK_MS		33
@@ -50,14 +55,51 @@ static SIF_LINE_OFFSET c_slTileOffsets[] =
 	{ 30, 2 }
 };
 
+class CSimpleRNG : public IRandomNumber
+{
+public:
+	CSimpleRNG (DWORD dwSeed)
+	{
+		srand(dwSeed);
+	}
+
+	// IRandomNumber
+	virtual INT Next (VOID)
+	{
+		return rand();
+	}
+
+	virtual INT Next (INT nMax)
+	{
+		return rand() % nMax;
+	}
+};
+
+class CMapData
+{
+public:
+	CTile* m_pFeature;
+
+public:
+	CMapData () :
+		m_pFeature(NULL)
+	{
+	}
+
+	~CMapData ()
+	{
+	}
+};
+
 CLargeCombatRenderer::CLargeCombatRenderer (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
 	m_Surface(640, 400),
 	m_pMain(NULL),
 	m_Isometric(TILE_WIDTH, TILE_HEIGHT),
 	m_fActive(FALSE),
-	m_pSIF(NULL),
-	m_pTile(NULL)
+	m_pPackage(NULL),
+	m_pTileRules(NULL),
+	m_pGenerators(NULL)
 {
 	m_Surface.EnableClear(RGB(255, 255, 255));
 
@@ -66,13 +108,12 @@ CLargeCombatRenderer::CLargeCombatRenderer (HINSTANCE hInstance) :
 
 CLargeCombatRenderer::~CLargeCombatRenderer ()
 {
-	if(m_pSIF)
-	{
-		SafeRelease(m_pTile);
+	m_mapCombatTiles.DeleteAll();
+	SafeRelease(m_pGenerators);
+	SafeDelete(m_pTileRules);
+	m_mapSmoothingSystems.DeleteAll();
 
-		m_pSIF->Close();
-		m_pSIF->Release();
-	}
+	SafeRelease(m_pPackage);
 }
 
 HRESULT CLargeCombatRenderer::Register (HINSTANCE hInstance)
@@ -98,76 +139,70 @@ HRESULT CLargeCombatRenderer::Unregister (HINSTANCE hInstance)
 	return UnregisterClass(c_wzLCRClass, hInstance);
 }
 
-HRESULT CLargeCombatRenderer::Initialize (INT nWidth, INT nHeight, INT nCmdShow)
+HRESULT CLargeCombatRenderer::Initialize (INT nWidth, INT nHeight, PCWSTR pcwzCmdLine, INT nCmdShow)
 {
 	HRESULT hr;
-	RECT rect = { 0, 0, nWidth, nHeight };
+	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONObject> srSmoothing;
+	RECT rect = { 0, 0, nWidth, nHeight }, rc;
+	INT xSize, ySize;
+	INT xScroll, yScroll;
+	RSTRING rstrWorld = NULL, rstrGenerator = NULL, rstrSeed = NULL;
+	DWORD dwSeed;
+	COptions options;
 
-	DWORD dwIndex;
-	Check(sifCreateNew(&m_pSIF));
-	Check(sifAddImageFileAsLayer(L"Tile_62x32.png", m_pSIF, &dwIndex));
-	Check(m_pSIF->GetLayerByIndex(dwIndex, &m_pTile));
+	Check(options.Parse(pcwzCmdLine));
+
+	m_pPackage = __new CSIFPackage;
+	CheckAlloc(m_pPackage);
+	Check(m_pPackage->OpenPackage(L"Assets.pkg"));
+
+	Check(m_pPackage->GetJSONData(SLP(L"combat_large\\terrain\\smoothing.json"), &srv));
+	Check(srv->GetObject(&srSmoothing));
+	srv.Release();
+	Check(CSmoothingSystem::LoadFromJSON(srSmoothing, m_mapSmoothingSystems));
+
+	Check(m_pPackage->GetJSONData(SLP(L"combat_large\\terrain\\rules.json"), &srv));
+
+	m_pTileRules = __new CTileRules;
+	CheckAlloc(m_pTileRules);
+	Check(m_pTileRules->Initialize(m_mapSmoothingSystems, srv));
+	srv.Release();
+
+	Check(m_pPackage->GetJSONData(SLP(L"combat_large\\terrain\\generators.json"), &srv));
+	Check(srv->GetArray(&m_pGenerators));
 
 	CheckIfGetLastError(!AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE));
 	Check(Create(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE, WS_OVERLAPPEDWINDOW,
 		c_wzLCRClass, c_wzLCRTitle, CW_USEDEFAULT, CW_USEDEFAULT,
 		rect.right - rect.left, rect.bottom - rect.top, NULL, nCmdShow));
 
-	{
-		INT xSize, ySize;
-		RECT rc;
+	m_Surface.GetViewSize(&xSize, &ySize);
+	rc.left = 0;
+	rc.top = 0;
+	rc.right = xSize;
+	rc.bottom = ySize;
 
-		m_Surface.GetViewSize(&xSize, &ySize);
-		rc.left = 0;
-		rc.top = 0;
-		rc.right = xSize;
-		rc.bottom = ySize;
+	m_Isometric.TileToView(MAP_WIDTH / 2, MAP_HEIGHT / 2, &xScroll, &yScroll);
+	Check(m_Surface.AddCanvas(&rc, TRUE, &m_pMain));
+	m_pMain->SetScroll(xScroll + TILE_WIDTH / 2, yScroll);
 
-		INT xScroll, yScroll;
-		INT xTileStart, yTileStart, xTileEnd, yTileEnd, yMid, nAdjust = 0;
+	if(!options.GetParamValue(L"world", &rstrWorld))
+		Check(RStrCreateW(LSP(L"arcanus"), &rstrWorld));
+	if(!options.GetParamValue(L"generator", &rstrGenerator))
+		Check(RStrCreateW(LSP(L"grasslands"), &rstrGenerator));
 
-		m_Isometric.TileToView(MAP_WIDTH / 2, MAP_HEIGHT / 2, &xScroll, &yScroll);
-		Check(m_Surface.AddCanvas(&rc, TRUE, &m_pMain));
-		m_pMain->SetScroll(xScroll + TILE_WIDTH / 2, yScroll);
+	if(options.GetParamValue(L"seed", &rstrSeed))
+		dwSeed = Formatting::TAscToUInt32(RStrToWide(rstrSeed));
+	else
+		dwSeed = GetTickCount();
 
-		m_Isometric.GetTileRange(m_pMain, &xTileStart, &yTileStart, &xTileEnd, &yTileEnd);
-		yMid = (yTileStart + yTileEnd) / 2;
-
-		sysint nLayer;
-		m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer);
-
-		for(INT y = yTileStart; y < yTileEnd; y++)
-		{
-			if(0 <= y && y < MAP_HEIGHT)
-			{
-				INT xStart = xTileStart - nAdjust;
-				INT xEnd = xTileEnd + nAdjust;
-				if(0 > xStart)
-					xStart = 0;
-				if(MAP_WIDTH < xEnd)
-					xEnd = MAP_WIDTH;
-				for(INT x = xStart; x < xEnd; x++)
-				{
-					INT xIso, yIso, xTile, yTile;
-					TStackRef<ISimbeyInterchangeSprite> srSprite;
-
-					m_Isometric.TileToView(x, y, &xIso, &yIso);
-					m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xTile, &yTile);
-
-					Check(sifCreateStaticSprite(m_pTile, 0, 0, &srSprite));
-					srSprite->SetPosition(xTile, yTile);
-					Check(m_pMain->AddSprite(nLayer, srSprite, NULL));
-				}
-			}
-
-			if(y < yMid)
-				nAdjust++;
-			else
-				nAdjust--;
-		}
-	}
+	Check(GenerateMap(dwSeed, rstrWorld, rstrGenerator));
 
 Cleanup:
+	RStrRelease(rstrGenerator);
+	RStrRelease(rstrWorld);
+	RStrRelease(rstrSeed);
 	return hr;
 }
 
@@ -345,4 +380,231 @@ BOOL CLargeCombatRenderer::OnSetCursor (UINT uMsg, WPARAM wParam, LPARAM lParam,
 		return TRUE;
 	}
 	return FALSE;
+}
+
+HRESULT CLargeCombatRenderer::PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, CTile* pTile, __deref_out_opt ISimbeyInterchangeSprite** ppSprite)
+{
+	HRESULT hr;
+	TStackRef<ISimbeyInterchangeSprite> srSprite;
+	INT xIso, yIso, x, y;
+
+	m_Isometric.TileToView(xTile, yTile, &xIso, &yIso);
+	m_Isometric.IsometricToView(m_pMain, xIso, yIso, &x, &y);
+
+	Check(pTile->CreateSprite(&srSprite));
+	srSprite->SetPosition(x, y);
+	Check(pCanvas->AddSprite(nLayer, srSprite, NULL));
+
+	if(ppSprite)
+		*ppSprite = srSprite.Detach();
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CLargeCombatRenderer::AllocateCombatWorld (__deref_out MAPTILE** ppWorld)
+{
+	HRESULT hr;
+	CTileSet* pStandardSet;
+	TArray<CTile*>* paTiles;
+	MAPTILE* pWorld = NULL;
+
+	Check(m_mapCombatTiles.Find(RSTRING_CAST(L"standard"), &pStandardSet));
+	Check(pStandardSet->FindFromKey(RSTRING_CAST(L"00000000"), &paTiles));
+
+	pWorld = __new MAPTILE[MAP_WIDTH * MAP_HEIGHT];
+	CheckAlloc(pWorld);
+
+	for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
+	{
+		pWorld[i].pTile = (*paTiles)[rand() % paTiles->Length()];
+		pWorld[i].pData = __new CMapData;
+		CheckAlloc(pWorld[i].pData);
+	}
+
+	*ppWorld = pWorld;
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CLargeCombatRenderer::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGenerator, DWORD dwSeed)
+{
+	HRESULT hr;
+	CMapPainter painter(m_pTileRules, pWorld, MAP_WIDTH, MAP_HEIGHT);
+	COORD_SYSTEM coords;
+	CSimpleRNG rng(dwSeed);
+	CHeightMapGenerator HeightMap(&rng, rng.Next(5) + 2, rng.Next(5) + 2, 0);
+	TStackRef<IJSONValue> srv;
+	INT cTiles;
+	TArray<POINT> aTiles;
+	RSTRING rstrDarkened = NULL, rstrRidge = NULL;
+	CTileSet* pFeatures;
+	TArray<CTile*>* paFeatures;
+
+	coords.nWidth = MAP_WIDTH;
+	coords.nHeight = MAP_HEIGHT;
+	coords.fWrapsLeftToRight = FALSE;
+	coords.fWrapsTopToBottom = FALSE;
+
+	Check(HeightMap.Initialize(coords));
+	Check(HeightMap.GenerateHeightMap());
+
+	Check(RStrCreateW(LSP(L"darkened"), &rstrDarkened));
+	Check(RStrCreateW(LSP(L"ridge"), &rstrRidge));
+
+	Check(pGenerator->FindNonNullValueW(L"dark", &srv));
+	Check(srv->GetInteger(&cTiles));
+	srv.Release();
+
+	Check(HeightMap.SetLowestTiles(cTiles, &aTiles));
+	for(sysint i = 0; i < aTiles.Length(); i++)
+	{
+		POINT& pt = aTiles[i];
+		Check(painter.PaintTile(pt.x, pt.y, rstrDarkened));
+		Check(painter.CheckTransitions(pt.x, pt.y, rstrDarkened));
+		Check(painter.Commit(&m_mapCombatTiles, NULL));
+	}
+	aTiles.Clear();
+
+	Check(pGenerator->FindNonNullValueW(L"ridge", &srv));
+	Check(srv->GetInteger(&cTiles));
+	srv.Release();
+
+	Check(HeightMap.SetHighestTiles(cTiles, &aTiles));
+	for(sysint i = 0; i < aTiles.Length(); i++)
+	{
+		POINT& pt = aTiles[i];
+		Check(painter.PaintTile(pt.x, pt.y, rstrRidge));
+		Check(painter.CheckTransitions(pt.x, pt.y, rstrRidge));
+		Check(painter.Commit(&m_mapCombatTiles, NULL));
+	}
+	aTiles.Clear();
+
+	Check(pGenerator->FindNonNullValueW(L"features", &srv));
+	Check(srv->GetInteger(&cTiles));
+
+	// Half the tiles won't be included anyway, so let's multiply by 2.5 to increase the visible distribution.
+	cTiles = MulDiv(cTiles, 5, 2);
+
+	for(INT y = 0; y < MAP_HEIGHT; y++)
+	{
+		for(INT x = 0; x < MAP_WIDTH; x++)
+		{
+			if(((x >= 7 && x <= 13) || (x >= 19 && x <= 25)) && (y >= 15 && y <= 21))
+			{
+				// No terrain features are placed on these tiles.
+			}
+			else
+			{
+				POINT pt = { x, y };
+				Check(aTiles.Append(pt));
+			}
+		}
+	}
+
+	Check(m_mapCombatTiles.Find(RSTRING_CAST(L"feature"), &pFeatures));
+	Check(pFeatures->FindFromKey(RSTRING_CAST(L"00000000"), &paFeatures));
+
+	for(INT i = 0; i < cTiles; i++)
+	{
+		INT idxTile = rng.Next(aTiles.Length());
+		POINT pt;
+
+		Check(aTiles.RemoveChecked(idxTile, &pt));
+		pWorld[pt.y * MAP_WIDTH + pt.x].pData->m_pFeature = (*paFeatures)[rng.Next(paFeatures->Length())];
+	}
+
+Cleanup:
+	RStrRelease(rstrDarkened);
+	RStrRelease(rstrRidge);
+	return hr;
+}
+
+HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTRING rstrGenerator)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+	TStackRef<IJSONObject> srGenerator;
+	TStackRef<CSIFPackage> srTileSets;
+	RSTRING rstrTiles = NULL;
+	WCHAR wzTileSets[MAX_PATH];
+	INT xTileStart, yTileStart, xTileEnd, yTileEnd, cchTileSets, yMid, nAdjust = 0;
+	sysint nLayer, nUnitLayer;
+	MAPTILE* pWorld = NULL;
+
+	Check(JSONFindArrayObject(m_pGenerators, RSTRING_CAST(L"name"), rstrGenerator, &srGenerator, NULL));
+	Check(srGenerator->FindNonNullValueW(L"tiles", &srv));
+	Check(srv->GetString(&rstrTiles));
+
+	// Load the tile-specific graphics for the combat terrain tiles.
+	Check(Formatting::TPrintF(wzTileSets, ARRAYSIZE(wzTileSets), &cchTileSets, L"combat_large\\terrain\\%r\\%r", rstrWorld, rstrTiles));
+	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
+	Check(TileSetLoader::LoadTileSets(srTileSets, m_mapCombatTiles));
+	srTileSets.Release();
+
+	// Load the default graphics for any missing combat terrain tiles.
+	Check(Formatting::TPrintF(wzTileSets, ARRAYSIZE(wzTileSets), &cchTileSets, L"combat_large\\terrain\\%r\\default", rstrWorld));
+	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
+	Check(TileSetLoader::LoadTileSets(srTileSets, m_mapCombatTiles));
+
+	Check(AllocateCombatWorld(&pWorld));
+	Check(GenerateCombatWorld(pWorld, srGenerator, dwSeed));
+
+	Check(m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer));
+	//Check(m_pMain->AddLayer(TRUE, LayerRender::Masked, 0, &m_nTileEffectsLayer));
+	Check(m_pMain->AddLayer(TRUE, LayerRender::Blended, 0, &nUnitLayer));
+
+	m_Isometric.GetTileRange(m_pMain, &xTileStart, &yTileStart, &xTileEnd, &yTileEnd);
+	yMid = (yTileStart + yTileEnd) / 2;
+
+	for(INT y = yTileStart; y < yTileEnd; y++)
+	{
+		if(0 <= y && y < MAP_HEIGHT)
+		{
+			INT xStart = xTileStart - nAdjust;
+			INT xEnd = xTileEnd + nAdjust;
+			if(0 > xStart)
+				xStart = 0;
+			if(MAP_WIDTH < xEnd)
+				xEnd = MAP_WIDTH;
+			for(INT x = xStart; x < xEnd; x++)
+			{
+				MAPTILE* pMapPtr = pWorld + (y * MAP_WIDTH + x);
+				PlaceTile(m_pMain, x, y, nLayer, pMapPtr->pTile, NULL);
+				if(pMapPtr->pData->m_pFeature)
+				{
+					TStackRef<ISimbeyInterchangeSprite> srSprite;
+					INT xIso, yIso, xPlace, yPlace;
+
+					Check(pMapPtr->pData->m_pFeature->CreateSprite(&srSprite));
+
+					m_Isometric.TileToView(x, y, &xIso, &yIso);
+					m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xPlace, &yPlace);
+
+					// The terrain features are supposed to be positioned using the
+					// bottom center, not counting rows only containing shadow pixels.
+					srSprite->SetPosition(xPlace + (TILE_WIDTH / 2), yPlace + TILE_HEIGHT / 2);
+					Check(m_pMain->AddSprite(nUnitLayer, srSprite, NULL));
+				}
+			}
+		}
+
+		if(y < yMid)
+			nAdjust++;
+		else
+			nAdjust--;
+	}
+
+Cleanup:
+	RStrRelease(rstrTiles);
+
+	if(pWorld)
+	{
+		for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
+			__delete pWorld[i].pData;
+		__delete_array pWorld;
+	}
+
+	return hr;
 }

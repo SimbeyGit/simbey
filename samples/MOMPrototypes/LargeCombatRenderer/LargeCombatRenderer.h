@@ -1,8 +1,12 @@
 #pragma once
 
 #include "Library\Core\BaseUnknown.h"
+#include "Library\Core\RStrMap.h"
 #include "Library\Window\BaseWindow.h"
 #include "Surface\SIFSurface.h"
+#include "Package\SIFPackage.h"
+#include "..\Shared\TileRules.h"
+#include "..\Shared\TileSet.h"
 
 class CLargeCombatRenderer :
 	public CBaseUnknown,
@@ -19,8 +23,12 @@ protected:
 
 	bool m_fKeys[256];
 
-	ISimbeyInterchangeFile* m_pSIF;
-	ISimbeyInterchangeFileLayer* m_pTile;
+	CSIFPackage* m_pPackage;
+
+	TRStrMap<CSmoothingSystem*> m_mapSmoothingSystems;
+	CTileRules* m_pTileRules;
+	IJSONArray* m_pGenerators;
+	TRStrMap<CTileSet*> m_mapCombatTiles;
 
 public:
 	IMP_BASE_UNKNOWN
@@ -52,7 +60,7 @@ public:
 	static HRESULT Register (HINSTANCE hInstance);
 	static HRESULT Unregister (HINSTANCE hInstance);
 
-	HRESULT Initialize (INT nWidth, INT nHeight, INT nCmdShow);
+	HRESULT Initialize (INT nWidth, INT nHeight, PCWSTR pcwzCmdLine, INT nCmdShow);
 
 	VOID Run (VOID);
 
@@ -75,4 +83,11 @@ protected:
 	DECL_WM_HANDLER(OnKeyDown);
 	DECL_WM_HANDLER(OnKeyUp);
 	DECL_WM_HANDLER(OnSetCursor);
+
+	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, CTile* pTile, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
+
+	HRESULT AllocateCombatWorld (__deref_out MAPTILE** ppWorld);
+	HRESULT GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGenerator, DWORD dwSeed);
+
+	HRESULT GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTRING rstrGenerator);
 };

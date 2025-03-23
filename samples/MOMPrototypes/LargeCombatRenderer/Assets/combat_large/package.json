@@ -1,0 +1,6 @@
+[
+	{
+		package: "import",
+		import: "..\\..\\..\\..\\..\\resources\\MoM\\combat_large"
+	}
+]
