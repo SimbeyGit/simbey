@@ -27,12 +27,12 @@ function main ()
 
 	println("Building large combat terrain animators (Arcanus)...");
 	BuildCombatAnimators(oTerrain, "Arcanus");
-	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\default\\feature"));
-	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\desert\\feature"));
+	//DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\default\\feature"));
+	//DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\desert\\feature"));
 	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\mountains\\feature"));
-	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\swamp\\feature"));
+	//DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\swamp\\feature"));
 	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\tundra\\feature"));
-	DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\darkForest\\feature"));
+	//DoubleFeatureSprites(oTerrain.OpenFolder("arcanus\\darkForest\\feature"));
 
 	var oPackager = Host.CreateProcess("..\\..\\..\\target\\release\\SIFPackage.exe", "Assets Assets.pkg");
 	oPackager.Wait();
