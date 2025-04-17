@@ -457,29 +457,35 @@ HRESULT CLargeCombatRenderer::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject*
 	Check(srv->GetInteger(&cTiles));
 	srv.Release();
 
-	Check(HeightMap.SetLowestTiles(cTiles, &aTiles));
-	for(sysint i = 0; i < aTiles.Length(); i++)
+	if(0 < cTiles)
 	{
-		POINT& pt = aTiles[i];
-		Check(painter.PaintTile(pt.x, pt.y, rstrDarkened));
-		Check(painter.CheckTransitions(pt.x, pt.y, rstrDarkened));
-		Check(painter.Commit(&m_mapCombatTiles, NULL));
+		Check(HeightMap.SetLowestTiles(cTiles, &aTiles));
+		for(sysint i = 0; i < aTiles.Length(); i++)
+		{
+			POINT& pt = aTiles[i];
+			Check(painter.PaintTile(pt.x, pt.y, rstrDarkened));
+			Check(painter.CheckTransitions(pt.x, pt.y, rstrDarkened));
+			Check(painter.Commit(&m_mapCombatTiles, NULL));
+		}
+		aTiles.Clear();
 	}
-	aTiles.Clear();
 
 	Check(pGenerator->FindNonNullValueW(L"ridge", &srv));
 	Check(srv->GetInteger(&cTiles));
 	srv.Release();
 
-	Check(HeightMap.SetHighestTiles(cTiles, &aTiles));
-	for(sysint i = 0; i < aTiles.Length(); i++)
+	if(0 < cTiles)
 	{
-		POINT& pt = aTiles[i];
-		Check(painter.PaintTile(pt.x, pt.y, rstrRidge));
-		Check(painter.CheckTransitions(pt.x, pt.y, rstrRidge));
-		Check(painter.Commit(&m_mapCombatTiles, NULL));
+		Check(HeightMap.SetHighestTiles(cTiles, &aTiles));
+		for(sysint i = 0; i < aTiles.Length(); i++)
+		{
+			POINT& pt = aTiles[i];
+			Check(painter.PaintTile(pt.x, pt.y, rstrRidge));
+			Check(painter.CheckTransitions(pt.x, pt.y, rstrRidge));
+			Check(painter.Commit(&m_mapCombatTiles, NULL));
+		}
+		aTiles.Clear();
 	}
-	aTiles.Clear();
 
 	Check(pGenerator->FindNonNullValueW(L"features", &srv));
 	Check(srv->GetInteger(&cTiles));
