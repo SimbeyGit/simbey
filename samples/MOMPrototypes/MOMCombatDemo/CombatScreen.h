@@ -25,6 +25,12 @@ class CAction;
 class CMoveUnitAction;
 class CProjectileAction;
 
+struct MAPTILE
+{
+	CTile* pTile;
+	CTile* pFeature;
+};
+
 class CProjectileData
 {
 public:
@@ -313,6 +319,31 @@ private:
 	static INT GetButtonFromPoint (INT xView, INT yView);
 };
 
+class CCombatTiles : public ITileMap
+{
+private:
+	ULONG m_cRef;
+
+public:
+	MAPTILE* m_pWorld;
+
+public:
+	CCombatTiles ();
+	~CCombatTiles ();
+
+	HRESULT Initialize (VOID);
+
+	// IUnknown
+	IFACEMETHODIMP QueryInterface (REFIID riid, __deref_out PVOID* ppvObj) { return E_NOTIMPL; }
+	IFACEMETHODIMP_(ULONG) AddRef ();
+	IFACEMETHODIMP_(ULONG) Release ();
+
+	// ITileMap
+	virtual VOID GetSize (__out INT* pxTiles, __out INT* pyTiles);
+	virtual CTile* GetTile (INT idxTile);
+	virtual VOID SetTile (INT idxTile, CTile* pTile);
+};
+
 class CCombatScreen :
 	public CBaseScreen,
 	public ILayerInputHandler,
@@ -448,8 +479,8 @@ protected:
 	HRESULT LoadCombatStats (VOID);
 	HRESULT LoadMusic (VOID);
 
-	HRESULT AllocateCombatWorld (__deref_out MAPTILE** ppWorld);
-	HRESULT GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGenerator);
+	HRESULT AllocateCombatWorld (__deref_out CCombatTiles** ppTiles);
+	HRESULT GenerateCombatWorld (CCombatTiles* pTiles, IJSONObject* pGenerator);
 
 	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, ISimbeyInterchangeAnimator* pAnimator, INT nAnimation, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
 	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, CTile* pTile, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);

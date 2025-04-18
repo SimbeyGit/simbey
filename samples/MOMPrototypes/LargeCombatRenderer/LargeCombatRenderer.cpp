@@ -75,21 +75,68 @@ public:
 	}
 };
 
-class CMapData
+///////////////////////////////////////////////////////////////////////////////
+// CCombatTiles
+///////////////////////////////////////////////////////////////////////////////
+
+CCombatTiles::CCombatTiles () :
+	m_cRef(1),
+	m_pWorld(NULL)
 {
-public:
-	CTile* m_pFeature;
+}
 
-public:
-	CMapData () :
-		m_pFeature(NULL)
-	{
-	}
+CCombatTiles::~CCombatTiles ()
+{
+	__delete_array m_pWorld;
+}
 
-	~CMapData ()
-	{
-	}
-};
+HRESULT CCombatTiles::Initialize (VOID)
+{
+	HRESULT hr;
+
+	m_pWorld = __new MAPTILE[MAP_WIDTH * MAP_HEIGHT];
+	CheckAlloc(m_pWorld);
+	ZeroMemory(m_pWorld, sizeof(MAPTILE) * MAP_WIDTH * MAP_HEIGHT);
+	hr = S_OK;
+
+Cleanup:
+	return hr;
+}
+
+IFACEMETHODIMP_(ULONG) CCombatTiles::AddRef ()
+{
+	return ++m_cRef;
+}
+
+IFACEMETHODIMP_(ULONG) CCombatTiles::Release ()
+{
+	ULONG cRef = --m_cRef;
+	if(0 == cRef)
+		__delete this;
+	return cRef;
+}
+
+// ITileMap
+
+VOID CCombatTiles::GetSize (__out INT* pxTiles, __out INT* pyTiles)
+{
+	*pxTiles = MAP_WIDTH;
+	*pyTiles = MAP_HEIGHT;
+}
+
+CTile* CCombatTiles::GetTile (INT idxTile)
+{
+	return m_pWorld[idxTile].pTile;
+}
+
+VOID CCombatTiles::SetTile (INT idxTile, CTile* pTile)
+{
+	m_pWorld[idxTile].pTile = pTile;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CLargeCombatRenderer
+///////////////////////////////////////////////////////////////////////////////
 
 CLargeCombatRenderer::CLargeCombatRenderer (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
@@ -402,36 +449,33 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CLargeCombatRenderer::AllocateCombatWorld (__deref_out MAPTILE** ppWorld)
+HRESULT CLargeCombatRenderer::AllocateCombatWorld (__deref_out CCombatTiles** ppTiles)
 {
 	HRESULT hr;
 	CTileSet* pStandardSet;
 	TArray<CTile*>* paTiles;
-	MAPTILE* pWorld = NULL;
+	TStackRef<CCombatTiles> srTiles;
 
 	Check(m_mapCombatTiles.Find(RSTRING_CAST(L"standard"), &pStandardSet));
 	Check(pStandardSet->FindFromKey(RSTRING_CAST(L"00000000"), &paTiles));
 
-	pWorld = __new MAPTILE[MAP_WIDTH * MAP_HEIGHT];
-	CheckAlloc(pWorld);
+	srTiles.Attach(__new CCombatTiles);
+	CheckAlloc(srTiles);
+	Check(srTiles->Initialize());
 
 	for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
-	{
-		pWorld[i].pTile = (*paTiles)[rand() % paTiles->Length()];
-		pWorld[i].pData = __new CMapData;
-		CheckAlloc(pWorld[i].pData);
-	}
+		srTiles->m_pWorld[i].pTile = (*paTiles)[rand() % paTiles->Length()];
 
-	*ppWorld = pWorld;
+	*ppTiles = srTiles.Detach();
 
 Cleanup:
 	return hr;
 }
 
-HRESULT CLargeCombatRenderer::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGenerator, DWORD dwSeed)
+HRESULT CLargeCombatRenderer::GenerateCombatWorld (CCombatTiles* pTiles, IJSONObject* pGenerator, DWORD dwSeed)
 {
 	HRESULT hr;
-	CMapPainter painter(m_pTileRules, pWorld, MAP_WIDTH, MAP_HEIGHT);
+	CMapPainter painter(m_pTileRules, pTiles);
 	COORD_SYSTEM coords;
 	CSimpleRNG rng(dwSeed);
 	CHeightMapGenerator HeightMap(&rng, rng.Next(5) + 2, rng.Next(5) + 2, 0);
@@ -518,7 +562,7 @@ HRESULT CLargeCombatRenderer::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject*
 		POINT pt;
 
 		Check(aTiles.RemoveChecked(idxTile, &pt));
-		pWorld[pt.y * MAP_WIDTH + pt.x].pData->m_pFeature = (*paFeatures)[rng.Next(paFeatures->Length())];
+		pTiles->m_pWorld[pt.y * MAP_WIDTH + pt.x].pFeature = (*paFeatures)[rng.Next(paFeatures->Length())];
 	}
 
 Cleanup:
@@ -537,7 +581,7 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 	WCHAR wzTileSets[MAX_PATH];
 	INT xTileStart, yTileStart, xTileEnd, yTileEnd, cchTileSets, yMid, nAdjust = 0;
 	sysint nLayer, nUnitLayer;
-	MAPTILE* pWorld = NULL;
+	TStackRef<CCombatTiles> srTiles;
 
 	Check(JSONFindArrayObject(m_pGenerators, RSTRING_CAST(L"name"), rstrGenerator, &srGenerator, NULL));
 	Check(srGenerator->FindNonNullValueW(L"tiles", &srv));
@@ -554,8 +598,8 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
 	Check(TileSetLoader::LoadTileSets(srTileSets, m_mapCombatTiles));
 
-	Check(AllocateCombatWorld(&pWorld));
-	Check(GenerateCombatWorld(pWorld, srGenerator, dwSeed));
+	Check(AllocateCombatWorld(&srTiles));
+	Check(GenerateCombatWorld(srTiles, srGenerator, dwSeed));
 
 	Check(m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer));
 	//Check(m_pMain->AddLayer(TRUE, LayerRender::Masked, 0, &m_nTileEffectsLayer));
@@ -576,14 +620,14 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 				xEnd = MAP_WIDTH;
 			for(INT x = xStart; x < xEnd; x++)
 			{
-				MAPTILE* pMapPtr = pWorld + (y * MAP_WIDTH + x);
+				MAPTILE* pMapPtr = srTiles->m_pWorld + (y * MAP_WIDTH + x);
 				PlaceTile(m_pMain, x, y, nLayer, pMapPtr->pTile, NULL);
-				if(pMapPtr->pData->m_pFeature)
+				if(pMapPtr->pFeature)
 				{
 					TStackRef<ISimbeyInterchangeSprite> srSprite;
 					INT xIso, yIso, xPlace, yPlace;
 
-					Check(pMapPtr->pData->m_pFeature->CreateSprite(&srSprite));
+					Check(pMapPtr->pFeature->CreateSprite(&srSprite));
 
 					m_Isometric.TileToView(x, y, &xIso, &yIso);
 					m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xPlace, &yPlace);
@@ -604,13 +648,5 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 
 Cleanup:
 	RStrRelease(rstrTiles);
-
-	if(pWorld)
-	{
-		for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
-			__delete pWorld[i].pData;
-		__delete_array pWorld;
-	}
-
 	return hr;
 }

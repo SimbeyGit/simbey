@@ -195,6 +195,12 @@ public:
 	}
 };
 
+struct MAPTILE
+{
+	CTile* pTile;
+	CMapData* pData;
+};
+
 class CBaseGalleryCommand
 {
 public:
@@ -291,6 +297,48 @@ public:
 	HRESULT GetJSONObject (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out IJSONObject** ppObject);
 	HRESULT OpenSIF (PCWSTR pcwzSubPath, __deref_out ISimbeyInterchangeFile** ppSIF);
 	HRESULT OpenDirectory (PCWSTR pcwzSubPath, INT cchSubPath, __deref_out CSIFPackage** ppSubPackage);
+};
+
+class CWorldTiles : public ITileMap
+{
+private:
+	ULONG m_cRef;
+
+public:
+	MAPTILE* m_pTiles;
+	INT m_xWorld;
+	INT m_yWorld;
+
+public:
+	CWorldTiles (MAPTILE* pTiles, INT xWorld, INT yWorld) :
+		m_cRef(1), m_pTiles(pTiles), m_xWorld(xWorld), m_yWorld(yWorld) {}
+	~CWorldTiles () {}
+
+	// IUnknown
+	IFACEMETHODIMP QueryInterface (REFIID riid, __deref_out PVOID* ppvObj) { return E_NOTIMPL; }
+	IFACEMETHODIMP_(ULONG) AddRef () { return ++m_cRef; }
+	IFACEMETHODIMP_(ULONG) Release ()
+	{
+		ULONG cRef = --m_cRef;
+		if(0 == cRef)
+			__delete this;
+		return cRef;
+	}
+
+	// ITileMap
+	virtual VOID GetSize (__out INT* pxTiles, __out INT* pyTiles)
+	{
+		*pxTiles = m_xWorld;
+		*pyTiles = m_yWorld;
+	}
+	virtual CTile* GetTile (INT idxTile)
+	{
+		return m_pTiles[idxTile].pTile;
+	}
+	virtual VOID SetTile (INT idxTile, CTile* pTile)
+	{
+		m_pTiles[idxTile].pTile = pTile;
+	}
 };
 
 class CMOMWorldEditor :

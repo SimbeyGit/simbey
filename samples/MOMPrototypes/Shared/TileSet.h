@@ -10,7 +10,6 @@ interface IJSONArray;
 class CSmoothingSystem;
 class CTileRules;
 class CTileSet;
-class CMapData;
 
 class CTile
 {
@@ -67,10 +66,11 @@ private:
 	HRESULT EnsureTilesArray (RSTRING rstrKey, __deref_out TArray<CTile*>** ppTiles);
 };
 
-struct MAPTILE
+interface __declspec(uuid("FAE1F021-89E6-4a16-9166-E897A77435F9")) ITileMap : IUnknown
 {
-	CTile* pTile;
-	CMapData* pData;
+	virtual VOID GetSize (__out INT* pxTiles, __out INT* pyTiles) = 0;
+	virtual CTile* GetTile (INT idxTile) = 0;
+	virtual VOID SetTile (INT idxTile, CTile* pTile) = 0;
 };
 
 class CPlaceItem
@@ -86,7 +86,7 @@ public:
 	INT m_x, m_y;	// Adjusted tile coordinates
 
 public:
-	static HRESULT CreatePlaceItem (CTileRules* pTileRules, MAPTILE* pWorld, INT xWorld, INT yWorld, INT x, INT y, __deref_out CPlaceItem** ppItem);
+	static HRESULT CreatePlaceItem (CTileRules* pTileRules, ITileMap* pTiles, INT x, INT y, __deref_out CPlaceItem** ppItem);
 
 public:
 	CPlaceItem (CTileRules* pTileRules, CTile* pTile, INT xTile, INT x, INT y);
@@ -109,12 +109,11 @@ class CMapPainter
 {
 private:
 	CTileRules* m_pTileRules;
-	MAPTILE* m_pWorld;
-	INT m_xWorld, m_yWorld;
+	ITileMap* m_pTiles;
 	TArray<CPlaceItem*> m_aAffected;
 
 public:
-	CMapPainter (CTileRules* pTileRules, MAPTILE* pWorld, INT xWorld, INT yWorld);
+	CMapPainter (CTileRules* pTileRules, ITileMap* pTiles);
 	~CMapPainter ();
 
 	HRESULT PaintTile (INT xTile, INT yTile, RSTRING rstrTile);
@@ -122,7 +121,7 @@ public:
 	HRESULT Commit (TRStrMap<CTileSet*>* pmapTileSets, __out_opt TArray<POINT>* paTilesChanged);
 
 private:
-	VOID GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, TArray<CPlaceItem*>& aItems, PWSTR pwzKey);
+	VOID GetTileKey (CPlaceItem* pItem, TArray<CPlaceItem*>& aItems, PWSTR pwzKey);
 
 	static CPlaceItem* FindItem (TArray<CPlaceItem*>& aItems, INT xTile, INT yTile);
 };

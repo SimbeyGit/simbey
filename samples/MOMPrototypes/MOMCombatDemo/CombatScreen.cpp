@@ -45,22 +45,6 @@ public:
 	}
 };
 
-class CMapData
-{
-public:
-	CTile* m_pFeature;
-
-public:
-	CMapData () :
-		m_pFeature(NULL)
-	{
-	}
-
-	~CMapData ()
-	{
-	}
-};
-
 const POINT c_ptMoveOffset[8][8] =
 {
 	{	// Up (0)
@@ -1289,6 +1273,69 @@ INT CCombatBar::GetButtonFromPoint (INT xView, INT yView)
 	}
 	return -1;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// CCombatTiles
+///////////////////////////////////////////////////////////////////////////////
+
+CCombatTiles::CCombatTiles () :
+	m_cRef(1),
+	m_pWorld(NULL)
+{
+}
+
+CCombatTiles::~CCombatTiles ()
+{
+	__delete_array m_pWorld;
+}
+
+HRESULT CCombatTiles::Initialize (VOID)
+{
+	HRESULT hr;
+
+	m_pWorld = __new MAPTILE[MAP_WIDTH * MAP_HEIGHT];
+	CheckAlloc(m_pWorld);
+	ZeroMemory(m_pWorld, sizeof(MAPTILE) * MAP_WIDTH * MAP_HEIGHT);
+	hr = S_OK;
+
+Cleanup:
+	return hr;
+}
+
+IFACEMETHODIMP_(ULONG) CCombatTiles::AddRef ()
+{
+	return ++m_cRef;
+}
+
+IFACEMETHODIMP_(ULONG) CCombatTiles::Release ()
+{
+	ULONG cRef = --m_cRef;
+	if(0 == cRef)
+		__delete this;
+	return cRef;
+}
+
+// ITileMap
+
+VOID CCombatTiles::GetSize (__out INT* pxTiles, __out INT* pyTiles)
+{
+	*pxTiles = MAP_WIDTH;
+	*pyTiles = MAP_HEIGHT;
+}
+
+CTile* CCombatTiles::GetTile (INT idxTile)
+{
+	return m_pWorld[idxTile].pTile;
+}
+
+VOID CCombatTiles::SetTile (INT idxTile, CTile* pTile)
+{
+	m_pWorld[idxTile].pTile = pTile;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CCombatScreen
+///////////////////////////////////////////////////////////////////////////////
 
 CCombatScreen::CCombatScreen (IScreenHost* pHost, CInteractiveSurface* pSurface, CSIFPackage* pPackage, ISimbeyInterchangeFileFont* pYellowFont, ISimbeyInterchangeFileFont* pSmallYellowFont, IJSONObject* pWizard, IJSONObject* pPlacements) :
 	CBaseScreen(pHost, pSurface, pPackage),
@@ -2637,7 +2684,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	CInteractiveLayer* pLayer = NULL;
 	RSTRING rstrGenerator = NULL, rstrWorld = NULL, rstrTiles = NULL;
 	WCHAR wzTileSets[MAX_PATH];
-	MAPTILE* pWorld = NULL;
+	TStackRef<CCombatTiles> srTiles;
 
 	Check(m_pPlacements->FindNonNullValueW(L"generator", &srv));
 	Check(srv->GetString(&rstrGenerator));
@@ -2662,8 +2709,8 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 	Check(m_pPackage->OpenDirectory(wzTileSets, cchTileSets, &srTileSets));
 	Check(TileSetLoader::LoadTileSets(srTileSets, m_mapCombatTiles));
 
-	Check(AllocateCombatWorld(&pWorld));
-	Check(GenerateCombatWorld(pWorld, srGenerator));
+	Check(AllocateCombatWorld(&srTiles));
+	Check(GenerateCombatWorld(srTiles, srGenerator));
 
 	Check(m_pMain->AddTileLayer(FALSE, c_slTileOffsets, 0, &nLayer));
 	Check(m_pMain->AddLayer(TRUE, LayerRender::Masked, 0, &m_nTileEffectsLayer));
@@ -2700,7 +2747,7 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 				TStackRef<ISimbeyInterchangeSprite> srTile;
 				INT xTile, yTile;
 
-				PlaceTile(m_pMain, x, y, nLayer, pWorld[y * MAP_WIDTH + x].pTile, &srTile);
+				PlaceTile(m_pMain, x, y, nLayer, srTiles->GetTile(y * MAP_WIDTH + x), &srTile);
 				srTile->GetPosition(xTile, yTile);
 
 				if(y == c_rcFloatingTiles.bottom)
@@ -2741,14 +2788,14 @@ HRESULT CCombatScreen::LoadSprites (VOID)
 					xEnd = MAP_WIDTH;
 				for(INT x = xStart; x < xEnd; x++)
 				{
-					MAPTILE* pMapPtr = pWorld + (y * MAP_WIDTH + x);
+					MAPTILE* pMapPtr = srTiles->m_pWorld + (y * MAP_WIDTH + x);
 					PlaceTile(m_pMain, x, y, nLayer, pMapPtr->pTile, NULL);
-					if(pMapPtr->pData->m_pFeature)
+					if(pMapPtr->pFeature)
 					{
 						TStackRef<ISimbeyInterchangeSprite> srSprite;
 						INT xIso, yIso, xPlace, yPlace;
 
-						Check(pMapPtr->pData->m_pFeature->CreateSprite(&srSprite));
+						Check(pMapPtr->pFeature->CreateSprite(&srSprite));
 
 						m_Isometric.TileToView(x, y, &xIso, &yIso);
 						m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xPlace, &yPlace);
@@ -2793,12 +2840,6 @@ Cleanup:
 	RStrRelease(rstrTiles);
 	RStrRelease(rstrWorld);
 	RStrRelease(rstrGenerator);
-	if(pWorld)
-	{
-		for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
-			__delete pWorld[i].pData;
-		__delete_array pWorld;
-	}
 	return hr;
 }
 
@@ -2895,36 +2936,33 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CCombatScreen::AllocateCombatWorld (__deref_out MAPTILE** ppWorld)
+HRESULT CCombatScreen::AllocateCombatWorld (__deref_out CCombatTiles** ppTiles)
 {
 	HRESULT hr;
 	CTileSet* pStandardSet;
 	TArray<CTile*>* paTiles;
-	MAPTILE* pWorld = NULL;
+	TStackRef<CCombatTiles> srTiles;
 
 	Check(m_mapCombatTiles.Find(RSTRING_CAST(L"standard"), &pStandardSet));
 	Check(pStandardSet->FindFromKey(RSTRING_CAST(L"00000000"), &paTiles));
 
-	pWorld = __new MAPTILE[MAP_WIDTH * MAP_HEIGHT];
-	CheckAlloc(pWorld);
+	srTiles.Attach(__new CCombatTiles);
+	CheckAlloc(srTiles);
+	Check(srTiles->Initialize());
 
 	for(INT i = 0; i < MAP_WIDTH * MAP_HEIGHT; i++)
-	{
-		pWorld[i].pTile = (*paTiles)[rand() % paTiles->Length()];
-		pWorld[i].pData = __new CMapData;
-		CheckAlloc(pWorld[i].pData);
-	}
+		srTiles->SetTile(i, (*paTiles)[rand() % paTiles->Length()]);
 
-	*ppWorld = pWorld;
+	*ppTiles = srTiles.Detach();
 
 Cleanup:
 	return hr;
 }
 
-HRESULT CCombatScreen::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGenerator)
+HRESULT CCombatScreen::GenerateCombatWorld (CCombatTiles* pTiles, IJSONObject* pGenerator)
 {
 	HRESULT hr;
-	CMapPainter painter(m_pTileRules, pWorld, MAP_WIDTH, MAP_HEIGHT);
+	CMapPainter painter(m_pTileRules, pTiles);
 	COORD_SYSTEM coords;
 	CSimpleRNG rng(GetTickCount());
 	CHeightMapGenerator HeightMap(&rng, rng.Next(5) + 2, rng.Next(5) + 2, 0);
@@ -3008,7 +3046,7 @@ HRESULT CCombatScreen::GenerateCombatWorld (MAPTILE* pWorld, IJSONObject* pGener
 		POINT pt;
 
 		Check(aTiles.RemoveChecked(idxTile, &pt));
-		pWorld[pt.y * MAP_WIDTH + pt.x].pData->m_pFeature = (*paFeatures)[rng.Next(paFeatures->Length())];
+		pTiles->m_pWorld[pt.y * MAP_WIDTH + pt.x].pFeature = (*paFeatures)[rng.Next(paFeatures->Length())];
 	}
 
 Cleanup:

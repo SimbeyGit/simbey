@@ -2378,7 +2378,8 @@ Cleanup:
 HRESULT CMOMWorldEditor::PlaceTile (MAPTILE* pWorld, INT xTile, INT yTile, TRStrMap<CTileSet*>* pmapTileSets, RSTRING rstrTile, BOOL fActiveWorld)
 {
 	HRESULT hr;
-	CMapPainter painter(m_pTileRules, pWorld, m_xWorld, m_yWorld);
+	CWorldTiles tiles(pWorld, m_xWorld, m_yWorld);
+	CMapPainter painter(m_pTileRules, &tiles);
 	TArray<POINT> aTiles;
 
 	Check(painter.PaintTile(xTile, yTile, rstrTile));

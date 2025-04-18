@@ -249,10 +249,12 @@ Cleanup:
 // CPlaceItem
 ///////////////////////////////////////////////////////////////////////////////
 
-HRESULT CPlaceItem::CreatePlaceItem (CTileRules* pTileRules, MAPTILE* pWorld, INT xWorld, INT yWorld, INT x, INT y, __deref_out CPlaceItem** ppItem)
+HRESULT CPlaceItem::CreatePlaceItem (CTileRules* pTileRules, ITileMap* pTiles, INT x, INT y, __deref_out CPlaceItem** ppItem)
 {
-	INT xTile = x;
+	INT xTile = x, xWorld, yWorld;
 	CTile* pOther = NULL;
+
+	pTiles->GetSize(&xWorld, &yWorld);
 
 	// Wrap the sides of the world.
 	if(x < 0)
@@ -261,7 +263,7 @@ HRESULT CPlaceItem::CreatePlaceItem (CTileRules* pTileRules, MAPTILE* pWorld, IN
 		x -= xWorld;
 
 	if(y >= 0 && y < yWorld)
-		pOther = pWorld[y * xWorld + x].pTile;
+		pOther = pTiles->GetTile(y * xWorld + x);
 
 	*ppItem = __new CPlaceItem(pTileRules, pOther, xTile, x, y);
 	return *ppItem ? S_OK : E_OUTOFMEMORY;
@@ -430,17 +432,17 @@ Cleanup:
 // CMapPainter
 ///////////////////////////////////////////////////////////////////////////////
 
-CMapPainter::CMapPainter (CTileRules* pTileRules, MAPTILE* pWorld, INT xWorld, INT yWorld) :
+CMapPainter::CMapPainter (CTileRules* pTileRules, ITileMap* pTiles) :
 	m_pTileRules(pTileRules),
-	m_pWorld(pWorld),
-	m_xWorld(xWorld),
-	m_yWorld(yWorld)
+	m_pTiles(pTiles)
 {
+	m_pTiles->AddRef();
 }
 
 CMapPainter::~CMapPainter ()
 {
 	m_aAffected.DeleteAll();
+	m_pTiles->Release();
 }
 
 HRESULT CMapPainter::PaintTile (INT xTile, INT yTile, RSTRING rstrTile)
@@ -448,7 +450,7 @@ HRESULT CMapPainter::PaintTile (INT xTile, INT yTile, RSTRING rstrTile)
 	HRESULT hr;
 	CPlaceItem* pItem = NULL;
 
-	Check(CPlaceItem::CreatePlaceItem(m_pTileRules, m_pWorld, m_xWorld, m_yWorld, xTile, yTile, &pItem));
+	Check(CPlaceItem::CreatePlaceItem(m_pTileRules, m_pTiles, xTile, yTile, &pItem));
 
 	// Set the new tile onto the placed tile without actually picking a new tile sprite.
 	pItem->SetTileOnly(rstrTile);
@@ -477,7 +479,7 @@ HRESULT CMapPainter::CheckTransitions (INT xTile, INT yTile, RSTRING rstrTile)
 		INT x = xTile + c_rgDirections[i].x;
 		INT y = yTile + c_rgDirections[i].y;
 
-		Check(CPlaceItem::CreatePlaceItem(m_pTileRules, m_pWorld, m_xWorld, m_yWorld, x, y, &pItem));
+		Check(CPlaceItem::CreatePlaceItem(m_pTileRules, m_pTiles, x, y, &pItem));
 
 		if(!pItem->IsSameTile(rstrTile) &&
 			!pItem->IsSpecialTile(pPlaced->m_rstrTile) &&
@@ -512,7 +514,7 @@ HRESULT CMapPainter::CheckTransitions (INT xTile, INT yTile, RSTRING rstrTile)
 
 			if(NULL == FindItem(m_aAffected, x, y))
 			{
-				Check(CPlaceItem::CreatePlaceItem(m_pTileRules, m_pWorld, m_xWorld, m_yWorld, x, y, &pItem));
+				Check(CPlaceItem::CreatePlaceItem(m_pTileRules, m_pTiles, x, y, &pItem));
 				Check(m_aAffected.Append(pItem));
 				pItem = NULL;
 			}
@@ -526,6 +528,9 @@ Cleanup:
 HRESULT CMapPainter::Commit (TRStrMap<CTileSet*>* pmapTileSets, __out_opt TArray<POINT>* paTilesChanged)
 {
 	HRESULT hr = S_FALSE;
+	INT xWorld, yWorld;
+
+	m_pTiles->GetSize(&xWorld, &yWorld);
 
 	// Update the tile for every grid item.
 	for(sysint i = 0; i < m_aAffected.Length(); i++)
@@ -535,10 +540,10 @@ HRESULT CMapPainter::Commit (TRStrMap<CTileSet*>* pmapTileSets, __out_opt TArray
 		{
 			WCHAR wzAdjacent[12];
 
-			GetTileKey(m_pWorld, pPlaced, m_aAffected, wzAdjacent);
+			GetTileKey(pPlaced, m_aAffected, wzAdjacent);
 			Check(pPlaced->SetNewKey(pmapTileSets, wzAdjacent));
 
-			m_pWorld[pPlaced->m_y * m_xWorld + pPlaced->m_x].pTile = pPlaced->m_pTile;
+			m_pTiles->SetTile(pPlaced->m_y * xWorld + pPlaced->m_x, pPlaced->m_pTile);
 			if(paTilesChanged)
 			{
 				POINT pt = { pPlaced->m_x, pPlaced->m_y };
@@ -563,15 +568,19 @@ CPlaceItem* CMapPainter::FindItem (TArray<CPlaceItem*>& aItems, INT xTile, INT y
 	return NULL;
 }
 
-VOID CMapPainter::GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, TArray<CPlaceItem*>& aItems, PWSTR pwzKey)
+VOID CMapPainter::GetTileKey (CPlaceItem* pItem, TArray<CPlaceItem*>& aItems, PWSTR pwzKey)
 {
+	INT xWorld, yWorld;
+
+	m_pTiles->GetSize(&xWorld, &yWorld);
+
 	for(INT i = 0; i < ARRAYSIZE(c_rgDirections); i++)
 	{
 		INT x = pItem->m_x + c_rgDirections[i].x;
 		INT y = pItem->m_y + c_rgDirections[i].y;
 		RSTRING rstrOther = NULL;
 
-		if(y >= 0 && y < m_yWorld)
+		if(y >= 0 && y < yWorld)
 		{
 			CPlaceItem* pOther = FindItem(aItems, x, y);
 			if(pOther)
@@ -580,11 +589,11 @@ VOID CMapPainter::GetTileKey (MAPTILE* pWorld, CPlaceItem* pItem, TArray<CPlaceI
 			{
 				// Wrap the sides of the world.
 				if(x < 0)
-					x += m_xWorld;
-				else if(x >= m_xWorld)
-					x -= m_xWorld;
+					x += xWorld;
+				else if(x >= xWorld)
+					x -= xWorld;
 
-				rstrOther = pWorld[m_xWorld * y + x].pTile->GetTileSet()->GetName();
+				rstrOther = m_pTiles->GetTile(xWorld * y + x)->GetTileSet()->GetName();
 			}
 
 			if(pItem->IsSameTile(rstrOther))
