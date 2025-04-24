@@ -34,7 +34,7 @@
 			[
 				"mom_ext:mind_control"
 			],
-			music: [ "MOM98.MID", "MOM99.MID" ]
+			music: [ "mom:kali/a", "mom:kali/b" ]
 		}
 	}
 ]
