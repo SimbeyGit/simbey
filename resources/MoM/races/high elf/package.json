@@ -64,7 +64,8 @@
 			[
 				"mom:parthenon",
 				"mom:maritime_guild"
-			]
+			],
+			combatHouses: "mom:combat/house/treehouse"
 		}
 	}
 ]

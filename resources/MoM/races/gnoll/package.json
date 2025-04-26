@@ -67,7 +67,8 @@
 				"mom:parthenon",
 				"mom:armorers_guild",
 				"mom:maritime_guild"
-			]
+			],
+			combatHouses: "mom:combat/house/standard"
 		}
 	}
 ]

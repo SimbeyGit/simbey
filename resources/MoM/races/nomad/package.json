@@ -64,7 +64,8 @@
 			[
 				"mom:maritime_guild",
 				"mom:wizards_guild"
-			]
+			],
+			combatHouses: "mom:combat/house/standard"
 		}
 	}
 ]

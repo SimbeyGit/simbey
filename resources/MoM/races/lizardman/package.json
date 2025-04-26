@@ -68,7 +68,8 @@
 				"mom:miners_guild",
 				"mom:shipwrights_guild",
 				"mom:animists_guild"
-			]
+			],
+			combatHouses: "mom:combat/house/mudhut"
 		}
 	}
 ]

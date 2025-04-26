@@ -64,7 +64,8 @@
 			[
 				"mom:cathedral",
 				"mom:maritime_guild"
-			]
+			],
+			combatHouses: "mom:combat/house/treehouse"
 		}
 	}
 ]

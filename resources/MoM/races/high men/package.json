@@ -63,7 +63,8 @@
 			no_build:
 			[
 				"mom:fantastic_stable"
-			]
+			],
+			combatHouses: "mom:combat/house/standard"
 		}
 	}
 ]

@@ -65,7 +65,8 @@
 				"mom:university",
 				"mom:animists_guild",
 				"mom:cathedral"
-			]
+			],
+			combatHouses: "mom:combat/house/standard"
 		}
 	}
 ]

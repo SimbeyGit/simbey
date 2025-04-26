@@ -59,7 +59,8 @@
 				"Oxenaak",
 				"Zom",
 				"Rife"
-			]
+			],
+			combatHouses: "mom:combat/house/standard"
 		}
 	}
 ]

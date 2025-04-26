@@ -65,7 +65,8 @@
 				"mom:mechanicians_guild",
 				"mom:maritime_guild",
 				"mom:fantastic_stable"
-			]
+			],
+			combatHouses: "mom:combat/house/standard"
 		}
 	}
 ]

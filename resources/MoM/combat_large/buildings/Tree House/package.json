@@ -1,0 +1,18 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:combat/house/treehouse",
+			animated: false
+		}
+	}
+]

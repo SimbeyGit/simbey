@@ -65,7 +65,8 @@
 				"mom:sages_guild",
 				"mom:temple",
 				"mom:ship_yard"
-			]
+			],
+			combatHouses: "mom:combat/house/mudhut"
 		}
 	}
 ]

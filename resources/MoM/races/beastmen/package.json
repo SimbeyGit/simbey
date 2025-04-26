@@ -64,7 +64,8 @@
 			[
 				"mom:fantastic_stable",
 				"mom:ship_yard"
-			]
+			],
+			combatHouses: "mom:combat/house/standard"
 		}
 	}
 ]
