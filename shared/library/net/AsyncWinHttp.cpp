@@ -455,13 +455,16 @@ VOID CAsyncWinHttp::HeadersAvailable (VOID)
 		if(0 < cbData)
 		{
 			PWSTR pwzHeaders;
-			Check(m_pCallback->OnAllocateHeadersW(cbData / sizeof(WCHAR), &pwzHeaders));
+			INT cchHeaders = cbData / sizeof(WCHAR);
+
+			Check(m_pCallback->OnAllocateHeadersW(cchHeaders, &pwzHeaders));
 			if(pwzHeaders)
 			{
 				CheckIfGetLastError(!m_pWinHttp->m_pfnWinHttpQueryHeaders(m_hRequest,
 					WINHTTP_QUERY_RAW_HEADERS_CRLF,
 					WINHTTP_HEADER_NAME_BY_INDEX,
 					pwzHeaders, &cbData, WINHTTP_NO_HEADER_INDEX));
+				m_pCallback->OnReceivedHeadersW(cchHeaders, pwzHeaders);
 			}
 		}
 

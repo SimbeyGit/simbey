@@ -195,6 +195,7 @@ HRESULT CLargeCombatRenderer::Initialize (INT nWidth, INT nHeight, PCWSTR pcwzCm
 	INT xSize, ySize;
 	INT xScroll, yScroll;
 	RSTRING rstrWorld = NULL, rstrGenerator = NULL, rstrSeed = NULL;
+	RSTRING rstrHouseSprites = NULL;
 	DWORD dwSeed;
 	COptions options;
 
@@ -239,14 +240,17 @@ HRESULT CLargeCombatRenderer::Initialize (INT nWidth, INT nHeight, PCWSTR pcwzCm
 	if(!options.GetParamValue(L"generator", &rstrGenerator))
 		Check(RStrCreateW(LSP(L"grasslands"), &rstrGenerator));
 
+	options.GetParamValue(L"house", &rstrHouseSprites);
+
 	if(options.GetParamValue(L"seed", &rstrSeed))
 		dwSeed = Formatting::TAscToUInt32(RStrToWide(rstrSeed));
 	else
 		dwSeed = GetTickCount();
 
-	Check(GenerateMap(dwSeed, rstrWorld, rstrGenerator));
+	Check(GenerateMap(dwSeed, rstrWorld, rstrGenerator, rstrHouseSprites));
 
 Cleanup:
+	RStrRelease(rstrHouseSprites);
 	RStrRelease(rstrGenerator);
 	RStrRelease(rstrWorld);
 	RStrRelease(rstrSeed);
@@ -449,6 +453,43 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CLargeCombatRenderer::FindBuildingBottom (ISimbeyInterchangeFileLayer* pLayer, __out POINT* ppt)
+{
+	HRESULT hr;
+	PBYTE pBits;
+	DWORD cbBits;
+	SIZE size;
+
+	Check(pLayer->GetBitsPtr(&pBits, &cbBits));
+	Check(pLayer->GetSize(&size));
+
+	for(INT y = size.cy - 1; y >= 0; y--)
+	{
+		PBYTE pRow = pBits + (y * size.cx * sizeof(DWORD));
+		for(INT x = 0; x < size.cx; x++)
+		{
+			if((pRow[0] || pRow[1] || pRow[2]) && pRow[3] == 255)
+			{
+				ppt->x = x + 3;
+				ppt->y = y + 1;
+				goto Cleanup;
+			}
+
+			pRow += sizeof(DWORD);
+		}
+	}
+
+Cleanup:
+	return hr;
+}
+
+VOID CLargeCombatRenderer::PlaceBuilding (CCombatTiles* pTiles, INT x, INT y, CTile* pBuilding)
+{
+	MAPTILE* pMapPtr = pTiles->m_pWorld + (y * MAP_WIDTH + x);
+	pMapPtr->pFeature = pBuilding;
+	pMapPtr->eType = MapFeature::Building;
+}
+
 HRESULT CLargeCombatRenderer::AllocateCombatWorld (__deref_out CCombatTiles** ppTiles)
 {
 	HRESULT hr;
@@ -563,6 +604,7 @@ HRESULT CLargeCombatRenderer::GenerateCombatWorld (CCombatTiles* pTiles, IJSONOb
 
 		Check(aTiles.RemoveChecked(idxTile, &pt));
 		pTiles->m_pWorld[pt.y * MAP_WIDTH + pt.x].pFeature = (*paFeatures)[rng.Next(paFeatures->Length())];
+		pTiles->m_pWorld[pt.y * MAP_WIDTH + pt.x].eType = MapFeature::Decoration;
 	}
 
 Cleanup:
@@ -571,7 +613,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTRING rstrGenerator)
+HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTRING rstrGenerator, RSTRING rstrHouseSprites)
 {
 	HRESULT hr;
 	TStackRef<IJSONValue> srv;
@@ -582,6 +624,8 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 	INT xTileStart, yTileStart, xTileEnd, yTileEnd, cchTileSets, yMid, nAdjust = 0;
 	sysint nLayer, nUnitLayer;
 	TStackRef<CCombatTiles> srTiles;
+	TStackRef<ISimbeyInterchangeFile> srHouseSIF;
+	TArray<CTile*> aHouseTiles;
 
 	Check(JSONFindArrayObject(m_pGenerators, RSTRING_CAST(L"name"), rstrGenerator, &srGenerator, NULL));
 	Check(srGenerator->FindNonNullValueW(L"tiles", &srv));
@@ -608,6 +652,37 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 	m_Isometric.GetTileRange(m_pMain, &xTileStart, &yTileStart, &xTileEnd, &yTileEnd);
 	yMid = (yTileStart + yTileEnd) / 2;
 
+	if(rstrHouseSprites)
+	{
+		TStackRef<CSIFPackage> srHouseSprites;
+		WCHAR wzPath[MAX_PATH];
+		INT cchPath;
+		CSimpleRNG rng(dwSeed);
+
+		Check(Formatting::TPrintF(wzPath, ARRAYSIZE(wzPath), &cchPath, L"combat_large\\buildings\\%r", rstrHouseSprites));
+		Check(m_pPackage->OpenDirectory(wzPath, cchPath, &srHouseSprites));
+		Check(srHouseSprites->OpenSIF(L"building.sif", &srHouseSIF));
+
+		DWORD cLayers = srHouseSIF->GetLayerCount();
+		for(DWORD i = 0; i < cLayers; i++)
+		{
+			POINT pt;
+
+			TStackRef<ISimbeyInterchangeFileLayer> srLayer;
+			TStackRef<ISimbeyInterchangeSprite> srSprite;
+
+			Check(srHouseSIF->GetLayerByIndex(i, &srLayer));
+			Check(FindBuildingBottom(srLayer, &pt));
+
+			Check(sifCreateStaticSprite(srLayer, -(pt.x), -(pt.y), &srSprite));
+			Check(aHouseTiles.Append(__new CTile(NULL, NULL, srSprite)));
+		}
+
+		PlaceBuilding(srTiles, 10, 15, aHouseTiles[rng.Next(aHouseTiles.Length())]);
+		PlaceBuilding(srTiles, 9, 16, aHouseTiles[rng.Next(aHouseTiles.Length())]);
+		PlaceBuilding(srTiles, 9, 17, aHouseTiles[rng.Next(aHouseTiles.Length())]);
+	}
+
 	for(INT y = yTileStart; y < yTileEnd; y++)
 	{
 		if(0 <= y && y < MAP_HEIGHT)
@@ -621,6 +696,7 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 			for(INT x = xStart; x < xEnd; x++)
 			{
 				MAPTILE* pMapPtr = srTiles->m_pWorld + (y * MAP_WIDTH + x);
+
 				PlaceTile(m_pMain, x, y, nLayer, pMapPtr->pTile, NULL);
 				if(pMapPtr->pFeature)
 				{
@@ -632,9 +708,20 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 					m_Isometric.TileToView(x, y, &xIso, &yIso);
 					m_Isometric.IsometricToView(m_pMain, xIso, yIso, &xPlace, &yPlace);
 
-					// The terrain features are supposed to be positioned using the
-					// bottom center, not counting rows only containing shadow pixels.
-					srSprite->SetPosition(xPlace + (TILE_WIDTH / 2), yPlace + TILE_HEIGHT / 2);
+					switch(pMapPtr->eType)
+					{
+					case MapFeature::Decoration:
+						// The terrain features are supposed to be positioned using the
+						// bottom center, not counting rows only containing shadow pixels.
+						srSprite->SetPosition(xPlace + (TILE_WIDTH / 2), yPlace + TILE_HEIGHT / 2);
+						break;
+					case MapFeature::Building:
+						// Buildings are supposed to be positioned using their bottom center, just slightly
+						// above the bottom of the tile, not counting rows only containing shadow pixels
+						srSprite->SetPosition(xPlace + (TILE_WIDTH / 2), (yPlace + TILE_HEIGHT) - (TILE_HEIGHT / 4));
+						break;
+					}
+
 					Check(m_pMain->AddSprite(nUnitLayer, srSprite, NULL));
 				}
 			}
@@ -647,6 +734,9 @@ HRESULT CLargeCombatRenderer::GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTR
 	}
 
 Cleanup:
+	aHouseTiles.DeleteAll();
+	if(srHouseSIF)
+		srHouseSIF->Close();
 	RStrRelease(rstrTiles);
 	return hr;
 }

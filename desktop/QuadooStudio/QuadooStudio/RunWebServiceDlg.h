@@ -49,6 +49,7 @@ public:
 	virtual HRESULT OnGetWriteBuffer (LPBYTE* ppbWriteBuffer, __out DWORD* pcbMaxWrite);
 	virtual VOID OnAdjustWrittenSize (DWORD cbWritten, DWORD cbUnwritten);
 	virtual HRESULT OnAllocateHeadersW (INT cchHeaders, __out PWSTR* ppwzHeaders);
+	virtual VOID OnReceivedHeadersW (INT cchHeaders, PCWSTR pcwzHeaders);
 	virtual VOID OnCompletion (HRESULT hrRequestResult, DWORD dwStatusCode);
 };
 

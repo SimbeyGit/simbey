@@ -305,6 +305,7 @@ interface __declspec(uuid("0DE69E10-13A9-4a58-8181-3BE35CA81285")) IAsyncWinHttp
 	virtual HRESULT OnGetWriteBuffer (LPBYTE* ppbWriteBuffer, __out DWORD* pcbMaxWrite) = 0;
 	virtual VOID OnAdjustWrittenSize (DWORD cbWritten, DWORD cbUnwritten) = 0;
 	virtual HRESULT OnAllocateHeadersW (INT cchHeaders, __out PWSTR* ppwzHeaders) = 0;
+	virtual VOID OnReceivedHeadersW (INT cchHeaders, PCWSTR pcwzHeaders) = 0;
 	virtual VOID OnCompletion (HRESULT hrRequestResult, DWORD dwStatusCode) = 0;
 };
 

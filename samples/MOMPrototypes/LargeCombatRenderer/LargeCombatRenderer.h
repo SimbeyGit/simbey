@@ -8,9 +8,21 @@
 #include "..\Shared\TileRules.h"
 #include "..\Shared\TileSet.h"
 
+namespace MapFeature
+{
+	enum Type
+	{
+		None,
+		Decoration,
+		Building
+	};
+}
+
 struct MAPTILE
 {
 	CTile* pTile;
+
+	MapFeature::Type eType;
 	CTile* pFeature;
 };
 
@@ -116,9 +128,11 @@ protected:
 	DECL_WM_HANDLER(OnSetCursor);
 
 	HRESULT PlaceTile (CSIFCanvas* pCanvas, INT xTile, INT yTile, sysint nLayer, CTile* pTile, __deref_out_opt ISimbeyInterchangeSprite** ppSprite);
+	HRESULT FindBuildingBottom (ISimbeyInterchangeFileLayer* pLayer, __out POINT* ppt);
+	VOID PlaceBuilding (CCombatTiles* pTiles, INT x, INT y, CTile* pBuilding);
 
 	HRESULT AllocateCombatWorld (__deref_out CCombatTiles** ppTiles);
 	HRESULT GenerateCombatWorld (CCombatTiles* pTiles, IJSONObject* pGenerator, DWORD dwSeed);
 
-	HRESULT GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTRING rstrGenerator);
+	HRESULT GenerateMap (DWORD dwSeed, RSTRING rstrWorld, RSTRING rstrGenerator, RSTRING rstrHouseSprites);
 };

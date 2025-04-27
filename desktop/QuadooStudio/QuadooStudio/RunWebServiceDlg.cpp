@@ -106,6 +106,10 @@ Cleanup:
 	return hr;
 }
 
+VOID CWebCall::OnReceivedHeadersW (INT cchHeaders, PCWSTR pcwzHeaders)
+{
+}
+
 VOID CWebCall::OnCompletion (HRESULT hrRequestResult, DWORD dwStatusCode)
 {
 	SafeRelease(m_pRequest);
