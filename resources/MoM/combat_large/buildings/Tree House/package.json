@@ -12,6 +12,7 @@
 		data:
 		{
 			ref: "mom:combat/house/treehouse",
+			size: 1,
 			animated: false
 		}
 	}

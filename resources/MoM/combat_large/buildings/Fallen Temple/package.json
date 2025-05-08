@@ -11,7 +11,7 @@
 		name: "building.json",
 		data:
 		{
-			ref: "mom:combat/house/standard",
+			ref: "mom:combat/structure/fallen_temple",
 			size: 1,
 			animated: false
 		}
