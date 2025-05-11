@@ -30,7 +30,8 @@
 			[
 				"mom:charismatic"
 			],
-			music: [ "MOM94.MID", "MOM95.MID" ]
+			music: [ "mom:ariel/a", "mom:ariel/b" ],
+			startingRaces: [ "mom:high_men" ]
 		}
 	}
 ]

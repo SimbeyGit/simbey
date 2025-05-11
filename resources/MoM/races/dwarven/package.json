@@ -37,6 +37,7 @@
 			taxes: 2.0,
 			capitol_unrest: 0,
 			trade_bonus_pct: 0,
+			raiderWeight: 5,
 			cityNames:
 			[
 				"Ebonsway",

@@ -34,7 +34,8 @@
 			[
 				"mom:warlord"
 			],
-			music: [ "MOM96.MID", "MOM97.MID" ]
+			music: [ "mom:tlaloc/a", "mom:tlaloc/b" ],
+			startingRaces: [ "mom:nomad", "mom:barbarian" ]
 		}
 	}
 ]

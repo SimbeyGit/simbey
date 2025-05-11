@@ -34,7 +34,8 @@
 			[
 				"mom:archmage"
 			],
-			music: [ "MOM92.MID", "MOM93.MID" ]
+			music: [ "mom:horus/a", "mom:horus/b" ],
+			startingRaces: [ "mom:halfling" ]
 		}
 	}
 ]

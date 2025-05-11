@@ -37,6 +37,7 @@
 			taxes: 1.0,
 			capitol_unrest: -2,
 			trade_bonus_pct: 0,
+			raiderWeight: 50,
 			cityNames:
 			[
 				"Fa-rul",

@@ -30,7 +30,8 @@
 			[
 				"mom:alchemy"
 			],
-			music: [ "MOM80.MID", "MOM81.MID" ]
+			music: [ "mom:jafar/a", "mom:jafar/b" ],
+			startingRaces: [ "mom:nomad" ]
 		}
 	}
 ]

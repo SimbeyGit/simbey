@@ -30,7 +30,8 @@
 			[
 				"mom:nature_mastery"
 			],
-			music: [ "MOM90.MID", "MOM91.MID" ]
+			music: [ "mom:freya/a", "mom:freya/b" ],
+			startingRaces: [ "mom:high_elf" ]
 		}
 	}
 ]

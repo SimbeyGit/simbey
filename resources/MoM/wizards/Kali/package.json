@@ -34,7 +34,8 @@
 			[
 				"mom:artificer"
 			],
-			music: [ "MOM98.MID", "MOM99.MID" ]
+			music: [ "mom:kali/a", "mom:kali/b" ],
+			startingRaces: [ "mom:high_men", "mom:barbarian" ]
 		}
 	}
 ]

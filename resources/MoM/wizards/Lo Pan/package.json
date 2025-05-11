@@ -34,7 +34,8 @@
 			[
 				"mom:channeler"
 			],
-			music: [ "MOM78.MID" ]
+			music: [ "mom:lopan/a" ],
+			startingRaces: [ "mom:high_men", "mom:barbarian" ]
 		}
 	}
 ]

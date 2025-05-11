@@ -33,7 +33,8 @@
 			retorts:
 			[
 			],
-			music: [ "MOM74.MID", "MOM75.MID" ]
+			music: [ "mom:raven/a", "mom:raven/b" ],
+			startingRaces: [ "mom:nomad", "mom:barbarian" ]
 		}
 	}
 ]

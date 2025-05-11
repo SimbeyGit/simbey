@@ -30,7 +30,8 @@
 			[
 				"mom:chaos_mastery"
 			],
-			music: [ "MOM88.MID", "MOM89.MID" ]
+			music: [ "mom:tauron/a", "mom:tauron/b" ],
+			startingRaces: [ "mom:high_men" ]
 		}
 	}
 ]

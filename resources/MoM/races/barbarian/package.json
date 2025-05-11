@@ -37,6 +37,7 @@
 			taxes: 1.0,
 			capitol_unrest: 0,
 			trade_bonus_pct: 0,
+			raiderWeight: 20,
 			cityNames:
 			[
 				"Norport",

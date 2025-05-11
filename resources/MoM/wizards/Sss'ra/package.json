@@ -34,7 +34,8 @@
 			[
 				"mom:myrran"
 			],
-			music: [ "MOM86.MID", "MOM87.MID" ]
+			music: [ "mom:sssra/a", "mom:sssra/b" ],
+			startingRaces: [ "mom:draconian" ]
 		}
 	}
 ]

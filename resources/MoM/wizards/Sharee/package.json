@@ -34,7 +34,8 @@
 			[
 				"mom:conjurer"
 			],
-			music: [ "MOM76.MID", "MOM77.MID" ]
+			music: [ "mom:sharee/a", "mom:sharee/b" ],
+			startingRaces: [ "mom:nomad", "mom:barbarian" ]
 		}
 	}
 ]

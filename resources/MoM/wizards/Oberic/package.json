@@ -34,7 +34,8 @@
 			[
 				"mom:mana_focusing"
 			],
-			music: [ "MOM82.MID", "MOM83.MID" ]
+			music: [ "mom:oberic/a", "mom:oberic/b" ],
+			startingRaces: [ "mom:high_men" ]
 		}
 	}
 ]

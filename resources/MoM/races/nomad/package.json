@@ -37,6 +37,7 @@
 			taxes: 1.0,
 			capitol_unrest: 0,
 			trade_bonus_pct: 50,
+			raiderWeight: 15,
 			cityNames:
 			[
 				"Mecca",

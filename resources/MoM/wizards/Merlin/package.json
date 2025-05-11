@@ -34,7 +34,8 @@
 			[
 				"mom:sage_master"
 			],
-			music: [ "MOM72.MID", "MOM73.MID" ]
+			music: [ "mom:merlin/a", "mom:merlin/b" ],
+			startingRaces: [ "mom:high_men" ]
 		}
 	}
 ]

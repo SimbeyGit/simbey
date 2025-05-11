@@ -18,7 +18,7 @@
 		{
 			ref: "mom_ext:viephren",
 			name: "Viephren",
-			description: "Out of time and out of space, no one knows the origins of Viephren. The reports of Viephren's activity are few, as those who dare to travel near and spy are usually never seen again.\r\n\r\nViephren's Mind Control retort suppresses unrest (-1 per city) and increases production (+50% production bonus).",
+			description: "Otherworldly or from another era entirely, no one can shed a glimmer of light on Viephren's origin or even fully make out its form. Other rulers simply chose to leave such information to myths since no one employed for the task was ever heard of again. Any who managed to gain its audience however, end up glorifying its existence as one of a rightful heir to the lands.\r\n\r\nViephren's Mind Control retort suppresses unrest (-1 per city) and increases production (+50% production bonus).",
 			books:
 			[
 				{
@@ -34,7 +34,8 @@
 			[
 				"mom_ext:mind_control"
 			],
-			music: [ "mom:kali/a", "mom:kali/b" ]
+			music: [ "mom:kali/a", "mom:kali/b" ],
+			startingRaces: [ "mom:high_men", "mom:orc" ]
 		}
 	}
 ]

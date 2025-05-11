@@ -30,7 +30,8 @@
 			[
 				"mom:infernal_power"
 			],
-			music: [ "MOM84.MID", "MOM85.MID" ]
+			music: [ "mom:rjak/a", "mom:rjak/b" ],
+			startingRaces: [ "mom:high_men", "mom:high_elf" ]
 		}
 	}
 ]
