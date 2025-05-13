@@ -1,0 +1,20 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:combat/node/nature",
+			size: 1,
+			animated: true,
+			ticks: 15
+		}
+	}
+]
