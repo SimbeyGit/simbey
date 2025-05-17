@@ -1,0 +1,27 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			ref: "mom:ranged/blue_sparkle",
+			type: "magic",
+			name: "Blue Sparkle",
+			realm: "nature",
+			cost: 3,
+			sound_ref: "mom:sounds/magic_missile",
+			velocity: 4.0,
+			stats:
+			{
+				normal: "mom:stat/magic/nature"
+			}
+		}
+	}
+]

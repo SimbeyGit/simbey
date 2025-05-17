@@ -1,0 +1,27 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			ref: "mom:ranged/fire_bolt",
+			type: "magic",
+			name: "Fire Bolt",
+			realm: "chaos",
+			cost: 3,
+			sound_ref: "mom:sounds/fire_bolt",
+			velocity: 3.5,
+			stats:
+			{
+				normal: "mom:stat/magic/chaos"
+			}
+		}
+	}
+]

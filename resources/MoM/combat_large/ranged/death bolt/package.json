@@ -1,0 +1,27 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			ref: "mom:ranged/death_bolt",
+			type: "magic",
+			name: "Death Bolt",
+			realm: "chaos",
+			cost: 3,
+			sound_ref: "mom:sounds/death_bolt",
+			velocity: 4.0,
+			stats:
+			{
+				normal: "mom:stat/magic/chaos"
+			}
+		}
+	}
+]

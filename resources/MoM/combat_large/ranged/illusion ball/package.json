@@ -1,0 +1,27 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			ref: "mom:ranged/illusion_ball",
+			type: "magic",
+			name: "Illusion Ball",
+			realm: "sorcery",
+			cost: 3,
+			sound_ref: "mom:sounds/psionic_blast",
+			velocity: 3.0,
+			stats:
+			{
+				normal: "mom:stat/magic/sorcery"
+			}
+		}
+	}
+]

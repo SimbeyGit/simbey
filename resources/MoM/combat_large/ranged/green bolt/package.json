@@ -1,0 +1,27 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			ref: "mom:ranged/green_bolt",
+			type: "magic",
+			name: "Green Bolt",
+			realm: "nature",
+			cost: 3,
+			sound_ref: "mom:sounds/magic_missile",
+			velocity: 3.5,
+			stats:
+			{
+				normal: "mom:stat/magic/nature"
+			}
+		}
+	}
+]

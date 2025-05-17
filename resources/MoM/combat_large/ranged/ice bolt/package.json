@@ -1,0 +1,27 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			ref: "mom:ranged/ice_bolt",
+			type: "magic",
+			name: "Ice Bolt",
+			realm: "nature",
+			cost: 3,
+			sound_ref: "mom:sounds/ice_bolt",
+			velocity: 4.5,
+			stats:
+			{
+				normal: "mom:stat/magic/nature"
+			}
+		}
+	}
+]

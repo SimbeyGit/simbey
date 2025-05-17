@@ -1,0 +1,78 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: ["d*.png"],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: ["overland.png","summon.png"],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/arcane/magic_spirit",
+			type:"fantastic",
+			name:"Magic Spirit",
+			realm:"arcane",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:1
+					},
+					{
+						ref:"mom:stat/move/water",
+						sound_ref:"mom:sounds/scuttle",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/creature_a",
+					value:5
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:8
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:10
+				}
+			},
+			abilities:
+			[
+				{ name: "Meld", type: "ability" },
+				{ name: "Non-Corporeal", type: "ability" }
+			]
+		}
+	}
+]

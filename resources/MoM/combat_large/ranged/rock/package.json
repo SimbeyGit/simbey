@@ -1,0 +1,28 @@
+[
+	{
+		package: "buildsif",
+		name: "range_attack.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "range_attack.json",
+		data:
+		{
+			ref: "mom:ranged/rock",
+			type: "missile",
+			name: "Rock",
+			sound_ref: "mom:sounds/rock",
+			velocity: 3.5,
+			stats:
+			{
+				normal: "mom:stat/rock/normal",
+				alchemy: "mom:stat/rock/alchemy",
+				mithril: "mom:stat/rock/mithril",
+				adamantium: "mom:stat/rock/adamantium"
+			}
+		}
+	}
+]
