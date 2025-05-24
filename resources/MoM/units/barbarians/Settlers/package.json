@@ -1,0 +1,57 @@
+[
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/barbarian/settlers",
+			import:"units\\shared\\Settlers",
+			type:"normal",
+			name:"Barbarian Settlers",
+			race:"mom:barbarian",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:1
+					}
+				],
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:1
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:5
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:10
+				}
+			},
+			abilities:
+			[
+				{ name: "Create Outpost", type: "ability" }
+			]
+		}
+	}
+]
