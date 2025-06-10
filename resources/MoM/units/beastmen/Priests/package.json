@@ -1,0 +1,84 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/beastmen/priests",
+			type:"normal",
+			name:"Beastmen Priests",
+			race:"mom:beastmen",
+			figures:4,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:3
+				},
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/armor",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:4
+				},
+				range:
+				{
+					ref:"mom:ranged/fire_bolt",
+					value:4
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:8
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:2
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 4 },
+				{ name: "Healer", type: "ability" },
+				{ name: "Purify", type: "ability" },
+				{ name: "Healing", type: "spell", value: 5 }
+			]
+		}
+	}
+]
