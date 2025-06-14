@@ -1,0 +1,93 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/hero/aureus",
+			type:"hero",
+			name:"Aureus",
+			tag_line:"The Golden One",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:200,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:4
+				}
+			],
+			prereq:
+			[
+				{
+					type:"fame",
+					value:10
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:6
+				},
+				range:
+				{
+					ref:"mom:ranged/fire_bolt",
+					value:6
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:6
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:6
+				}
+			},
+			slots:
+			[
+				"sword",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 5 },
+				{ type: "Random", random: "any" },
+				{ type: "Random", random: "any" }
+			]
+		}
+	}
+]

@@ -1,0 +1,70 @@
+[
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/orc/galley",
+			import:"units\\shared\\Galley",
+			type:"normal",
+			name:"Galley",
+			race:"mom:orc",
+			figures:1,
+			animation:"water_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:ship_yard"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/water",
+						sound_ref:"mom:sounds/scuttle",
+						value:3
+					}
+				],
+				range:
+				{
+					ref:"mom:ranged/arrow",
+					value:2
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:20
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 8 },
+				{ name: "Transport", type: "ability", value: 5 }
+			]
+		}
+	}
+]

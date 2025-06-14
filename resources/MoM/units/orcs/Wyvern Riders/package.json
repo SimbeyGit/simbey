@@ -1,0 +1,83 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/orc/wyvern_riders",
+			type:"normal",
+			name:"Wyvern Riders",
+			race:"mom:orc",
+			figures:2,
+			animation:"flying_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:4
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:fantastic_stable"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/whoosh",
+						value:3
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:5
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:7
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:10
+				}
+			},
+			abilities:
+			[
+				{ name: "Poison Touch", type: "touch", touch: "poison", value: 6 }
+			]
+		}
+	}
+]

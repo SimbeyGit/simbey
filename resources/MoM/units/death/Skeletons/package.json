@@ -1,0 +1,77 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/death/skeletons",
+			type:"fantastic",
+			name:"Skeletons",
+			realm:"death",
+			figures:6,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:1
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:3
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:5
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:1
+				}
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
+				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" }
+			]
+		}
+	}
+]

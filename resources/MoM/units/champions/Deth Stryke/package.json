@@ -1,0 +1,91 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/deth_stryke",
+			type:"champion",
+			name:"Deth Stryke",
+			tag_line:"The Swordsman",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:500,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:10
+				}
+			],
+			prereq:
+			[
+				{
+					type:"fame",
+					value:40
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:6
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:10
+				}
+			},
+			slots:
+			[
+				"sword",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Leadership", type: "ability" },
+				{ name: "Legendary", type: "ability" },
+				{ name: "Armsmaster", type: "ability" },
+				{ name: "Constitution", type: "ability" },
+				{ name: "Might", type: "ability" },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]

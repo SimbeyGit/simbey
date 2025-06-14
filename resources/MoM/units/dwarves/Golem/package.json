@@ -1,0 +1,84 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/dwarf/golem",
+			type:"normal",
+			name:"Golem",
+			race:"mom:dwarven",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:4
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:armorers_guild"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/heavy_walking",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:12
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:8
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:15
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:20
+				}
+			},
+			abilities:
+			[
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" }
+			]
+		}
+	}
+]

@@ -1,0 +1,91 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/nomad/priests",
+			type:"normal",
+			name:"Priests",
+			race:"mom:nomad",
+			figures:4,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				},
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:parthenon"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/armor",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:3
+				},
+				range:
+				{
+					ref:"mom:ranged/fire_bolt",
+					value:4
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:7
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:1
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 4 },
+				{ name: "Healer", type: "ability" },
+				{ name: "Purify", type: "ability" },
+				{ name: "Healing", type: "spell", value: 5 }
+			]
+		}
+	}
+]

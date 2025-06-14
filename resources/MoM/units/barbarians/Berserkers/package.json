@@ -20,7 +20,7 @@
 		{
 			ref:"mom:unit/barbarian/berserkers",
 			type:"normal",
-			name:"Barbarian Berserkers",
+			name:"Berserkers",
 			race:"mom:barbarian",
 			figures:6,
 			animation:"ground_unit",
@@ -33,6 +33,13 @@
 				{
 					ref:"mom:stat/gold/one",
 					amount:3
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:armorers_guild"
 				}
 			],
 			stats:

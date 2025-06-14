@@ -1,0 +1,73 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/nature/gorgons",
+			type:"fantastic",
+			name:"Gorgons",
+			realm:"nature",
+			figures:4,
+			animation:"flying_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:15
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/whoosh",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/creature_b",
+					value:8
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:7
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:9
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:9
+				}
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 2 },
+				{ name: "Stoning Gaze", type: "gaze", gaze: "stoning", value: -2 }
+			]
+		}
+	}
+]

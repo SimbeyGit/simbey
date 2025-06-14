@@ -1,0 +1,81 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/hero/bahgtru",
+			type:"hero",
+			name:"Bahgtru",
+			tag_line:"The Orc Warrior",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:100,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:6
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:8
+				}
+			},
+			slots:
+			[
+				"sword",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Thrown", type: "thrown", value: 3 },
+				{ name: "Mountaineer" },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]

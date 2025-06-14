@@ -1,0 +1,59 @@
+[
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/high_elf/settlers",
+			import:"units\\shared\\Settlers",
+			type:"normal",
+			name:"Settlers",
+			race:"mom:high_elf",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:1
+					}
+				],
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:1
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:10
+				}
+			},
+			abilities:
+			[
+				{ name: "Create Outpost", type: "ability" },
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Forester", type: "ability" }
+			]
+		}
+	}
+]

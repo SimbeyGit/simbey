@@ -1,0 +1,71 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/chaos/fire_elemental",
+			type:"fantastic",
+			name:"Fire Elemental",
+			realm:"chaos",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/creature_a",
+					value:12
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4,
+					type:"normal"
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:10
+				}
+			},
+			abilities:
+			[
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Fire Immunity", type: "immunity", immunity: "fire" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" }
+			]
+		}
+	}
+]

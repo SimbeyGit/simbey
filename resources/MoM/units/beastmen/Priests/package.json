@@ -20,7 +20,7 @@
 		{
 			ref:"mom:unit/beastmen/priests",
 			type:"normal",
-			name:"Beastmen Priests",
+			name:"Priests",
 			race:"mom:beastmen",
 			figures:4,
 			animation:"ground_unit",
@@ -33,6 +33,13 @@
 				{
 					ref:"mom:stat/food/one",
 					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:parthenon"
 				}
 			],
 			stats:

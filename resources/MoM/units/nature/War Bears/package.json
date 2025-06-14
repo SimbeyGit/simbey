@@ -1,0 +1,72 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/nature/war_bears",
+			type:"fantastic",
+			name:"War Bears",
+			realm:"nature",
+			figures:2,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/creature_a",
+					value:7
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:3
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:8
+				}
+			},
+			abilities:
+			[
+				{ name: "Forester", type: "ability" }
+			]
+		}
+	}
+]

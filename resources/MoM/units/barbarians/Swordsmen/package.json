@@ -20,7 +20,7 @@
 		{
 			ref:"mom:unit/barbarian/swordsmen",
 			type:"normal",
-			name:"Barbarian Swordsmen",
+			name:"Swordsmen",
 			race:"mom:barbarian",
 			figures:6,
 			animation:"ground_unit",
@@ -33,6 +33,17 @@
 				{
 					ref:"mom:stat/gold/one",
 					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:smithy"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
 				}
 			],
 			stats:

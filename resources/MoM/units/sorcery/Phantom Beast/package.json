@@ -1,0 +1,78 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/sorcery/phantom_beast",
+			type:"fantastic",
+			name:"Phantom Beast",
+			realm:"sorcery",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:2
+					},
+					{
+						ref:"mom:stat/move/water",
+						sound_ref:"mom:sounds/scuttle",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:18
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:0
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:8
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:20
+				}
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Non-Corporeal", type: "ability" },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" },
+				{ name: "Illusion", type: "ability" }
+			]
+		}
+	}
+]

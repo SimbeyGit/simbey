@@ -1,0 +1,85 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/hero/rakir",
+			type:"hero",
+			name:"Rakir",
+			tag_line:"The Beastmaster",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:100,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:5
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:7
+				}
+			},
+			slots:
+			[
+				"sword",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 5 },
+				{ name: "Scouting", type: "ability", value: 3 },
+				{ name: "Forester", type: "ability" }
+			],
+			spells:
+			[
+				"Resist Elements"
+			]
+		}
+	}
+]

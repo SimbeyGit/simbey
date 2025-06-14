@@ -1,0 +1,88 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/draconian/swordsmen",
+			type:"normal",
+			name:"Swordsmen",
+			race:"mom:draconian",
+			figures:6,
+			animation:"flying_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:smithy"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/whoosh",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:3
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:3
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:1
+				}
+			},
+			abilities:
+			[
+				{ name: "Large Shield", type: "ability" },
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 1 }
+			]
+		}
+	}
+]

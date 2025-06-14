@@ -35,6 +35,17 @@
 					amount:2
 				}
 			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:stables"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
+				}
+			],
 			stats:
 			{
 				move:

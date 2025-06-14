@@ -1,0 +1,89 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/high_elf/cavalry",
+			type:"normal",
+			name:"Cavalry",
+			race:"mom:high_elf",
+			figures:4,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:stables"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:4
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:2
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:3
+				}
+			},
+			abilities:
+			[
+				{ name: "First Strike", type: "ability" },
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Forester", type: "ability" }
+			]
+		}
+	}
+]

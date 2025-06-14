@@ -1,0 +1,79 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/death/wraiths",
+			type:"fantastic",
+			name:"Wraiths",
+			realm:"death",
+			figures:4,
+			animation:"flying_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:5
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/whoosh",
+						value:2,
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:7
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:6
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:8
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:8
+				}
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 2 },
+				{ name: "Non-Corporeal", type: "ability" },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Weapon Immunity", type: "immunity", immunity: "weapon" },
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
+				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
+				{ name: "Death Immunity", type: "immunity", immunity: "death" },
+				{ name: "Life Steal", type: "touch", touch: "life steal", value: 3, resist: true }
+			]
+		}
+	}
+]

@@ -1,0 +1,92 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/lizardmen/dragon_turtle",
+			type:"normal",
+			name:"Dragon Turtle",
+			race:"mom:lizardmen",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:armorers_guild"
+				},
+				{
+					type: "building",
+					ref: "mom:stables"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:2
+					},
+					{
+						ref:"mom:stat/move/water",
+						sound_ref:"mom:sounds/scuttle",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:10
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:8
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:8
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:15
+				}
+			},
+			abilities:
+			[
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 5 }
+			]
+		}
+	}
+]

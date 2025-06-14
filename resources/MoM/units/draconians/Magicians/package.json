@@ -1,0 +1,93 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/draconian/magicians",
+			type:"normal",
+			name:"Magicians",
+			race:"mom:draconian",
+			figures:4,
+			animation:"flying_unit",
+			upkeep:
+			[
+				{
+					amount:4,
+					ref:"mom:stat/gold/one"
+				},
+				{
+					amount:1,
+					ref:"mom:stat/food/one"
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:wizards_guild"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/whoosh",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:1
+				},
+				range:
+				{
+					ref:"mom:ranged/fire_bolt",
+					value:5
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:10
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:1
+				}
+			},
+			abilities:
+			[
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 1 },
+				{ name: "Ranged Attack", type: "range", value: 4 },
+				{ name: "Healer", type: "ability" },
+				{ name: "Purify", type: "ability" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Fireball", type: "spell", value: 5 }
+			]
+		}
+	}
+]

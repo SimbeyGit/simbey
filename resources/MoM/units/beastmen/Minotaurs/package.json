@@ -35,6 +35,13 @@
 					amount:4
 				}
 			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:armorers_guild"
+				}
+			],
 			stats:
 			{
 				move:

@@ -20,7 +20,7 @@
 		{
 			ref:"mom:unit/barbarian/shamans",
 			type:"normal",
-			name:"Barbarian Shamans",
+			name:"Shamans",
 			race:"mom:barbarian",
 			figures:4,
 			animation:"ground_unit",
@@ -33,6 +33,13 @@
 				{
 					ref:"mom:stat/food/one",
 					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:shrine"
 				}
 			],
 			stats:

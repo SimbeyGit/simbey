@@ -1,0 +1,94 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/nomad/rangers",
+			type:"normal",
+			name:"Rangers",
+			race:"mom:nomad",
+			figures:4,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:3
+				},
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:animists_guild"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/armor",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:4
+				},
+				range:
+				{
+					ref:"mom:ranged/arrow",
+					value:3
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:2
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 8 },
+				{ name: "Mountaineer", type: "ability" },
+				{ name: "Forester", type: "ability" }
+			]
+		}
+	}
+]

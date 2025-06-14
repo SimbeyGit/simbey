@@ -1,0 +1,92 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/gnoll/bowmen",
+			type:"normal",
+			name:"Bowmen",
+			race:"mom:gnoll",
+			figures:6,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:sawmill"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/armor",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:3
+				},
+				range:
+				{
+					ref:"mom:ranged/arrow",
+					value:1
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:1
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:4
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:1
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 8 }
+			]
+		}
+	}
+]

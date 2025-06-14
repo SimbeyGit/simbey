@@ -1,0 +1,91 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/nomad/horsebowmen",
+			type:"normal",
+			name:"Horsebowmen",
+			race:"mom:nomad",
+			figures:4,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:stables"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					value:4
+				},
+				range:
+				{
+					ref:"mom:ranged/arrow",
+					value:2
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:2
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:4
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:3
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 8 }
+			]
+		}
+	}
+]

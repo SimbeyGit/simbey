@@ -20,7 +20,7 @@
 		{
 			ref:"mom:unit/beastmen/halberdiers",
 			type:"normal",
-			name:"Beastmen Halberdiers",
+			name:"Halberdiers",
 			race:"mom:beastmen",
 			figures:6,
 			animation:"ground_unit",
@@ -33,6 +33,13 @@
 				{
 					ref:"mom:stat/gold/one",
 					amount:2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:armory"
 				}
 			],
 			stats:

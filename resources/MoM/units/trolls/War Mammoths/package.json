@@ -1,0 +1,88 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/troll/war_mammoths",
+			type:"normal",
+			name:"War Mammoths",
+			race:"mom:troll",
+			figures:2,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:5
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:stables"
+				},
+				{
+					type: "building",
+					ref: "mom:armorers_guild"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/heavy_walking",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:10
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:6
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:9
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:12
+				}
+			},
+			abilities:
+			[
+				{ name: "Wall Crusher", type: "ability" },
+				{ name: "First Strike", type: "ability" }
+			]
+		}
+	}
+]

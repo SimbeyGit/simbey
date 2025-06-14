@@ -1,0 +1,80 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/sorcery/storm_giant",
+			type:"fantastic",
+			name:"Storm Giant",
+			realm:"sorcery",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:10
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/heavy_walking",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/colossus",
+					value:12
+				},
+				range:
+				{
+					ref:"mom:ranged/lightning_bolt",
+					value:10
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:7
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:9
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:20
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 4 },
+				{ name: "To Hit", type: "tohit", value: 2 },
+				{ name: "Wall Crusher", type: "ability" },
+				{ name: "Armor Piercing", type: "ability" }
+			]
+		}
+	}
+]

@@ -7,7 +7,7 @@
 			ref:"mom:unit/beastmen/settlers",
 			import:"units\\shared\\Settlers",
 			type:"normal",
-			name:"Beastmen Settlers",
+			name:"Settlers",
 			race:"mom:beastmen",
 			figures:1,
 			animation:"ground_unit",

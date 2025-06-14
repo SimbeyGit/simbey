@@ -1,0 +1,77 @@
+[
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/orc/warship",
+			import:"units\\shared\\Warship",
+			type:"normal",
+			name:"Warship",
+			race:"mom:orc",
+			figures:1,
+			animation:"water_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:4
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:maritime_guild"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/water",
+						sound_ref:"mom:sounds/scuttle",
+						value:4
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:10
+				},
+				range:
+				{
+					ref:"mom:ranged/rock",
+					value:10
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:7
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:30
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 99 },
+				{ name: "Transport", type: "ability", value: 3 },
+				{ name: "Long Range", type: "ability" }
+			]
+		}
+	}
+]

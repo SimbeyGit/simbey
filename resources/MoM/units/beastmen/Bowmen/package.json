@@ -20,7 +20,7 @@
 		{
 			ref:"mom:unit/beastmen/bowmen",
 			type:"normal",
-			name:"Beastmen Bowmen",
+			name:"Bowmen",
 			race:"mom:beastmen",
 			figures:6,
 			animation:"ground_unit",
@@ -33,6 +33,17 @@
 				{
 					ref:"mom:stat/food/one",
 					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:sawmill"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
 				}
 			],
 			stats:

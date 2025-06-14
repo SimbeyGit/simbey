@@ -1,0 +1,90 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/hero/serena",
+			type:"hero",
+			name:"Serena",
+			tag_line:"The Healer",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:150,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:3
+				},
+				range:
+				{
+					ref:"mom:ranged/blue_sparkle",
+					value:6
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:7
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:5
+				}
+			},
+			slots:
+			[
+				"sword",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 7.5 },
+				{ name: "Healer", type: "ability" },
+				{ name: "Random", random: "mage" }
+			],
+			spells:
+			[
+				"Healing"
+			]
+		}
+	}
+]

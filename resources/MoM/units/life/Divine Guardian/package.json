@@ -1,0 +1,77 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32,
+		clean_alpha:true
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/life/divine_guardian",
+			type:"fantastic",
+			name:"Divine Guardian",
+			realm:"life",
+			figures:1,
+			animation:"flying_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:35
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/drake_fly",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/lion",
+					value:35
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:12
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:12
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:35
+				}
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 3 },
+				{ name: "Cause Fear", type: "ability" },
+				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
+				{ name: "Cold Breath", type: "breath", breath: "cold", value: 20, armor_piercing: true },
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" }
+			]
+		}
+	}
+]

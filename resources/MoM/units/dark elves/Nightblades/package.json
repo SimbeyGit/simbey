@@ -1,0 +1,84 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/dark_elf/nightblades",
+			type:"normal",
+			name:"Nightblades",
+			race:"mom:dark_elf",
+			figures:6,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:3
+				},
+				{
+					ref:"mom:stat/food/one",
+					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:fighters_guild"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/armor",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:4
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:3
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:7
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:1
+				}
+			},
+			abilities:
+			[
+				{ name: "Invisibility", type: "ability" },
+				{ name: "Poison Touch", type: "touch", touch: "poison", value: 1 }
+			]
+		}
+	}
+]

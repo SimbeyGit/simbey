@@ -1,0 +1,101 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/aerie",
+			type:"champion",
+			name:"Aerie",
+			tag_line:"The Illusionist",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:500,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:10
+				}
+			],
+			prereq:
+			[
+				{
+					type:"fame",
+					value:40
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:1
+				},
+				range:
+				{
+					ref:"mom:ranged/illusion_ball",
+					value:5
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:5
+				}
+			},
+			slots:
+			[
+				"staff",
+				"item",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 10 },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Illusion", type: "ability" },
+				{ name: "Random", random: "mage" },
+				{ name: "Random", random: "mage" }
+			],
+			spells:
+			[
+				"Psionic Blast",
+				"Vertigo",
+				"Mind Storm"
+			]
+		}
+	}
+]

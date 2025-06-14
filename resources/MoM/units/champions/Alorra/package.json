@@ -1,0 +1,102 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/alorra",
+			type:"champion",
+			name:"Alorra",
+			tag_line:"The Elven Archer",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:500,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:10
+				}
+			],
+			prereq:
+			[
+				{
+					type:"fame",
+					value:40
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:5
+				},
+				range:
+				{
+					ref:"mom:stat/arrow/normal",
+					value:8
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:6
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:6
+				}
+			},
+			slots:
+			[
+				"bow",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 5 },
+				{ name: "Ranged Attack", type: "range", value: 8 },
+				{ name: "Blademaster", type: "ability" },
+				{ name: "Forester", type: "ability" },
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" }
+			],
+			spells:
+			[
+				"Resist Magic",
+				"Flight"
+			]
+		}
+	}
+]

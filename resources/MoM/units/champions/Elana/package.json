@@ -1,0 +1,105 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/elana",
+			type:"champion",
+			name:"Elana",
+			tag_line:"The Priestess",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:500,
+			upkeep:
+			[
+			],
+			prereq:
+			[
+				{
+					type:"fame",
+					value:40
+				},
+				{
+					type:"book",
+					book:"life"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword"
+					value:2
+				},
+				range:
+				{
+					ref:"mom:stat/magic/chaos",
+					name:"Blue Sparkle",
+					value:8
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:5
+				}
+			},
+			slots:
+			[
+				"staff",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 12.5 },
+				{ name: "Arcane Power", type: "ability" },
+				{ name: "Super Prayermaster", type: "ability" },
+				{ name: "Charmed", type: "ability" },
+				{ name: "Noble", type: "ability" },
+				{ name: "Healer", type: "ability" },
+				{ name: "Purify", type: "ability" }
+			],
+			spells:
+			[
+				"Dispel Evil",
+				"Healing",
+				"Prayer",
+				"Holy Word"
+			]
+		}
+	}
+]

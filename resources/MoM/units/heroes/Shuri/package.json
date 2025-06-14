@@ -1,0 +1,87 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/hero/shuri",
+			type:"hero",
+			name:"Shuri",
+			tag_line:"The Huntress",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:100,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:5
+				},
+				range:
+				{
+					ref:"mom:ranged/arrow",
+					value:4
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:3
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:7
+				}
+			},
+			slots:
+			[
+				"bow",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 8 },
+				{ name: "Blademaster", type: "ability" },
+				{ name: "Pathfinding", type: "ability" },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]

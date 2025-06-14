@@ -1,0 +1,73 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/chaos/doom_bat",
+			type:"fantastic",
+			name:"Doom Bat",
+			realm:"chaos",
+			figures:1,
+			animation:"flying_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:8
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/whoosh",
+						value:4
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/creature_b",
+					value:10
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:9
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:20
+				}
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Immolation", type: "ability" }
+			]
+		}
+	}
+]

@@ -1,0 +1,75 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/chaos/hydra",
+			type:"fantastic",
+			name:"Hydra",
+			realm:"chaos",
+			figures:1,
+			heads:9,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:14
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/scuttle",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/creature_b",
+					value:6
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:11
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:10
+				}
+			},
+			abilities:
+			[
+				{ name: "To Hit", type: "tohit", value: 1 }
+				{ name: "Regeneration", type: "ability" },
+				{ name: "Fire Breath", type: "breath", breath: "fire", value: 5 }
+			]
+		}
+	}
+]

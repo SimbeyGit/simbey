@@ -1,0 +1,82 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/chaos/fire_giant",
+			type:"fantastic",
+			name:"Fire Giant",
+			realm:"chaos",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					amount:3,
+					ref:"mom:stat/mana/one"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						sound_ref:"mom:sounds/heavy_walking",
+						value:2,
+						ref:"mom:stat/move/land"
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:10
+				},
+				range:
+				{
+					ref:"mom:ranged/rock",
+					value:10
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5,
+					type:"normal"
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:7
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:15
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 2 },
+				{ name: "To Hit", type: "tohit", value: 1 },
+				{ name: "Mountaineer", type: "ability" },
+				{ name: "Wall Crusher", type: "ability" },
+				{ name: "Fire Immunity", type: "immunity", immunity: "fire" }
+			]
+		}
+	}
+]

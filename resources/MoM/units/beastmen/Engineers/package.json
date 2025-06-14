@@ -20,7 +20,7 @@
 		{
 			ref:"mom:unit/beastmen/engineers",
 			type:"normal",
-			name:"Beastmen Engineers",
+			name:"Engineers",
 			race:"mom:beastmen",
 			figures:6,
 			animation:"ground_unit",
@@ -33,6 +33,13 @@
 				{
 					ref:"mom:stat/gold/one",
 					amount:2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:builders_hall"
 				}
 			],
 			stats:

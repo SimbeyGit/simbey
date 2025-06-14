@@ -20,7 +20,7 @@
 		{
 			ref:"mom:unit/beastmen/swordsmen",
 			type:"normal",
-			name:"Beastmen Swordsmen",
+			name:"Swordsmen",
 			race:"mom:beastmen",
 			figures:6,
 			animation:"ground_unit",
@@ -33,6 +33,17 @@
 				{
 					ref:"mom:stat/gold/one",
 					amount:1
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:smithy"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
 				}
 			],
 			stats:

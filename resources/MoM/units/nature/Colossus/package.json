@@ -1,0 +1,82 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "summon.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/nature/colossus",
+			type:"fantastic",
+			name:"Colossus",
+			realm:"nature",
+			figures:1,
+			animation:"ground_unit",
+			upkeep:
+			[
+				{
+					ref:"mom:stat/mana/one",
+					amount:17
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/heavy_walking",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/colossus",
+					value:10
+				},
+				range:
+				{
+					ref:"mom:ranged/rock",
+					value:20
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:10
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:15
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:30
+				}
+			},
+			abilities:
+			[
+				{ name: "Ranged Attack", type: "range", value: 2 },
+				{ name: "To Hit", type: "tohit", value: 3 },
+				{ name: "Wall Crusher", type: "ability" },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" },
+				{ name: "First Strike", type: "ability" }
+			]
+		}
+	}
+]

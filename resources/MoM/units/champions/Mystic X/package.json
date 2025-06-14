@@ -1,0 +1,97 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/mystic_x",
+			type:"champion",
+			name:"Mystic X",
+			tag_line:"The Unknown",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:300,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:6
+				}
+			],
+			prereq:
+			[
+				{
+					type:"fame",
+					value:20
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:5
+				},
+				range:
+				{
+					ref:"mom:stat/magic/chaos",
+					ref:"mom:ranged/fire_bolt",
+					value:5
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:10
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:8
+				}
+			},
+			slots:
+			[
+				"sword/staff",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Caster", type: "caster", value: 5 },
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" }
+			]
+		}
+	}
+]

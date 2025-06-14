@@ -7,7 +7,7 @@
 			ref:"mom:unit/barbarian/settlers",
 			import:"units\\shared\\Settlers",
 			type:"normal",
-			name:"Barbarian Settlers",
+			name:"Settlers",
 			race:"mom:barbarian",
 			figures:1,
 			animation:"ground_unit",

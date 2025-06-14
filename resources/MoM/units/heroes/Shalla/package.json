@@ -1,0 +1,90 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/hero/shalla",
+			type:"hero",
+			name:"Shalla",
+			tag_line:"The Amazon",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:300,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:6
+				}
+			],
+			prereq:
+			[
+				{
+					type:"fame",
+					value:20
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:7
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:8
+				}
+			},
+			slots:
+			[
+				"sword",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Blademaster", type: "ability" },
+				{ name: "Might", type: "ability" },
+				{ name: "Charmed", type: "ability" },
+				{ name: "Thrown", type: "thrown", value: 4 },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]

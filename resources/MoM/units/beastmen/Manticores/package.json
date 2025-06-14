@@ -35,6 +35,17 @@
 					amount:4
 				}
 			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:animists_guild"
+				},
+				{
+					type: "building",
+					ref: "mom:barracks"
+				}
+			],
 			stats:
 			{
 				move:

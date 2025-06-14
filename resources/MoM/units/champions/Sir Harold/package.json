@@ -1,0 +1,86 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/sir_harold",
+			type:"champion",
+			name:"Sir Harold",
+			tag_line:"The Knight",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:500,
+			upkeep:
+			[
+			],
+			prereq:
+			[
+				{
+					type:"fame",
+					value:40
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:8
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:6
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:9
+				}
+			},
+			slots:
+			[
+				"sword",
+				"shield",
+				"item"
+			],
+			abilities:
+			[
+				{ name: "Super Leadership", type: "ability" },
+				{ name: "Super Legendary", type: "ability" },
+				{ name: "Constitution", type: "ability" },
+				{ name: "Noble", type: "ability" },
+				{ name: "Random", random: "fighter" }
+			]
+		}
+	}
+]
