@@ -59,7 +59,7 @@
 				{ name: "Super Might", type: "ability" },
 				{ name: "Constitution", type: "ability" },
 				{ name: "Prayermaster", type: "ability" },
-				{ name: "Missile Immunity", type: "missile", immunity: "missile" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
 				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
 				{ name: "Random", random: "any" },
 				{ name: "Random", random: "any" }

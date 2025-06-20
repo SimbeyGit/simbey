@@ -1,57 +1,11 @@
 #include <math.h>
+#include <float.h>
 #include <windows.h>
 #include "Core\CoreDefs.h"
 #include "Spatial\Geometry.h"
 #include "CADCtrl.h"
 
 #define MIN_DISTANCE_FROM_LINE 2.5F
-
-static void reorderLinesOnPolygon (DWORD polygonID, LineMap* pLines, VertexMap* pVertices)
-{
-	if(polygonID == CAD_INVALID)
-	{
-		const WCHAR message[] = L"Invalid polygon\n";
-		OutputDebugString(message);
-		return;
-	}
-
-	TArray<DWORD> linesOnPolygon;
-	TMap<DWORD, DWORD> vertices;
-	for(sysint lineIndex = 0; lineIndex < pLines->Length(); ++lineIndex)
-	{
-		DWORD lineKey = CAD_INVALID;
-		CAD_LINE* pLine = NULL;
-		pLines->GetKeyAndValue(lineIndex, &lineKey, &pLine);
-
-		if(pLine->idPolygonA == polygonID || pLine->idPolygonB == polygonID)
-		{
-			linesOnPolygon.Append(lineKey);
-			vertices.Add(pLine->idVertexA, pLine->idVertexB);
-		}
-	}
-
-	/*
-	WCHAR message[512];
-	swprintf(message, L"Polygon %d\n", polygonID);
-	OutputDebugString(message);
-	*/
-
-	for(sysint lineIndex = 0; lineIndex < linesOnPolygon.Length(); ++lineIndex)
-	{
-		const DWORD lineKey = linesOnPolygon[lineIndex];
-		CAD_LINE* pLine = *(*pLines)[lineKey];
-
-		CAD_VERTEX* pVertexA = *(*pVertices)[pLine->idVertexA];
-		CAD_VERTEX* pVertexB = *(*pVertices)[pLine->idVertexB];
-
-		/*
-		swprintf(message, L"%d = (%F, %F) ---> %d = (%F, %F)\n",
-			pLine->idVertexA, pVertexA->vertex.x, pVertexA->vertex.y,
-			pLine->idVertexB, pVertexB->vertex.x, pVertexB->vertex.y);
-		OutputDebugString(message);
-		*/
-	}
-}
 
 CCADCtrl::CCADCtrl (ICADHost* pHost, VertexMap* pVertices, LineMap* pLines,
 	PolygonMap* pPolygons, IGrapher* pGraph, CAD::Mode eMode) :
@@ -400,52 +354,54 @@ FLOAT PointDistanceFromLine (FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2, FLOAT x3, F
 	return sqrt(dx * dx + dy * dy);
 }
 
-FLOAT PointRelationship (FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2, FLOAT x3, FLOAT y3)
-{
-	return ((x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1));
-}
-
 VOID CCADCtrl::LBtnDown (KEYS dwKeys, FLOAT x, FLOAT y)
 {
 	if(CAD::DrawLine == m_eMouse)
 	{
-		DWORD idVertex;
+		SnapCoordinate(x, y);
+		m_xMouse = x;
+		m_yMouse = y;
 
-		if(SUCCEEDED(FindOrCreateVertex(x, y, &idVertex)))
+		// TODO - Ignore clicks on previous vertices other than the first vertex in the new points list.
+		if(m_aNewPoints.Length() > 0 && m_aNewPoints[0].x == x && m_aNewPoints[0].y == y)
 		{
-			CAD_VERTEX* pVertex;
-			SideAssertHr(m_pVertices->Find(idVertex, &pVertex));
+			TArray<DWORD> aCommitted;
 
-			m_xMouse = pVertex->vertex.x;
-			m_yMouse = pVertex->vertex.y;
-
-			if(SUCCEEDED(IntegrateLine(m_idDrawFromVertex, idVertex)))
+			for(sysint i = 0; i < m_aNewPoints.Length(); i++)
 			{
-				m_idDrawFromVertex = idVertex;
+				const XYPOINT& pt = m_aNewPoints[i];
+				DWORD* pidVertex;
 
-				if(IsPolygonClosed(m_idNewPolygon, idVertex))
-				{
-					CheckAdjacentPolygon(m_idNewPolygon);
-					DeselectAll();
-					m_aNewPoints.Clear();
-					m_eMouse = CAD::None;
-					m_pHost->OnEndDrawing();
-				}
-				else
-				{
-					XYPOINT pt;
-					pt.x = m_xMouse;
-					pt.y = m_yMouse;
-					m_aNewPoints.Append(pt);
-					m_pHost->OnDrawLineStatus(0.0f);
-					DeselectAll(CAD_SELECTED | CAD_HOVER);
-				}
-
-				m_pHost->InvalidateContainer(m_pGraph);
-
-				// reorderLinesOnPolygon(m_idNewPolygon, m_pLines, m_pVertices);
+				aCommitted.AppendSlot(&pidVertex);
+				FindOrCreateVertex(pt.x, pt.y, pidVertex);
 			}
+
+			for(sysint i = 0; i < aCommitted.Length(); i++)
+			{
+				DWORD idA = aCommitted[i];
+				DWORD idB = aCommitted[(i + 1) % aCommitted.Length()];
+
+				SideAssertHr(IntegrateLine(idA, idB));
+			}
+
+			DeselectAll();
+			m_aNewPoints.Clear();
+			m_eMouse = CAD::None;
+			m_pHost->OnEndDrawing();
 		}
+		else
+		{
+			XYPOINT pt;
+			pt.x = x;
+			pt.y = y;
+
+			m_aNewPoints.Append(pt);
+
+			m_pHost->OnDrawLineStatus(0.0f);
+			DeselectAll(CAD_SELECTED | CAD_HOVER);
+		}
+
+		m_pHost->InvalidateContainer(m_pGraph);
 	}
 	else
 	{
@@ -518,7 +474,7 @@ VOID CCADCtrl::LBtnDbl (KEYS dwKeys, FLOAT x, FLOAT y)
 		m_pHost->InvalidateContainer(m_pGraph);
 		break;
 	case CAD::Drawing:
-		if(CAD::DrawLine != m_eMouse && SUCCEEDED(FindOrCreateVertex(x, y, &m_idDrawFromVertex)))
+		if(CAD::DrawLine != m_eMouse)
 		{
 			m_idNewPolygon = GetFreePolygon();
 
@@ -526,22 +482,23 @@ VOID CCADCtrl::LBtnDbl (KEYS dwKeys, FLOAT x, FLOAT y)
 			if(m_pHost->OnCreatePolygon(m_idNewPolygon, &srPolygon) &&
 				SUCCEEDED(AddPolygon(m_idNewPolygon, srPolygon)))
 			{
-				m_eMouse = CAD::DrawLine;
-				m_pHost->OnBeginDrawing();
-
-				CAD_VERTEX* pVertex;
-				SideAssertHr(m_pVertices->Find(m_idDrawFromVertex, &pVertex));
-
-				m_xMouse = pVertex->vertex.x;
-				m_yMouse = pVertex->vertex.y;
-
 				XYPOINT pt;
-				pt.x = m_xMouse;
-				pt.y = m_yMouse;
-				m_aNewPoints.Append(pt);
 
-				DeselectAll();
-				m_pHost->InvalidateContainer(m_pGraph);
+				SnapCoordinate(x, y);
+				pt.x = x;
+				pt.y = y;
+
+				if(SUCCEEDED(m_aNewPoints.Append(pt)))
+				{
+					m_eMouse = CAD::DrawLine;
+					m_pHost->OnBeginDrawing();
+
+					m_xMouse = x;
+					m_yMouse = y;
+
+					DeselectAll();
+					m_pHost->InvalidateContainer(m_pGraph);
+				}
 			}
 		}
 		break;
@@ -729,51 +686,92 @@ BOOL CCADCtrl::KeyUp (WPARAM iKey)
 
 DWORD CCADCtrl::GetPolygonFromPoint (FLOAT x, FLOAT y, DWORD idIgnore)
 {
-	FLOAT rClosest = 0.0f;
-	CAD_LINE* pClosest = NULL;
-	DWORD idPolygon = CAD_INVALID;
+	struct EDGE
+	{
+		FPOINT a, b;
+		INT winding; // +1 for CCW, -1 for CW relative to polygon
+	};
 
+	TMultiMap<DWORD, EDGE> polygonEdges;
+
+	// Group all lines by polygon
 	for(sysint i = 0; i < m_pLines->Length(); i++)
 	{
-		CAD_LINE* pCadLine;
-		SideAssertHr(m_pLines->GetValueChecked(i, &pCadLine));
+		DWORD idLine;
+		CAD_LINE* pLine;
 
-		if(AnalyzeLine(pCadLine, idIgnore))
+		SideAssertHr(m_pLines->GetKeyAndValue(i, &idLine, &pLine));
+
+		// Get vertices
+		CAD_VERTEX* pA, * pB;
+		if(FAILED(m_pVertices->Find(pLine->idVertexA, &pA)) ||
+			FAILED(m_pVertices->Find(pLine->idVertexB, &pB)))
+			continue;
+
+		// Side A (forward)
+		if(pLine->idPolygonA != CAD_INVALID && pLine->idPolygonA != idIgnore)
 		{
-			CAD_VERTEX* pVertexA, *pVertexB;
-			SideAssertHr(m_pVertices->Find(pCadLine->idVertexA, &pVertexA));
-			SideAssertHr(m_pVertices->Find(pCadLine->idVertexB, &pVertexB));
+			EDGE edge = { pA->vertex, pB->vertex, +1 };
+			polygonEdges.Add(pLine->idPolygonA, edge);
+		}
 
-			FLOAT rDistance = PointDistanceFromLine(pVertexA->vertex.x, pVertexA->vertex.y, pVertexB->vertex.x, pVertexB->vertex.y, x, y);
-			if(NULL == pClosest || rDistance < rClosest)
+		// Side B (reverse)
+		if(pLine->idPolygonB != CAD_INVALID && pLine->idPolygonB != idIgnore)
+		{
+			EDGE edge = { pB->vertex, pA->vertex, -1 };
+			polygonEdges.Add(pLine->idPolygonB, edge); // always CCW winding for test
+		}
+	}
+
+	DWORD idBestPoly = CAD_INVALID;
+	FLOAT bestArea = FLT_MAX;
+
+	// Perform point-in-polygon test for each polygon
+	for(sysint i = 0; i < polygonEdges.Length(); i++)
+	{
+		DWORD idPoly = polygonEdges.GetKey(i);
+		const TArray<EDGE>* edges = *polygonEdges.GetValuePtr(i);
+
+		int windingNumber = 0;
+		FLOAT minX = FLT_MAX, maxX = -FLT_MAX;
+		FLOAT minY = FLT_MAX, maxY = -FLT_MAX;
+
+		for(sysint n = 0; n < edges->Length(); n++)
+		{
+			const EDGE& edge = (*edges)[n];
+			const FPOINT& a = edge.a;
+			const FPOINT& b = edge.b;
+
+			// Update bounds
+			minX = min(minX, a.x);
+			maxX = max(maxX, a.x);
+			minY = min(minY, a.y);
+			maxY = max(maxY, a.y);
+
+			if (a.y <= y)
 			{
-				rClosest = rDistance;
-				pClosest = pCadLine;
+				if (b.y > y && CrossProduct(a, b, x, y) > 0)
+					windingNumber += edge.winding;
+			}
+			else
+			{
+				if (b.y <= y && CrossProduct(a, b, x, y) < 0)
+					windingNumber -= edge.winding;
+			}
+		}
+
+		if(windingNumber != 0)
+		{
+			FLOAT area = (maxX - minX) * (maxY - minY);
+			if(area < bestArea)
+			{
+				bestArea = area;
+				idBestPoly = idPoly;
 			}
 		}
 	}
 
-	if(pClosest)
-	{
-		CAD_VERTEX* pVertexA, *pVertexB;
-		SideAssertHr(m_pVertices->Find(pClosest->idVertexA, &pVertexA));
-		SideAssertHr(m_pVertices->Find(pClosest->idVertexB, &pVertexB));
-
-		if(PointRelationship(pVertexA->vertex.x, pVertexA->vertex.y, pVertexB->vertex.x, pVertexB->vertex.y, x, y) <= 0.0f)
-		{
-			idPolygon = pClosest->idPolygonA;
-			if(idPolygon == idIgnore && CAD_INVALID != idIgnore)
-				idPolygon = CAD_INVALID;
-		}
-		else
-		{
-			idPolygon = pClosest->idPolygonB;
-			if(idPolygon == idIgnore && CAD_INVALID != idIgnore)
-				idPolygon = CAD_INVALID;
-		}
-	}
-
-	return idPolygon;
+	return idBestPoly;
 }
 
 VOID CCADCtrl::DeselectAll (UINT nRemove)
@@ -885,97 +883,50 @@ Cleanup:
 HRESULT CCADCtrl::IntegrateLine (DWORD idVertexA, DWORD idVertexB)
 {
 	HRESULT hr;
-	TStackRef<ICADLine> srLine;
-	CAD_LINE* pCadLine;
+	CAD_VERTEX* pA; CAD_VERTEX* pB;
 
-	for(sysint i = 0; i < m_pLines->Length(); i++)
+	Check(m_pVertices->Find(idVertexA, &pA));
+	Check(m_pVertices->Find(idVertexB, &pB));
+
+	// Midpoint of segment
+	FLOAT midX = (pA->vertex.x + pB->vertex.x) / 2.0f;
+	FLOAT midY = (pA->vertex.y + pB->vertex.y) / 2.0f;
+	DWORD idEnclosing = GetPolygonFromPoint(midX, midY, m_idNewPolygon);
+
+	// Look for existing line to reuse
+	bool fReused = false;
+	for(sysint j = 0; j < m_pLines->Length(); j++)
 	{
-		Check(m_pLines->GetValueChecked(i, &pCadLine));
+		CAD_LINE* pLine;
 
-		if(pCadLine->idVertexA == idVertexA && pCadLine->idVertexB == idVertexB)
+		Check(m_pLines->GetValueChecked(j, &pLine));
+		if((pLine->idVertexA == idVertexA && pLine->idVertexB == idVertexB) ||
+			(pLine->idVertexA == idVertexB && pLine->idVertexB == idVertexA))
 		{
-			CheckIf(CAD_INVALID != pCadLine->idPolygonA, E_FAIL);
-			pCadLine->idPolygonA = m_idNewPolygon;
-			goto SetDrawing;
-		}
-		else if(pCadLine->idVertexA == idVertexB && pCadLine->idVertexB == idVertexA)
-		{
-			CheckIf(CAD_INVALID != pCadLine->idPolygonB, E_FAIL);
-			pCadLine->idPolygonB = m_idNewPolygon;
-			goto SetDrawing;
+			// If line already belongs to one polygon, make it double-sided
+			if (pLine->idPolygonA == CAD_INVALID)
+				pLine->idPolygonA = m_idNewPolygon;
+			else if (pLine->idPolygonB == CAD_INVALID)
+				pLine->idPolygonB = m_idNewPolygon;
+			else
+				continue; // already double-sided
+
+			fReused = true;
+			break;
 		}
 	}
 
-	DWORD idLine = GetFreeLine();
+	if(!fReused)
+	{
+		DWORD idLine = GetFreeLine();
+		TStackRef<ICADLine> srLine;
 
-	CheckIf(!m_pHost->OnCreateLine(m_idNewPolygon, idLine, &srLine), E_FAIL);
-	Check(AddLine(idLine, idVertexA, idVertexB, m_idNewPolygon, CAD_INVALID, srLine, NULL));
-	Check(m_pLines->Find(idLine, &pCadLine));
-
-SetDrawing:
-	pCadLine->nFlags |= CAD_DRAWING;
+		Check(m_pHost->OnCreateLine(m_idNewPolygon, idLine, &srLine));
+		Check(AddLine(idLine, idVertexA, idVertexB, m_idNewPolygon, idEnclosing, srLine, NULL));
+	}
 
 Cleanup:
 	return hr;
-}
-
-bool CCADCtrl::IsPolygonClosed (DWORD idPolygon, DWORD idVertex)
-{
-	sysint cLines = m_pLines->Length(), cSegments = 0;
-	for(sysint i = 0; i < cLines; i++)
-	{
-		CAD_LINE* pCadLine;
-		SideAssertHr(m_pLines->GetValueChecked(i, &pCadLine));
-
-		if((pCadLine->idVertexA == idVertex || pCadLine->idVertexB == idVertex) && (pCadLine->idPolygonA == idPolygon || pCadLine->idPolygonB == idPolygon))
-		{
-			if(2 == ++cSegments)
-				return true;
-		}
-	}
-	return false;
-}
-
-VOID CCADCtrl::CheckAdjacentPolygon (DWORD idPolygon)
-{
-	FLOAT rWindingSum = 0.0f;
-	sysint cLines = m_pLines->Length();
-
-	for(sysint i = 0; i < m_aNewPoints.Length(); i++)
-	{
-		XYPOINT& ptA = m_aNewPoints[i];
-		XYPOINT& ptB = (i + 1 < m_aNewPoints.Length()) ? m_aNewPoints[i + 1] : m_aNewPoints[0];
-		rWindingSum += (ptA.x * ptB.y) - (ptB.x * ptA.y);
-	}
-
-	for(sysint i = 0; i < cLines; i++)
-	{
-		CAD_LINE* pCadLine;
-		SideAssertHr(m_pLines->GetValueChecked(i, &pCadLine));
-
-		if((idPolygon == pCadLine->idPolygonA || idPolygon == pCadLine->idPolygonB) &&
-			(CAD_INVALID == pCadLine->idPolygonA || CAD_INVALID == pCadLine->idPolygonB))
-		{
-			CAD_VERTEX* pVertexA, * pVertexB;
-			SideAssertHr(m_pVertices->Find(pCadLine->idVertexA, &pVertexA));
-			SideAssertHr(m_pVertices->Find(pCadLine->idVertexB, &pVertexB));
-
-			if(0.0f < rWindingSum)
-			{
-				SwapData(pCadLine->idPolygonB, pCadLine->idPolygonA);
-				SwapData(pCadLine->pLineB, pCadLine->pLineA);
-			}
-
-			DWORD idEnclosing = GetPolygonFromPoint((pVertexB->vertex.x + pVertexA->vertex.x) / 2.0f, (pVertexB->vertex.y + pVertexA->vertex.y) / 2.0f, idPolygon);
-			if(CAD_INVALID != idEnclosing)
-			{
-				if(CAD_INVALID == pCadLine->idPolygonA)
-					pCadLine->idPolygonA = idEnclosing;
-				else
-					pCadLine->idPolygonB = idEnclosing;
-			}
-		}
-	}
 }
 
 BOOL CCADCtrl::VertexHover (FLOAT x, FLOAT y)
@@ -1221,15 +1172,49 @@ VOID CCADCtrl::DrawLineMode (VOID)
 VOID CCADCtrl::DrawLineDrawing (VOID)
 {
 	HPEN hpnDefault = m_pGraph->SelectPen(m_pnDrawing);
+	FPOINT fptB;
+
+	if(1 < m_aNewPoints.Length())
+	{
+		for(sysint i = 1; i < m_aNewPoints.Length(); i++)
+		{
+			XYPOINT& ptA = m_aNewPoints[i - 1];
+			XYPOINT& ptB = m_aNewPoints[i];
+			FPOINT fptA;
+
+			fptA.x = ptA.x;
+			fptA.y = ptA.y;
+			fptA.z = 0.0f;
+
+			m_pGraph->Rectangle(fptA.x - 2.5f, fptA.y - 2.5f, fptA.z - 2.5f,
+				fptA.x + 2.5f, fptA.y + 2.5f, fptA.z + 2.5f);
+
+			fptB.x = ptB.x;
+			fptB.y = ptB.y;
+			fptB.z = 0.0f;
+
+			DrawLineSegment(fptA, fptB);
+		}
+	}
+	else
+	{
+		Assert(1 == m_aNewPoints.Length());
+
+		XYPOINT& ptB = m_aNewPoints[0];
+		fptB.x = ptB.x;
+		fptB.y = ptB.y;
+		fptB.z = 0.0f;
+	}
+
+	m_pGraph->Rectangle(fptB.x - 2.5f, fptB.y - 2.5f, fptB.z - 2.5f,
+		fptB.x + 2.5f, fptB.y + 2.5f, fptB.z + 2.5f);
 
 	FPOINT fpTo;
 	fpTo.x = m_xMouse;
 	fpTo.y = m_yMouse;
 	fpTo.z = 0.0f;
 
-	CAD_VERTEX* pVertex;
-	if(SUCCEEDED(m_pVertices->Find(m_idDrawFromVertex, &pVertex)))
-		DrawLineSegment(pVertex->vertex, fpTo);
+	DrawLineSegment(fptB, fpTo);
 
 	m_pGraph->SelectPen(hpnDefault);
 }
@@ -1310,16 +1295,6 @@ bool CCADCtrl::IsPointEqual (const FPOINT& fpA, const FPOINT& fpB)
 		fabs(fpA.z - fpB.z) < 0.01f;
 }
 
-bool CCADCtrl::AnalyzeLine (CAD_LINE* pCadLine, DWORD idIgnore)
-{
-	if(CAD_INVALID == idIgnore)
-		return true;
-	if((pCadLine->idPolygonA == idIgnore && CAD_INVALID == pCadLine->idPolygonB) ||
-		(pCadLine->idPolygonB == idIgnore && CAD_INVALID == pCadLine->idPolygonA))
-		return false;
-	return true;
-}
-
 VOID CCADCtrl::ToggleSelection (UINT& nFlags, BOOL fSelect, __inout BOOL& fChanged)
 {
 	if(fSelect)
@@ -1335,4 +1310,9 @@ VOID CCADCtrl::ToggleSelection (UINT& nFlags, BOOL fSelect, __inout BOOL& fChang
 		nFlags &= ~CAD_HOVER;
 		fChanged = TRUE;
 	}
+}
+
+FLOAT CCADCtrl::CrossProduct (const FPOINT& a, const FPOINT& b, FLOAT x, FLOAT y)
+{
+    return (b.x - a.x) * (y - a.y) - (b.y - a.y) * (x - a.x);
 }

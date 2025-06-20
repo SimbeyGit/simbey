@@ -68,8 +68,8 @@
 			abilities:
 			[
 				{ name: "Caster", type: "caster", value: 5 },
-				{ type: "Random", random: "any" },
-				{ type: "Random", random: "any" }
+				{ name: "Random", random: "any" },
+				{ name: "Random", random: "any" }
 			]
 		}
 	}

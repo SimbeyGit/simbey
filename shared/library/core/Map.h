@@ -59,12 +59,12 @@ public:
 		return m_Store.Length();
 	}
 
-	inline const TChar* GetKey (sysint n)
+	inline const TChar* GetKey (sysint n) const
 	{
 		return m_Store[n].ptzName;
 	}
 
-	HRESULT GetKeyChecked (sysint n, const TChar** pptzKey)
+	HRESULT GetKeyChecked (sysint n, const TChar** pptzKey) const
 	{
 		HRESULT hr = HRESULT_FROM_WIN32(ERROR_INVALID_INDEX);
 
@@ -79,7 +79,7 @@ public:
 		return hr;
 	}
 
-	const TChar* GetKeyPtr (const TChar* ptzName)
+	const TChar* GetKeyPtr (const TChar* ptzName) const
 	{
 		const TChar* ptzKey = NULL;
 		sysint nPosition;
@@ -254,18 +254,18 @@ public:
 		m_Store.Clear();
 	}
 
-	HRESULT Find (const TChar* ptzName, TValue* pValue)
+	HRESULT Find (const TChar* ptzName, TValue* pValue) const
 	{
 		HRESULT hr = E_FAIL;
 		sysint nPosition;
 
 		if(BinaryFind(ptzName, &nPosition))
 		{
-			NAMED_MAP_ENTRY* pData;
+			const NAMED_MAP_ENTRY* pcData;
 			sysint cList;
 
-			m_Store.GetData(&pData, &cList);
-			*pValue = pData[nPosition].value;
+			m_Store.GetData(&pcData, &cList);
+			*pValue = pcData[nPosition].value;
 
 			hr = S_OK;
 		}
@@ -294,13 +294,13 @@ public:
 		return hr;
 	}
 
-	inline BOOL HasItem (const TChar* ptzName)
+	inline BOOL HasItem (const TChar* ptzName) const
 	{
 		sysint nPosition;
 		return BinaryFind(ptzName, &nPosition);
 	}
 
-	inline BOOL IndexOf (const TChar* ptzName, sysint* pnPosition)
+	inline BOOL IndexOf (const TChar* ptzName, sysint* pnPosition) const
 	{
 		return BinaryFind(ptzName, pnPosition);
 	}
@@ -383,18 +383,18 @@ public:
 	}
 
 protected:
-	BOOL BinaryFind (const TChar* ptzName, sysint* pnPosition)
+	BOOL BinaryFind (const TChar* ptzName, sysint* pnPosition) const
 	{
-		NAMED_MAP_ENTRY* pData;
+		const NAMED_MAP_ENTRY* pcData;
 		sysint iRight, iLeft = 0, iMiddle, nCompare;
 
-		m_Store.GetData(&pData, &iRight);
+		m_Store.GetData(&pcData, &iRight);
 		iRight--;
 
 		while(iLeft <= iRight)
 		{
 			iMiddle = ((unsigned)(iLeft + iRight)) >> 1;
-			nCompare = m_pfnCompare(pData[iMiddle].ptzName, ptzName);
+			nCompare = m_pfnCompare(pcData[iMiddle].ptzName, ptzName);
 			if(0 > nCompare)
 				iLeft = iMiddle + 1;
 			else if(0 < nCompare)
@@ -531,12 +531,12 @@ public:
 		return m_Store.Length();
 	}
 
-	inline TKey GetKey (sysint n)
+	inline TKey GetKey (sysint n) const
 	{
 		return m_Store[n].key;
 	}
 
-	HRESULT GetKeyChecked (sysint n, TKey* pKey)
+	HRESULT GetKeyChecked (sysint n, TKey* pKey) const
 	{
 		HRESULT hr = HRESULT_FROM_WIN32(ERROR_INVALID_INDEX);
 
@@ -711,7 +711,7 @@ public:
 		m_Store.Clear();
 	}
 
-	HRESULT Find (const TKey key, TValue* pValue)
+	HRESULT Find (const TKey key, TValue* pValue) const
 	{
 		HRESULT hr = E_FAIL;
 		sysint n;
@@ -741,13 +741,13 @@ public:
 		return hr;
 	}
 
-	inline BOOL HasItem (const TKey key)
+	inline BOOL HasItem (const TKey key) const
 	{
 		sysint nPosition;
 		return BinaryFind(key, &nPosition);
 	}
 
-	inline BOOL IndexOf (const TKey key, sysint* pnPosition)
+	inline BOOL IndexOf (const TKey key, sysint* pnPosition) const
 	{
 		return BinaryFind(key, pnPosition);
 	}
@@ -831,20 +831,20 @@ public:
 	}
 
 protected:
-	BOOL BinaryFind (const TKey key, sysint* pnPosition)
+	BOOL BinaryFind (const TKey key, sysint* pnPosition) const
 	{
-		KEY_MAP_ENTRY* pData;
+		const KEY_MAP_ENTRY* pcData;
 		sysint iRight, iLeft = 0, iMiddle;
 
-		m_Store.GetData(&pData, &iRight);
+		m_Store.GetData(&pcData, &iRight);
 		iRight--;
 
 		while(iLeft <= iRight)
 		{
 			iMiddle = ((unsigned)(iLeft + iRight)) >> 1;
-			if(pData[iMiddle].key < key)
+			if(pcData[iMiddle].key < key)
 				iLeft = iMiddle + 1;
-			else if(pData[iMiddle].key > key)
+			else if(pcData[iMiddle].key > key)
 				iRight = iMiddle - 1;
 			else
 			{
@@ -917,7 +917,7 @@ public:
 		return m_Map.Length();
 	}
 
-	sysint ArrayLength (const TKey key)
+	sysint ArrayLength (const TKey key) const
 	{
 		sysint cArrayLength = -1;
 		ArrayType* pvMapArray;
@@ -926,7 +926,12 @@ public:
 		return cArrayLength;
 	}
 
-	inline const TKey GetKey (sysint n)
+	inline TKey GetKey (sysint n) const
+	{
+		return m_Map.GetKey(n);
+	}
+
+	inline const TKey GetKeyConst (sysint n) const
 	{
 		return const_cast<const TKey>(m_Map.GetKey(n));
 	}
@@ -989,6 +994,29 @@ public:
 		return hr;
 	}
 
+	HRESULT AddSlot (const TKey key, TValue** ppValue)
+	{
+		HRESULT hr;
+
+		ArrayType** ppvMapArray = m_Map[key];
+		if(ppvMapArray)
+		{
+			if(NULL == *ppvMapArray)
+			{
+				if(SUCCEEDED(m_Heap.allocate_storage(1, ppvMapArray)))
+					__new_placement(*ppvMapArray) ArrayType(m_Heap);
+			}
+			if(*ppvMapArray)
+				hr = (*ppvMapArray)->AppendSlot(ppValue);
+			else
+				hr = E_OUTOFMEMORY;
+		}
+		else
+			hr = E_OUTOFMEMORY;
+
+		return hr;
+	}
+
 	HRESULT Remove (const TKey key, ArrayType** ppMapArray)
 	{
 		ArrayType* pMapArray;
@@ -1027,17 +1055,21 @@ public:
 		}
 	}
 
-	HRESULT Find (const TKey key, TValue** ppvArray, sysint* pcArray)
+	HRESULT Find (const TKey key, TValue** ppvArray, sysint* pArray)
 	{
-		HRESULT hr;
-		ArrayType** ppvMapArray = m_Map[key];
-		if(ppvMapArray && *ppvMapArray)
-		{
-			(*ppvMapArray)->GetData(ppvArray, pcArray);
-			hr = S_OK;
-		}
-		else
-			hr = E_FAIL;
+		ArrayType* pMapArray;
+		HRESULT hr = m_Map.Find(key, &pMapArray);
+		if(SUCCEEDED(hr))
+			pMapArray->GetData(ppvArray, pArray);
+		return hr;
+	}
+
+	HRESULT Find (const TKey key, const TValue** ppcvArray, sysint* pArray) const
+	{
+		ArrayType* pMapArray;
+		HRESULT hr = m_Map.Find(key, &pMapArray);
+		if(SUCCEEDED(hr))
+			pMapArray->GetData(ppcvArray, pArray);
 		return hr;
 	}
 };

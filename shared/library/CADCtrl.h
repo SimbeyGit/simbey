@@ -98,7 +98,6 @@ private:
 	FLOAT m_xMouse, m_yMouse;
 	CAD::Mouse m_eMouse;
 
-	DWORD m_idDrawFromVertex;
 	DWORD m_idNewPolygon;
 	TArray<XYPOINT> m_aNewPoints;
 
@@ -116,13 +115,13 @@ public:
 
 	CAD::Mode GetMode (VOID) const { return m_eMode; }
 
-	DWORD GetFreeVertex(VOID);
-	DWORD GetFreeLine(VOID);
+	DWORD GetFreeVertex (VOID);
+	DWORD GetFreeLine (VOID);
 	DWORD GetFreePolygon(VOID);
 
-	HRESULT AddVertex(DWORD idVertex, const FPOINT& vertex);
-	HRESULT AddLine(DWORD idLine, DWORD idVertexA, DWORD idVertexB, DWORD idPolygonA, DWORD idPolygonB, ICADLine* pLineA, ICADLine* pLineB);
-	HRESULT AddPolygon(DWORD idPolygon, ICADPolygon* pPolygon);
+	HRESULT AddVertex (DWORD idVertex, const FPOINT& vertex);
+	HRESULT AddLine (DWORD idLine, DWORD idVertexA, DWORD idVertexB, DWORD idPolygonA, DWORD idPolygonB, ICADLine* pLineA, ICADLine* pLineB);
+	HRESULT AddPolygon (DWORD idPolygon, ICADPolygon* pPolygon);
 
 	bool DeleteSelectedPolygon (VOID);
 	bool DeleteSelectedLine (VOID);
@@ -146,15 +145,12 @@ public:
 	VOID SnapCoordinate (FLOAT& x, FLOAT& y);
 
 private:
-	DWORD GetPolygonFromPoint(FLOAT x, FLOAT y, DWORD idIgnore);
-	VOID DeselectAll(UINT nRemove = CAD_SELECTED | CAD_HOVER | CAD_DRAWING);
-	HRESULT SplitLine(FLOAT x, FLOAT y, __out_opt DWORD* pidVertex);
-	HRESULT FindOrCreateVertex(FLOAT x, FLOAT y, __out DWORD* pidVertex);
-	HRESULT IntegrateLine(DWORD idVertexA, DWORD idVertexB);
+	DWORD GetPolygonFromPoint (FLOAT x, FLOAT y, DWORD idIgnore);
+	VOID DeselectAll (UINT nRemove = CAD_SELECTED | CAD_HOVER | CAD_DRAWING);
+	HRESULT SplitLine (FLOAT x, FLOAT y, __out_opt DWORD* pidVertex);
+	HRESULT FindOrCreateVertex (FLOAT x, FLOAT y, __out DWORD* pidVertex);
+	HRESULT IntegrateLine (DWORD idVertexA, DWORD idVertexB);
 
-	bool IsPolygonClosed (DWORD idPolygon, DWORD idVertex);
-
-	VOID CheckAdjacentPolygon (DWORD idPolygon);
 	BOOL VertexHover (FLOAT x, FLOAT y);
 	BOOL LineHover (FLOAT x, FLOAT y);
 	BOOL PolygonHover (FLOAT x, FLOAT y);
@@ -174,6 +170,6 @@ private:
 
 	static void AdjustVertex (CAD_VERTEX* pCadVertex, FLOAT xDelta, FLOAT yDelta);
 	static bool IsPointEqual (const FPOINT& fpA, const FPOINT& fpB);
-	static bool AnalyzeLine (CAD_LINE* pCadLine, DWORD idIgnore);
 	static void ToggleSelection (UINT& nFlags, BOOL fSelect, __inout BOOL& fChanged);
+	static FLOAT CrossProduct (const FPOINT& a, const FPOINT& b, FLOAT x, FLOAT y);
 };
