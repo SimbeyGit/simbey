@@ -65,10 +65,10 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 2 },
-				{ name: "Teleporting", type: "ability" },
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Resistance to All", type: "ability", value: 2 }
+				{ ref: "mom:ability/unit/to_hit", value: 2 },
+				{ ref: "mom:ability/unit/teleporting" },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/resistance_all", value: 2 }
 			]
 		}
 	}

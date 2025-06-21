@@ -76,8 +76,8 @@
 			},
 			abilities:
 			[
-				{ name: "Construction", type: "ability" },
-				{ name: "Wall Crusher", type: "ability" }
+				{ ref: "mom:ability/unit/construction" },
+				{ ref: "mom:ability/unit/wall_crusher" }
 			]
 		}
 	}

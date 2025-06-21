@@ -70,9 +70,9 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 2 },
-				{ name: "Fire Immunity", type: "immunity", immunity: "fire" }
-				{ name: "Caster", type: "caster", value: 20 }
+				{ ref: "mom:ability/unit/to_hit", value: 2 },
+				{ ref: "mom:ability/unit/fire_immunity" },
+				{ ref: "mom:ability/hero/caster", value: 20 }
 			]
 		}
 	}

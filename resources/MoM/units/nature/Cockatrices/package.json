@@ -65,8 +65,8 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "Stoning Touch", type: "touch", touch: "stoning", value: -3 }
+				{ ref: "mom:ability/unit/to_hit", value: 1 },
+				{ ref: "mom:ability/unit/stoning_touch", value: -3 }
 			]
 		}
 	}

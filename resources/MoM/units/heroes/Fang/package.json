@@ -72,10 +72,10 @@
 			],
 			abilities:
 			[
-				{ name: "Fire Breath", type: "breath", breath: "fire", value: 5 },
-				{ name: "Might", type: "ability" },
-				{ name: "Random", random: "fighter" },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/unit/fire_breath", value: 5 },
+				{ ref: "mom:ability/hero/might" },
+				{ ref: "mom:ability/unit/random/fighter" },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

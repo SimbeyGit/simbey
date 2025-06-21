@@ -76,8 +76,8 @@
 			},
 			abilities:
 			[
-				{ name: "Regeneration", type: "ability" },
-				{ name: "Negate First Strike", type: "ability" }
+				{ ref: "mom:ability/unit/regeneration" },
+				{ ref: "mom:ability/unit/negate_first_strike" }
 			]
 		}
 	}

@@ -63,7 +63,7 @@
 			},
 			abilities:
 			[
-				{ name: "Transport", type: "ability", value: 2 }
+				{ ref: "mom:ability/unit/transport", value: 2 }
 			]
 		}
 	}

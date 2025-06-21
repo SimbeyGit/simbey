@@ -61,10 +61,10 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "Wall Crusher", type: "ability" },
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" }
+				{ ref: "mom:ability/unit/to_hit", value: 1 },
+				{ ref: "mom:ability/unit/wall_crusher" },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/stoning_immunity" }
 			]
 		}
 	}

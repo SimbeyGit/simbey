@@ -72,8 +72,8 @@
 			],
 			abilities:
 			[
-				{ name: "Leadership", type: "ability" },
-				{ name: "Caster", type: "caster", value: 5 }
+				{ ref: "mom:ability/hero/leadership" },
+				{ ref: "mom:ability/hero/caster", value: 5 }
 			],
 			spells:
 			[

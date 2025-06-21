@@ -76,8 +76,8 @@
 			},
 			abilities:
 			[
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Death Immunity", type: "immunity", immunity: "death" }
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/death_immunity" }
 			]
 		}
 	}

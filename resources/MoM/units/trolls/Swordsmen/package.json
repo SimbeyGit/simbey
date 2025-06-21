@@ -80,8 +80,8 @@
 			},
 			abilities:
 			[
-				{ name: "Regeneration", type: "ability" },
-				{ name: "Large Shield", type: "ability" }
+				{ ref: "mom:ability/unit/regeneration" },
+				{ ref: "mom:ability/unit/large_shield" }
 			]
 		}
 	}

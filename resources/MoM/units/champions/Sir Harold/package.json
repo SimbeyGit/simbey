@@ -75,11 +75,11 @@
 			],
 			abilities:
 			[
-				{ name: "Super Leadership", type: "ability" },
-				{ name: "Super Legendary", type: "ability" },
-				{ name: "Constitution", type: "ability" },
-				{ name: "Noble", type: "ability" },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/hero/super_leadership" },
+				{ ref: "mom:ability/hero/super_legendary" },
+				{ ref: "mom:ability/hero/constitution" },
+				{ ref: "mom:ability/hero/noble" },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

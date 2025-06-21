@@ -83,13 +83,13 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 10 },
-				{ name: "Constitution", type: "ability" },
-				{ name: "Arcane Power", type: "ability" },
-				{ name: "Armor Piercing", type: "ability" },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" }
+				{ ref: "mom:ability/hero/caster", value: 10 },
+				{ ref: "mom:ability/hero/constitution" },
+				{ ref: "mom:ability/hero/arcane_power" },
+				{ ref: "mom:ability/unit/armor_piercing" },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" }
 			]
 		}
 	}

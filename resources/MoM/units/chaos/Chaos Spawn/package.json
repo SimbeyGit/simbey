@@ -65,11 +65,11 @@
 			},
 			abilities:
 			[
-				{ name: "Cause Fear", type: "ability" },
-				{ name: "Poison Touch", type: "touch", touch: "poison", value: 4 },
-				{ name: "Doom Gaze", type: "gaze", gaze: "doom", value: 4 },
-				{ name: "Death Gaze", type: "gaze", gaze: "death", value: -4 },
-				{ name: "Stoning Gaze", type: "gaze", gaze: "stoning", value: -4 }
+				{ ref: "mom:ability/unit/cause_fear" },
+				{ ref: "mom:ability/unit/poison_touch", value: 4 },
+				{ ref: "mom:ability/unit/doom_gaze", value: 4 },
+				{ ref: "mom:ability/unit/death_gaze", value: -4 },
+				{ ref: "mom:ability/unit/stoning_gaze", value: -4 }
 			]
 		}
 	}

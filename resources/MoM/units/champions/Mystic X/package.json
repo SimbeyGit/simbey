@@ -85,12 +85,12 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 5 },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" }
+				{ ref: "mom:ability/hero/caster", value: 5 },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" }
 			]
 		}
 	}

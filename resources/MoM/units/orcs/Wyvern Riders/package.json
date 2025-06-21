@@ -76,7 +76,7 @@
 			},
 			abilities:
 			[
-				{ name: "Poison Touch", type: "touch", touch: "poison", value: 6 }
+				{ ref: "mom:ability/unit/poison_touch", value: 6 }
 			]
 		}
 	}

@@ -76,8 +76,8 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 2 },
-				{ name: "Large Shield", type: "ability" }
+				{ ref: "mom:ability/unit/to_hit", value: 2 },
+				{ ref: "mom:ability/unit/large_shield" }
 			]
 		}
 	}

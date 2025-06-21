@@ -65,10 +65,10 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 3 },
-				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
-				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
-				{ name: "Lightning Breath", type: "breath", breath: "lightning", value: 20, armor_piercing: true }
+				{ ref: "mom:ability/unit/to_hit", value: 3 },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/magic_immunity" },
+				{ ref: "mom:ability/unit/lightning_breath", value: 20 }
 			]
 		}
 	}

@@ -65,7 +65,7 @@
 			},
 			abilities:
 			[
-				{ name: "Forester", type: "ability" }
+				{ ref: "mom:ability/unit/forester" }
 			]
 		}
 	}

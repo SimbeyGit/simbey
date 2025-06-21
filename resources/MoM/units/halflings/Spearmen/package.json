@@ -65,7 +65,7 @@
 			},
 			abilities:
 			[
-				{ name: "Lucky", type: "ability" }
+				{ ref: "mom:ability/hero/lucky" }
 			]
 		}
 	}

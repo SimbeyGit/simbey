@@ -84,11 +84,11 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 5 },
-				{ name: "Ranged Attack", type: "range", value: 8 },
-				{ name: "Might", type: "ability" },
-				{ name: "Scouting", type: "ability" },
-				{ name: "Pathfinding", type: "ability" }
+				{ ref: "mom:ability/hero/caster", value: 5 },
+				{ ref: "mom:ability/unit/ranged_attack", value: 8 },
+				{ ref: "mom:ability/hero/might" },
+				{ ref: "mom:ability/unit/scouting" },
+				{ ref: "mom:ability/unit/pathfinding" }
 			],
 			spells:
 			[

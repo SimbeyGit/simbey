@@ -66,9 +66,9 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 1 }
-				{ name: "Regeneration", type: "ability" },
-				{ name: "Fire Breath", type: "breath", breath: "fire", value: 5 }
+				{ ref: "mom:ability/unit/to_hit", value: 1 },
+				{ ref: "mom:ability/unit/regeneration" },
+				{ ref: "mom:ability/unit/fire_breath", value: 5 }
 			]
 		}
 	}

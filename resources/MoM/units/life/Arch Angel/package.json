@@ -65,10 +65,10 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 3 },
-				{ name: "Caster", type: "caster", value: 40 },
-				{ name: "Illusions Immunity", type: "immunity", immunity: "illusion" },
-				{ name: "Holy Bonus", type: "ability", value: 2 }
+				{ ref: "mom:ability/unit/to_hit", value: 3 },
+				{ ref: "mom:ability/hero/caster", value: 40 },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/holy_bonus", value: 2 }
 			],
 			spells:
 			[

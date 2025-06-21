@@ -85,8 +85,8 @@
 			},
 			abilities:
 			[
-				{ name: "Fire Breath", type: "breath", breath: "fire", value: 1 },
-				{ name: "Ranged Attack", type: "range", value: 8 }
+				{ ref: "mom:ability/unit/fire_breath", value: 1 },
+				{ ref: "mom:ability/unit/ranged_attack", value: 8 }
 			]
 		}
 	}

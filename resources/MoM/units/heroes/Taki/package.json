@@ -79,8 +79,8 @@
 			],
 			abilities:
 			[
-				{ name: "Super Agility", type: "ability" },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/hero/super_agility" },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

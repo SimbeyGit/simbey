@@ -83,14 +83,14 @@
 			],
 			abilities:
 			[
-				{ name: "Legendary", type: "ability" },
-				{ name: "Super Might", type: "ability" },
-				{ name: "Prayermaster", type: "ability" },
-				{ name: "Healer", type: "ability" },
-				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
-				{ name: "Armor Piercing", type: "ability" },
-				{ name: "First Strike", type: "ability" },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/hero/legendary" },
+				{ ref: "mom:ability/hero/super_might" },
+				{ ref: "mom:ability/hero/prayermaster" },
+				{ ref: "mom:ability/unit/healer" },
+				{ ref: "mom:ability/unit/magic_immunity" },
+				{ ref: "mom:ability/unit/armor_piercing" },
+				{ ref: "mom:ability/unit/first_strike" },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

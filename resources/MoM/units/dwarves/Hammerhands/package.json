@@ -76,7 +76,7 @@
 			},
 			abilities:
 			[
-				{ name: "Mountaineer", type: "ability" }
+				{ ref: "mom:ability/unit/mountaineer" }
 			]
 		}
 	}

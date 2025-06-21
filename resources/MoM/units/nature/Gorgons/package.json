@@ -65,8 +65,8 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 2 },
-				{ name: "Stoning Gaze", type: "gaze", gaze: "stoning", value: -2 }
+				{ ref: "mom:ability/unit/to_hit", value: 2 },
+				{ ref: "mom:ability/unit/stoning_gaze", value: -2 }
 			]
 		}
 	}

@@ -50,8 +50,8 @@
 			},
 			abilities:
 			[
-				{ name: "Regeneration", type: "ability" },
-				{ name: "Create Outpost", type: "ability" }
+				{ ref: "mom:ability/unit/regeneration" },
+				{ ref: "mom:ability/unit/create_outpost" }
 			]
 		}
 	}

@@ -84,10 +84,10 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 7.5 },
-				{ name: "Wind Walking", type: "ability" },
-				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
-				{ name: "Random", random: "mage" }
+				{ ref: "mom:ability/hero/caster", value: 7.5 },
+				{ ref: "mom:ability/unit/wind_walking" },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/random/mage" }
 			],
 			spells:
 			[

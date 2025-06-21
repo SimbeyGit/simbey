@@ -65,7 +65,7 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 2 }
+				{ ref: "mom:ability/unit/to_hit", value: 2 }
 			]
 		}
 	}

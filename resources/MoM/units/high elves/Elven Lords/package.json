@@ -76,10 +76,10 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 2 },
-				{ name: "Forester", type: "ability" },
-				{ name: "Armor Piercing", type: "ability" },
-				{ name: "First Strike", type: "ability" }
+				{ ref: "mom:ability/unit/to_hit", value: 2 },
+				{ ref: "mom:ability/unit/forester" },
+				{ ref: "mom:ability/unit/armor_piercing" },
+				{ ref: "mom:ability/unit/first_strike" }
 			]
 		}
 	}

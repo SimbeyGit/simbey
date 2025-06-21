@@ -81,9 +81,9 @@
 			},
 			abilities:
 			[
-				{ name: "Ranged Attack", type: "range", value: 4 },
-				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
-				{ name: "Doom Bolt", type: "spell", value: 5 }
+				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/doom_bolt", value: 5 }
 			]
 		}
 	}

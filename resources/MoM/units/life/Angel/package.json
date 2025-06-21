@@ -65,10 +65,10 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 2 },
-				{ name: "Illusions Immunity", type: "immunity", immunity: "illusion" },
-				{ name: "Holy Bonus", type: "ability", value: 1 },
-				{ name: "Dispel Evil", type: "ability" }
+				{ ref: "mom:ability/unit/to_hit", value: 2 },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/holy_bonus", value: 1 },
+				{ ref: "mom:ability/unit/dispel_evil" }
 			]
 		}
 	}

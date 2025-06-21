@@ -70,9 +70,9 @@
 			},
 			abilities:
 			[
-				{ name: "Meld", type: "ability" },
-				{ name: "Non-Corporeal", type: "ability" },
-				{ name: "Resistance to All", type: "ability", value: 1 }
+				{ ref: "mom:ability/unit/meld" },
+				{ ref: "mom:ability/unit/noncorporeal" },
+				{ ref: "mom:ability/unit/resistance_all", value: 1 }
 			]
 		}
 	}

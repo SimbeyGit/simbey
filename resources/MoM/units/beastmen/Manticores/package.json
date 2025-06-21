@@ -80,8 +80,8 @@
 			},
 			abilities:
 			[
-				{ name: "Scouting", type: "ability", value: 2 },
-				{ name: "Poison Touch", type: "touch", touch: "poison", value: 6 }
+				{ ref: "mom:ability/unit/scouting", value: 2 },
+				{ ref: "mom:ability/unit/poison_touch", value: 6 }
 			]
 		}
 	}

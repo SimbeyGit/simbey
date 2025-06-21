@@ -77,9 +77,9 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 7.5 },
-				{ name: "Healer", type: "ability" },
-				{ name: "Random", random: "mage" }
+				{ ref: "mom:ability/hero/caster", value: 7.5 },
+				{ ref: "mom:ability/unit/healer" },
+				{ ref: "mom:ability/unit/random/mage" }
 			],
 			spells:
 			[

@@ -72,9 +72,9 @@
 			],
 			abilities:
 			[
-				{ name: "Thrown", type: "thrown", value: 3 },
-				{ name: "Mountaineer" },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/unit/thrown", value: 3 },
+				{ ref: "mom:ability/unit/mountaineer" },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

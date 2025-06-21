@@ -85,7 +85,7 @@
 			},
 			abilities:
 			[
-				{ name: "Large Shield", type: "ability" }
+				{ ref: "mom:ability/unit/large_shield" }
 			]
 		}
 	}

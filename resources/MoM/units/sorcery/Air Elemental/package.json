@@ -61,11 +61,11 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "Invisibility", type: "ability" },
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" },
-				{ name: "Weapon Immunity", type: "immunity", immunity: "weapon" }
+				{ ref: "mom:ability/unit/to_hit", value: 1 },
+				{ ref: "mom:ability/unit/invisibility" },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/stoning_immunity" },
+				{ ref: "mom:ability/unit/weapon_immunity" }
 			]
 		}
 	}

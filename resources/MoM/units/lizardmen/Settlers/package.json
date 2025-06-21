@@ -55,7 +55,7 @@
 			},
 			abilities:
 			[
-				{ name: "Create Outpost", type: "ability" }
+				{ ref: "mom:ability/unit/create_outpost" }
 			]
 		}
 	}

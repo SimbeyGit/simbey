@@ -85,13 +85,13 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 12.5 },
-				{ name: "Arcane Power", type: "ability" },
-				{ name: "Super Prayermaster", type: "ability" },
-				{ name: "Charmed", type: "ability" },
-				{ name: "Noble", type: "ability" },
-				{ name: "Healer", type: "ability" },
-				{ name: "Purify", type: "ability" }
+				{ ref: "mom:ability/hero/caster", value: 12.5 },
+				{ ref: "mom:ability/hero/arcane_power" },
+				{ ref: "mom:ability/hero/super_prayermaster" },
+				{ ref: "mom:ability/hero/charmed" },
+				{ ref: "mom:ability/hero/noble" },
+				{ ref: "mom:ability/unit/healer" },
+				{ ref: "mom:ability/unit/purify" }
 			],
 			spells:
 			[

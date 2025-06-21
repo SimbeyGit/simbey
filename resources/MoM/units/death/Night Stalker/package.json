@@ -65,13 +65,13 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "Invisibility", type: "ability" },
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
-				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
-				{ name: "Death Immunity", type: "immunity", immunity: "death" },
-				{ name: "Death Gaze", type: "gaze", gaze: "death" }
+				{ ref: "mom:ability/unit/to_hit", value: 1 },
+				{ ref: "mom:ability/unit/invisibility" },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/cold_immunity" },
+				{ ref: "mom:ability/unit/death_immunity" },
+				{ ref: "mom:ability/unit/death_gaze" }
 			]
 		}
 	}

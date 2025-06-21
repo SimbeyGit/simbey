@@ -79,10 +79,10 @@
 			],
 			abilities:
 			[
-				{ name: "Blademaster", type: "ability" },
-				{ name: "Invisibility", type: "ability" },
-				{ name: "Random", random: "fighter" },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/hero/blademaster" },
+				{ ref: "mom:ability/unit/invisibility" },
+				{ ref: "mom:ability/unit/random/fighter" },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

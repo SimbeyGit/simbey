@@ -65,15 +65,15 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 3 },
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Weapon Immunity", type: "immunity", immunity: "weapon" },
-				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
-				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
-				{ name: "Death Immunity", type: "immunity", immunity: "death" },
-				{ name: "Armor Piercing", type: "ability" },
-				{ name: "First Strike", type: "ability" },
-				{ name: "Life Steal", type: "touch", touch: "life steal", value: 4, resist: true }
+				{ ref: "mom:ability/unit/to_hit", value: 3 },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/weapon_immunity" },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/cold_immunity" },
+				{ ref: "mom:ability/unit/death_immunity" },
+				{ ref: "mom:ability/unit/armor_piercing" },
+				{ ref: "mom:ability/unit/first_strike" },
+				{ ref: "mom:ability/unit/life_steal", value: 4 }
 			]
 		}
 	}

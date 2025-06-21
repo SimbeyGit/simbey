@@ -70,16 +70,16 @@
 			},
 			abilities:
 			[
-				{ name: "Ranged Attack", type: "range", value: 8 },
-				{ name: "To Hit", type: "tohit", value: 2 },
-				{ name: "Plane Shift", type: "ability" },
-				{ name: "Non-Corporeal", type: "ability" },
-				{ name: "Regeneration", type: "ability" },
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Weapon Immunity", type: "immunity", immunity: "weapon" },
-				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
-				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
-				{ name: "Death Immunity", type: "immunity", immunity: "death" }
+				{ ref: "mom:ability/unit/ranged_attack", value: 8 },
+				{ ref: "mom:ability/unit/to_hit", value: 2 },
+				{ ref: "mom:ability/unit/plane_shift" },
+				{ ref: "mom:ability/unit/noncorporeal" },
+				{ ref: "mom:ability/unit/regeneration" },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/weapon_immunity" },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/cold_immunity" },
+				{ ref: "mom:ability/unit/death_immunity" }
 			]
 		}
 	}

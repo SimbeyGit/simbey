@@ -72,15 +72,15 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 15 },
-				{ name: "Super Leadership", type: "ability" },
-				{ name: "Super Might", type: "ability" },
-				{ name: "Constitution", type: "ability" },
-				{ name: "Prayermaster", type: "ability" },
-				{ name: "Missile Immunity", type: "missile", immunity: "missile" },
-				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" }
+				{ ref: "mom:ability/hero/caster", value: 15 },
+				{ ref: "mom:ability/hero/super_leadership" },
+				{ ref: "mom:ability/hero/super_might" },
+				{ ref: "mom:ability/hero/constitution" },
+				{ ref: "mom:ability/hero/prayermaster" },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/magic_immunity" },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" }
 			],
 			spells:
 			[

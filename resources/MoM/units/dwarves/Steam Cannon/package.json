@@ -75,8 +75,8 @@
 			},
 			abilities:
 			[
-				{ name: "Ranged Attack", type: "range", value: 10 },
-				{ name: "Mountaineer", type: "ability" }
+				{ ref: "mom:ability/unit/ranged_attack", value: 10 },
+				{ ref: "mom:ability/unit/mountaineer" }
 			]
 		}
 	}

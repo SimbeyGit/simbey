@@ -84,9 +84,9 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 15 },
-				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
-				{ name: "Random", random: "mage" }
+				{ ref: "mom:ability/hero/caster", value: 15 },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/random/mage" }
 			],
 			spells:
 			[

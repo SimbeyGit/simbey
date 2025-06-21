@@ -80,8 +80,8 @@
 			},
 			abilities:
 			[
-				{ name: "Wall Crusher", type: "ability" },
-				{ name: "First Strike", type: "ability" }
+				{ ref: "mom:ability/unit/wall_crusher" },
+				{ ref: "mom:ability/unit/first_strike" }
 			]
 		}
 	}

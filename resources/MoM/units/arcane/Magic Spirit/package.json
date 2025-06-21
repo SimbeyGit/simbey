@@ -70,8 +70,8 @@
 			},
 			abilities:
 			[
-				{ name: "Meld", type: "ability" },
-				{ name: "Non-Corporeal", type: "ability" }
+				{ ref: "mom:ability/unit/meld" },
+				{ ref: "mom:ability/unit/noncorporeal" }
 			]
 		}
 	}

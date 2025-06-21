@@ -84,10 +84,10 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 10 },
-				{ name: "Arcane Power", type: "ability" },
-				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
-				{ name: "Random", random: "mage" }
+				{ ref: "mom:ability/hero/caster", value: 10 },
+				{ ref: "mom:ability/hero/arcane_power" },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/random/mage" }
 			],
 			spells:
 			[

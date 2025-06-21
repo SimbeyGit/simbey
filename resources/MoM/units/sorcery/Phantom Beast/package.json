@@ -66,12 +66,12 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "Non-Corporeal", type: "ability" },
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Stoning Immunity", type: "immunity", immunity: "stoning" },
-				{ name: "Death Immunity", type: "immunity", immunity: "death" },
-				{ name: "Illusion", type: "ability" }
+				{ ref: "mom:ability/unit/to_hit", value: 1 },
+				{ ref: "mom:ability/unit/noncorporeal" },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/stoning_immunity" },
+				{ ref: "mom:ability/unit/death_immunity" },
+				{ ref: "mom:ability/unit/illusion" }
 			]
 		}
 	}

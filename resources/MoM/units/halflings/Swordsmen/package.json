@@ -80,8 +80,8 @@
 			},
 			abilities:
 			[
-				{ name: "Lucky", type: "ability" },
-				{ name: "Large Shield", type: "ability" },
+				{ ref: "mom:ability/hero/lucky" },
+				{ ref: "mom:ability/unit/large_shield" }
 			]
 		}
 	}

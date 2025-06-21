@@ -80,8 +80,8 @@
 			},
 			abilities:
 			[
-				{ name: "Thrown", type: "thrown", value: 1 },
-				{ name: "Large Shield", type: "ability" }
+				{ ref: "mom:ability/unit/thrown", value: 1 },
+				{ ref: "mom:ability/unit/large_shield" }
 			]
 		}
 	}

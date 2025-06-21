@@ -50,8 +50,8 @@
 			},
 			abilities:
 			[
-				{ name: "Create Outpost", type: "ability" },
-				{ name: "Lucky", type: "ability" }
+				{ ref: "mom:ability/unit/create_outpost" },
+				{ ref: "mom:ability/hero/lucky" }
 			]
 		}
 	}

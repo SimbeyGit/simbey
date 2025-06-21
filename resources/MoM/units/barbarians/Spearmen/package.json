@@ -65,7 +65,7 @@
 			},
 			abilities:
 			[
-				{ name: "Thrown", type: "thrown", value: 1 }
+				{ ref: "mom:ability/unit/thrown", value: 1 }
 			]
 		}
 	}

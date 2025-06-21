@@ -79,11 +79,11 @@
 			],
 			abilities:
 			[
-				{ name: "Blademaster", type: "ability" },
-				{ name: "Might", type: "ability" },
-				{ name: "Charmed", type: "ability" },
-				{ name: "Thrown", type: "thrown", value: 4 },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/hero/blademaster" },
+				{ ref: "mom:ability/hero/might" },
+				{ ref: "mom:ability/hero/charmed" },
+				{ ref: "mom:ability/unit/thrown", value: 4 },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

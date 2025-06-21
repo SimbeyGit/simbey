@@ -80,7 +80,7 @@
 			},
 			abilities:
 			[
-				{ name: "First Strike", type: "ability" }
+				{ ref: "mom:ability/unit/first_strike" }
 			]
 		}
 	}

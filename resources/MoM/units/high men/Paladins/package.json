@@ -80,10 +80,10 @@
 			},
 			abilities:
 			[
-				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
-				{ name: "Holy Bonus", type: "ability", value: 1 },
-				{ name: "Armor Piercing", type: "ability" },
-				{ name: "First Strike", type: "ability" }
+				{ ref: "mom:ability/unit/magic_immunity" },
+				{ ref: "mom:ability/unit/holy_bonus", value: 1 },
+				{ ref: "mom:ability/unit/armor_piercing" },
+				{ ref: "mom:ability/unit/first_strike" }
 			]
 		}
 	}

@@ -79,9 +79,9 @@
 			],
 			abilities:
 			[
-				{ name: "Leadership", type: "ability" },
-				{ name: "Super Legendary", type: "ability" },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/hero/leadership" },
+				{ ref: "mom:ability/hero/super_legendary" },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

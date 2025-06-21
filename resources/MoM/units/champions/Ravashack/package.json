@@ -88,12 +88,12 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 12.5 },
-				{ name: "Arcane Power", type: "ability" },
-				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
-				{ name: "Life Steal", type: "touch", touch: "life steal", value: 0, resist: true },
-				{ name: "Random", random: "mage" },
-				{ name: "Random", random: "mage" }
+				{ ref: "mom:ability/hero/caster", value: 12.5 },
+				{ ref: "mom:ability/hero/arcane_power" },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/life_steal", value: 0 },
+				{ ref: "mom:ability/unit/random/mage" },
+				{ ref: "mom:ability/unit/random/mage" }
 			],
 			spells:
 			[

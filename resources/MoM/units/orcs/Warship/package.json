@@ -68,9 +68,9 @@
 			},
 			abilities:
 			[
-				{ name: "Ranged Attack", type: "range", value: 99 },
-				{ name: "Transport", type: "ability", value: 3 },
-				{ name: "Long Range", type: "ability" }
+				{ ref: "mom:ability/unit/ranged_attack", value: 99 },
+				{ ref: "mom:ability/unit/transport", value: 3 },
+				{ ref: "mom:ability/unit/long_range" }
 			]
 		}
 	}

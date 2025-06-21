@@ -65,13 +65,13 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "Create Undead", type: "ability" },
-				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
-				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
-				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
-				{ name: "Death Immunity", type: "immunity", immunity: "death" },
-				{ name: "Poison Touch", type: "touch", touch: "poison", value: 1 }
+				{ ref: "mom:ability/unit/to_hit", value: 1 },
+				{ ref: "mom:ability/unit/create_undead" },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/cold_immunity" },
+				{ ref: "mom:ability/unit/death_immunity" },
+				{ ref: "mom:ability/unit/poison_touch", value: 1 }
 			]
 		}
 	}

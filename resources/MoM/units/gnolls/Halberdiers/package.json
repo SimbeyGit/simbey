@@ -76,7 +76,7 @@
 			},
 			abilities:
 			[
-				{ name: "Negate First Strike", type: "ability" }
+				{ ref: "mom:ability/unit/negate_first_strike" }
 			]
 		}
 	}

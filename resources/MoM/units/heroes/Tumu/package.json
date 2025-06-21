@@ -79,9 +79,9 @@
 			],
 			abilities:
 			[
-				{ name: "Blademaster", type: "ability" },
-				{ name: "Poison Touch", type: "touch", touch: "poison", value: 5 },
-				{ name: "Random", random: "figher" }
+				{ ref: "mom:ability/hero/blademaster" },
+				{ ref: "mom:ability/unit/poison_touch", value: 5 },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

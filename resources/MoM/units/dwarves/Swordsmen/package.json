@@ -76,8 +76,8 @@
 			},
 			abilities:
 			[
-				{ name: "Large Shield", type: "ability" },
-				{ name: "Mountaineer", type: "ability" }
+				{ ref: "mom:ability/unit/large_shield" },
+				{ ref: "mom:ability/unit/mountaineer" }
 			]
 		}
 	}

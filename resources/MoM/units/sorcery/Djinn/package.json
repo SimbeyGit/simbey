@@ -70,10 +70,10 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 3 },
-				{ name: "Teleporting", type: "ability" },
-				{ name: "Wind Walking", type: "ability" },
-				{ name: "Caster", type: "caster", value: 20.0 }
+				{ ref: "mom:ability/unit/to_hit", value: 3 },
+				{ ref: "mom:ability/unit/teleporting" },
+				{ ref: "mom:ability/unit/wind_walking" },
+				{ ref: "mom:ability/hero/caster", value: 20.0 }
 			]
 		}
 	}

@@ -70,9 +70,9 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 1 },
-				{ name: "First Strike", type: "ability" },
-				{ name: "Poison Touch", type: "touch", touch: "poison", value: 4 }
+				{ ref: "mom:ability/unit/to_hit", value: 1 },
+				{ ref: "mom:ability/unit/first_strike" },
+				{ ref: "mom:ability/unit/poison_touch", value: 4 }
 			]
 		}
 	}

@@ -84,9 +84,9 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 7.5 },
-				{ name: "Scouting", type: "ability", value: 3 },
-				{ name: "Purify" }
+				{ ref: "mom:ability/hero/caster", value: 7.5 },
+				{ ref: "mom:ability/unit/scouting", value: 3 },
+				{ ref: "mom:ability/unit/purify" }
 			]
 		}
 	}

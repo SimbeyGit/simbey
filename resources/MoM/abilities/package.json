@@ -1,0 +1,581 @@
+[
+	{
+		package: "buildsif",
+		name: "abilities.sif",
+		trim: false,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "abilities.json",
+		data:
+		[
+			{
+				ref: "mom:ability/hero/super_agility",
+				name: "Super Agility",
+				type: "hero",
+				image: "Hero_Agility.png"
+			},
+			{
+				ref: "mom:ability/hero/super_arcane_power",
+				name: "Super Arcane Power",
+				type: "hero",
+				image: "Hero_ArcanePower.png"
+			},
+			{
+				ref: "mom:ability/hero/super_armsmaster",
+				name: "Super Armsmaster",
+				type: "hero",
+				image: "Hero_Armsmaster.png"
+			},
+			{
+				ref: "mom:ability/hero/super_blademaster",
+				name: "Super Blademaster",
+				type: "hero",
+				image: "Hero_Blademaster.png"
+			},
+			{
+				ref: "mom:ability/hero/super_constitution",
+				name: "Super Constitution",
+				type: "hero",
+				image: "Hero_Constitution.png"
+			},
+			{
+				ref: "mom:ability/hero/super_leadership",
+				name: "Super Leadership",
+				type: "hero",
+				image: "Hero_Leadership.png"
+			},
+			{
+				ref: "mom:ability/hero/super_legendary",
+				name: "Super Legendary",
+				type: "hero",
+				image: "Hero_Legendary.png"
+			},
+			{
+				ref: "mom:ability/hero/super_might",
+				name: "Super Might",
+				type: "hero",
+				image: "Hero_Might.png"
+			},
+			{
+				ref: "mom:ability/hero/super_prayermaster",
+				name: "Super Prayermaster",
+				type: "hero",
+				image: "Hero_Prayermaster.png"
+			},
+			{
+				ref: "mom:ability/hero/super_sage",
+				name: "Super Sage",
+				type: "hero",
+				image: "Hero_Sage.png"
+			},
+			{
+				ref: "mom:ability/hero/agility",
+				name: "Agility",
+				type: "hero",
+				class: "any",
+				super: "mom:ability/hero/super_agility",
+				image: "Hero_Agility.png"
+			},
+			{
+				ref: "mom:ability/hero/arcane_power",
+				name: "Arcane Power",
+				type: "hero",
+				class: "mage",
+				super: "mom:ability/hero/super_arcane_power",
+				image: "Hero_ArcanePower.png"
+			},
+			{
+				ref: "mom:ability/hero/armsmaster",
+				name: "Armsmaster",
+				type: "hero",
+				class: "fighter",
+				super: "mom:ability/hero/super_armsmaster",
+				image: "Hero_Armsmaster.png"
+			},
+			{
+				ref: "mom:ability/hero/blademaster",
+				name: "Blademaster",
+				type: "hero",
+				class: "fighter",
+				super: "mom:ability/hero/super_blademaster",
+				image: "Hero_Blademaster.png"
+			},
+			{
+				ref: "mom:ability/hero/caster",
+				name: "Caster",
+				type: "hero",
+				class: "mage",
+				image: "Hero_Caster.png"
+			},
+			{
+				ref: "mom:ability/hero/charmed",
+				name: "Charmed",
+				type: "hero",
+				class: "any",
+				image: "Hero_Charmed.png"
+			},
+			{
+				ref: "mom:ability/hero/constitution",
+				name: "Constitution",
+				type: "hero",
+				class: "fighter",
+				super: "mom:ability/hero/super_constitution",
+				image: "Hero_Constitution.png"
+			},
+			{
+				ref: "mom:ability/hero/leadership",
+				name: "Leadership",
+				type: "hero",
+				class: "fighter",
+				super: "mom:ability/hero/super_leadership",
+				image: "Hero_Leadership.png"
+			},
+			{
+				ref: "mom:ability/hero/legendary",
+				name: "Legendary",
+				type: "hero",
+				class: "fighter",
+				super: "mom:ability/hero/super_legendary",
+				image: "Hero_Legendary.png"
+			},
+			{
+				ref: "mom:ability/hero/lucky",
+				name: "Lucky",
+				type: "hero",
+				class: "any",
+				image: "Hero_Lucky.png"
+			},
+			{
+				ref: "mom:ability/hero/might",
+				name: "Might",
+				type: "hero",
+				class: "fighter",
+				super: "mom:ability/hero/super_might",
+				image: "Hero_Might.png"
+			},
+			{
+				ref: "mom:ability/hero/noble",
+				name: "Noble",
+				type: "hero",
+				class: "any",
+				image: "Hero_Noble.png"
+			},
+			{
+				ref: "mom:ability/hero/prayermaster",
+				name: "Prayermaster",
+				type: "hero",
+				class: "mage",
+				super: "mom:ability/hero/super_prayermaster",
+				image: "Hero_Prayermaster.png"
+			},
+			{
+				ref: "mom:ability/hero/sage",
+				name: "Sage",
+				type: "hero",
+				class: "mage",
+				super: "mom:ability/hero/super_sage",
+				image: "Hero_Sage.png"
+			},
+			{
+				ref: "mom:ability/unit/armor_piercing",
+				name: "Armor Piercing",
+				type: "ability",
+				image: "Unit_ArmorPiercing.png"
+			},
+			{
+				ref: "mom:ability/unit/caster",
+				name: "Caster",
+				type: "caster",
+				image: "Unit_Caster.png"
+			},
+			{
+				ref: "mom:ability/unit/cause_fear",
+				name: "Cause Fear",
+				type: "ability",
+				image: "Unit_CauseFear.png"
+			},
+			{
+				ref: "mom:ability/unit/cold_breath",
+				name: "Cold Breath",
+				type: "breath",
+				damage: "cold",
+				armor_piercing: true,
+				image: "Unit_ColdBreath.png"
+			},
+			{
+				ref: "mom:ability/unit/cold_immunity",
+				name: "Cold Immunity",
+				type: "immunity",
+				immunity: ["cold"],
+				image: "Unit_ColdImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/construction",
+				name: "Construction",
+				type: "ability",
+				image: "Unit_Construction.png"
+			},
+			{
+				ref: "mom:ability/unit/create_outpost",
+				name: "Create Outpost",
+				type: "ability",
+				image: "Unit_CreateOutpost.png"
+			},
+			{
+				ref: "mom:ability/unit/create_undead",
+				name: "Create Undead",
+				type: "ability",
+				image: "Unit_CreateUndead.png"
+			},
+			{
+				ref: "mom:ability/unit/death_gaze",
+				name: "Death Gaze",
+				type: "gaze",
+				damage: "death",
+				armor_piercing: false,
+				image: "Unit_DeathGaze.png"
+			},
+			{
+				ref: "mom:ability/unit/death_immunity",
+				name: "Death Immunity",
+				type: "immunity",
+				immunity: ["death"],
+				image: "Unit_DeathImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/dispel_evil",
+				name: "Dispel Evil",
+				type: "ability",
+				image: "Unit_DispelEvil.png"
+			},
+			{
+				ref: "mom:ability/unit/doom_bolt",
+				name: "Doom Bolt",
+				type: "spell",
+				image: "Unit_DoomBolt.png"
+			},
+			{
+				ref: "mom:ability/unit/doom_gaze",
+				name: "Doom Gaze",
+				type: "gaze",
+				damage: "doom",
+				armor_piercing: false,
+				image: "Unit_DoomGaze.png"
+			},
+			{
+				ref: "mom:ability/unit/fireball_spell",
+				name: "Fireball Spell",
+				type: "spell",
+				image: "Unit_FireballSpell.png"
+			},
+			{
+				ref: "mom:ability/unit/fire_breath",
+				name: "Fire Breath",
+				type: "breath",
+				damage: "fire",
+				armor_piercing: false,
+				image: "Unit_FireBreath.png"
+			},
+			{
+				ref: "mom:ability/unit/fire_immunity",
+				name: "Fire Immunity",
+				type: "immunity",
+				immunity: ["fire"],
+				image: "Unit_FireImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/first_strike",
+				name: "First Strike",
+				type: "ability",
+				image: "Unit_FirstStrike.png"
+			},
+			{
+				ref: "mom:ability/unit/forester",
+				name: "Forester",
+				type: "ability",
+				image: "Unit_Forester.png"
+			},
+			{
+				ref: "mom:ability/unit/healer",
+				name: "Healer",
+				type: "ability",
+				image: "Unit_Healer.png"
+			},
+			{
+				ref: "mom:ability/unit/healing_spell",
+				name: "Healing Spell",
+				type: "spell",
+				image: "Unit_HealingSpell.png"
+			},
+			{
+				ref: "mom:ability/unit/holy_bonus",
+				name: "Holy Bonus",
+				type: "ability",
+				image: "Unit_HolyBonus.png"
+			},
+			{
+				ref: "mom:ability/unit/illusion",
+				name: "Illusion",
+				type: "ability",
+				image: "Unit_Illusion.png"
+			},
+			{
+				ref: "mom:ability/unit/illusions_immunity",
+				name: "Illusions Immunity",
+				type: "immunity",
+				immunity: ["illusions"],
+				image: "Unit_IllusionsImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/immolation",
+				name: "Immolation",
+				type: "ability",
+				image: "Unit_Immolation.png"
+			},
+			{
+				ref: "mom:ability/unit/invisibility",
+				name: "Invisibility",
+				type: "ability",
+				image: "Unit_Invisibility.png"
+			},
+			{
+				ref: "mom:ability/unit/large_shield",
+				name: "Large Shield",
+				type: "ability",
+				image: "Unit_LargeShield.png"
+			},
+			{
+				ref: "mom:ability/unit/life_steal",
+				name: "Life Steal",
+				type: "touch",
+				damage: "life steal",
+				armor_piercing: false,
+				image: "Unit_LifeSteal.png"
+			},
+			{
+				ref: "mom:ability/unit/lightning_breath",
+				name: "Lightning Breath",
+				type: "breath",
+				damage: "lightning",
+				armor_piercing: true,
+				image: "Unit_LightningBreath.png"
+			},
+			{
+				ref: "mom:ability/unit/long_range",
+				name: "Long Range",
+				type: "ability",
+				image: "Unit_LongRange.png"
+			},
+			{
+				ref: "mom:ability/unit/lucky",
+				name: "Lucky",
+				type: "ability",
+				image: "Unit_Lucky.png"
+			},
+			{
+				ref: "mom:ability/unit/magic_immunity",
+				name: "Magic Immunity",
+				type: "immunity",
+				immunity: ["magic","fire","lightning","stoning","death","life steal","fear"],
+				image: "Unit_MagicImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/meld",
+				name: "Meld",
+				type: "ability",
+				image: "Unit_Meld.png"
+			},
+			{
+				ref: "mom:ability/unit/merging",
+				name: "Merging",
+				type: "ability",
+				image: "Unit_Merging.png"
+			},
+			{
+				ref: "mom:ability/unit/missile_immunity",
+				name: "Missile Immunity",
+				type: "immunity",
+				immunity: ["missile"],
+				image: "Unit_MissileImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/mountaineer",
+				name: "Mountaineer",
+				type: "ability",
+				image: "Unit_Mountaineer.png"
+			},
+			{
+				ref: "mom:ability/unit/negate_first_strike",
+				name: "Negate First Strike",
+				type: "ability",
+				image: "Unit_NegateFirstStrike.png"
+			},
+			{
+				ref: "mom:ability/unit/noncorporeal",
+				name: "Non-Corporeal",
+				type: "ability",
+				image: "Unit_NonCorporeal.png"
+			},
+			{
+				ref: "mom:ability/unit/pathfinding",
+				name: "Pathfinding",
+				type: "ability",
+				image: "Unit_PathFinding.png"
+			},
+			{
+				ref: "mom:ability/unit/plane_shift",
+				name: "Plane Shift",
+				type: "ability",
+				image: "Unit_PlaneShift.png"
+			},
+			{
+				ref: "mom:ability/unit/poison_immunity",
+				name: "Poison Immunity",
+				type: "immunity",
+				immunity: ["poison"],
+				image: "Unit_PoisonImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/poison_touch",
+				name: "Poison Touch",
+				type: "touch",
+				damage: "poison",
+				armor_piercing: false,
+				image: "Unit_PoisonTouch.png"
+			},
+			{
+				ref: "mom:ability/unit/purify",
+				name: "Purify",
+				type: "ability",
+				image: "Unit_Purify.png"
+			},
+			{
+				ref: "mom:ability/unit/ranged_attack",
+				name: "Ranged Attack",
+				type: "range",
+				image: "Unit_Quiver.png"
+			},
+			{
+				ref: "mom:ability/unit/regeneration",
+				name: "Regeneration",
+				type: "ability",
+				image: "Unit_Regeneration.png"
+			},
+			{
+				ref: "mom:ability/unit/resistance_all",
+				name: "Resistance to All",
+				type: "ability",
+				image: "Unit_ResistanceToAll.png"
+			},
+			{
+				ref: "mom:ability/unit/scouting",
+				name: "Scouting",
+				type: "ability",
+				image: "Unit_Scouting.png"
+			},
+			{
+				ref: "mom:ability/unit/stoning_gaze",
+				name: "Stoning Gaze",
+				type: "gaze",
+				damage: "stoning",
+				armor_piercing: false,
+				image: "Unit_StoningGaze.png"
+			},
+			{
+				ref: "mom:ability/unit/stoning_immunity",
+				name: "Stoning Immunity",
+				type: "immunity",
+				immunity: ["stoning"],
+				image: "Unit_StoningImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/stoning_touch",
+				name: "Stoning Touch",
+				type: "touch",
+				damage: "stoning",
+				armor_piercing: false,
+				image: "Unit_StoningTouch.png"
+			},
+			{
+				ref: "mom:ability/unit/summon_demons",
+				name: "Summon Demons",
+				type: "summon",
+				summon: "mom:unit/death/demons",
+				image: "Unit_SummonDemons.png"
+			},
+			{
+				ref: "mom:ability/unit/teleporting",
+				name: "Teleporting",
+				type: "ability",
+				image: "Unit_Teleporting.png"
+			},
+			{
+				ref: "mom:ability/unit/thrown",
+				name: "Thrown",
+				type: "thrown",
+				image: "Unit_Thrown.png"
+			},
+			{
+				ref: "mom:ability/unit/to_hit",
+				name: "To Hit",
+				type: "tohit",
+				image: "Unit_ToHit.png"
+			},
+			{
+				ref: "mom:ability/unit/wall_crusher",
+				name: "Wall Crusher",
+				type: "ability",
+				image: "Unit_WallCrusher.png"
+			},
+			{
+				ref: "mom:ability/unit/weapon_immunity",
+				name: "Weapon Immunity",
+				type: "immunity",
+				immunity: ["weapon"],
+				image: "Unit_WeaponImmunity.png"
+			},
+			{
+				ref: "mom:ability/unit/wind_walking",
+				name: "Wind Walking",
+				type: "ability",
+				image: "Unit_WindWalking.png"
+			},
+			{
+				ref: "mom:ability/unit/web_spell",
+				name: "Web Spell",
+				type: "spell",
+				image: "Unit_WebSpell.png"
+			},
+			{
+				ref: "mom:ability/unit/transport",
+				name: "Transport",
+				type: "transport",
+				image: "Unit_Transport.png"
+			},
+			{
+				ref: "mom:ability/unit/random/fighter",
+				name: "Random Fighter",
+				type: "random",
+				class: "fighter",
+				image: "Unit_Random.png"
+			},
+			{
+				ref: "mom:ability/unit/random/mage",
+				name: "Random Mage",
+				type: "random",
+				class: "mage",
+				image: "Unit_Random.png"
+			},
+			{
+				ref: "mom:ability/unit/random/any",
+				name: "Random Any",
+				type: "random",
+				class: "any",
+				image: "Unit_Random.png"
+			}
+		]
+	}
+]

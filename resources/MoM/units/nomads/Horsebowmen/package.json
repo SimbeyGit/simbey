@@ -84,7 +84,7 @@
 			},
 			abilities:
 			[
-				{ name: "Ranged Attack", type: "range", value: 8 }
+				{ ref: "mom:ability/unit/ranged_attack", value: 8 }
 			]
 		}
 	}

@@ -72,8 +72,8 @@
 			],
 			abilities:
 			[
-				{ name: "Mountaineer", type: "ability" },
-				{ name: "Constitution", type: "ability" }
+				{ ref: "mom:ability/unit/mountaineer" },
+				{ ref: "mom:ability/hero/constitution" }
 			]
 		}
 	}

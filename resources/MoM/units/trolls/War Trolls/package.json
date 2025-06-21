@@ -75,7 +75,7 @@
 			},
 			abilities:
 			[
-				{ name: "Regeneration", type: "ability" }
+				{ ref: "mom:ability/unit/regeneration" }
 			]
 		}
 	}

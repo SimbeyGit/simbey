@@ -81,10 +81,10 @@
 			},
 			abilities:
 			[
-				{ name: "Fire Breath", type: "breath", breath: "fire", value: 1 },
-				{ name: "Ranged Attack", type: "range", value: 4 },
-				{ name: "Healer", type: "ability" },
-				{ name: "Purify", type: "ability" }
+				{ ref: "mom:ability/unit/fire_breath", value: 1 },
+				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
+				{ ref: "mom:ability/unit/healer" },
+				{ ref: "mom:ability/unit/purify" }
 			]
 		}
 	}

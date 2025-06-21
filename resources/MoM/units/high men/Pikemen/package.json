@@ -76,8 +76,8 @@
 			},
 			abilities:
 			[
-				{ name: "Negate First Strike", type: "ability" },
-				{ name: "Armor Piercing", type: "ability" }
+				{ ref: "mom:ability/unit/negate_first_strike" },
+				{ ref: "mom:ability/unit/armor_piercing" }
 			]
 		}
 	}

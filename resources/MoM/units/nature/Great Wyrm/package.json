@@ -65,9 +65,9 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 3 },
-				{ name: "Merging", type: "ability" },
-				{ name: "Poison Touch", type: "touch", touch: "poison", value: 15 }
+				{ ref: "mom:ability/unit/to_hit", value: 3 },
+				{ ref: "mom:ability/unit/merging" },
+				{ ref: "mom:ability/unit/poison_touch", value: 15 }
 			]
 		}
 	}

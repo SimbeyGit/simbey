@@ -77,8 +77,8 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 7.5 },
-				{ name: "Sage", type: "ability" }
+				{ ref: "mom:ability/hero/caster", value: 7.5 },
+				{ ref: "mom:ability/hero/sage" }
 			],
 			spells:
 			[

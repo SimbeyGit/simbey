@@ -80,8 +80,8 @@
 			},
 			abilities:
 			[
-				{ name: "Fire Breath", type: "breath", breath: "fire", value: 6 },
-				{ name: "Scouting", type: "ability", value: 2 }
+				{ ref: "mom:ability/unit/fire_breath", value: 6 },
+				{ ref: "mom:ability/unit/scouting", value: 2 }
 			]
 		}
 	}

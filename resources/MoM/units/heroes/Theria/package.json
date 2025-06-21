@@ -72,8 +72,8 @@
 			],
 			abilities:
 			[
-				{ name: "Agility", type: "ability" },
-				{ name: "Charmed", type: "ability" }
+				{ ref: "mom:ability/hero/agility" },
+				{ ref: "mom:ability/hero/charmed" }
 			]
 		}
 	}

@@ -77,10 +77,10 @@
 			],
 			abilities:
 			[
-				{ name: "Ranged Attack", type: "range", value: 8 },
-				{ name: "Blademaster", type: "ability" },
-				{ name: "Pathfinding", type: "ability" },
-				{ name: "Random", random: "fighter" }
+				{ ref: "mom:ability/unit/ranged_attack", value: 8 },
+				{ ref: "mom:ability/hero/blademaster" },
+				{ ref: "mom:ability/unit/pathfinding" },
+				{ ref: "mom:ability/unit/random/fighter" }
 			]
 		}
 	}

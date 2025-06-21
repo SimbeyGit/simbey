@@ -66,11 +66,11 @@
 			},
 			abilities:
 			[
-				{ name: "To Hit", type: "tohit", value: 3 },
-				{ name: "Cause Fear", type: "ability" },
-				{ name: "Cold Immunity", type: "immunity", immunity: "cold" },
-				{ name: "Cold Breath", type: "breath", breath: "cold", value: 20, armor_piercing: true },
-				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" }
+				{ ref: "mom:ability/unit/to_hit", value: 3 },
+				{ ref: "mom:ability/unit/cause_fear" },
+				{ ref: "mom:ability/unit/cold_immunity" },
+				{ ref: "mom:ability/unit/cold_breath", value: 20 },
+				{ ref: "mom:ability/unit/illusions_immunity" }
 			]
 		}
 	}

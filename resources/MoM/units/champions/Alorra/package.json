@@ -84,13 +84,13 @@
 			],
 			abilities:
 			[
-				{ name: "Caster", type: "caster", value: 5 },
-				{ name: "Ranged Attack", type: "range", value: 8 },
-				{ name: "Blademaster", type: "ability" },
-				{ name: "Forester", type: "ability" },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" },
-				{ name: "Random", random: "any" }
+				{ ref: "mom:ability/hero/caster", value: 5 },
+				{ ref: "mom:ability/unit/ranged_attack", value: 8 },
+				{ ref: "mom:ability/hero/blademaster" },
+				{ ref: "mom:ability/unit/forester" },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" },
+				{ ref: "mom:ability/unit/random/any" }
 			],
 			spells:
 			[
