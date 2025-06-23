@@ -145,6 +145,7 @@ public:
 	VOID SnapCoordinate (FLOAT& x, FLOAT& y);
 
 private:
+	DWORD GetPolygonFromLine (FPOINT a, FPOINT b, DWORD idIgnore);
 	DWORD GetPolygonFromPoint (FLOAT x, FLOAT y, DWORD idIgnore);
 	VOID DeselectAll (UINT nRemove = CAD_SELECTED | CAD_HOVER | CAD_DRAWING);
 	HRESULT SplitLine (FLOAT x, FLOAT y, __out_opt DWORD* pidVertex);
@@ -172,4 +173,9 @@ private:
 	static bool IsPointEqual (const FPOINT& fpA, const FPOINT& fpB);
 	static void ToggleSelection (UINT& nFlags, BOOL fSelect, __inout BOOL& fChanged);
 	static FLOAT CrossProduct (const FPOINT& a, const FPOINT& b, FLOAT x, FLOAT y);
+
+	HRESULT DiffPolygon (DWORD subPolygonKey, DWORD clipPolygonKey);
+	HRESULT GetPolygonPoints (DWORD polygonId, __out TArray<FPOINT>& polygonPoints);
+	HRESULT OrderPolygonPoints (TArray<DWORD>& polygon, __out TArray<DWORD>& orderedPolygon);
+	VOID SetPolygonIDToLine (DWORD idVertexA, DWORD idVertexB, DWORD subPolygonKey, DWORD clipPoligonKey);
 };
