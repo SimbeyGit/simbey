@@ -260,6 +260,7 @@ namespace QuadooVM
 		INT_ATAN2,			// atan2(y, x) - Returns the angle in the plane (in radians) between the positive x-axis and the ray from (0, 0) to the point (x, y)
 		INT_DOEVENTS,		// doevents(oEvents, msTimeout) - Processes events (IQuadooWaitForEvents) until the timeout has occurred
 		INT_DOEVENTS_WAIT,	// doevents(oEvents, aHandles, msTimeout) - Processes events (IQuadooWaitForEvents) until the timeout or an event handle has been triggered
+		INT_DOT,			// dot(aSet1, aSet2) - Calculates dot product between two arrays
 		INT_TYPEOF = 0xFF	// typeof(value) - Return the type of the value using the Type enumeration below
 	};
 
@@ -511,7 +512,7 @@ interface __declspec(uuid("E8B88B7C-3FE7-4d6f-AB84-9827882E465E")) IQuadooArray 
 	virtual HRESULT STDMETHODCALLTYPE Splice (sysint nInsertAt, sysint cRemove, const QuadooVM::QVARIANT* pqv) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Slice (sysint nBegin, sysint nEnd, __out QuadooVM::QVARIANT* pqv) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Swap (sysint nItemA, sysint nItemB) = 0;
-	virtual VOID STDMETHODCALLTYPE Sort (INT (WINAPI* pfnCallback)(QuadooVM::QVARIANT* pqvLeft, QuadooVM::QVARIANT* pqvRight, PVOID pvParam), PVOID pvParam) = 0;
+	virtual HRESULT STDMETHODCALLTYPE Sort (INT (WINAPI* pfnCallback)(QuadooVM::QVARIANT* pqvLeft, QuadooVM::QVARIANT* pqvRight, PVOID pvParam), PVOID pvParam) = 0;
 };
 
 interface __declspec(uuid("48A8AD92-4BA4-476f-9BF1-E58F8295FDE5")) IQuadooMap : IQuadooContainer
@@ -715,6 +716,7 @@ HRESULT WINAPI QVMFindJSONArrayObject (IJSONArray* pJSONArray, QuadooVM::QVARIAN
 HRESULT WINAPI QVMDeleteProperty (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARIANT* pqvProperty, __out QuadooVM::QVARIANT* pqvResult);
 HRESULT WINAPI QVMCreateLineReader (ISequentialStream* pStream, __out QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMMapFind (QuadooVM::QVARIANT* pqvArgs, __out QuadooVM::QVARIANT* pqvResult);
+HRESULT WINAPI QVMDot (QuadooVM::QVARIANT* pqvSet1, QuadooVM::QVARIANT* pqvSet2, __out QuadooVM::QVARIANT* pqv);
 
 inline HRESULT GetSysIntFromVariant (const QuadooVM::QVARIANT* pqv, __out sysint* pnValue)
 {
