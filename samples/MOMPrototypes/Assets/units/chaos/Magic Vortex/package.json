@@ -1,0 +1,58 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			type: "fantastic",
+			name: "Magic Vortex",
+			realm: "chaos",
+			figures: 1,
+			animation: "cycling",
+			stats:
+			{
+				move:
+				[
+					{
+						stat: "air",
+						sound: "Whoosh.mp3",
+						value: 1
+					}
+				],
+				defense: 10,
+				resist: 15,
+				hits: 30
+			},
+			abilities:
+			[
+				{ name: "Chaotic", type: "moves", moves: 3 },
+				{ name: "Adjacent Damage", type: "aura", chance: 33 },
+				{ name: "Poison Immunity", type: "immunity", immunity: "poison" },
+				{ name: "Weapon Immunity", type: "immunity", immunity: "weapon" },
+				{ name: "Missile Immunity", type: "immunity", immunity: "missile" },
+				{ name: "Illusions Immunity", type: "immunity", immunity: "illusions" },
+				{ name: "Magic Immunity", type: "immunity", immunity: ["magic", "fire", "lightning", "stoning", "death", "life steal", "fear"] },
+				{ name: "Lightning Breath", type: "breath", breath: "lightning", value: 5,
+					abilities:
+					[
+						{ name: "Armor Piercing", type: "ability" }
+					]
+				}
+			]
+		}
+	}
+]
