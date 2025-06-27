@@ -12,6 +12,9 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
@@ -66,12 +69,92 @@
 				AdditionalDependencies="SimbeyCore.lib JSON.lib QuadooParser.lib QuadooVM.lib"
 				OutputFile="$(OutDir)\$(ProjectName).pyd"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\Python\libs;..\..\..\target\lib\debug"
+				AdditionalLibraryDirectories="..\Python\libs\x86;..\..\..\target\lib\debug"
 				ModuleDefinitionFile="PyQuadoo.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				ImportLibrary="..\..\..\target\lib\$(ConfigurationName)\$(ProjectName).lib"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="..\..\..\target\$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\QuadooScript;..\Python"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PYQUADOO_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT;_CHECK_REPORT_ERROR;PYTHON_RELEASE_ALWAYS"
+				MinimalRebuild="true"
+				ExceptionHandling="0"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				ShowIncludes="false"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="SimbeyCore.lib JSON.lib QuadooParser.lib QuadooVM.lib"
+				OutputFile="$(OutDir)\$(ProjectName).pyd"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\Python\libs\x64;..\..\..\target\lib\debug\x64"
+				ModuleDefinitionFile="PyQuadoo.def"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				ImportLibrary="..\..\..\target\lib\$(ConfigurationName)\$(PlatformName)\$(ProjectName).lib"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -145,7 +228,7 @@
 				AdditionalDependencies="SimbeyCore.lib JSON.lib QuadooParser.lib QuadooVM.lib"
 				OutputFile="$(OutDir)\$(ProjectName).pyd"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\Python\libs;..\..\..\target\lib\release"
+				AdditionalLibraryDirectories="..\Python\libs\x86;..\..\..\target\lib\release"
 				ModuleDefinitionFile="PyQuadoo.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -153,6 +236,88 @@
 				EnableCOMDATFolding="2"
 				ImportLibrary="..\..\..\target\lib\$(ConfigurationName)\$(ProjectName).lib"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="..\..\..\target\$(ConfigurationName)\$(PlatformName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\QuadooScript;..\Python"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYQUADOO_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT;_CHECK_REPORT_ERROR"
+				ExceptionHandling="0"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="SimbeyCore.lib JSON.lib QuadooParser.lib QuadooVM.lib"
+				OutputFile="$(OutDir)\$(ProjectName).pyd"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Python\libs\x64;..\..\..\target\lib\release\x64"
+				ModuleDefinitionFile="PyQuadoo.def"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				ImportLibrary="..\..\..\target\lib\$(ConfigurationName)\$(PlatformName)\$(ProjectName).lib"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"

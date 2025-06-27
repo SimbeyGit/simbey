@@ -17,6 +17,59 @@
 	#include <intrin.h>
 #else
 
+#ifdef	_WIN64
+
+static __inline char _InterlockedCompareExchange8 (volatile char* pTarget, char exchange, char comparand)
+{
+    // Determine the aligned DWORD address
+    ULONG_PTR addr = (ULONG_PTR)pTarget;
+    ULONG_PTR aligned = addr & ~3ULL;
+    int byteOffset = (int)(addr - aligned);
+
+    // Access as a volatile 32-bit pointer
+    volatile LONG* pAligned = (volatile LONG*)aligned;
+
+    LONG oldValue;
+    LONG newValue;
+    char result;
+
+    do {
+        oldValue = *pAligned;
+
+        // Extract target byte from old value
+        result = (char)((oldValue >> (byteOffset * 8)) & 0xFF);
+
+        if (result != comparand)
+            break;
+
+        // Replace target byte in the DWORD
+        newValue = (oldValue & ~(0xFF << (byteOffset * 8))) | ((exchange & 0xFF) << (byteOffset * 8));
+    }
+    while (_InterlockedCompareExchange(pAligned, newValue, oldValue) != oldValue);
+
+    return result;
+}
+
+static __inline char _InterlockedExchange8 (volatile char* target, char value)
+{
+    char old;
+    do {
+        old = *target;
+    } while (_InterlockedCompareExchange8(target, value, old) != old);
+    return old;
+}
+
+static __inline short _InterlockedExchange16 (volatile short* target, short value)
+{
+    short old;
+    do {
+        old = *target;
+    } while (_InterlockedCompareExchange16(target, value, old) != old);
+    return old;
+}
+
+#else
+
 static __inline char _InterlockedExchange8 (volatile char* dest, char value)
 {
     __asm
@@ -60,6 +113,8 @@ static __inline char _InterlockedCompareExchange8 (volatile char* dest, char exc
     // not reachable without compiler support — wrap in inline asm macro if needed
     return 0;
 }
+
+#endif
 
 // 8-bit atomic exchange add (simulate with CAS loop)
 static __inline char _InterlockedExchangeAdd8 (volatile char* ptr, char val)

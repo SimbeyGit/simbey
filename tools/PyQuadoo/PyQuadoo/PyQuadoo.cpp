@@ -152,7 +152,16 @@ HRESULT PythonToRSTRING (PyObject* pyValue, __deref_out RSTRING* prstrValue)
 
 	if(pwzValue)
 	{
-		hr = RStrCreateW(cchValue, pwzValue, prstrValue);
+#ifdef	_WIN64
+		if(cchValue <= INT_MAX)
+		{
+#endif
+		hr = RStrCreateW(static_cast<INT>(cchValue), pwzValue, prstrValue);
+#ifdef	_WIN64
+		}
+		else
+			hr = DISP_E_OVERFLOW;
+#endif
 		PyMem_Free(pwzValue);
 
 		if(FAILED(hr))
@@ -362,7 +371,11 @@ static PyObject* PyCompileText (PyObject* self, PyObject* args)
 	pwzScript = PyUnicode_AsWideCharString(pyScript, &cchScript);
 	PyCheckIf(NULL == pwzScript, DISP_E_BADVARTYPE);
 
-	PyCheck(QuadooParseTextToStream(NULL, 0, pwzScript, cchScript, QUADOO_COMPILE_LINE_NUMBER_MAP, &stmByteCode, NULL, &status));
+#ifdef	_WIN64
+	PyCheckIf(cchScript > INT_MAX, DISP_E_OVERFLOW);
+#endif
+
+	PyCheck(QuadooParseTextToStream(NULL, 0, pwzScript, static_cast<INT>(cchScript), QUADOO_COMPILE_LINE_NUMBER_MAP, &stmByteCode, NULL, &status));
 	pyResult = (PyObject*)PyBytes_FromStringAndSize(stmByteCode.TGetReadPtr<CHAR>(), stmByteCode.DataRemaining());
 
 Cleanup:

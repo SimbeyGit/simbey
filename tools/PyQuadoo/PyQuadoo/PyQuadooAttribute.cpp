@@ -16,9 +16,12 @@ static PyObject* PyQuadooAttribute_call (PyQuadooAttribute* self, PyObject* args
 	PyObject* pyResult = NULL;
 	QuadooVM::QVPARAMS qvParams;
 	QuadooVM::QVARIANT qvResult; qvResult.eType = QuadooVM::Null;
+	Py_ssize_t cArgs = PyTuple_Size(args);
 
-	qvParams.cArgs = PyTuple_Size(args);
-	if(0 < qvParams.cArgs)
+	PyCheckIf(cArgs > 255, DISP_E_OVERFLOW);
+
+	qvParams.cArgs = static_cast<BYTE>(cArgs);
+	if(0 < cArgs)
 	{
 		qvParams.pqvArgs = __new QuadooVM::QVARIANT[qvParams.cArgs];
 		PyCheckAlloc(qvParams.pqvArgs);
