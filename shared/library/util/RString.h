@@ -157,3 +157,100 @@ HRESULT WINAPI RStrReplaceSubStringIA (RSTRING rstrSource, PCSTR pcszFind, INT c
 HRESULT WINAPI RStrReplaceSubStringIW (RSTRING rstrSource, PCWSTR pcwzFind, INT cchFind, PCWSTR pcwzReplace, INT cchReplace, __deref_out RSTRING* prstrResult);
 
 HRESULT WINAPI RStrFromGUID (REFGUID rguid, __deref_out RSTRING* prstrGUIDW);
+
+class CRString
+{
+private:
+	RSTRING m_rstrValue;
+
+public:
+	CRString () :
+		m_rstrValue(NULL)
+	{
+	}
+
+	CRString (RSTRING rstrValue)
+	{
+		RStrSet(m_rstrValue, rstrValue);
+	}
+
+	CRString (const CRString& rsOther)
+	{
+		RStrSet(m_rstrValue, rsOther.m_rstrValue);
+	}
+
+	~CRString ()
+	{
+		RStrRelease(m_rstrValue);
+	}
+
+#if _MSC_VER >= 1700  // Visual Studio 2012 or newer supports move semantics
+    CRString (CRString&& other) noexcept
+    {
+        m_rstrValue = other.m_rstrValue;
+        other.m_rstrValue = NULL;
+    }
+
+    CRString& operator= (CRString&& other) noexcept
+    {
+        if(this != &other)
+        {
+            RStrRelease(m_rstrValue);
+            m_rstrValue = other.m_rstrValue;
+            other.m_rstrValue = NULL;
+        }
+        return *this;
+    }
+#endif
+
+	CRString& operator= (const CRString& rsOther)
+	{
+		RStrReplace(&m_rstrValue, rsOther.m_rstrValue);
+		return *this;
+	}
+
+	operator RSTRING () const
+	{
+		return m_rstrValue;
+	}
+
+	RSTRING operator* ()
+	{
+		return m_rstrValue;
+	}
+
+	RSTRING* operator& ()
+	{
+		Assert(NULL == m_rstrValue);
+		return &m_rstrValue;
+	}
+
+	operator bool () const
+	{
+		return (NULL != m_rstrValue);
+	}
+
+	bool operator! () const
+	{
+		return (NULL == m_rstrValue);
+	}
+
+	bool operator== (RSTRING rstrOther) const
+	{
+		INT nResult;
+		return SUCCEEDED(RStrCompareRStr(m_rstrValue, rstrOther, &nResult)) && 0 == nResult;
+	}
+
+	CRString& operator= (__in_opt RSTRING rstrOther)
+	{
+		RStrReplace(&m_rstrValue, rstrOther);
+		return *this;
+	}
+
+	inline RSTRING Detach (VOID)
+	{
+		RSTRING rstrDetached = m_rstrValue;
+		m_rstrValue = NULL;
+		return rstrDetached;
+	}
+};

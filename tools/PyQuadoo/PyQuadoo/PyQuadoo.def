@@ -1,0 +1,4 @@
+LIBRARY "PyQuadoo"
+
+EXPORTS
+	PyInit_PyQuadoo
