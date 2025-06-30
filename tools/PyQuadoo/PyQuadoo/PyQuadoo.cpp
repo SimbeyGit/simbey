@@ -8,6 +8,7 @@
 #include "PyQuadooObject.h"
 #include "PyQuadooVM.h"
 #include "PyQuadooLoader.h"
+#include "PyQuadooArray.h"
 
 typedef HRESULT (__stdcall* PFNGETCLASSOBJECT)(REFCLSID, REFIID, LPVOID);
 
@@ -176,7 +177,7 @@ HRESULT PythonToRSTRING (PyObject* pyValue, __deref_out RSTRING* prstrValue)
 	return hr;
 }
 
-HRESULT QuadooToPython (QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue)
+HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue)
 {
 	HRESULT hr;
 
@@ -289,6 +290,12 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 		PyQuadooObject* pyObject = (PyQuadooObject*)pyValue;
 		pqv->eType = QuadooVM::Object;
 		SetInterface(pqv->pObject, pyObject->pObject);
+	}
+	else if(PyList_Check(pyValue))
+	{
+		pqv->pArray = __new CPyQuadooArray(pyValue);
+		CheckAlloc(pqv->pArray);
+		pqv->eType = QuadooVM::Array;
 	}
 	else if(pyValue == Py_None)
 		pqv->eType = QuadooVM::Null;

@@ -359,6 +359,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PyQuadooArray.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PyQuadooAttribute.cpp"
 				>
 			</File>
@@ -382,6 +386,10 @@
 			>
 			<File
 				RelativePath=".\PyQuadoo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PyQuadooArray.h"
 				>
 			</File>
 			<File
@@ -1458,6 +1466,14 @@
 		<Filter
 			Name="Library"
 			>
+			<File
+				RelativePath="..\..\..\shared\library\Sorting.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\shared\library\Sorting.h"
+				>
+			</File>
 			<Filter
 				Name="Util"
 				>

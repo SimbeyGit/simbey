@@ -4,7 +4,7 @@
 #include "Published\QuadooVM.h"
 
 HRESULT PythonToRSTRING (PyObject* pyValue, __deref_out RSTRING* prstrValue);
-HRESULT QuadooToPython (QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue);
+HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue);
 HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv);
 
 VOID SetHResultError (HRESULT hr);
