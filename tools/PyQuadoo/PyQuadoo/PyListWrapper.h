@@ -3,7 +3,7 @@
 #include "Library\Core\BaseUnknown.h"
 #include "PyQuadoo.h"
 
-class CPyQuadooArray :
+class __declspec(uuid("A9CDBADA-30D6-4adf-8021-1C7561F7E7F2")) CPyListWrapper :
 	public CBaseUnknown,
 	public IQuadooArray
 {
@@ -14,13 +14,16 @@ public:
 	IMP_BASE_UNKNOWN
 
 	BEGIN_UNK_MAP
+		UNK_INTERFACE(CPyListWrapper)
 		UNK_INTERFACE(IQuadooArray)
 		UNK_INTERFACE(IQuadooContainer)
 	END_UNK_MAP
 
 public:
-	CPyQuadooArray (PyObject* pyList);
-	~CPyQuadooArray ();
+	CPyListWrapper (PyObject* pyList);
+	~CPyListWrapper ();
+
+	inline PyObject* GetPyList (VOID) { return m_pyList; }
 
 	// IQuadooContainer
 	virtual sysint STDMETHODCALLTYPE Length (VOID);

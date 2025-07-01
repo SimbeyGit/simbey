@@ -1,7 +1,7 @@
 #include "WinPython.h"
 #include "Library\Core\CoreDefs.h"
 #include "Library\Sorting.h"
-#include "PyQuadooArray.h"
+#include "PyListWrapper.h"
 
 struct SORT_DATA
 {
@@ -9,25 +9,25 @@ struct SORT_DATA
 	PVOID pvParam;
 };
 
-CPyQuadooArray::CPyQuadooArray (PyObject* pyList) :
+CPyListWrapper::CPyListWrapper (PyObject* pyList) :
 	m_pyList(pyList)
 {
 	Py_XINCREF(m_pyList);
 }
 
-CPyQuadooArray::~CPyQuadooArray ()
+CPyListWrapper::~CPyListWrapper ()
 {
 	Py_XDECREF(m_pyList);
 }
 
 // IQuadooContainer
 
-sysint STDMETHODCALLTYPE CPyQuadooArray::Length (VOID)
+sysint STDMETHODCALLTYPE CPyListWrapper::Length (VOID)
 {
 	return static_cast<sysint>(PyList_Size(m_pyList));
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::SetItem (sysint nItem, const QuadooVM::QVARIANT* pqv)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::SetItem (sysint nItem, const QuadooVM::QVARIANT* pqv)
 {
 	HRESULT hr;
 	PyObject* pyObject = NULL;
@@ -42,7 +42,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::GetItem (sysint nItem, __out QuadooVM::QVARIANT* pqv)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::GetItem (sysint nItem, __out QuadooVM::QVARIANT* pqv)
 {
 	HRESULT hr;
 	PyObject* pyObject = PyList_GetItem(m_pyList, nItem);
@@ -54,7 +54,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::RemoveItem (sysint nItem, __out_opt QuadooVM::QVARIANT* pqv)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::RemoveItem (sysint nItem, __out_opt QuadooVM::QVARIANT* pqv)
 {
 	HRESULT hr;
 	Py_ssize_t nSize = PyList_Size(m_pyList);
@@ -71,19 +71,19 @@ Cleanup:
 	return hr;
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::Compact (VOID)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::Compact (VOID)
 {
 	return S_FALSE;
 }
 
-VOID STDMETHODCALLTYPE CPyQuadooArray::Clear (VOID)
+VOID STDMETHODCALLTYPE CPyListWrapper::Clear (VOID)
 {
 	PyList_SetSlice(m_pyList, 0, PyList_Size(m_pyList), NULL);
 }
 
 // IQuadooArray
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::InsertAt (const QuadooVM::QVARIANT* pqv, sysint nInsert)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::InsertAt (const QuadooVM::QVARIANT* pqv, sysint nInsert)
 {
 	HRESULT hr;
 	PyObject* pyObject = NULL;
@@ -105,7 +105,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::Append (const QuadooVM::QVARIANT* pqv)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::Append (const QuadooVM::QVARIANT* pqv)
 {
 	HRESULT hr;
 	PyObject* pyObject = NULL;
@@ -120,7 +120,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::Splice (sysint nInsertAt, sysint cRemove, const QuadooVM::QVARIANT* pqv)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::Splice (sysint nInsertAt, sysint cRemove, const QuadooVM::QVARIANT* pqv)
 {
 	HRESULT hr;
 	Py_ssize_t nSize = PyList_Size(m_pyList);
@@ -165,7 +165,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::Slice (sysint nBegin, sysint nEnd, __out QuadooVM::QVARIANT* pqv)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::Slice (sysint nBegin, sysint nEnd, __out QuadooVM::QVARIANT* pqv)
 {
 	HRESULT hr;
 	Py_ssize_t nSize = PyList_Size(m_pyList);
@@ -180,7 +180,7 @@ HRESULT STDMETHODCALLTYPE CPyQuadooArray::Slice (sysint nBegin, sysint nEnd, __o
 	PyObject* pySlice = PyList_GetSlice(m_pyList, nBegin, nEnd);
 	CheckIf(NULL == pySlice, E_FAIL);
 
-	pqv->pArray = __new CPyQuadooArray(pySlice);
+	pqv->pArray = __new CPyListWrapper(pySlice);
 	CheckAlloc(pqv->pArray);
 	hr = S_OK;
 
@@ -189,7 +189,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::Swap (sysint nItemA, sysint nItemB)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::Swap (sysint nItemA, sysint nItemB)
 {
 	HRESULT hr;
 	Py_ssize_t nSize = PyList_Size(m_pyList);
@@ -228,7 +228,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT STDMETHODCALLTYPE CPyQuadooArray::Sort (INT (WINAPI* pfnCallback)(QuadooVM::QVARIANT* pqvLeft, QuadooVM::QVARIANT* pqvRight, PVOID pvParam), PVOID pvParam)
+HRESULT STDMETHODCALLTYPE CPyListWrapper::Sort (INT (WINAPI* pfnCallback)(QuadooVM::QVARIANT* pqvLeft, QuadooVM::QVARIANT* pqvRight, PVOID pvParam), PVOID pvParam)
 {
 	HRESULT hr;
 	Py_ssize_t nSize = PyList_Size(m_pyList);
@@ -266,7 +266,7 @@ Cleanup:
 	return hr;
 }
 
-INT WINAPI CPyQuadooArray::_SortPython (PyObject** ppyLeft, PyObject** ppyRight, PVOID pvParam)
+INT WINAPI CPyListWrapper::_SortPython (PyObject** ppyLeft, PyObject** ppyRight, PVOID pvParam)
 {
 	INT nResult;
 	QuadooVM::QVARIANT qvLeft, qvRight;

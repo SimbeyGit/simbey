@@ -8,7 +8,8 @@
 #include "PyQuadooObject.h"
 #include "PyQuadooVM.h"
 #include "PyQuadooLoader.h"
-#include "PyQuadooArray.h"
+#include "PyObjectWrapper.h"
+#include "PyListWrapper.h"
 
 typedef HRESULT (__stdcall* PFNGETCLASSOBJECT)(REFCLSID, REFIID, LPVOID);
 
@@ -233,10 +234,39 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 
 	case QuadooVM::Object:
 		{
-			PyQuadooObject* pyObject = PyObject_New(PyQuadooObject, PY_QUADOO_OBJECT());
-			CheckAlloc(pyObject);
-			SetInterface(pyObject->pObject, pqv->pObject);
-			*ppyValue = (PyObject*)pyObject;
+			CPyObjectWrapper* pObjectWrapper;
+
+			if(SUCCEEDED(pqv->pObject->QueryInterface(&pObjectWrapper)))
+			{
+				*ppyValue = pObjectWrapper->GetPyObject();
+				Py_XINCREF(*ppyValue);
+				pObjectWrapper->Release();
+			}
+			else
+			{
+				PyQuadooObject* pyObject = PyObject_New(PyQuadooObject, PY_QUADOO_OBJECT());
+				CheckAlloc(pyObject);
+				SetInterface(pyObject->pObject, pqv->pObject);
+				*ppyValue = (PyObject*)pyObject;
+			}
+		}
+		break;
+
+	case QuadooVM::Array:
+		{
+			CPyListWrapper* pListWrapper;
+
+			if(SUCCEEDED(pqv->pArray->QueryInterface(&pListWrapper)))
+			{
+				*ppyValue = pListWrapper->GetPyList();
+				Py_XINCREF(*ppyValue);
+				pListWrapper->Release();
+			}
+			else
+			{
+				// TODO - How can QuadooScript arrays be returned to Python?
+				Check(E_NOTIMPL);
+			}
 		}
 		break;
 
@@ -291,9 +321,15 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 		pqv->eType = QuadooVM::Object;
 		SetInterface(pqv->pObject, pyObject->pObject);
 	}
+	else if(PyObject_IsInstance(pyValue, (PyObject*)&PyBaseObject_Type))
+	{
+		pqv->pObject = __new CPyObjectWrapper(pyValue);
+		CheckAlloc(pqv->pObject);
+		pqv->eType = QuadooVM::Object;
+	}
 	else if(PyList_Check(pyValue))
 	{
-		pqv->pArray = __new CPyQuadooArray(pyValue);
+		pqv->pArray = __new CPyListWrapper(pyValue);
 		CheckAlloc(pqv->pArray);
 		pqv->eType = QuadooVM::Array;
 	}

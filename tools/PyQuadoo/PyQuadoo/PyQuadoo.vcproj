@@ -351,15 +351,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\PyListWrapper.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PyObjectWrapper.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PyQuadoo.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\PyQuadoo.def"
-				>
-			</File>
-			<File
-				RelativePath=".\PyQuadooArray.cpp"
 				>
 			</File>
 			<File
@@ -385,11 +389,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\PyQuadoo.h"
+				RelativePath=".\PyListWrapper.h"
 				>
 			</File>
 			<File
-				RelativePath=".\PyQuadooArray.h"
+				RelativePath=".\PyObjectWrapper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PyQuadoo.h"
 				>
 			</File>
 			<File
