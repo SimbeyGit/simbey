@@ -26,4 +26,12 @@ public:
 
 	// IQuadooObject
 	virtual HRESULT STDMETHODCALLTYPE Invoke (__in_opt IQuadooVM* pVM, RSTRING rstrMethod, QuadooVM::QVPARAMS* pqvParams, __out QuadooVM::QVARIANT* pqvResult);
+	virtual HRESULT STDMETHODCALLTYPE GetProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, __out QuadooVM::QVARIANT* pqvResult);
+	virtual HRESULT STDMETHODCALLTYPE GetIndexedProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, QuadooVM::QVARIANT* pqvIndex, __out QuadooVM::QVARIANT* pqvResult);
+	virtual HRESULT STDMETHODCALLTYPE SetProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, QuadooVM::QVARIANT* pqv);
+	virtual HRESULT STDMETHODCALLTYPE SetIndexedProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, QuadooVM::QVARIANT* pqvIndex, QuadooVM::QVARIANT* pqv);
+	virtual HRESULT STDMETHODCALLTYPE DeleteProperty (RSTRING rstrProperty, __out_opt QuadooVM::QVARIANT* pqv);
+
+private:
+	HRESULT GetAttribute (RSTRING rstrAttribute, __deref_out PyObject** ppyObject);
 };

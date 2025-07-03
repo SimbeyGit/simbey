@@ -18,17 +18,9 @@ CPyObjectWrapper::~CPyObjectWrapper ()
 HRESULT STDMETHODCALLTYPE CPyObjectWrapper::Invoke (__in_opt IQuadooVM* pVM, RSTRING rstrMethod, QuadooVM::QVPARAMS* pqvParams, __out QuadooVM::QVARIANT* pqvResult)
 {
 	HRESULT hr;
-	PCWSTR pcwzMethod = RStrToWide(rstrMethod);
-	PyObject* pyMethodName = PyUnicode_FromWideChar(pcwzMethod, RStrLen(rstrMethod));
 	PyObject* pyCallable = NULL, *pyArgs = NULL, *pyResult = NULL;
 
-	CheckAlloc(pyMethodName);
-
-	// Look up method on the Python object
-	pyCallable = PyObject_GetAttr(m_pyObject, pyMethodName);
-	Py_DECREF(pyMethodName);
-
-	CheckIf(NULL == pyCallable, DISP_E_UNKNOWNNAME);
+	Check(GetAttribute(rstrMethod, &pyCallable));
 	CheckIf(!PyCallable_Check(pyCallable), HRESULT_FROM_WIN32(ERROR_CALL_NOT_IMPLEMENTED));
 
 	// Convert Quadoo params to Python tuple
@@ -53,5 +45,115 @@ Cleanup:
 	Py_DECREF(pyResult);
 	Py_DECREF(pyArgs);
 	Py_DECREF(pyCallable);
+	return hr;
+}
+
+HRESULT STDMETHODCALLTYPE CPyObjectWrapper::GetProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, __out QuadooVM::QVARIANT* pqvResult)
+{
+	HRESULT hr;
+	PyObject* pyProperty = NULL;
+
+	Check(GetAttribute(rstrProperty, &pyProperty));
+	Check(PythonToQuadoo(pyProperty, pqvResult));
+
+Cleanup:
+	Py_DECREF(pyProperty);
+	return hr;
+}
+
+HRESULT STDMETHODCALLTYPE CPyObjectWrapper::GetIndexedProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, QuadooVM::QVARIANT* pqvIndex, __out QuadooVM::QVARIANT* pqvResult)
+{
+	HRESULT hr;
+	PyObject* pyProperty = NULL, *pyIndex = NULL, *pyValue = NULL;
+
+	Check(GetAttribute(rstrProperty, &pyProperty));
+	Check(QuadooToPython(pqvIndex, &pyIndex));
+
+	pyValue = PyObject_GetItem(pyProperty, pyIndex);
+	CheckIf(NULL == pyValue, E_FAIL);
+
+	Check(PythonToQuadoo(pyValue, pqvResult));
+
+Cleanup:
+	Py_DECREF(pyValue);
+	Py_DECREF(pyIndex);
+	Py_DECREF(pyProperty);
+	return hr;
+}
+
+HRESULT STDMETHODCALLTYPE CPyObjectWrapper::SetProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, QuadooVM::QVARIANT* pqv)
+{
+	HRESULT hr;
+	PCWSTR pcwzProperty = RStrToWide(rstrProperty);
+	PyObject* pyProperty = PyUnicode_FromWideChar(pcwzProperty, RStrLen(rstrProperty)), *pyValue = NULL;
+
+	CheckAlloc(pyProperty);
+	Check(QuadooToPython(pqv, &pyValue));
+	CheckIf(0 != PyObject_SetAttr(m_pyObject, pyProperty, pyValue), DISP_E_UNKNOWNNAME);
+
+Cleanup:
+	Py_DECREF(pyValue);
+	Py_DECREF(pyProperty);
+	return hr;
+}
+
+HRESULT STDMETHODCALLTYPE CPyObjectWrapper::SetIndexedProperty (__in_opt IQuadooVM* pVM, RSTRING rstrProperty, QuadooVM::QVARIANT* pqvIndex, QuadooVM::QVARIANT* pqv)
+{
+	HRESULT hr;
+	PyObject* pyProperty = NULL, *pyIndex = NULL, *pyValue = NULL;
+
+	Check(GetAttribute(rstrProperty, &pyProperty));
+	Check(QuadooToPython(pqvIndex, &pyIndex));
+	Check(QuadooToPython(pqv, &pyValue));
+
+	CheckIf(0 != PyObject_SetItem(pyProperty, pyIndex, pyValue), E_FAIL);
+
+Cleanup:
+	Py_DECREF(pyValue);
+	Py_DECREF(pyIndex);
+	Py_DECREF(pyProperty);
+	return hr;
+}
+
+HRESULT STDMETHODCALLTYPE CPyObjectWrapper::DeleteProperty (RSTRING rstrProperty, __out_opt QuadooVM::QVARIANT* pqv)
+{
+	HRESULT hr;
+	PCWSTR pcwzProperty = RStrToWide(rstrProperty);
+	PyObject* pyProperty = PyUnicode_FromWideChar(pcwzProperty, RStrLen(rstrProperty)), *pyValue = NULL;
+
+	CheckAlloc(pyProperty);
+
+	if(pqv)
+	{
+		pyValue = PyObject_GetAttr(m_pyObject, pyProperty);
+		CheckIf(NULL == pyValue, DISP_E_UNKNOWNNAME);
+		Check(PythonToQuadoo(pyValue, pqv));
+	}
+
+	CheckIf(0 != PyObject_DelAttr(m_pyObject, pyProperty), E_FAIL);
+	hr = S_OK;
+
+Cleanup:
+	Py_DECREF(pyValue);
+	Py_DECREF(pyProperty);
+	return hr;
+}
+
+HRESULT CPyObjectWrapper::GetAttribute (RSTRING rstrAttribute, __deref_out PyObject** ppyObject)
+{
+	HRESULT hr;
+	PCWSTR pcwzAttribute = RStrToWide(rstrAttribute);
+	PyObject* pyAttribute = PyUnicode_FromWideChar(pcwzAttribute, RStrLen(rstrAttribute));
+
+	CheckAlloc(pyAttribute);
+
+	// Look up method on the Python object
+	*ppyObject = PyObject_GetAttr(m_pyObject, pyAttribute);
+	Py_DECREF(*ppyObject);
+
+	CheckIf(NULL == *ppyObject, DISP_E_UNKNOWNNAME);
+	hr = S_OK;
+
+Cleanup:
 	return hr;
 }
