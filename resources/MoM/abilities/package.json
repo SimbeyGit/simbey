@@ -575,6 +575,16 @@
 				type: "random",
 				class: "any",
 				image: "Unit_Random.png"
+			},
+			{
+				ref: "mom:ability/unit/chaotic",
+				type: "moves",
+				image: "Unit_Chaotic.png"
+			},
+			{
+				ref: "ability/unit/aura_damage",
+				type: "aura",
+				image: "Unit_AuraDamage.png"
 			}
 		]
 	}

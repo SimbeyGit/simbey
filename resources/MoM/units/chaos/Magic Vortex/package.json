@@ -1,0 +1,69 @@
+[
+	{
+		package: "buildsif",
+		name: "combat.sif",
+		files: ["d*.png"],
+		trim: true,
+		canvas: 32
+	},
+	{
+		package: "buildsif",
+		name: "unit.sif",
+		files: ["overland.png"],
+		trim: true,
+		canvas: 128
+	},
+	{
+		package: "json",
+		name: "data.json",
+		data:
+		{
+			ref: "mom:unit/chaos/magic_vortex",
+			type: "fantastic",
+			name: "Magic Vortex",
+			realm: "chaos",
+			figures: 1,
+			animation: "cycling",
+			upkeep:
+			[
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/whoosh",
+						value: 1
+					}
+				],
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:10
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:15
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:30
+				}
+			},
+			abilities:
+			[
+				{ ref: "mom:ability/unit/chaotic", value: 3 },
+				{ ref: "mom:ability/unit/aura_damage", value: 33 },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/weapon_immunity" },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/magic_immunity" },
+				{ ref: "mom:ability/unit/lightning_breath", value: 5 }
+			]
+		}
+	}
+]
