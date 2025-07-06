@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\QuadooScript;..\Python"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\JSON;..\..\..\platform\QuadooScript;..\Python"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PYQUADOO_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT;_CHECK_REPORT_ERROR;PYTHON_RELEASE_ALWAYS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -124,7 +124,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\QuadooScript;..\Python"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\JSON;..\..\..\platform\QuadooScript;..\Python"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PYQUADOO_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT;_CHECK_REPORT_ERROR;PYTHON_RELEASE_ALWAYS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -205,7 +205,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\QuadooScript;..\Python"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\JSON;..\..\..\platform\QuadooScript;..\Python"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYQUADOO_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT;_CHECK_REPORT_ERROR"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -287,7 +287,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\QuadooScript;..\Python"
+				AdditionalIncludeDirectories="..\..\..\shared;..\..\..\platform\SimbeyCore;..\..\..\platform\JSON;..\..\..\platform\QuadooScript;..\Python"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYQUADOO_EXPORTS;USE_SIMBEY_CORE_API_REDIRECT;_CHECK_REPORT_ERROR"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -371,6 +371,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PyQuadooJSONObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PyQuadooJSONObjectNames.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PyQuadooLoader.cpp"
 				>
 			</File>
@@ -402,6 +410,14 @@
 			</File>
 			<File
 				RelativePath=".\PyQuadooAttribute.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PyQuadooJSONObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PyQuadooJSONObjectNames.h"
 				>
 			</File>
 			<File

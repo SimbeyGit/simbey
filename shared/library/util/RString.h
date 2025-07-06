@@ -253,4 +253,9 @@ public:
 		m_rstrValue = NULL;
 		return rstrDetached;
 	}
+
+	inline INT Length (VOID)
+	{
+		return RStrLen(m_rstrValue);
+	}
 };

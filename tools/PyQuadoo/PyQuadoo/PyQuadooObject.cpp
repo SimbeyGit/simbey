@@ -42,7 +42,7 @@ static PyTypeObject g_pyQuadooObject =
 {
 	PyVarObject_HEAD_INIT(NULL, 0)
 	"PyQuadoo.Object",				// tp_name
-	sizeof(PyTypeObject),		// tp_basicsize
+	sizeof(PyTypeObject),			// tp_basicsize
 	0,								// tp_itemsize
 	(destructor)PyQuadooObject_dealloc,	// tp_dealloc
 	0, 0, 0, 0, 0,					// standard method slots
