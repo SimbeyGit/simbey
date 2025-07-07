@@ -371,6 +371,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PyQuadooJSONArray.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PyQuadooJSONObject.cpp"
 				>
 			</File>
@@ -410,6 +414,10 @@
 			</File>
 			<File
 				RelativePath=".\PyQuadooAttribute.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PyQuadooJSONArray.h"
 				>
 			</File>
 			<File

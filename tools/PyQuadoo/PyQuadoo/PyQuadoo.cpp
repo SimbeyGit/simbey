@@ -6,6 +6,7 @@
 #include "Published\QuadooObject.inc"
 #include "PyQuadooJSONObjectNames.h"
 #include "PyQuadooJSONObject.h"
+#include "PyQuadooJSONArray.h"
 #include "PyQuadooAttribute.h"
 #include "PyQuadooObject.h"
 #include "PyQuadooVM.h"
@@ -280,6 +281,14 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 			*ppyValue = (PyObject*)pyJSONObject;
 		}
 		break;
+	case QuadooVM::JSONArray:
+		{
+			PyQuadooJSONArray* pyJSONArray = PyObject_New(PyQuadooJSONArray, PY_QUADOO_JSONARRAY());
+			CheckAlloc(pyJSONArray);
+			SetInterface(pyJSONArray->pJSONArray, pqv->pJSONArray);
+			*ppyValue = (PyObject*)pyJSONArray;
+		}
+		break;
 
 	default:
 		Check(DISP_E_BADVARTYPE);
@@ -326,12 +335,6 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 		Check(PythonToRSTRING(pyValue, &pqv->rstrVal));
 		pqv->eType = QuadooVM::String;
 	}
-	else if(PyObject_IsInstance(pyValue, (PyObject*)&PyBaseObject_Type))
-	{
-		pqv->pObject = __new CPyObjectWrapper(pyValue);
-		CheckAlloc(pqv->pObject);
-		pqv->eType = QuadooVM::Object;
-	}
 	else if(PyList_Check(pyValue))
 	{
 		pqv->pArray = __new CPyListWrapper(pyValue);
@@ -349,6 +352,12 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 		PyQuadooJSONObject* pyJSONObject = (PyQuadooJSONObject*)pyValue;
 		pqv->eType = QuadooVM::JSONObject;
 		SetInterface(pqv->pJSONObject, pyJSONObject->pJSONObject);
+	}
+	else if(PyObject_TypeCheck(pyValue, PY_QUADOO_JSONARRAY()))
+	{
+		PyQuadooJSONArray* pyJSONArray = (PyQuadooJSONArray*)pyValue;
+		pqv->eType = QuadooVM::JSONArray;
+		SetInterface(pqv->pJSONArray, pyJSONArray->pJSONArray);
 	}
 	else if(pyValue == Py_None)
 		pqv->eType = QuadooVM::Null;
@@ -368,6 +377,12 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 		}
 
 		Py_DECREF(pyString);
+	}
+	else if(PyObject_IsInstance(pyValue, (PyObject*)&PyBaseObject_Type))
+	{
+		pqv->pObject = __new CPyObjectWrapper(pyValue);
+		CheckAlloc(pqv->pObject);
+		pqv->eType = QuadooVM::Object;
 	}
 	else
 		hr = DISP_E_BADVARTYPE;
@@ -521,7 +536,23 @@ static PyObject* PyJSONCreateObject (PyObject* self, PyObject* args)
 	pyJSONObject = NULL;
 
 Cleanup:
-	Py_DECREF(pyJSONObject);
+	Py_XDECREF(pyJSONObject);
+	return pyResult;
+}
+
+static PyObject* PyJSONCreateArray (PyObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	PyQuadooJSONArray* pyJSONArray = NULL;
+
+	pyJSONArray = PyObject_New(PyQuadooJSONArray, PY_QUADOO_JSONARRAY());
+	PyCheckAlloc(pyJSONArray);
+	PyCheck(JSONCreateArray(&pyJSONArray->pJSONArray));
+	pyResult = (PyObject*)pyJSONArray;
+	pyJSONArray = NULL;
+
+Cleanup:
+	Py_XDECREF(pyJSONArray);
 	return pyResult;
 }
 
@@ -551,6 +582,7 @@ static PyMethodDef g_rgMethods[] =
 	{ "CreateLoader", PyCreateLoader, METH_NOARGS, "Return a new QuadooScript VM loader" },
 	{ "LoadModule", PyLoadModule, METH_VARARGS, "Load an external QuadooScript module" },
 	{ "JSONCreateObject", PyJSONCreateObject, METH_NOARGS, "Create and return an empty JSON object" },
+	{ "JSONCreateArray", PyJSONCreateArray, METH_NOARGS, "Create and return an empty JSON array" },
 	{ "JSONParse", PyJSONParse, METH_VARARGS, "Parse JSON text and return the parsed data" },
 	{ NULL, NULL, 0, NULL }
 };
@@ -581,6 +613,8 @@ PyMODINIT_FUNC PyInit_PyQuadoo (VOID)
 		return NULL;
 	if(PyType_Ready(PY_QUADOO_JSONOBJECT()) < 0)
 		return NULL;
+	if(PyType_Ready(PY_QUADOO_JSONARRAY()) < 0)
+		return NULL;
 	if(PyType_Ready(PY_QUADOO_ATTRIBUTE()) < 0)
 		return NULL;
 	if(PyType_Ready(PY_QUADOO_OBJECT()) < 0)
@@ -597,6 +631,9 @@ PyMODINIT_FUNC PyInit_PyQuadoo (VOID)
 
 	Py_INCREF(PY_QUADOO_JSONOBJECT());
 	PyModule_AddObject(pModule, "JSONObject", (PyObject*)PY_QUADOO_JSONOBJECT());
+
+	Py_INCREF(PY_QUADOO_JSONARRAY());
+	PyModule_AddObject(pModule, "JSONArray", (PyObject*)PY_QUADOO_JSONARRAY());
 
 	Py_INCREF(PY_QUADOO_ATTRIBUTE());
 	PyModule_AddObject(pModule, "Attribute", (PyObject*)PY_QUADOO_ATTRIBUTE());

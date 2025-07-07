@@ -12,12 +12,12 @@ struct SORT_DATA
 CPyListWrapper::CPyListWrapper (PyObject* pyList) :
 	m_pyList(pyList)
 {
-	Py_XINCREF(m_pyList);
+	Py_INCREF(m_pyList);
 }
 
 CPyListWrapper::~CPyListWrapper ()
 {
-	Py_XDECREF(m_pyList);
+	Py_DECREF(m_pyList);
 }
 
 // IQuadooContainer
@@ -37,8 +37,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::SetItem (sysint nItem, const QuadooVM:
 	pyObject = NULL;	// Now owned by the list
 
 Cleanup:
-	if(pyObject)
-		Py_XDECREF(pyObject);
+	Py_XDECREF(pyObject);
 	return hr;
 }
 
@@ -115,8 +114,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::Append (const QuadooVM::QVARIANT* pqv)
 	pyObject = NULL;
 
 Cleanup:
-	if(pyObject)
-		Py_XDECREF(pyObject);
+	Py_XDECREF(pyObject);
 	return hr;
 }
 
@@ -160,7 +158,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::Splice (sysint nInsertAt, sysint cRemo
 	hr = S_OK;
 
 Cleanup:
-	Py_DECREF(pyItem);
+	Py_XDECREF(pyItem);
 	QVMClearVariant(&qv);
 	return hr;
 }
@@ -185,7 +183,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::Slice (sysint nBegin, sysint nEnd, __o
 	hr = S_OK;
 
 Cleanup:
-	Py_DECREF(pySlice);
+	Py_XDECREF(pySlice);
 	return hr;
 }
 
@@ -260,7 +258,7 @@ Cleanup:
 	if(rgPyObjects)
 	{
 		for(Py_ssize_t i = 0; i < nSize; i++)
-			Py_DECREF(rgPyObjects[i]);
+			Py_XDECREF(rgPyObjects[i]);
 		__delete_array rgPyObjects;
 	}
 	return hr;

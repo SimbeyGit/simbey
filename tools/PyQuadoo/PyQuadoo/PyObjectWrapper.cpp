@@ -5,7 +5,7 @@
 CPyObjectWrapper::CPyObjectWrapper (PyObject* pyObject) :
 	m_pyObject(pyObject)
 {
-	Py_XINCREF(m_pyObject);
+	Py_INCREF(m_pyObject);
 }
 
 CPyObjectWrapper::~CPyObjectWrapper ()
@@ -42,9 +42,9 @@ HRESULT STDMETHODCALLTYPE CPyObjectWrapper::Invoke (__in_opt IQuadooVM* pVM, RST
 	Check(PythonToQuadoo(pyResult, pqvResult));
 
 Cleanup:
-	Py_DECREF(pyResult);
-	Py_DECREF(pyArgs);
-	Py_DECREF(pyCallable);
+	Py_XDECREF(pyResult);
+	Py_XDECREF(pyArgs);
+	Py_XDECREF(pyCallable);
 	return hr;
 }
 
@@ -57,7 +57,7 @@ HRESULT STDMETHODCALLTYPE CPyObjectWrapper::GetProperty (__in_opt IQuadooVM* pVM
 	Check(PythonToQuadoo(pyProperty, pqvResult));
 
 Cleanup:
-	Py_DECREF(pyProperty);
+	Py_XDECREF(pyProperty);
 	return hr;
 }
 
@@ -75,9 +75,9 @@ HRESULT STDMETHODCALLTYPE CPyObjectWrapper::GetIndexedProperty (__in_opt IQuadoo
 	Check(PythonToQuadoo(pyValue, pqvResult));
 
 Cleanup:
-	Py_DECREF(pyValue);
-	Py_DECREF(pyIndex);
-	Py_DECREF(pyProperty);
+	Py_XDECREF(pyValue);
+	Py_XDECREF(pyIndex);
+	Py_XDECREF(pyProperty);
 	return hr;
 }
 
@@ -92,8 +92,8 @@ HRESULT STDMETHODCALLTYPE CPyObjectWrapper::SetProperty (__in_opt IQuadooVM* pVM
 	CheckIf(0 != PyObject_SetAttr(m_pyObject, pyProperty, pyValue), DISP_E_UNKNOWNNAME);
 
 Cleanup:
-	Py_DECREF(pyValue);
-	Py_DECREF(pyProperty);
+	Py_XDECREF(pyValue);
+	Py_XDECREF(pyProperty);
 	return hr;
 }
 
@@ -109,9 +109,9 @@ HRESULT STDMETHODCALLTYPE CPyObjectWrapper::SetIndexedProperty (__in_opt IQuadoo
 	CheckIf(0 != PyObject_SetItem(pyProperty, pyIndex, pyValue), E_FAIL);
 
 Cleanup:
-	Py_DECREF(pyValue);
-	Py_DECREF(pyIndex);
-	Py_DECREF(pyProperty);
+	Py_XDECREF(pyValue);
+	Py_XDECREF(pyIndex);
+	Py_XDECREF(pyProperty);
 	return hr;
 }
 
@@ -134,8 +134,8 @@ HRESULT STDMETHODCALLTYPE CPyObjectWrapper::DeleteProperty (RSTRING rstrProperty
 	hr = S_OK;
 
 Cleanup:
-	Py_DECREF(pyValue);
-	Py_DECREF(pyProperty);
+	Py_XDECREF(pyValue);
+	Py_XDECREF(pyProperty);
 	return hr;
 }
 
@@ -149,7 +149,7 @@ HRESULT CPyObjectWrapper::GetAttribute (RSTRING rstrAttribute, __deref_out PyObj
 
 	// Look up method on the Python object
 	*ppyObject = PyObject_GetAttr(m_pyObject, pyAttribute);
-	Py_DECREF(*ppyObject);
+	Py_DECREF(pyAttribute);
 
 	CheckIf(NULL == *ppyObject, DISP_E_UNKNOWNNAME);
 	hr = S_OK;

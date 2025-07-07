@@ -11,7 +11,7 @@ static VOID PyQuadooJSONObject_dealloc (PyQuadooJSONObject* self)
 
 static PyObject* PyQuadooJSONObject_GetName (PyQuadooJSONObject* self, PyObject* args)
 {
-	INT nIndex;
+	sysint nIndex;
 	RSTRING rstrName = NULL;
 	PyObject* pyResult = NULL;
 	CRString rsName;
@@ -27,7 +27,7 @@ Cleanup:
 
 static PyObject* PyQuadooJSONObject_SetName (PyQuadooJSONObject* self, PyObject* args)
 {
-	INT nIndex;
+	sysint nIndex;
 	PyObject* pyResult = NULL, *pyName;
 	CRString rsName;
 
