@@ -192,6 +192,11 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 		Py_INCREF(Py_None);
 		break;
 
+	case QuadooVM::Bool:
+		*ppyValue = pqv->fVal ? Py_True : Py_False;
+		Py_INCREF(*ppyValue);
+		break;
+
 	case QuadooVM::I4:
 		*ppyValue = PyLong_FromLong(pqv->lVal);
 		CheckAlloc(*ppyValue);
@@ -388,6 +393,105 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 		hr = DISP_E_BADVARTYPE;
 
 Cleanup:
+	return hr;
+}
+
+HRESULT JSONToPython (__in_opt IJSONValue* pvJSON, __deref_out PyObject** ppyValue)
+{
+	HRESULT hr;
+
+	if(NULL == pvJSON)
+	{
+		*ppyValue = Py_None;
+		Py_INCREF(Py_None);
+	}
+	else
+	{
+		switch(pvJSON->GetType())
+		{
+		case JSON::String:
+			{
+				RSTRING rstrValue;
+				SideAssertHr(pvJSON->GetString(&rstrValue));
+				*ppyValue = PyUnicode_FromWideChar(RStrToWide(rstrValue), RStrLen(rstrValue));
+				RStrRelease(rstrValue);
+			}
+			break;
+		case JSON::Object:
+			{
+				PyQuadooJSONObject* pyJSONObject = PyObject_New(PyQuadooJSONObject, PY_QUADOO_JSONOBJECT());
+
+				CheckAlloc(pyJSONObject);
+				SideAssertHr(pvJSON->GetObject(&pyJSONObject->pJSONObject));
+				*ppyValue = (PyObject*)pyJSONObject;
+			}
+			break;
+		case JSON::Boolean:
+			{
+				bool fValue;
+				SideAssertHr(pvJSON->GetBoolean(&fValue));
+				*ppyValue = fValue ? Py_True : Py_False;
+				Py_INCREF(*ppyValue);
+			}
+			break;
+		case JSON::Integer:
+			{
+				INT nValue;
+				SideAssertHr(pvJSON->GetInteger(&nValue));
+				*ppyValue = PyLong_FromLong(nValue);
+			}
+			break;
+		case JSON::LongInteger:
+			{
+				LONGLONG llValue;
+				SideAssertHr(pvJSON->GetLongInteger(&llValue));
+				*ppyValue = PyLong_FromLongLong(llValue);
+			}
+			break;
+		case JSON::Double:
+			{
+				DOUBLE dblValue;
+				SideAssertHr(pvJSON->GetDouble(&dblValue));
+				*ppyValue = PyFloat_FromDouble(dblValue);
+			}
+			break;
+		case JSON::Float:
+			{
+				FLOAT fltValue;
+				SideAssertHr(pvJSON->GetFloat(&fltValue));
+				*ppyValue = PyFloat_FromDouble(fltValue);
+			}
+			break;
+		case JSON::Array:
+			{
+				PyQuadooJSONArray* pyJSONArray = PyObject_New(PyQuadooJSONArray, PY_QUADOO_JSONARRAY());
+
+				CheckAlloc(pyJSONArray);
+				SideAssertHr(pvJSON->GetArray(&pyJSONArray->pJSONArray));
+				*ppyValue = (PyObject*)pyJSONArray;
+			}
+			break;
+		}
+
+		CheckAlloc(*ppyValue);
+	}
+
+	hr = S_OK;
+
+Cleanup:
+	return hr;
+}
+
+HRESULT PythonToJSON (PyObject* pyValue, __deref_out IJSONValue** ppvJSON)
+{
+	HRESULT hr;
+	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
+
+	Check(PythonToQuadoo(pyValue, &qv));
+	Check(QVMConvertToJSON(&qv, ppvJSON));
+
+Cleanup:
+	QVMClearVariant(&qv);
 	return hr;
 }
 

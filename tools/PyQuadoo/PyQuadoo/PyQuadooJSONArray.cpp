@@ -17,38 +17,30 @@ static PyObject* JSONArray_getitem (PyQuadooJSONArray* self, Py_ssize_t index)
 {
 	PyObject* pyResult = NULL;
 	TStackRef<IJSONValue> srv;
-	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 
 	if(SUCCEEDED(self->pJSONArray->GetValue(index, &srv)))
-	{
-		PyCheck(QVMConvertFromJSON(srv, &qv));
-		PyCheck(QuadooToPython(&qv, &pyResult));
-	}
+		PyCheck(JSONToPython(srv, &pyResult));
 	else
 		PyErr_SetString(PyExc_IndexError, "Index out of range");
 
 Cleanup:
-	QVMClearVariant(&qv);
 	return pyResult;
 }
 
 static int JSONArray_setitem (PyQuadooJSONArray* self, Py_ssize_t index, PyObject* value)
 {
 	HRESULT hr;
-	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 	TStackRef<IJSONValue> srv;
 
 	if(NULL == value)
 		Check(self->pJSONArray->Remove(index));
 	else
 	{
-		Check(PythonToQuadoo(value, &qv));
-		Check(QVMConvertToJSON(&qv, &srv));
+		Check(PythonToJSON(value, &srv));
 		Check(self->pJSONArray->Replace(index, srv));
 	}
 
 Cleanup:
-	QVMClearVariant(&qv);
 	return SUCCEEDED(hr) ? 0 : -1;
 }
 
@@ -66,17 +58,14 @@ static PySequenceMethods g_pyQuadooJSONArraySeq =
 static PyObject* PyQuadooJSONArray_Add (PyQuadooJSONArray* self, PyObject* args)
 {
 	PyObject* pyResult = NULL, *pyValue;
-	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 	TStackRef<IJSONValue> srv;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "O", &pyValue), E_INVALIDARG);
-	PyCheck(PythonToQuadoo(pyValue, &qv));
-	PyCheck(QVMConvertToJSON(&qv, &srv));
+	PyCheck(PythonToJSON(pyValue, &srv));
 	PyCheck(self->pJSONArray->Add(srv));
 	pyResult = Py_NewRef(Py_None);
 
 Cleanup:
-	QVMClearVariant(&qv);
 	return pyResult;
 }
 
@@ -84,17 +73,14 @@ static PyObject* PyQuadooJSONArray_Insert (PyQuadooJSONArray* self, PyObject* ar
 {
 	PyObject* pyResult = NULL, *pyValue;
 	sysint nIndex;
-	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 	TStackRef<IJSONValue> srv;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "nO", &nIndex, &pyValue), E_INVALIDARG);
-	PyCheck(PythonToQuadoo(pyValue, &qv));
-	PyCheck(QVMConvertToJSON(&qv, &srv));
+	PyCheck(PythonToJSON(pyValue, &srv));
 	PyCheck(self->pJSONArray->Insert(nIndex, srv));
 	pyResult = Py_NewRef(Py_None);
 
 Cleanup:
-	QVMClearVariant(&qv);
 	return pyResult;
 }
 

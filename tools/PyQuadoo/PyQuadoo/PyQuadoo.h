@@ -7,6 +7,9 @@ HRESULT PythonToRSTRING (PyObject* pyValue, __deref_out RSTRING* prstrValue);
 HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue);
 HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv);
 
+HRESULT JSONToPython (__in_opt IJSONValue* pvJSON, __deref_out PyObject** ppyValue);
+HRESULT PythonToJSON (PyObject* pyValue, __deref_out IJSONValue** ppvJSON);
+
 VOID SetHResultError (HRESULT hr);
 
 #define	PyCheck(x) \

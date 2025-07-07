@@ -57,7 +57,6 @@ static PyObject* PyQuadooJSONObject_getItem (PyQuadooJSONObject* self, PyObject*
 	PyObject* pyResult = NULL;
 	RSTRING rstrKey = NULL;
 	TStackRef<IJSONValue> srv;
-	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 
 	if(PyLong_Check(key))
 	{
@@ -75,11 +74,9 @@ static PyObject* PyQuadooJSONObject_getItem (PyQuadooJSONObject* self, PyObject*
 			goto Cleanup;
 		}
 	}
-	PyCheck(QVMConvertFromJSON(srv, &qv));
-	PyCheck(QuadooToPython(&qv, &pyResult));
+	PyCheck(JSONToPython(srv, &pyResult));
 
 Cleanup:
-	QVMClearVariant(&qv);
 	RStrRelease(rstrKey);
 	return pyResult;
 }
@@ -88,7 +85,6 @@ static INT PyQuadooJSONObject_setItem (PyQuadooJSONObject* self, PyObject* key, 
 {
 	HRESULT hr;
 	RSTRING rstrKey = NULL;
-	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 	TStackRef<IJSONValue> srv;
 
 	if(NULL == value)
@@ -108,8 +104,7 @@ static INT PyQuadooJSONObject_setItem (PyQuadooJSONObject* self, PyObject* key, 
 	}
 	else
 	{
-		Check(PythonToQuadoo(value, &qv));
-		Check(QVMConvertToJSON(&qv, &srv));
+		Check(PythonToJSON(value, &srv));
 
 		if(PyLong_Check(key))
 		{
@@ -128,7 +123,6 @@ Cleanup:
 	if(FAILED(hr))
 		SetHResultError(hr);
 
-	QVMClearVariant(&qv);
 	RStrRelease(rstrKey);
 	return SUCCEEDED(hr) ? 0 : -1;
 }
