@@ -1,5 +1,6 @@
 #include "WinPython.h"
 #include "Library\Core\CoreDefs.h"
+#include "Library\Core\MemoryStream.h"
 #include "PyQuadooJSONObjectNames.h"
 #include "PyQuadooJSONObject.h"
 
@@ -134,6 +135,18 @@ static PyMappingMethods g_pyQuadooJSONObjectMapping =
 	(objobjargproc)PyQuadooJSONObject_setItem	// mp_ass_subscript (e.g., obj["key"] = value)
 };
 
+static PyObject* PyQuadooJSONObject_str (PyQuadooJSONObject* self)
+{
+	PyObject* pyResult = NULL;
+	CMemoryStream stmJSON;
+
+	PyCheck(JSONSerializeObject(self->pJSONObject, &stmJSON));
+	pyResult = PyUnicode_FromWideChar(stmJSON.TGetReadPtr<WCHAR>(), stmJSON.TDataRemaining<WCHAR>());
+
+Cleanup:
+	return pyResult;
+}
+
 static PyObject* PyQuadooJSONObject_getattro (PyQuadooJSONObject* self, PyObject* attrName)
 {
 	PyObject* pyResult = NULL;
@@ -181,7 +194,7 @@ static PyTypeObject g_pyQuadooJSONObject =
 	&g_pyQuadooJSONObjectMapping,	// tp_as_mapping
 	0,								// tp_hash
 	NULL,							// tp_call
-	0,								// tp_str
+	(reprfunc)PyQuadooJSONObject_str,			// tp_str
 	(getattrofunc)PyQuadooJSONObject_getattro,	// tp_getattro
 	0,								// tp_setattro
 	0,								// tp_as_buffer
