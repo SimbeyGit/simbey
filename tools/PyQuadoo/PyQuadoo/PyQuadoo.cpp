@@ -181,6 +181,37 @@ HRESULT PythonToRSTRING (PyObject* pyValue, __deref_out RSTRING* prstrValue)
 	return hr;
 }
 
+HRESULT ConvertArrayToPython (IQuadooArray* pArray, __deref_out PyObject** ppyList)
+{
+	HRESULT hr = S_FALSE;
+	sysint cItems = pArray->Length();
+	PyObject* pyList = PyList_New(cItems);
+	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
+
+	CheckAlloc(pyList);
+
+	for(sysint i = 0; i < cItems; ++i)
+	{
+		PyObject* pyValue;
+
+		SideAssertHr(pArray->GetItem(i, &qv));
+		Check(QuadooToPython(&qv, &pyValue));
+
+		// Reference is stolen by PyList_SetItem()
+		PyList_SetItem(pyList, i, pyValue);
+
+		QVMClearVariant(&qv);
+	}
+
+	*ppyList = pyList;
+	pyList = NULL;
+
+Cleanup:
+	QVMClearVariant(&qv);
+	Py_XDECREF(pyList);
+	return hr;
+}
+
 HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue)
 {
 	HRESULT hr;
@@ -272,8 +303,8 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 			}
 			else
 			{
-				// TODO - How can QuadooScript arrays be returned to Python?
-				Check(E_NOTIMPL);
+				// Convert native QuadooScript arrays to Python.
+				Check(ConvertArrayToPython(pqv->pArray, ppyValue));
 			}
 		}
 		break;
@@ -679,6 +710,100 @@ Cleanup:
 	return pyResult;
 }
 
+static PyObject* PyJSONFormat (PyObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	PyObject* pyJSON;
+	CRString rsJSON;
+	CMemoryStream stmFormatted;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "U", &pyJSON), E_INVALIDARG);
+	PyCheck(PythonToRSTRING(pyJSON, &rsJSON));
+	PyCheck(ReformatJSON(RStrToWide(*rsJSON), rsJSON.Length(), &stmFormatted));
+	pyResult = PyUnicode_FromWideChar(stmFormatted.TGetReadPtr<WCHAR>(), stmFormatted.TDataRemaining<WCHAR>());
+
+Cleanup:
+	return pyResult;
+}
+
+static PyObject* PyJSONGetObject (PyObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	PyObject* pyJSON, *pyPath;
+	int bEnsureExists;
+	CRString rsPath;
+	TStackRef<IJSONValue> srvRoot;
+	TStackRef<IJSONObject> srObject;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "OUp", &pyJSON, &pyPath, &bEnsureExists), E_INVALIDARG);
+	PyCheck(PythonToJSON(pyJSON, &srvRoot));
+	PyCheck(PythonToRSTRING(pyPath, &rsPath));
+	if(SUCCEEDED(JSONGetObject(srvRoot, RStrToWide(*rsPath), rsPath.Length(), bEnsureExists, &srObject)))
+	{
+		PyQuadooJSONObject* pyJSONObject = PyObject_New(PyQuadooJSONObject, PY_QUADOO_JSONOBJECT());
+		PyCheckAlloc(pyJSONObject);
+		pyJSONObject->pJSONObject = srObject.Detach();
+		pyResult = (PyObject*)pyJSONObject;
+	}
+	else
+		pyResult = Py_NewRef(Py_None);
+
+Cleanup:
+	return pyResult;
+}
+
+static PyObject* PyJSONGetValue (PyObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	PyObject* pyJSON, *pyPath;
+	CRString rsPath;
+	TStackRef<IJSONValue> srvRoot, srv;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "OU", &pyJSON, &pyPath), E_INVALIDARG);
+	PyCheck(PythonToJSON(pyJSON, &srvRoot));
+	PyCheck(PythonToRSTRING(pyPath, &rsPath));
+	if(SUCCEEDED(JSONGetValue(srvRoot, RStrToWide(*rsPath), rsPath.Length(), &srv)))
+		JSONToPython(srv, &pyResult);
+	else
+		pyResult = Py_NewRef(Py_None);
+
+Cleanup:
+	return pyResult;
+}
+
+static PyObject* PyJSONSetValue (PyObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	PyObject* pyJSON, *pyPath, *pyValue;
+	CRString rsPath;
+	TStackRef<IJSONValue> srvRoot, srv;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "OUO", &pyJSON, &pyPath, &pyValue), E_INVALIDARG);
+	PyCheck(PythonToJSON(pyJSON, &srvRoot));
+	PyCheck(PythonToJSON(pyValue, &srv));
+	PyCheck(JSONSetValue(srvRoot, RStrToWide(*rsPath), rsPath.Length(), srv));
+	pyResult = Py_NewRef(Py_None);
+
+Cleanup:
+	return pyResult;
+}
+
+static PyObject* PyJSONRemoveValue (PyObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	PyObject* pyJSON, *pyPath;
+	CRString rsPath;
+	TStackRef<IJSONValue> srvRoot;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "OU", &pyJSON, &pyPath), E_INVALIDARG);
+	PyCheck(PythonToJSON(pyJSON, &srvRoot));
+	PyCheck(JSONRemoveValue(srvRoot, RStrToWide(*rsPath), rsPath.Length(), NULL));
+	pyResult = Py_NewRef(Py_None);
+
+Cleanup:
+	return pyResult;
+}
+
 static PyMethodDef g_rgMethods[] =
 {
 	{ "CompileScript", PyCompileScript, METH_VARARGS, "Compile a QuadooScript file and return bytecode" },
@@ -688,6 +813,11 @@ static PyMethodDef g_rgMethods[] =
 	{ "JSONCreateObject", PyJSONCreateObject, METH_NOARGS, "Create and return an empty JSON object" },
 	{ "JSONCreateArray", PyJSONCreateArray, METH_NOARGS, "Create and return an empty JSON array" },
 	{ "JSONParse", PyJSONParse, METH_VARARGS, "Parse JSON text and return the parsed data" },
+	{ "JSONFormat", PyJSONFormat, METH_VARARGS, "Reformat JSON text with indentation and line breaks" },
+	{ "JSONGetObject", PyJSONGetObject, METH_VARARGS, "Search the JSON data and return the requested object, possibly creating it" },
+	{ "JSONGetValue", PyJSONGetValue, METH_VARARGS, "Search the JSON data and return requested value" },
+	{ "JSONSetValue", PyJSONSetValue, METH_VARARGS, "Set a value at the specified JSON path" },
+	{ "JSONRemoveValue", PyJSONRemoveValue, METH_VARARGS, "Remove the value at the specified JSON path" },
 	{ NULL, NULL, 0, NULL }
 };
 

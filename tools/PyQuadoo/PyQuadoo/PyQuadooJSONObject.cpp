@@ -41,10 +41,28 @@ Cleanup:
 	return pyResult;
 }
 
+static PyObject* PyQuadooJSONObject_Search (PyQuadooJSONObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL, *pyPath;
+	CRString rsPath;
+	TStackRef<IJSONValue> srv;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "U", &pyPath), E_INVALIDARG);
+	PyCheck(PythonToRSTRING(pyPath, &rsPath));
+	if(SUCCEEDED(JSONGetValueFromObject(self->pJSONObject, RStrToWide(*rsPath), rsPath.Length(), &srv)))
+		JSONToPython(srv, &pyResult);	// No need to check, it's the last operation on this code path
+	else
+		pyResult = Py_NewRef(Py_None);
+
+Cleanup:
+	return pyResult;
+}
+
 static PyMethodDef g_pyQuadooJSONObjectMethods[] =
 {
 	{ "GetName", (PyCFunction)PyQuadooJSONObject_GetName, METH_VARARGS, "Get key name by index" },
 	{ "SetName", (PyCFunction)PyQuadooJSONObject_SetName, METH_VARARGS, "Set key name by index" },
+	{ "Search", (PyCFunction)PyQuadooJSONObject_Search, METH_VARARGS, "Search the object using the specified JSON path" },
 	{ NULL, NULL, 0, NULL }
 };
 
