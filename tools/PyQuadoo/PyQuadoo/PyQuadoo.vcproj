@@ -387,6 +387,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PyQuadooMap.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PyQuadooObject.cpp"
 				>
 			</File>
@@ -430,6 +434,10 @@
 			</File>
 			<File
 				RelativePath=".\PyQuadooLoader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PyQuadooMap.h"
 				>
 			</File>
 			<File

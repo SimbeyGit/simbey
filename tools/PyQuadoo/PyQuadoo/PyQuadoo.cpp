@@ -7,6 +7,7 @@
 #include "PyQuadooJSONObjectNames.h"
 #include "PyQuadooJSONObject.h"
 #include "PyQuadooJSONArray.h"
+#include "PyQuadooMap.h"
 #include "PyQuadooAttribute.h"
 #include "PyQuadooObject.h"
 #include "PyQuadooVM.h"
@@ -309,6 +310,15 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 		}
 		break;
 
+	case QuadooVM::Map:
+		{
+			PyQuadooMap* pyMap = PyObject_New(PyQuadooMap, PY_QUADOO_MAP());
+			CheckAlloc(pyMap);
+			SetInterface(pyMap->pMap, pqv->pMap);
+			*ppyValue = (PyObject*)pyMap;
+		}
+		break;
+
 	case QuadooVM::JSONObject:
 		{
 			PyQuadooJSONObject* pyJSONObject = PyObject_New(PyQuadooJSONObject, PY_QUADOO_JSONOBJECT());
@@ -317,6 +327,7 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 			*ppyValue = (PyObject*)pyJSONObject;
 		}
 		break;
+
 	case QuadooVM::JSONArray:
 		{
 			PyQuadooJSONArray* pyJSONArray = PyObject_New(PyQuadooJSONArray, PY_QUADOO_JSONARRAY());
@@ -324,6 +335,11 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 			SetInterface(pyJSONArray->pJSONArray, pqv->pJSONArray);
 			*ppyValue = (PyObject*)pyJSONArray;
 		}
+		break;
+
+	case QuadooVM::Void:
+		*ppyValue = PyCapsule_New(pqv->pv, "PyQuadoo.Void", NULL);
+		CheckAlloc(*ppyValue);
 		break;
 
 	default:
@@ -395,6 +411,12 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 		pqv->eType = QuadooVM::JSONArray;
 		SetInterface(pqv->pJSONArray, pyJSONArray->pJSONArray);
 	}
+	else if(PyObject_TypeCheck(pyValue, PY_QUADOO_MAP()))
+	{
+		PyQuadooMap* pyMap = (PyQuadooMap*)pyValue;
+		pqv->eType = QuadooVM::Map;
+		SetInterface(pqv->pMap, pyMap->pMap);
+	}
 	else if(pyValue == Py_None)
 		pqv->eType = QuadooVM::Null;
 	else if(EnsureDecimalType() && PyObject_IsInstance(pyValue, g_pyDecimalType))
@@ -413,6 +435,11 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 		}
 
 		Py_DECREF(pyString);
+	}
+	else if(PyCapsule_CheckExact(pyValue) && 0 == TStrCmpChecked(PyCapsule_GetName(pyValue), "PyQuadoo.Void"))
+	{
+		pqv->pv = PyCapsule_GetPointer(pyValue, "PyQuadoo.Void");
+		pqv->eType = QuadooVM::Void;
 	}
 	else if(PyObject_IsInstance(pyValue, (PyObject*)&PyBaseObject_Type))
 	{
@@ -851,6 +878,8 @@ PyMODINIT_FUNC PyInit_PyQuadoo (VOID)
 		return NULL;
 	if(PyType_Ready(PY_QUADOO_ATTRIBUTE()) < 0)
 		return NULL;
+	if(PyType_Ready(PY_QUADOO_MAP()) < 0)
+		return NULL;
 	if(PyType_Ready(PY_QUADOO_OBJECT()) < 0)
 		return NULL;
 	if(PyType_Ready(PY_QUADOO_VM()) < 0)
@@ -871,6 +900,9 @@ PyMODINIT_FUNC PyInit_PyQuadoo (VOID)
 
 	Py_INCREF(PY_QUADOO_ATTRIBUTE());
 	PyModule_AddObject(pModule, "Attribute", (PyObject*)PY_QUADOO_ATTRIBUTE());
+
+	Py_INCREF(PY_QUADOO_MAP());
+	PyModule_AddObject(pModule, "Map", (PyObject*)PY_QUADOO_MAP());
 
 	Py_INCREF(PY_QUADOO_OBJECT());
 	PyModule_AddObject(pModule, "Object", (PyObject*)PY_QUADOO_OBJECT());
