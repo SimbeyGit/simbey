@@ -523,6 +523,7 @@ interface __declspec(uuid("48A8AD92-4BA4-476f-9BF1-E58F8295FDE5")) IQuadooMap : 
 	virtual HRESULT STDMETHODCALLTYPE MultiAdd (QuadooVM::QVARIANT* pqvItem, const QuadooVM::QVARIANT* pqv) = 0;
 	virtual HRESULT STDMETHODCALLTYPE Delete (QuadooVM::QVARIANT* pqvItem, __out_opt QuadooVM::QVARIANT* pqv) = 0;
 	virtual bool STDMETHODCALLTYPE HasItem (QuadooVM::QVARIANT* pqvItem) = 0;
+	virtual bool STDMETHODCALLTYPE IndexOf (QuadooVM::QVARIANT* pqvItem, __out sysint* pidxItem) = 0;
 };
 
 interface __declspec(uuid("1DC75125-4C80-4525-9728-F8FCD97E1370")) IQuadooInterface : IUnknown

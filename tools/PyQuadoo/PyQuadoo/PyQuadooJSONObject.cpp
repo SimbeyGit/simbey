@@ -74,7 +74,6 @@ static Py_ssize_t PyQuadooJSONObject_len (PyQuadooJSONObject* self)
 static PyObject* PyQuadooJSONObject_getItem (PyQuadooJSONObject* self, PyObject* key)
 {
 	PyObject* pyResult = NULL;
-	RSTRING rstrKey = NULL;
 	TStackRef<IJSONValue> srv;
 
 	if(PyLong_Check(key))
@@ -85,9 +84,11 @@ static PyObject* PyQuadooJSONObject_getItem (PyQuadooJSONObject* self, PyObject*
 	}
 	else
 	{
-		PyCheck(PythonToRSTRING(key, &rstrKey));
+		CRString rsKey;
 
-		if(FAILED(self->pJSONObject->FindValue(rstrKey, &srv)))
+		PyCheck(PythonToRSTRING(key, &rsKey));
+
+		if(FAILED(self->pJSONObject->FindValue(rsKey, &srv)))
 		{
 			PyErr_SetString(PyExc_KeyError, "Key not found in object");
 			goto Cleanup;
@@ -96,7 +97,6 @@ static PyObject* PyQuadooJSONObject_getItem (PyQuadooJSONObject* self, PyObject*
 	PyCheck(JSONToPython(srv, &pyResult));
 
 Cleanup:
-	RStrRelease(rstrKey);
 	return pyResult;
 }
 

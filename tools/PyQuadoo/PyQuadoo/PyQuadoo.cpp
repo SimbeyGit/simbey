@@ -831,6 +831,42 @@ Cleanup:
 	return pyResult;
 }
 
+static PyObject* PyNewMapString (PyObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	QuadooVM::QVARIANT qvMap; qvMap.eType = QuadooVM::Null;
+	PyQuadooMap* pyMap;
+
+	PyCheck(QVMCreateStringMap(&qvMap));
+	pyMap = PyObject_New(PyQuadooMap, PY_QUADOO_MAP());
+	PyCheckAlloc(pyMap);
+	pyMap->pMap = qvMap.pMap;
+	qvMap.eType = QuadooVM::Null;
+	pyResult = (PyObject*)pyResult;
+
+Cleanup:
+	QVMClearVariant(&qvMap);
+	return pyResult;
+}
+
+static PyObject* PyNewMapLong (PyObject* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	QuadooVM::QVARIANT qvMap; qvMap.eType = QuadooVM::Null;
+	PyQuadooMap* pyMap;
+
+	PyCheck(QVMCreateI4Map(&qvMap));
+	pyMap = PyObject_New(PyQuadooMap, PY_QUADOO_MAP());
+	PyCheckAlloc(pyMap);
+	pyMap->pMap = qvMap.pMap;
+	qvMap.eType = QuadooVM::Null;
+	pyResult = (PyObject*)pyResult;
+
+Cleanup:
+	QVMClearVariant(&qvMap);
+	return pyResult;
+}
+
 static PyMethodDef g_rgMethods[] =
 {
 	{ "CompileScript", PyCompileScript, METH_VARARGS, "Compile a QuadooScript file and return bytecode" },
@@ -845,6 +881,8 @@ static PyMethodDef g_rgMethods[] =
 	{ "JSONGetValue", PyJSONGetValue, METH_VARARGS, "Search the JSON data and return requested value" },
 	{ "JSONSetValue", PyJSONSetValue, METH_VARARGS, "Set a value at the specified JSON path" },
 	{ "JSONRemoveValue", PyJSONRemoveValue, METH_VARARGS, "Remove the value at the specified JSON path" },
+	{ "NewMapString", PyNewMapString, METH_NOARGS, "Return a new map<string> object" },
+	{ "NewMapLong", PyNewMapLong, METH_NOARGS, "Return a new map<long> object" },
 	{ NULL, NULL, 0, NULL }
 };
 
