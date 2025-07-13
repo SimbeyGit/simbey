@@ -113,9 +113,17 @@ static int PyQuadooMap_setattro (PyQuadooMap* self, PyObject* attrName, PyObject
 	Check(PythonToRSTRING(attrName, &qvKey.rstrVal));
 	qvKey.eType = QuadooVM::String;
 
-	CheckIf(NULL == pValue, DISP_E_BADVARTYPE);	// TODO - Support deleting items this way?
-	Check(PythonToQuadoo(pValue, &qv));
-	Check(self->pMap->Add(&qvKey, &qv));
+	if(NULL == pValue)
+	{
+		sysint idxItem;
+		CheckIfIgnore(!self->pMap->IndexOf(&qvKey, &idxItem), S_FALSE);
+		Check(self->pMap->RemoveItem(idxItem, NULL));
+	}
+	else
+	{
+		Check(PythonToQuadoo(pValue, &qv));
+		Check(self->pMap->Add(&qvKey, &qv));
+	}
 
 Cleanup:
 	QVMClearVariant(&qv);
