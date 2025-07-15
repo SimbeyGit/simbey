@@ -4,6 +4,7 @@
 * [Neural Circuits Simulator](desktop/NeuralCircuits)
 * [Infinite Wolfenstein Demo](desktop/InfiniteWolfenstein)
 * [Quadoo Studio](desktop/QuadooStudio)
+* [PyQuadoo](tools/PyQuadoo)
 * [Some of Simbey's common C++ library code and templates](shared/library)
 ## Screenshots:
 ### Master of Magic Combat Demo
