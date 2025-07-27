@@ -135,6 +135,35 @@ static PyObject* PyVM_RemoveGlobal (PyQuadooVM* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+static PyObject* PyVM_GetState (PyQuadooVM* self, PyObject* args)
+{
+	return PyLong_FromLong(self->pVM->GetState());
+}
+
+static PyObject* PyVM_Resume (PyQuadooVM* self, PyObject* args)
+{
+	PyObject* pyResult = NULL;
+	PyObject* pyArg = NULL;
+	QuadooVM::QVARIANT qvArg; qvArg.eType = QuadooVM::Null;
+	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "|O", &pyArg), E_FAIL);
+	if(pyArg)
+	{
+		PyCheck(PythonToQuadoo(pyArg, &qvArg));
+		PyCheck(self->pVM->Resume(&qvArg, &qv));
+	}
+	else
+		PyCheck(self->pVM->Resume(NULL, &qv));
+
+	PyCheck(QuadooToPython(&qv, &pyResult));
+
+Cleanup:
+	QVMClearVariant(&qv);
+	QVMClearVariant(&qvArg);
+	return pyResult;
+}
+
 static PyMethodDef g_pyQuadooVMMethods[] =
 {
 	{ "FindFunction", (PyCFunction)PyVM_FindFunction, METH_VARARGS, "Find a global script function and return its index" },
@@ -142,6 +171,8 @@ static PyMethodDef g_pyQuadooVMMethods[] =
 	{ "RunFunction", (PyCFunction)PyVM_RunFunction, METH_VARARGS, "Run a script function" },
 	{ "AddGlobal", (PyCFunction)PyVM_AddGlobal, METH_VARARGS, "Add a named global to the VM" },
 	{ "RemoveGlobal", (PyCFunction)PyVM_RemoveGlobal, METH_VARARGS, "Remove a named global from the VM" },
+	{ "GetState", (PyCFunction)PyVM_GetState, METH_NOARGS, "Get the VM's current state" },
+	{ "Resume", (PyCFunction)PyVM_Resume, METH_VARARGS, "Resume a suspended VM with an optional value to push onto the stack" },
 	{ NULL, NULL, 0, NULL }
 };
 
