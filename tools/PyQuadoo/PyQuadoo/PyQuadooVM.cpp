@@ -1,6 +1,7 @@
 #include "WinPython.h"
 #include "Library\Core\CoreDefs.h"
 #include "PyPrintTarget.h"
+#include "PyInputSource.h"
 #include "PyQuadooObject.h"
 #include "PyQuadooVM.h"
 
@@ -208,6 +209,28 @@ Cleanup:
 	return pyResult;
 }
 
+static PyObject* PyVM_SetInputSource (PyQuadooVM* self, PyObject* args)
+{
+	PyObject* pyObject, *pyResult = NULL;
+	PyObject* pyRead;
+	TStackRef<CPyInputSource> srInputSource;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "O", &pyObject), E_INVALIDARG);
+
+	pyRead = PyObject_GetAttrString(pyObject, "Read");
+	if(NULL == pyRead)
+		pyRead = PyObject_GetAttrString(pyObject, "read");
+	PyCheckIfTypeMsg(NULL == pyRead, "Expected object with 'Read' or 'read' method");
+
+	srInputSource.Attach(__new CPyInputSource(pyRead));
+	PyCheckAlloc(srInputSource);
+	PyCheck(self->pVM->SetInputSource(srInputSource));
+	pyResult = Py_NewRef(Py_None);
+
+Cleanup:
+	return pyResult;
+}
+
 static PyMethodDef g_pyQuadooVMMethods[] =
 {
 	{ "FindFunction", (PyCFunction)PyVM_FindFunction, METH_VARARGS, "Find a global script function and return its index" },
@@ -219,6 +242,7 @@ static PyMethodDef g_pyQuadooVMMethods[] =
 	{ "GetState", (PyCFunction)PyVM_GetState, METH_NOARGS, "Get the VM's current state" },
 	{ "Resume", (PyCFunction)PyVM_Resume, METH_VARARGS, "Resume a suspended VM with an optional value to push onto the stack" },
 	{ "SetPrintTarget", (PyCFunction)PyVM_SetPrintTarget, METH_VARARGS, "Set a Python object as the print target for the VM" },
+	{ "SetInputSource", (PyCFunction)PyVM_SetInputSource, METH_VARARGS, "Set a Python object as the input source for the VM" },
 	{ NULL, NULL, 0, NULL }
 };
 

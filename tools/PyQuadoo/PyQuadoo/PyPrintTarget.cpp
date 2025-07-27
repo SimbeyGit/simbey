@@ -41,7 +41,7 @@ HRESULT CPyPrintTarget::CallTarget (PyObject* pyTarget, RSTRING rstrText)
 	PyTuple_SET_ITEM(pyArgs, 0, pyText);	// steals reference
 
 	pyResult = PyObject_CallObject(pyTarget, pyArgs);
-	PyCheckIf(NULL == pyResult, E_FAIL);
+	CheckIf(NULL == pyResult, E_FAIL);
 	hr = S_OK;
 
 Cleanup:
