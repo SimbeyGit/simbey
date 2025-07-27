@@ -1,5 +1,6 @@
 #include "WinPython.h"
 #include "Library\Core\CoreDefs.h"
+#include "PyPrintTarget.h"
 #include "PyQuadooObject.h"
 #include "PyQuadooVM.h"
 
@@ -135,6 +136,22 @@ static PyObject* PyVM_RemoveGlobal (PyQuadooVM* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+static PyObject* PyVM_FindGlobal (PyQuadooVM* self, PyObject* args)
+{
+	CRString rsName;
+	PyObject* pyName, *pyResult = NULL;
+	QuadooVM::QVARIANT qvObject; qvObject.eType = QuadooVM::Null;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "U", &pyName), E_INVALIDARG);
+	PyCheck(PythonToRSTRING(pyName, &rsName));
+	PyCheck(self->pVM->FindGlobal(rsName, &qvObject.pObject));
+	PyCheck(QuadooToPython(&qvObject, &pyResult));
+
+Cleanup:
+	QVMClearVariant(&qvObject);
+	return pyResult;
+}
+
 static PyObject* PyVM_GetState (PyQuadooVM* self, PyObject* args)
 {
 	return PyLong_FromLong(self->pVM->GetState());
@@ -164,6 +181,33 @@ Cleanup:
 	return pyResult;
 }
 
+static PyObject* PyVM_SetPrintTarget (PyQuadooVM* self, PyObject* args)
+{
+	PyObject* pyObject, *pyResult = NULL;
+	PyObject* pyPrint, *pyPrintLn;
+	TStackRef<CPyPrintTarget> srPrintTarget;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "O", &pyObject), E_INVALIDARG);
+
+	pyPrint = PyObject_GetAttrString(pyObject, "Print");
+	if(NULL == pyPrint)
+		pyPrint = PyObject_GetAttrString(pyObject, "write");
+	PyCheckIfTypeMsg(NULL == pyPrint, "Expected object with 'Print' or 'write' method");
+
+	pyPrintLn = PyObject_GetAttrString(pyObject, "PrintLn");
+	if(NULL == pyPrintLn)
+		pyPrintLn = PyObject_GetAttrString(pyObject, "writeLn");
+	PyCheckIfTypeMsg(NULL == pyPrintLn, "Expected object with 'PrintLn' or 'writeLn' method");
+
+	srPrintTarget.Attach(__new CPyPrintTarget(pyPrint, pyPrintLn));
+	PyCheckAlloc(srPrintTarget);
+	PyCheck(self->pVM->SetPrintTarget(srPrintTarget));
+	pyResult = Py_NewRef(Py_None);
+
+Cleanup:
+	return pyResult;
+}
+
 static PyMethodDef g_pyQuadooVMMethods[] =
 {
 	{ "FindFunction", (PyCFunction)PyVM_FindFunction, METH_VARARGS, "Find a global script function and return its index" },
@@ -171,8 +215,10 @@ static PyMethodDef g_pyQuadooVMMethods[] =
 	{ "RunFunction", (PyCFunction)PyVM_RunFunction, METH_VARARGS, "Run a script function" },
 	{ "AddGlobal", (PyCFunction)PyVM_AddGlobal, METH_VARARGS, "Add a named global to the VM" },
 	{ "RemoveGlobal", (PyCFunction)PyVM_RemoveGlobal, METH_VARARGS, "Remove a named global from the VM" },
+	{ "FindGlobal", (PyCFunction)PyVM_FindGlobal, METH_VARARGS, "Find a named global from the VM" },
 	{ "GetState", (PyCFunction)PyVM_GetState, METH_NOARGS, "Get the VM's current state" },
 	{ "Resume", (PyCFunction)PyVM_Resume, METH_VARARGS, "Resume a suspended VM with an optional value to push onto the stack" },
+	{ "SetPrintTarget", (PyCFunction)PyVM_SetPrintTarget, METH_VARARGS, "Set a Python object as the print target for the VM" },
 	{ NULL, NULL, 0, NULL }
 };
 
@@ -180,7 +226,7 @@ static PyTypeObject g_PyQuadooVM =
 {
 	PyVarObject_HEAD_INIT(NULL, 0)
 	"PyQuadoo.VM",					// tp_name
-	sizeof(PyQuadooVM),			// tp_basicsize
+	sizeof(PyQuadooVM),				// tp_basicsize
 	0,								// tp_itemsize
 	(destructor)PyQuadooVM_dealloc,	// tp_dealloc
 	0, 0, 0, 0, 0,					// standard method slots

@@ -31,6 +31,15 @@ VOID SetHResultError (HRESULT hr);
 		} \
 	END_MULTI_LINE_MACRO
 
+#define	PyCheckIfTypeMsg(x, msg) \
+	BEGIN_MULTI_LINE_MACRO \
+		if(x) \
+		{ \
+			PyErr_SetString(PyExc_TypeError, msg); \
+			goto Cleanup; \
+		} \
+	END_MULTI_LINE_MACRO
+
 #define PyCheckAlloc(x) \
 	BEGIN_MULTI_LINE_MACRO \
 		if(NULL == x) \

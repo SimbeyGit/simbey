@@ -359,6 +359,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PyPrintTarget.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PyQuadoo.cpp"
 				>
 			</File>
@@ -410,6 +414,10 @@
 			</File>
 			<File
 				RelativePath=".\PyObjectWrapper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PyPrintTarget.h"
 				>
 			</File>
 			<File
