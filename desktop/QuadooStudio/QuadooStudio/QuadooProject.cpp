@@ -256,6 +256,7 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 
 	Check(Text::LoadFromFile(pcwzProject, &pwzJSON, &cchJSON));
 	Check(JSONParse(NULL, pwzJSON, cchJSON, &srv));
+	CheckIf(NULL == srv, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
 	Check(srv->GetObject(&m_pProject));
 
 	srv.Release();

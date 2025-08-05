@@ -258,7 +258,7 @@ HRESULT CQuadooStudio::OpenProjectPrompt (VOID)
 	Check(Exec(NULL, ID_FILE_CLOSEPROJECT, 0, NULL, NULL));
 
 	Check(pick.Initialize());
-	CheckIfIgnore(!pick.OpenSingleFile(m_hwnd, L"Open Project File", L"Project (*.qsproj)\0*.qsproj"), E_ABORT);
+	CheckIfIgnore(!pick.OpenSingleFile(m_hwnd, L"Open Project File", L"Project (*.qsproj)\0*.qsproj\0"), E_ABORT);
 	Check(OpenProject(pick.GetFile(0)));
 
 Cleanup:
@@ -270,6 +270,8 @@ HRESULT CQuadooStudio::OpenProject (PCWSTR pcwzProject)
 	HRESULT hr;
 	CQuadooProject* pProject = NULL;
 	RECT rcStatus, rcSite;
+
+	Check(Exec(NULL, ID_FILE_CLOSEPROJECT, 0, NULL, NULL));
 
 	GetClientRect(m_hwnd, &rcSite);
 	rcSite.left += GetTreeWidth() + m_pSplitter->GetWidth();
@@ -291,6 +293,9 @@ Cleanup:
 	{
 		pProject->CloseProject(FALSE);
 		SafeRelease(pProject);
+
+		TreeView_DeleteAllItems(m_hwndTree);
+		SetWindowText(m_hwnd, c_wzQuadooStudioTitle);
 	}
 	return hr;
 }

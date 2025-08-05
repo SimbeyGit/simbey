@@ -64,7 +64,7 @@ BOOL CNewProjectDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 			{
 				HWND hwnd;
 				GetWindow(&hwnd);
-				if(m_browse.SaveFile(hwnd, L"Create Project File", L"Project (*.qsproj)\0*.qsproj"))
+				if(m_browse.SaveFile(hwnd, L"Create Project File", L"Project (*.qsproj)\0*.qsproj\0"))
 					SetWindowText(GetDlgItem(IDC_PROJECT_PATH), GetProjectFile());
 			}
 			break;
