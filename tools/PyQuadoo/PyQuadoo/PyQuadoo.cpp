@@ -867,6 +867,11 @@ Cleanup:
 	return pyResult;
 }
 
+static PyObject* PyGetVersion (PyObject* self, PyObject* args)
+{
+	return PyUnicode_FromWideChar(SLP(WIDEN(PY_VERSION)));
+}
+
 static PyMethodDef g_rgMethods[] =
 {
 	{ "CompileScript", PyCompileScript, METH_VARARGS, "Compile a QuadooScript file and return bytecode" },
@@ -883,6 +888,7 @@ static PyMethodDef g_rgMethods[] =
 	{ "JSONRemoveValue", PyJSONRemoveValue, METH_VARARGS, "Remove the value at the specified JSON path" },
 	{ "NewMapString", PyNewMapString, METH_NOARGS, "Return a new map<string> object" },
 	{ "NewMapLong", PyNewMapLong, METH_NOARGS, "Return a new map<long> object" },
+	{ "GetVersion", PyGetVersion, METH_NOARGS, "Return the version of Python linked to this module" },
 	{ NULL, NULL, 0, NULL }
 };
 
