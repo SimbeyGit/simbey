@@ -277,7 +277,16 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 
 		srv.Release();
 		if(SUCCEEDED(srFile->FindNonNullValueW(L"default", &srv)))
+		{
 			Check(srv->GetBoolean(&pFile->m_fDefault));
+			if(pFile->m_fDefault && FAILED(SwitchToFile(pFile)))
+			{
+				RSTRING rstrError;
+				Check(RStrFormatW(&rstrError, L"Could not open %r (default file)!", pFile->m_rstrPath));
+				MessageBox(m_hwnd, RStrToWide(rstrError), L"File Error", MB_OK | MB_ICONERROR);
+				RStrRelease(rstrError);
+			}
+		}
 
 		RStrRelease(rstrPath); rstrPath = NULL;
 	}
