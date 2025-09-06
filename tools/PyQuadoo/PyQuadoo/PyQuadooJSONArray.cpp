@@ -7,6 +7,7 @@
 static VOID PyQuadooJSONArray_dealloc (PyQuadooJSONArray* self)
 {
 	SafeRelease(self->pJSONArray);
+	Py_DECREF(self->pyModule);
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -21,7 +22,7 @@ static PyObject* JSONArray_getitem (PyQuadooJSONArray* self, Py_ssize_t index)
 	TStackRef<IJSONValue> srv;
 
 	if(SUCCEEDED(self->pJSONArray->GetValue(index, &srv)))
-		PyCheck(JSONToPython(srv, &pyResult));
+		PyCheck(JSONToPython(self->pyModule, srv, &pyResult));
 	else
 		PyErr_SetString(PyExc_IndexError, "Index out of range");
 
@@ -38,7 +39,7 @@ static int JSONArray_setitem (PyQuadooJSONArray* self, Py_ssize_t index, PyObjec
 		Check(self->pJSONArray->Remove(index));
 	else
 	{
-		Check(PythonToJSON(value, &srv));
+		Check(PythonToJSON(self->pyModule, value, &srv));
 		Check(self->pJSONArray->Replace(index, srv));
 	}
 
@@ -75,7 +76,7 @@ static PyObject* PyQuadooJSONArray_Add (PyQuadooJSONArray* self, PyObject* args)
 	TStackRef<IJSONValue> srv;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "O", &pyValue), E_INVALIDARG);
-	PyCheck(PythonToJSON(pyValue, &srv));
+	PyCheck(PythonToJSON(self->pyModule, pyValue, &srv));
 	PyCheck(self->pJSONArray->Add(srv));
 	pyResult = Py_NewRef(Py_None);
 
@@ -90,7 +91,7 @@ static PyObject* PyQuadooJSONArray_Insert (PyQuadooJSONArray* self, PyObject* ar
 	TStackRef<IJSONValue> srv;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "nO", &nIndex, &pyValue), E_INVALIDARG);
-	PyCheck(PythonToJSON(pyValue, &srv));
+	PyCheck(PythonToJSON(self->pyModule, pyValue, &srv));
 	PyCheck(self->pJSONArray->Insert(nIndex, srv));
 	pyResult = Py_NewRef(Py_None);
 

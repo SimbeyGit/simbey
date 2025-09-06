@@ -5,6 +5,7 @@
 struct PyQuadooMap
 {
 	PyObject_HEAD
+	PyObject* pyModule;
 	IQuadooMap* pMap;
 };
 

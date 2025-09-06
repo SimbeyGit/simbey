@@ -8,6 +8,8 @@ static VOID PyQuadooAttribute_dealloc (PyQuadooAttribute* self)
 	if(self->pObject)
 		QVMReleaseObject(self->pObject);
 
+	Py_DECREF(self->pyModule);
+
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -32,14 +34,14 @@ static PyObject* PyQuadooAttribute_call (PyQuadooAttribute* self, PyObject* args
 		for(INT i = 0; i < qvParams.cArgs; i++)
 		{
 			PyObject* pyArg = PyTuple_GetItem(args, i);
-			PyCheck(PythonToQuadoo(pyArg, qvParams.pqvArgs + (bEnd - i)));
+			PyCheck(PythonToQuadoo(self->pyModule, pyArg, qvParams.pqvArgs + (bEnd - i)));
 		}
 	}
 	else
 		qvParams.pqvArgs = NULL;
 
 	PyCheck(self->pObject->Invoke(NULL, self->rstrName, &qvParams, &qvResult));
-	PyCheck(QuadooToPython(&qvResult, &pyResult));
+	PyCheck(QuadooToPython(self->pyModule, &qvResult, &pyResult));
 
 Cleanup:
 	if(0 < qvParams.cArgs)
@@ -57,7 +59,7 @@ static PyObject* PyAttr_Get (PyQuadooAttribute* self, PyObject* args)
 	QuadooVM::QVARIANT qv;
 
 	PyCheck(self->pObject->GetProperty(NULL, self->rstrName, &qv));
-	PyCheck(QuadooToPython(&qv, &pyResult));
+	PyCheck(QuadooToPython(self->pyModule, &qv, &pyResult));
 
 Cleanup:
 	QVMClearVariant(&qv);
@@ -72,7 +74,7 @@ static PyObject* PyAttr_Set (PyQuadooAttribute* self, PyObject* args)
 
 	PyCheckIf(NULL == pyArg, E_INVALIDARG);
 
-	PyCheck(PythonToQuadoo(pyArg, &qv));
+	PyCheck(PythonToQuadoo(self->pyModule, pyArg, &qv));
 	PyCheck(self->pObject->SetProperty(NULL, self->rstrName, &qv));
 
 	pyResult = Py_NewRef(Py_None);

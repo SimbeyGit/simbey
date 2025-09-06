@@ -6,6 +6,7 @@
 struct PyQuadooJSONArray
 {
 	PyObject_HEAD
+	PyObject* pyModule;
 	IJSONArray* pJSONArray;
 };
 

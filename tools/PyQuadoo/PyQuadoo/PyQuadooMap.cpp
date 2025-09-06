@@ -5,6 +5,7 @@
 static VOID PyQuadooMap_dealloc (PyQuadooMap* self)
 {
 	SafeRelease(self->pMap);
+	Py_DECREF(self->pyModule);
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -41,7 +42,7 @@ static PyObject* PyQuadooMap_getItem (PyQuadooMap* self, PyObject* key)
 		QVMClearVariant(&qvKey);
 	}
 
-	PyCheck(QuadooToPython(&qv, &pyResult));
+	PyCheck(QuadooToPython(self->pyModule, &qv, &pyResult));
 
 Cleanup:
 	QVMClearVariant(&qv);
@@ -53,7 +54,7 @@ static INT PyQuadooMap_setItem (PyQuadooMap* self, PyObject* key, PyObject* valu
 	HRESULT hr;
 	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 
-	Check(PythonToQuadoo(value, &qv));
+	Check(PythonToQuadoo(self->pyModule, value, &qv));
 
 	if(PyLong_Check(key))
 	{
@@ -94,7 +95,7 @@ static PyObject* PyQuadooMap_getattro (PyQuadooMap* self, PyObject* attrName)
 	qvKey.eType = QuadooVM::String;
 
 	if(SUCCEEDED(self->pMap->Find(&qvKey, &qv)))
-		PyCheck(QuadooToPython(&qv, &pyResult));
+		PyCheck(QuadooToPython(self->pyModule, &qv, &pyResult));
 	else
 		pyResult = Py_NewRef(Py_None);
 
@@ -121,7 +122,7 @@ static int PyQuadooMap_setattro (PyQuadooMap* self, PyObject* attrName, PyObject
 	}
 	else
 	{
-		Check(PythonToQuadoo(pValue, &qv));
+		Check(PythonToQuadoo(self->pyModule, pValue, &qv));
 		Check(self->pMap->Add(&qvKey, &qv));
 	}
 
@@ -139,7 +140,7 @@ static PyObject* PyQuadooMap_GetKey (PyQuadooMap* self, PyObject* args)
 
 	PyCheckIf(!PyArg_ParseTuple(args, "n", &nIndex), E_INVALIDARG);
 	PyCheck(self->pMap->GetKey(nIndex, &qvKey));
-	PyCheck(QuadooToPython(&qvKey, &pyResult));
+	PyCheck(QuadooToPython(self->pyModule, &qvKey, &pyResult));
 
 Cleanup:
 	QVMClearVariant(&qvKey);
@@ -154,9 +155,9 @@ static PyObject* PyQuadooMap_Find (PyQuadooMap* self, PyObject* args)
 	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 
 	PyCheckIf(NULL == pyKey, E_INVALIDARG);
-	PyCheck(PythonToQuadoo(pyKey, &qvKey));
+	PyCheck(PythonToQuadoo(self->pyModule, pyKey, &qvKey));
 	PyCheck(self->pMap->Find(&qvKey, &qv));
-	PyCheck(QuadooToPython(&qv, &pyResult));
+	PyCheck(QuadooToPython(self->pyModule, &qv, &pyResult));
 
 Cleanup:
 	QVMClearVariant(&qv);
@@ -173,8 +174,8 @@ static PyObject* PyQuadooMap_Add (PyQuadooMap* self, PyObject* args)
 	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 
 	PyCheckIf(NULL == pyKey || NULL == pyValue, E_INVALIDARG);
-	PyCheck(PythonToQuadoo(pyKey, &qvKey));
-	PyCheck(PythonToQuadoo(pyValue, &qv));
+	PyCheck(PythonToQuadoo(self->pyModule, pyKey, &qvKey));
+	PyCheck(PythonToQuadoo(self->pyModule, pyValue, &qv));
 	PyCheck(self->pMap->Add(&qvKey, &qv));
 	pyResult = Py_NewRef(Py_None);
 
@@ -193,8 +194,8 @@ static PyObject* PyQuadooMap_MultiAdd (PyQuadooMap* self, PyObject* args)
 	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 
 	PyCheckIf(NULL == pyKey || NULL == pyValue, E_INVALIDARG);
-	PyCheck(PythonToQuadoo(pyKey, &qvKey));
-	PyCheck(PythonToQuadoo(pyValue, &qv));
+	PyCheck(PythonToQuadoo(self->pyModule, pyKey, &qvKey));
+	PyCheck(PythonToQuadoo(self->pyModule, pyValue, &qv));
 	PyCheck(self->pMap->MultiAdd(&qvKey, &qv));
 	pyResult = Py_NewRef(Py_None);
 
@@ -211,7 +212,7 @@ static PyObject* PyQuadooMap_Delete (PyQuadooMap* self, PyObject* args)
 	QuadooVM::QVARIANT qvKey; qvKey.eType = QuadooVM::Null;
 
 	PyCheckIf(NULL == pyKey, E_INVALIDARG);
-	PyCheck(PythonToQuadoo(pyKey, &qvKey));
+	PyCheck(PythonToQuadoo(self->pyModule, pyKey, &qvKey));
 	PyCheck(self->pMap->Delete(&qvKey, NULL));
 	pyResult = Py_NewRef(Py_None);
 
@@ -227,7 +228,7 @@ static PyObject* PyQuadooMap_Has (PyQuadooMap* self, PyObject* args)
 	QuadooVM::QVARIANT qvKey; qvKey.eType = QuadooVM::Null;
 
 	PyCheckIf(NULL == pyKey, E_INVALIDARG);
-	PyCheck(PythonToQuadoo(pyKey, &qvKey));
+	PyCheck(PythonToQuadoo(self->pyModule, pyKey, &qvKey));
 	pyResult = self->pMap->HasItem(&qvKey) ? Py_True : Py_False;
 	Py_INCREF(pyResult);
 
@@ -244,7 +245,7 @@ static PyObject* PyQuadooMap_IndexOf (PyQuadooMap* self, PyObject* args)
 	sysint idxItem;
 
 	PyCheckIf(NULL == pyKey, E_INVALIDARG);
-	PyCheck(PythonToQuadoo(pyKey, &qvKey));
+	PyCheck(PythonToQuadoo(self->pyModule, pyKey, &qvKey));
 	if(self->pMap->IndexOf(&qvKey, &idxItem))
 	{
 #ifdef	_WIN64 

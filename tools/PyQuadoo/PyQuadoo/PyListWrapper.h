@@ -8,6 +8,7 @@ class __declspec(uuid("A9CDBADA-30D6-4adf-8021-1C7561F7E7F2")) CPyListWrapper :
 	public IQuadooArray
 {
 private:
+	PyObject* m_pyModule;
 	PyObject* m_pyList;
 
 public:
@@ -20,7 +21,7 @@ public:
 	END_UNK_MAP
 
 public:
-	CPyListWrapper (PyObject* pyList);
+	CPyListWrapper (PyObject* pyModule, PyObject* pyList);
 	~CPyListWrapper ();
 
 	inline PyObject* GetPyList (VOID) { return m_pyList; }

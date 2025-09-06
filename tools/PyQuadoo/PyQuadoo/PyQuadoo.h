@@ -4,11 +4,13 @@
 #include "Published\QuadooVM.h"
 
 HRESULT PythonToRSTRING (PyObject* pyValue, __deref_out RSTRING* prstrValue);
-HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue);
-HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv);
+HRESULT QuadooToPython (PyObject* pyModule, const QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue);
+HRESULT PythonToQuadoo (PyObject* pyModule, PyObject* pyValue, __out QuadooVM::QVARIANT* pqv);
 
-HRESULT JSONToPython (__in_opt IJSONValue* pvJSON, __deref_out PyObject** ppyValue);
-HRESULT PythonToJSON (PyObject* pyValue, __deref_out IJSONValue** ppvJSON);
+HRESULT JSONToPython (PyObject* pyModule, __in_opt IJSONValue* pvJSON, __deref_out PyObject** ppyValue);
+HRESULT PythonToJSON (PyObject* pyModule, PyObject* pyValue, __deref_out IJSONValue** ppvJSON);
+
+PyObject* GetSysCallPendingCapsule (PyObject* pyModule);
 
 VOID SetHResultError (HRESULT hr);
 

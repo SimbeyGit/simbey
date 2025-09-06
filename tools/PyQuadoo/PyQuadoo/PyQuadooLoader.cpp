@@ -12,6 +12,8 @@ static VOID PyQuadooLoader_dealloc (PyQuadooLoader* self)
 	if(self->pLoader)
 		self->pLoader->Release();
 
+	Py_DECREF(self->pyModule);
+
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -98,6 +100,10 @@ static PyObject* PyLoader_LoadVM (PyQuadooLoader* self, PyObject* args)
 	}
 
 	PyQuadooVM* pyVM = PyObject_New(PyQuadooVM, PY_QUADOO_VM());
+
+	pyVM->pyModule = self->pyModule;
+	Py_INCREF(pyVM->pyModule);
+
 	if(NULL == pyVM)
 		return PyErr_NoMemory();
 	pyVM->pVM = srVM.Detach();

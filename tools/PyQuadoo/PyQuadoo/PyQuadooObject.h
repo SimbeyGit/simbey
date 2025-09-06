@@ -5,6 +5,7 @@
 struct PyQuadooObject
 {
 	PyObject_HEAD
+	PyObject* pyModule;
 	IQuadooObject* pObject;
 };
 

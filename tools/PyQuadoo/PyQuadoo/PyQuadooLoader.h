@@ -5,6 +5,7 @@
 struct PyQuadooLoader
 {
 	PyObject_HEAD
+	PyObject* pyModule;
 	IQuadooInstanceLoader* pLoader;
 	IQuadooObject* pLastConstructorException;
 };

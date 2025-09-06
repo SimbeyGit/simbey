@@ -2,6 +2,7 @@
 #include "Library\Core\CoreDefs.h"
 #include "PyPrintTarget.h"
 #include "PyInputSource.h"
+#include "PySysCallTarget.h"
 #include "PyQuadooObject.h"
 #include "PyQuadooVM.h"
 
@@ -12,6 +13,8 @@ static VOID PyQuadooVM_dealloc (PyQuadooVM* self)
 		self->pVM->Unload();
 		self->pVM->Release();
 	}
+
+	Py_DECREF(self->pyModule);
 
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
@@ -50,7 +53,7 @@ static PyObject* PyVM_PushValue (PyQuadooVM* self, PyObject* args)
 		return NULL;
 
 	QuadooVM::QVARIANT qv;
-	if(FAILED(PythonToQuadoo(pyValue, &qv)))
+	if(FAILED(PythonToQuadoo(self->pyModule, pyValue, &qv)))
 		return NULL;
 
 	HRESULT hrPush = self->pVM->PushValue(&qv);
@@ -81,7 +84,7 @@ static PyObject* PyVM_RunFunction (PyQuadooVM* self, PyObject* args)
 		return NULL;
 	}
 
-	HRESULT hrConvert = QuadooToPython(&qvResult, &pyValue);
+	HRESULT hrConvert = QuadooToPython(self->pyModule, &qvResult, &pyValue);
 	QVMClearVariant(&qvResult);
 
 	if(FAILED(hrConvert))
@@ -146,7 +149,7 @@ static PyObject* PyVM_FindGlobal (PyQuadooVM* self, PyObject* args)
 	PyCheckIf(!PyArg_ParseTuple(args, "U", &pyName), E_INVALIDARG);
 	PyCheck(PythonToRSTRING(pyName, &rsName));
 	PyCheck(self->pVM->FindGlobal(rsName, &qvObject.pObject));
-	PyCheck(QuadooToPython(&qvObject, &pyResult));
+	PyCheck(QuadooToPython(self->pyModule, &qvObject, &pyResult));
 
 Cleanup:
 	QVMClearVariant(&qvObject);
@@ -168,13 +171,13 @@ static PyObject* PyVM_Resume (PyQuadooVM* self, PyObject* args)
 	PyCheckIf(!PyArg_ParseTuple(args, "|O", &pyArg), E_FAIL);
 	if(pyArg)
 	{
-		PyCheck(PythonToQuadoo(pyArg, &qvArg));
+		PyCheck(PythonToQuadoo(self->pyModule, pyArg, &qvArg));
 		PyCheck(self->pVM->Resume(&qvArg, &qv));
 	}
 	else
 		PyCheck(self->pVM->Resume(NULL, &qv));
 
-	PyCheck(QuadooToPython(&qv, &pyResult));
+	PyCheck(QuadooToPython(self->pyModule, &qv, &pyResult));
 
 Cleanup:
 	QVMClearVariant(&qv);
@@ -185,7 +188,7 @@ Cleanup:
 static PyObject* PyVM_SetPrintTarget (PyQuadooVM* self, PyObject* args)
 {
 	PyObject* pyObject, *pyResult = NULL;
-	PyObject* pyPrint, *pyPrintLn;
+	PyObject* pyPrint = NULL, *pyPrintLn = NULL;
 	TStackRef<CPyPrintTarget> srPrintTarget;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "O", &pyObject), E_INVALIDARG);
@@ -206,13 +209,15 @@ static PyObject* PyVM_SetPrintTarget (PyQuadooVM* self, PyObject* args)
 	pyResult = Py_NewRef(Py_None);
 
 Cleanup:
+	Py_XDECREF(pyPrint);
+	Py_XDECREF(pyPrintLn);
 	return pyResult;
 }
 
 static PyObject* PyVM_SetInputSource (PyQuadooVM* self, PyObject* args)
 {
 	PyObject* pyObject, *pyResult = NULL;
-	PyObject* pyRead;
+	PyObject* pyRead = NULL;
 	TStackRef<CPyInputSource> srInputSource;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "O", &pyObject), E_INVALIDARG);
@@ -228,6 +233,30 @@ static PyObject* PyVM_SetInputSource (PyQuadooVM* self, PyObject* args)
 	pyResult = Py_NewRef(Py_None);
 
 Cleanup:
+	Py_XDECREF(pyRead);
+	return pyResult;
+}
+
+static PyObject* PyVM_SetSysCallTarget (PyQuadooVM* self, PyObject* args)
+{
+	PyObject* pyObject, *pyResult = NULL;
+	PyObject* pySysCallTarget = NULL;
+	TStackRef<CPySysCallTarget> srSysCallTarget;
+
+	PyCheckIf(!PyArg_ParseTuple(args, "O", &pyObject), E_INVALIDARG);
+
+	pySysCallTarget = PyObject_GetAttrString(pyObject, "SysCall");
+	if(NULL == pySysCallTarget)
+		pySysCallTarget = PyObject_GetAttrString(pyObject, "syscall");
+	PyCheckIfTypeMsg(NULL == pySysCallTarget, "Expected object with 'SysCall' or 'syscall' method");
+
+	srSysCallTarget.Attach(__new CPySysCallTarget(self->pyModule, pySysCallTarget));
+	PyCheckAlloc(srSysCallTarget);
+	PyCheck(self->pVM->SetSysCallTarget(srSysCallTarget));
+	pyResult = Py_NewRef(Py_None);
+
+Cleanup:
+	Py_XDECREF(pySysCallTarget);
 	return pyResult;
 }
 
@@ -243,6 +272,7 @@ static PyMethodDef g_pyQuadooVMMethods[] =
 	{ "Resume", (PyCFunction)PyVM_Resume, METH_VARARGS, "Resume a suspended VM with an optional value to push onto the stack" },
 	{ "SetPrintTarget", (PyCFunction)PyVM_SetPrintTarget, METH_VARARGS, "Set a Python object as the print target for the VM" },
 	{ "SetInputSource", (PyCFunction)PyVM_SetInputSource, METH_VARARGS, "Set a Python object as the input source for the VM" },
+	{ "SetSysCallTarget", (PyCFunction)PyVM_SetSysCallTarget, METH_VARARGS, "Set a Python object as the system call target for the VM" },
 	{ NULL, NULL, 0, NULL }
 };
 

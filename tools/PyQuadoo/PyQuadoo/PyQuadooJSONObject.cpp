@@ -7,6 +7,7 @@
 static VOID PyQuadooJSONObject_dealloc (PyQuadooJSONObject* self)
 {
 	SafeRelease(self->pJSONObject);
+	Py_DECREF(self->pyModule);
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -50,7 +51,7 @@ static PyObject* PyQuadooJSONObject_Search (PyQuadooJSONObject* self, PyObject* 
 	PyCheckIf(!PyArg_ParseTuple(args, "U", &pyPath), E_INVALIDARG);
 	PyCheck(PythonToRSTRING(pyPath, &rsPath));
 	if(SUCCEEDED(JSONGetValueFromObject(self->pJSONObject, RStrToWide(*rsPath), rsPath.Length(), &srv)))
-		JSONToPython(srv, &pyResult);	// No need to check, it's the last operation on this code path
+		JSONToPython(self->pyModule, srv, &pyResult);	// No need to check, it's the last operation on this code path
 	else
 		pyResult = Py_NewRef(Py_None);
 
@@ -94,7 +95,7 @@ static PyObject* PyQuadooJSONObject_getItem (PyQuadooJSONObject* self, PyObject*
 			goto Cleanup;
 		}
 	}
-	PyCheck(JSONToPython(srv, &pyResult));
+	PyCheck(JSONToPython(self->pyModule, srv, &pyResult));
 
 Cleanup:
 	return pyResult;
@@ -123,7 +124,7 @@ static INT PyQuadooJSONObject_setItem (PyQuadooJSONObject* self, PyObject* key, 
 	}
 	else
 	{
-		Check(PythonToJSON(value, &srv));
+		Check(PythonToJSON(self->pyModule, value, &srv));
 
 		if(PyLong_Check(key))
 		{

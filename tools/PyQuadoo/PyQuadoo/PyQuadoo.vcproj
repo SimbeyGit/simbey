@@ -406,6 +406,10 @@
 				RelativePath=".\PyQuadooVM.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\PySysCallTarget.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -462,6 +466,10 @@
 			</File>
 			<File
 				RelativePath=".\PyQuadooVM.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PySysCallTarget.h"
 				>
 			</File>
 			<File

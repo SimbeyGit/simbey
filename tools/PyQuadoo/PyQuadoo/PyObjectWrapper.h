@@ -8,6 +8,7 @@ class __declspec(uuid("14658D7C-14B1-46ba-98CE-8468CFA7A8CB")) CPyObjectWrapper 
 	public CQuadooObjectImpl
 {
 private:
+	PyObject* m_pyModule;
 	PyObject* m_pyObject;
 
 public:
@@ -19,7 +20,7 @@ public:
 	END_UNK_MAP
 
 public:
-	CPyObjectWrapper (PyObject* pyObject);
+	CPyObjectWrapper (PyObject* pyModule, PyObject* pyObject);
 	~CPyObjectWrapper ();
 
 	inline PyObject* GetPyObject (VOID) { return m_pyObject; }

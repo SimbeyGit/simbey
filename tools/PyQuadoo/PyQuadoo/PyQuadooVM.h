@@ -5,6 +5,7 @@
 struct PyQuadooVM
 {
 	PyObject_HEAD
+	PyObject* pyModule;
 	IQuadooVM* pVM;
 };
 

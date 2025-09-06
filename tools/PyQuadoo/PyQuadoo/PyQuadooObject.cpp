@@ -8,6 +8,8 @@ static VOID PyQuadooObject_dealloc (PyQuadooObject* self)
 	if(self->pObject)
 		QVMReleaseObject(self->pObject);
 
+	Py_DECREF(self->pyModule);
+
 	Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -27,6 +29,9 @@ static PyObject* PyQuadooObject_getattro (PyQuadooObject* self, PyObject* attrNa
 	PyQuadooAttribute* pyInvoke = PyObject_New(PyQuadooAttribute, PY_QUADOO_ATTRIBUTE());
 	if(NULL == pyInvoke)
 		return PyErr_NoMemory();
+
+	pyInvoke->pyModule = self->pyModule;
+	Py_INCREF(pyInvoke->pyModule);
 
 	SetInterface(pyInvoke->pObject, self->pObject);
 	pyInvoke->rstrName = rsName.Detach();

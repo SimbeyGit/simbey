@@ -6,6 +6,7 @@
 struct PyQuadooJSONObject
 {
 	PyObject_HEAD
+	PyObject* pyModule;
 	IJSONObject* pJSONObject;
 };
 

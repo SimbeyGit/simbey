@@ -5,6 +5,7 @@
 struct PyQuadooAttribute
 {
 	PyObject_HEAD
+	PyObject* pyModule;
 	IQuadooObject* pObject;
 	RSTRING rstrName;
 };

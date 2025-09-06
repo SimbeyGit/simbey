@@ -17,9 +17,6 @@
 
 typedef HRESULT (__stdcall* PFNGETCLASSOBJECT)(REFCLSID, REFIID, LPVOID);
 
-// Global/static cache if desired
-static PyObject* g_pyDecimalType = NULL;
-
 class CNativeModule
 {
 private:
@@ -54,7 +51,7 @@ public:
 		return hr;
 	}
 
-	HRESULT Load (const GUID& guidClass, __deref_out PyObject** ppyObject)
+	HRESULT Load (PyObject* pyModule, const GUID& guidClass, __deref_out PyObject** ppyObject)
 	{
 		HRESULT hr;
 		PFNGETCLASSOBJECT pfnGetClassObject;
@@ -69,6 +66,9 @@ public:
 		pyObject = PyObject_New(PyQuadooObject, PY_QUADOO_OBJECT());
 		CheckAlloc(pyObject);
 
+		pyObject->pyModule = pyModule;
+		Py_INCREF(pyModule);
+
 		pyObject->pObject = srObject.Detach();
 		*ppyObject = (PyObject*)pyObject;
 
@@ -77,7 +77,12 @@ public:
 	}
 };
 
-TRStrMap<CNativeModule*> g_mapModules;
+struct PyQuadooState
+{
+	TRStrMap<CNativeModule*>* pmapModules;
+	PyObject* pyDecimalType;
+	PyObject* pySysCallPending;
+};
 
 HRESULT ConvertDecimalToString (LONGLONG llDecimal, INT cPlaces, PSTR pszDecimal, INT cchMaxDecimal, __out INT* pcchDecimal)
 {
@@ -133,21 +138,61 @@ Cleanup:
 	return hr;
 }
 
-bool EnsureDecimalType (VOID)
+bool EnsureDecimalType (PyQuadooState* pState)
 {
-	if(!g_pyDecimalType)
+	if(NULL == pState->pyDecimalType)
 	{
 		PyObject* pyDecimalModule = PyImport_ImportModule("decimal");
 		if(!pyDecimalModule)
 			return false;
 
-		g_pyDecimalType = PyObject_GetAttrString(pyDecimalModule, "Decimal");
+		pState->pyDecimalType = PyObject_GetAttrString(pyDecimalModule, "Decimal");
 		Py_DECREF(pyDecimalModule);
 
-		if(!g_pyDecimalType)
+		if(NULL == pState->pyDecimalType)
 			return false;
 	}
 	return true;
+}
+
+bool IsDecimalType (PyObject* pyModule, PyObject* pyValue)
+{
+	PyQuadooState* pState = (PyQuadooState*)PyModule_GetState(pyModule);
+	return EnsureDecimalType(pState) && PyObject_IsInstance(pyValue, pState->pyDecimalType);
+}
+
+HRESULT CreatePyJSONObject (PyObject* pyModule, PyQuadooJSONObject** ppyJSONObject)
+{
+	HRESULT hr;
+
+	*ppyJSONObject = PyObject_New(PyQuadooJSONObject, PY_QUADOO_JSONOBJECT());
+	CheckAlloc(*ppyJSONObject);
+
+	(*ppyJSONObject)->pyModule = pyModule;
+	Py_INCREF(pyModule);
+
+	(*ppyJSONObject)->pJSONObject = NULL;
+	hr = S_OK;
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CreatePyJSONArray (PyObject* pyModule, PyQuadooJSONArray** ppyJSONArray)
+{
+	HRESULT hr;
+
+	*ppyJSONArray = PyObject_New(PyQuadooJSONArray, PY_QUADOO_JSONARRAY());
+	CheckAlloc(*ppyJSONArray);
+
+	(*ppyJSONArray)->pyModule = pyModule;
+	Py_INCREF(pyModule);
+
+	(*ppyJSONArray)->pJSONArray = NULL;
+	hr = S_OK;
+
+Cleanup:
+	return hr;
 }
 
 HRESULT PythonToRSTRING (PyObject* pyValue, __deref_out RSTRING* prstrValue)
@@ -182,7 +227,7 @@ HRESULT PythonToRSTRING (PyObject* pyValue, __deref_out RSTRING* prstrValue)
 	return hr;
 }
 
-HRESULT ConvertArrayToPython (IQuadooArray* pArray, __deref_out PyObject** ppyList)
+HRESULT ConvertArrayToPython (PyObject* pyModule, IQuadooArray* pArray, __deref_out PyObject** ppyList)
 {
 	HRESULT hr = S_FALSE;
 	sysint cItems = pArray->Length();
@@ -196,7 +241,7 @@ HRESULT ConvertArrayToPython (IQuadooArray* pArray, __deref_out PyObject** ppyLi
 		PyObject* pyValue;
 
 		SideAssertHr(pArray->GetItem(i, &qv));
-		Check(QuadooToPython(&qv, &pyValue));
+		Check(QuadooToPython(pyModule, &qv, &pyValue));
 
 		// Reference is stolen by PyList_SetItem()
 		PyList_SetItem(pyList, i, pyValue);
@@ -213,7 +258,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue)
+HRESULT QuadooToPython (PyObject* pyModule, const QuadooVM::QVARIANT* pqv, __deref_out PyObject** ppyValue)
 {
 	HRESULT hr;
 
@@ -253,14 +298,15 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 		{
 			CHAR szDecimal[64];
 			INT cchDecimal;
+			PyQuadooState* pState = (PyQuadooState*)PyModule_GetState(pyModule);
 
-			CheckIf(!EnsureDecimalType(), DISP_E_BADVARTYPE);
+			CheckIf(!EnsureDecimalType(pState), DISP_E_BADVARTYPE);
 			Check(ConvertDecimalToString(pqv->llVal, 4, szDecimal, ARRAYSIZE(szDecimal), &cchDecimal));
 
 			PyObject* pyString = PyUnicode_FromStringAndSize(szDecimal, cchDecimal);
 			CheckAlloc(pyString);
 
-			*ppyValue = PyObject_CallFunctionObjArgs(g_pyDecimalType, pyString, NULL);
+			*ppyValue = PyObject_CallFunctionObjArgs(pState->pyDecimalType, pyString, NULL);
 			Py_DECREF(pyString);
 
 			CheckAlloc(*ppyValue);
@@ -286,6 +332,10 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 			{
 				PyQuadooObject* pyObject = PyObject_New(PyQuadooObject, PY_QUADOO_OBJECT());
 				CheckAlloc(pyObject);
+
+				pyObject->pyModule = pyModule;
+				Py_INCREF(pyModule);
+
 				SetInterface(pyObject->pObject, pqv->pObject);
 				*ppyValue = (PyObject*)pyObject;
 			}
@@ -305,7 +355,7 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 			else
 			{
 				// Convert native QuadooScript arrays to Python.
-				Check(ConvertArrayToPython(pqv->pArray, ppyValue));
+				Check(ConvertArrayToPython(pyModule, pqv->pArray, ppyValue));
 			}
 		}
 		break;
@@ -314,6 +364,10 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 		{
 			PyQuadooMap* pyMap = PyObject_New(PyQuadooMap, PY_QUADOO_MAP());
 			CheckAlloc(pyMap);
+
+			pyMap->pyModule = pyModule;
+			Py_INCREF(pyMap->pyModule);
+
 			SetInterface(pyMap->pMap, pqv->pMap);
 			*ppyValue = (PyObject*)pyMap;
 		}
@@ -321,8 +375,9 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 
 	case QuadooVM::JSONObject:
 		{
-			PyQuadooJSONObject* pyJSONObject = PyObject_New(PyQuadooJSONObject, PY_QUADOO_JSONOBJECT());
-			CheckAlloc(pyJSONObject);
+			PyQuadooJSONObject* pyJSONObject;
+
+			Check(CreatePyJSONObject(pyModule, &pyJSONObject));
 			SetInterface(pyJSONObject->pJSONObject, pqv->pJSONObject);
 			*ppyValue = (PyObject*)pyJSONObject;
 		}
@@ -330,8 +385,9 @@ HRESULT QuadooToPython (const QuadooVM::QVARIANT* pqv, __deref_out PyObject** pp
 
 	case QuadooVM::JSONArray:
 		{
-			PyQuadooJSONArray* pyJSONArray = PyObject_New(PyQuadooJSONArray, PY_QUADOO_JSONARRAY());
-			CheckAlloc(pyJSONArray);
+			PyQuadooJSONArray* pyJSONArray;
+
+			Check(CreatePyJSONArray(pyModule, &pyJSONArray));
 			SetInterface(pyJSONArray->pJSONArray, pqv->pJSONArray);
 			*ppyValue = (PyObject*)pyJSONArray;
 		}
@@ -352,7 +408,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
+HRESULT PythonToQuadoo (PyObject* pyModule, PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 {
 	HRESULT hr = S_OK;
 
@@ -389,7 +445,7 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 	}
 	else if(PyList_Check(pyValue))
 	{
-		pqv->pArray = __new CPyListWrapper(pyValue);
+		pqv->pArray = __new CPyListWrapper(pyModule, pyValue);
 		CheckAlloc(pqv->pArray);
 		pqv->eType = QuadooVM::Array;
 	}
@@ -419,7 +475,7 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 	}
 	else if(pyValue == Py_None)
 		pqv->eType = QuadooVM::Null;
-	else if(EnsureDecimalType() && PyObject_IsInstance(pyValue, g_pyDecimalType))
+	else if(IsDecimalType(pyModule, pyValue))
 	{
 		PyObject* pyString = PyObject_Str(pyValue);
 		CheckIf(NULL == pyString, DISP_E_BADVARTYPE);
@@ -443,7 +499,7 @@ HRESULT PythonToQuadoo (PyObject* pyValue, __out QuadooVM::QVARIANT* pqv)
 	}
 	else if(PyObject_IsInstance(pyValue, (PyObject*)&PyBaseObject_Type))
 	{
-		pqv->pObject = __new CPyObjectWrapper(pyValue);
+		pqv->pObject = __new CPyObjectWrapper(pyModule, pyValue);
 		CheckAlloc(pqv->pObject);
 		pqv->eType = QuadooVM::Object;
 	}
@@ -454,7 +510,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT JSONToPython (__in_opt IJSONValue* pvJSON, __deref_out PyObject** ppyValue)
+HRESULT JSONToPython (PyObject* pyModule, __in_opt IJSONValue* pvJSON, __deref_out PyObject** ppyValue)
 {
 	HRESULT hr;
 
@@ -477,9 +533,9 @@ HRESULT JSONToPython (__in_opt IJSONValue* pvJSON, __deref_out PyObject** ppyVal
 			break;
 		case JSON::Object:
 			{
-				PyQuadooJSONObject* pyJSONObject = PyObject_New(PyQuadooJSONObject, PY_QUADOO_JSONOBJECT());
+				PyQuadooJSONObject* pyJSONObject;
 
-				CheckAlloc(pyJSONObject);
+				Check(CreatePyJSONObject(pyModule, &pyJSONObject));
 				SideAssertHr(pvJSON->GetObject(&pyJSONObject->pJSONObject));
 				*ppyValue = (PyObject*)pyJSONObject;
 			}
@@ -522,9 +578,9 @@ HRESULT JSONToPython (__in_opt IJSONValue* pvJSON, __deref_out PyObject** ppyVal
 			break;
 		case JSON::Array:
 			{
-				PyQuadooJSONArray* pyJSONArray = PyObject_New(PyQuadooJSONArray, PY_QUADOO_JSONARRAY());
+				PyQuadooJSONArray* pyJSONArray;
 
-				CheckAlloc(pyJSONArray);
+				Check(CreatePyJSONArray(pyModule, &pyJSONArray));
 				SideAssertHr(pvJSON->GetArray(&pyJSONArray->pJSONArray));
 				*ppyValue = (PyObject*)pyJSONArray;
 			}
@@ -540,17 +596,23 @@ Cleanup:
 	return hr;
 }
 
-HRESULT PythonToJSON (PyObject* pyValue, __deref_out IJSONValue** ppvJSON)
+HRESULT PythonToJSON (PyObject* pyModule, PyObject* pyValue, __deref_out IJSONValue** ppvJSON)
 {
 	HRESULT hr;
 	QuadooVM::QVARIANT qv; qv.eType = QuadooVM::Null;
 
-	Check(PythonToQuadoo(pyValue, &qv));
+	Check(PythonToQuadoo(pyModule, pyValue, &qv));
 	Check(QVMConvertToJSON(&qv, ppvJSON));
 
 Cleanup:
 	QVMClearVariant(&qv);
 	return hr;
+}
+
+PyObject* GetSysCallPendingCapsule (PyObject* pyModule)
+{
+	PyQuadooState* pState = (PyQuadooState*)PyModule_GetState(pyModule);
+	return pState->pySysCallPending;
 }
 
 VOID SetHResultError (HRESULT hr)
@@ -631,6 +693,9 @@ static PyObject* PyCreateLoader (PyObject* self, PyObject* args)
 	pyLoader = PyObject_New(PyQuadooLoader, PY_QUADOO_LOADER());
 	PyCheckAlloc(pyLoader);
 
+	pyLoader->pyModule = self;
+	Py_INCREF(self);
+
 	pyLoader->pLoader = srLoader.Detach();
 	pyLoader->pLastConstructorException = NULL;
 	pyResult = (PyObject*)pyLoader;
@@ -641,6 +706,7 @@ Cleanup:
 
 static PyObject* PyLoadModule (PyObject* self, PyObject* args)
 {
+	PyQuadooState* pState = (PyQuadooState*)PyModule_GetState(self);
 	CNativeModule* pModule;
 	Py_ssize_t cArgs = PyTuple_Size(args);
 	PyObject* pyResult = NULL, *pyModule;
@@ -668,11 +734,17 @@ static PyObject* PyLoadModule (PyObject* self, PyObject* args)
 
 	PyCheck(PythonToRSTRING(pyModule, &rsModule));
 
-	if(FAILED(g_mapModules.Find(rsModule, &pModule)))
+	if(NULL == pState->pmapModules)
+	{
+		pState->pmapModules = __new TRStrMap<CNativeModule*>;
+		PyCheckAlloc(pState->pmapModules);
+	}
+
+	if(FAILED(pState->pmapModules->Find(rsModule, &pModule)))
 	{
 		PyCheck(CNativeModule::Create(rsModule, &pModule));
 		
-		HRESULT hrAdd = g_mapModules.Add(rsModule, pModule);
+		HRESULT hrAdd = pState->pmapModules->Add(rsModule, pModule);
 		if(FAILED(hrAdd))
 		{
 			__delete pModule;
@@ -680,7 +752,7 @@ static PyObject* PyLoadModule (PyObject* self, PyObject* args)
 		}
 	}
 
-	PyCheck(pModule->Load(guidClass, &pyResult));
+	PyCheck(pModule->Load(self, guidClass, &pyResult));
 
 Cleanup:
 	return pyResult;
@@ -691,8 +763,8 @@ static PyObject* PyJSONCreateObject (PyObject* self, PyObject* args)
 	PyObject* pyResult = NULL;
 	PyQuadooJSONObject* pyJSONObject = NULL;
 
-	pyJSONObject = PyObject_New(PyQuadooJSONObject, PY_QUADOO_JSONOBJECT());
-	PyCheckAlloc(pyJSONObject);
+	PyCheck(CreatePyJSONObject(self, &pyJSONObject));
+
 	PyCheck(JSONCreateObject(&pyJSONObject->pJSONObject));
 	pyResult = (PyObject*)pyJSONObject;
 	pyJSONObject = NULL;
@@ -707,8 +779,7 @@ static PyObject* PyJSONCreateArray (PyObject* self, PyObject* args)
 	PyObject* pyResult = NULL;
 	PyQuadooJSONArray* pyJSONArray = NULL;
 
-	pyJSONArray = PyObject_New(PyQuadooJSONArray, PY_QUADOO_JSONARRAY());
-	PyCheckAlloc(pyJSONArray);
+	PyCheck(CreatePyJSONArray(self, &pyJSONArray));
 	PyCheck(JSONCreateArray(&pyJSONArray->pJSONArray));
 	pyResult = (PyObject*)pyJSONArray;
 	pyJSONArray = NULL;
@@ -730,7 +801,7 @@ static PyObject* PyJSONParse (PyObject* self, PyObject* args)
 	PyCheck(PythonToRSTRING(pyJSON, &rsJSON));
 	PyCheck(JSONParse(NULL, const_cast<LPOLESTR>(RStrToWide(*rsJSON)), rsJSON.Length(), &srv));
 	PyCheck(QVMConvertFromJSON(srv, &qv));
-	PyCheck(QuadooToPython(&qv, &pyResult));
+	PyCheck(QuadooToPython(self, &qv, &pyResult));
 
 Cleanup:
 	QVMClearVariant(&qv);
@@ -763,12 +834,13 @@ static PyObject* PyJSONGetObject (PyObject* self, PyObject* args)
 	TStackRef<IJSONObject> srObject;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "OUp", &pyJSON, &pyPath, &bEnsureExists), E_INVALIDARG);
-	PyCheck(PythonToJSON(pyJSON, &srvRoot));
+	PyCheck(PythonToJSON(self, pyJSON, &srvRoot));
 	PyCheck(PythonToRSTRING(pyPath, &rsPath));
 	if(SUCCEEDED(JSONGetObject(srvRoot, RStrToWide(*rsPath), rsPath.Length(), bEnsureExists, &srObject)))
 	{
-		PyQuadooJSONObject* pyJSONObject = PyObject_New(PyQuadooJSONObject, PY_QUADOO_JSONOBJECT());
-		PyCheckAlloc(pyJSONObject);
+		PyQuadooJSONObject* pyJSONObject;
+
+		PyCheck(CreatePyJSONObject(self, &pyJSONObject));
 		pyJSONObject->pJSONObject = srObject.Detach();
 		pyResult = (PyObject*)pyJSONObject;
 	}
@@ -787,10 +859,10 @@ static PyObject* PyJSONGetValue (PyObject* self, PyObject* args)
 	TStackRef<IJSONValue> srvRoot, srv;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "OU", &pyJSON, &pyPath), E_INVALIDARG);
-	PyCheck(PythonToJSON(pyJSON, &srvRoot));
+	PyCheck(PythonToJSON(self, pyJSON, &srvRoot));
 	PyCheck(PythonToRSTRING(pyPath, &rsPath));
 	if(SUCCEEDED(JSONGetValue(srvRoot, RStrToWide(*rsPath), rsPath.Length(), &srv)))
-		JSONToPython(srv, &pyResult);
+		JSONToPython(self, srv, &pyResult);
 	else
 		pyResult = Py_NewRef(Py_None);
 
@@ -806,8 +878,8 @@ static PyObject* PyJSONSetValue (PyObject* self, PyObject* args)
 	TStackRef<IJSONValue> srvRoot, srv;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "OUO", &pyJSON, &pyPath, &pyValue), E_INVALIDARG);
-	PyCheck(PythonToJSON(pyJSON, &srvRoot));
-	PyCheck(PythonToJSON(pyValue, &srv));
+	PyCheck(PythonToJSON(self, pyJSON, &srvRoot));
+	PyCheck(PythonToJSON(self, pyValue, &srv));
 	PyCheck(JSONSetValue(srvRoot, RStrToWide(*rsPath), rsPath.Length(), srv));
 	pyResult = Py_NewRef(Py_None);
 
@@ -823,7 +895,7 @@ static PyObject* PyJSONRemoveValue (PyObject* self, PyObject* args)
 	TStackRef<IJSONValue> srvRoot;
 
 	PyCheckIf(!PyArg_ParseTuple(args, "OU", &pyJSON, &pyPath), E_INVALIDARG);
-	PyCheck(PythonToJSON(pyJSON, &srvRoot));
+	PyCheck(PythonToJSON(self, pyJSON, &srvRoot));
 	PyCheck(JSONRemoveValue(srvRoot, RStrToWide(*rsPath), rsPath.Length(), NULL));
 	pyResult = Py_NewRef(Py_None);
 
@@ -840,6 +912,10 @@ static PyObject* PyNewMapString (PyObject* self, PyObject* args)
 	PyCheck(QVMCreateStringMap(&qvMap));
 	pyMap = PyObject_New(PyQuadooMap, PY_QUADOO_MAP());
 	PyCheckAlloc(pyMap);
+
+	pyMap->pyModule = self;
+	Py_INCREF(pyMap->pyModule);
+
 	pyMap->pMap = qvMap.pMap;
 	qvMap.eType = QuadooVM::Null;
 	pyResult = (PyObject*)pyResult;
@@ -858,6 +934,10 @@ static PyObject* PyNewMapLong (PyObject* self, PyObject* args)
 	PyCheck(QVMCreateI4Map(&qvMap));
 	pyMap = PyObject_New(PyQuadooMap, PY_QUADOO_MAP());
 	PyCheckAlloc(pyMap);
+
+	pyMap->pyModule = self;
+	Py_INCREF(pyMap->pyModule);
+
 	pyMap->pMap = qvMap.pMap;
 	qvMap.eType = QuadooVM::Null;
 	pyResult = (PyObject*)pyResult;
@@ -892,25 +972,30 @@ static PyMethodDef g_rgMethods[] =
 	{ NULL, NULL, 0, NULL }
 };
 
+static VOID PyQuadooCleanup (VOID* pvModule)
+{
+	PyQuadooState* pState = (PyQuadooState*)PyModule_GetState((PyObject*)pvModule);
+
+	if(pState->pmapModules)
+	{
+		pState->pmapModules->DeleteAll();
+		__delete pState->pmapModules;
+	}
+
+	Py_XDECREF(pState->pyDecimalType);
+	Py_XDECREF(pState->pySysCallPending);
+}
+
 static PyModuleDef g_pyModule =
 {
 	PyModuleDef_HEAD_INIT,
 	"PyQuadoo",
 	"Python wrapper for QuadooScript",
-	-1,
-	g_rgMethods
+	sizeof(PyQuadooState),
+	g_rgMethods,
+	NULL, NULL, NULL,
+	PyQuadooCleanup
 };
-
-static VOID PyQuadooCleanup (VOID)
-{
-	g_mapModules.DeleteAll();
-
-	if(g_pyDecimalType)
-	{
-		Py_DECREF(g_pyDecimalType);
-		g_pyDecimalType = NULL;
-	}
-}
 
 PyMODINIT_FUNC PyInit_PyQuadoo (VOID)
 {
@@ -932,6 +1017,17 @@ PyMODINIT_FUNC PyInit_PyQuadoo (VOID)
 		return NULL;
 
 	PyObject* pModule = PyModule_Create(&g_pyModule);
+	PyQuadooState* pState = (PyQuadooState*)PyModule_GetState(pModule);
+
+	pState->pmapModules = NULL;
+	pState->pyDecimalType = NULL;
+
+	pState->pySysCallPending = PyCapsule_New((PVOID)E_PENDING, "PyQuadoo.SYS_CALL_PENDING", NULL);
+	if(pState->pySysCallPending)
+	{
+		Py_INCREF(pState->pySysCallPending);
+		PyModule_Add(pModule, "SYS_CALL_PENDING", pState->pySysCallPending);
+	}
 
 	Py_INCREF(PY_QUADOO_JSONOBJECT_NAMES());
 	PyModule_AddObject(pModule, "JSONObjectNames", (PyObject*)PY_QUADOO_JSONOBJECT_NAMES());
@@ -956,8 +1052,6 @@ PyMODINIT_FUNC PyInit_PyQuadoo (VOID)
 
 	Py_INCREF(PY_QUADOO_LOADER());
 	PyModule_AddObject(pModule, "Loader", (PyObject*)PY_QUADOO_LOADER());
-
-	Py_AtExit(PyQuadooCleanup);
 
 	return pModule;
 }

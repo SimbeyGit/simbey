@@ -5,19 +5,23 @@
 
 struct SORT_DATA
 {
+	PyObject* pyModule;
 	INT (WINAPI* pfnCallback)(QuadooVM::QVARIANT* pqvLeft, QuadooVM::QVARIANT* pqvRight, PVOID pvParam);
 	PVOID pvParam;
 };
 
-CPyListWrapper::CPyListWrapper (PyObject* pyList) :
+CPyListWrapper::CPyListWrapper (PyObject* pyModule, PyObject* pyList) :
+	m_pyModule(pyModule),
 	m_pyList(pyList)
 {
+	Py_INCREF(m_pyModule);
 	Py_INCREF(m_pyList);
 }
 
 CPyListWrapper::~CPyListWrapper ()
 {
 	Py_DECREF(m_pyList);
+	Py_DECREF(m_pyModule);
 }
 
 // IQuadooContainer
@@ -32,7 +36,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::SetItem (sysint nItem, const QuadooVM:
 	HRESULT hr;
 	PyObject* pyObject = NULL;
 
-	Check(QuadooToPython(pqv, &pyObject));
+	Check(QuadooToPython(m_pyModule, pqv, &pyObject));
 	CheckIf(0 != PyList_SetItem(m_pyList, nItem, pyObject), DISP_E_BADINDEX);
 	pyObject = NULL;	// Now owned by the list
 
@@ -47,7 +51,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::GetItem (sysint nItem, __out QuadooVM:
 	PyObject* pyObject = PyList_GetItem(m_pyList, nItem);
 
 	CheckIf(NULL == pyObject, DISP_E_BADINDEX);
-	Check(PythonToQuadoo(pyObject, pqv));
+	Check(PythonToQuadoo(m_pyModule, pyObject, pqv));
 
 Cleanup:
 	return hr;
@@ -96,7 +100,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::InsertAt (const QuadooVM::QVARIANT* pq
 			nInsert = nSize;
 	}
 
-	Check(QuadooToPython(pqv, &pyObject));
+	Check(QuadooToPython(m_pyModule, pqv, &pyObject));
 	CheckIf(0 != PyList_Insert(m_pyList, nInsert, pyObject), E_FAIL);
 
 Cleanup:
@@ -109,7 +113,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::Append (const QuadooVM::QVARIANT* pqv)
 	HRESULT hr;
 	PyObject* pyObject = NULL;
 
-	Check(QuadooToPython(pqv, &pyObject));
+	Check(QuadooToPython(m_pyModule, pqv, &pyObject));
 	CheckIf(0 != PyList_Append(m_pyList, pyObject), DISP_E_BADINDEX);
 	pyObject = NULL;
 
@@ -147,7 +151,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::Splice (sysint nInsertAt, sysint cRemo
 	for(sysint i = 0; i < cItems; i++)
 	{
 		Check(pqv->pArray->GetItem(i, &qv));
-		Check(QuadooToPython(&qv, &pyItem));
+		Check(QuadooToPython(m_pyModule, &qv, &pyItem));
 		QVMClearVariant(&qv);
 
 		CheckIf(PyList_Insert(m_pyList, nInsertAt + i, pyItem) < 0, E_FAIL);
@@ -178,7 +182,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::Slice (sysint nBegin, sysint nEnd, __o
 	PyObject* pySlice = PyList_GetSlice(m_pyList, nBegin, nEnd);
 	CheckIf(NULL == pySlice, E_FAIL);
 
-	pqv->pArray = __new CPyListWrapper(pySlice);
+	pqv->pArray = __new CPyListWrapper(m_pyModule, pySlice);
 	CheckAlloc(pqv->pArray);
 	hr = S_OK;
 
@@ -242,6 +246,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::Sort (INT (WINAPI* pfnCallback)(Quadoo
 		Py_INCREF(rgPyObjects[i]);
 	}
 
+	SortData.pyModule = m_pyModule;	// No reference needs to be added
 	SortData.pfnCallback = pfnCallback;
 	SortData.pvParam = pvParam;
 
@@ -249,7 +254,7 @@ HRESULT STDMETHODCALLTYPE CPyListWrapper::Sort (INT (WINAPI* pfnCallback)(Quadoo
 	for(Py_ssize_t i = 0; i < nSize; i++)
 	{
 		SideAssert(0 != PyList_SetItem(m_pyList, i, rgPyObjects[i]));
-		rgPyObjects[i] = NULL;	// Now owned by the list
+		rgPyObjects[i] = NULL;		// Now owned by the list
 	}
 
 	hr = S_OK;
@@ -267,15 +272,16 @@ Cleanup:
 INT WINAPI CPyListWrapper::_SortPython (PyObject** ppyLeft, PyObject** ppyRight, PVOID pvParam)
 {
 	INT nResult;
+	SORT_DATA* pSortData = reinterpret_cast<SORT_DATA*>(pvParam);
 	QuadooVM::QVARIANT qvLeft, qvRight;
 
 	qvLeft.eType = QuadooVM::Null;
 	qvRight.eType = QuadooVM::Null;
 
-	if(SUCCEEDED(PythonToQuadoo(*ppyLeft, &qvLeft)) &&
-		SUCCEEDED(PythonToQuadoo(*ppyRight, &qvRight)))
+	if(SUCCEEDED(PythonToQuadoo(pSortData->pyModule, *ppyLeft, &qvLeft)) &&
+		SUCCEEDED(PythonToQuadoo(pSortData->pyModule, *ppyRight, &qvRight)))
 	{
-		nResult = reinterpret_cast<SORT_DATA*>(pvParam)->pfnCallback(&qvLeft, &qvRight, reinterpret_cast<SORT_DATA*>(pvParam)->pvParam);
+		nResult = pSortData->pfnCallback(&qvLeft, &qvRight, pSortData->pvParam);
 	}
 	else
 		nResult = static_cast<INT>(*ppyLeft - *ppyRight);
