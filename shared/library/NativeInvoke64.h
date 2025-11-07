@@ -21,12 +21,17 @@ public:
     struct Arg
     {
         ArgClass kind;
-        union { ULONGLONG u64; float f32; double f64; } v;
-        static Arg Int(ULONGLONG x)		{ Arg a; a.kind=ArgClass::GP64; a.v.u64=x; return a; }
-        static Arg Ptr(const void* p)	{ Arg a; a.kind=ArgClass::GP64; a.v.u64=(ULONGLONG)reinterpret_cast<uintptr_t>(p); return a; }
-        static Arg ByRef(void* p)		{ Arg a; a.kind=ArgClass::GP64; a.v.u64=(ULONGLONG)reinterpret_cast<uintptr_t>(p); return a; }
-        static Arg Float(float x)		{ Arg a; a.kind=ArgClass::F32;  a.v.f32=x; return a; }
-        static Arg Double(double x)		{ Arg a; a.kind=ArgClass::F64;  a.v.f64=x; return a; }
+        union { ULONGLONG u64; float f32; double f64; };
+
+		Arg (const Arg& o) : kind(o.kind), u64(o.u64) {}
+		Arg (BYTE x) : kind(GP64), u64(x) {}
+		Arg (WORD x) : kind(GP64), u64(x) {}
+		Arg (DWORD x) : kind(GP64), u64(x) {}
+		Arg (ULONGLONG x) : kind(GP64), u64(x) {}
+		Arg (const VOID* pcv) : kind(GP64), u64(reinterpret_cast<uintptr_t>(pcv)) {}
+		Arg (VOID* pv) : kind(GP64), u64(reinterpret_cast<uintptr_t>(pv)) {}
+		Arg (FLOAT x) : kind(F32), f32(x) {}
+		Arg (DOUBLE x) : kind(F64), f64(x) {}
     };
 
 private:
@@ -58,13 +63,13 @@ public:
     void    Reset();
 
     // Parity-style adder methods
-    HRESULT AddParam8   (BYTE v)		{ return AddArg(Arg::Int(v)); }
-    HRESULT AddParam16  (WORD v)		{ return AddArg(Arg::Int(v)); }
-    HRESULT AddParam32  (DWORD v)		{ return AddArg(Arg::Int(v)); }
-    HRESULT AddParam64  (ULONGLONG v)	{ return AddArg(Arg::Int(v)); }
-    HRESULT AddParamPtr (const void* p)	{ return AddArg(Arg::Ptr(p)); }
-    HRESULT AddFloat    (float f)		{ return AddArg(Arg::Float(f)); }
-    HRESULT AddDouble   (double d)		{ return AddArg(Arg::Double(d)); }
+    HRESULT AddParam8   (BYTE v)		{ return AddArg(Arg(v)); }
+    HRESULT AddParam16  (WORD v)		{ return AddArg(Arg(v)); }
+    HRESULT AddParam32  (DWORD v)		{ return AddArg(Arg(v)); }
+    HRESULT AddParam64  (ULONGLONG v)	{ return AddArg(Arg(v)); }
+    HRESULT AddParamPtr (const void* p)	{ return AddArg(Arg(p)); }
+    HRESULT AddFloat    (float f)		{ return AddArg(Arg(f)); }
+    HRESULT AddDouble   (double d)		{ return AddArg(Arg(d)); }
 
     void SetThisPtr (ULONGLONG qwThisPtr) { m_qwThisPtr = qwThisPtr; }
 

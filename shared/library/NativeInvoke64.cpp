@@ -55,7 +55,7 @@ HRESULT CNativeInvoke::GenerateStub_x64 (DWORD_PTR pfnTarget, ULONGLONG* pReturn
 
 	// 0) Build ordered argument list (prepend implicit this if present)
 	if(m_qwThisPtr)
-		Check(args.Append(Arg::Int(m_qwThisPtr)));
+		Check(args.Append(Arg(m_qwThisPtr)));
 	for(sysint i = 0; i < m_args.Length(); ++i)
 		Check(args.Append(m_args[i]));
 
@@ -75,11 +75,11 @@ HRESULT CNativeInvoke::GenerateStub_x64 (DWORD_PTR pfnTarget, ULONGLONG* pReturn
 			// Load XMM{i} with 64-bit FP payload via RAX (no inline data in code stream)
 			ULONGLONG q;
 			if (a.kind == F64)
-				CopyMemory(&q, &a.v.f64, 8);
+				CopyMemory(&q, &a.f64, 8);
 			else
 			{
 				DWORD lo;
-				CopyMemory(&lo, &a.v.f32, 4);
+				CopyMemory(&lo, &a.f32, 4);
 				q = (ULONGLONG)lo;
 			}
 
@@ -95,7 +95,7 @@ HRESULT CNativeInvoke::GenerateStub_x64 (DWORD_PTR pfnTarget, ULONGLONG* pReturn
 		{
 			// mov RCX/RDX/R8/R9, imm64
 			emit8(mov64_gp[i][0]); emit8(mov64_gp[i][1]);
-			emit64(a.v.u64);
+			emit64(a.u64);
 		}
 	}
 
@@ -116,12 +116,12 @@ HRESULT CNativeInvoke::GenerateStub_x64 (DWORD_PTR pfnTarget, ULONGLONG* pReturn
 		ULONGLONG q;
 
 		if(a.kind == GP64)
-			q = a.v.u64;
+			q = a.u64;
 		else if(a.kind == F64)
-			CopyMemory(&q, &a.v.f64, 8);
+			CopyMemory(&q, &a.f64, 8);
 		else // F32 -> low dword holds the bits, high dword = 0
 		{
-			DWORD lo; CopyMemory(&lo, &a.v.f32, 4);
+			DWORD lo; CopyMemory(&lo, &a.f32, 4);
 			q = (ULONGLONG)lo;
 		}
 
