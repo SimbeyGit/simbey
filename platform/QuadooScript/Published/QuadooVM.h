@@ -134,6 +134,7 @@ namespace QuadooVM
 		DELETE_PROPERTY,
 		READ_DATA,
 		LOAD_EXTERN_CLASS,
+		XMAP,
 		SYSCALL_STATIC = 0xF8,
 		SYSCALL_DYNAMIC = 0xF9,
 		JSON = 0xFA,
@@ -718,6 +719,7 @@ HRESULT WINAPI QVMDeleteProperty (QuadooVM::QVARIANT* pqvObject, QuadooVM::QVARI
 HRESULT WINAPI QVMCreateLineReader (ISequentialStream* pStream, __out QuadooVM::QVARIANT* pqv);
 HRESULT WINAPI QVMMapFind (QuadooVM::QVARIANT* pqvArgs, __out QuadooVM::QVARIANT* pqvResult);
 HRESULT WINAPI QVMDot (QuadooVM::QVARIANT* pqvSet1, QuadooVM::QVARIANT* pqvSet2, __out QuadooVM::QVARIANT* pqv);
+HRESULT WINAPI QVMXMap (QuadooVM::QVARIANT* pqvArgs);
 
 inline HRESULT GetSysIntFromVariant (const QuadooVM::QVARIANT* pqv, __out sysint* pnValue)
 {
