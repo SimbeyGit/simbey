@@ -35,7 +35,8 @@
 				"mom:archmage"
 			],
 			music: [ "mom:horus/a", "mom:horus/b" ],
-			startingRaces: [ "mom:halfling" ]
+			startingRaces: [ "mom:halfling" ],
+			familiar: "mom:familiar/ui/dove"
 		}
 	}
 ]

@@ -35,7 +35,8 @@
 				"mom:artificer"
 			],
 			music: [ "mom:kali/a", "mom:kali/b" ],
-			startingRaces: [ "mom:high_men", "mom:barbarian" ]
+			startingRaces: [ "mom:high_men", "mom:barbarian" ],
+			familiar: "mom:familiar/ui/black_cat"
 		}
 	}
 ]

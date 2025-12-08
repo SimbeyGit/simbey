@@ -34,8 +34,9 @@
 			[
 				"mom_ext:mind_control"
 			],
-			music: [ "mom:kali/a", "mom:kali/b" ],
-			startingRaces: [ "mom:high_men", "mom:orc" ]
+			music: [ "mom_ext:viephren_battle_music" ],
+			startingRaces: [ "mom:high_men", "mom:orc" ],
+			familiar: "mom_ext:familiar/ui/cuttlefish"
 		}
 	}
 ]

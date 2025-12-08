@@ -1,0 +1,10 @@
+[
+	{
+		package: "buildsif",
+		name: "landscape.sif",
+		files: ["*.png"],
+		trim: false,
+		double: false,
+		canvas: 512
+	}
+]

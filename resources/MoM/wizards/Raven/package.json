@@ -34,7 +34,8 @@
 			[
 			],
 			music: [ "mom:raven/a", "mom:raven/b" ],
-			startingRaces: [ "mom:nomad", "mom:barbarian" ]
+			startingRaces: [ "mom:nomad", "mom:barbarian" ],
+			familiar: "mom:familiar/ui/snake"
 		}
 	}
 ]

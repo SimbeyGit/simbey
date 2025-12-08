@@ -1,0 +1,19 @@
+[
+	{
+		package: "buildsif",
+		name: "familiars.sif",
+		trim: false,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "familiars.json",
+		data:
+		[
+			{
+				ref: "mom_ext:familiar/ui/cuttlefish",
+				image: "cuttlefish.png"
+			}
+		]
+	}
+]

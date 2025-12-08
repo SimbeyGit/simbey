@@ -24,6 +24,7 @@
 			race:"mom:barbarian",
 			figures:8,
 			animation:"ground_unit",
+			cost:15,
 			upkeep:
 			[
 				{

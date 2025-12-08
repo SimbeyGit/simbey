@@ -1,0 +1,10 @@
+[
+	{
+		package: "buildsif",
+		name: "misc.sif",
+		files: ["*.png"],
+		trim: true,
+		double: true,
+		canvas: 512
+	}
+]

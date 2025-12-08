@@ -24,6 +24,7 @@
 			race:"mom:draconian",
 			figures:1,
 			animation:"flying_unit",
+			cost:200,
 			upkeep:
 			[
 				{

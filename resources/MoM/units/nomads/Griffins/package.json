@@ -24,6 +24,7 @@
 			race:"mom:nomad",
 			figures:2,
 			animation:"flying_unit",
+			cost:200,
 			upkeep:
 			[
 				{

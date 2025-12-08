@@ -24,6 +24,7 @@
 			race:"mom:beastmen",
 			figures:2,
 			animation:"ground_unit",
+			cost:200,
 			upkeep:
 			[
 				{

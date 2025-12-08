@@ -11,6 +11,7 @@
 			race:"mom:nomad",
 			figures:1,
 			animation:"ground_unit",
+			cost:60,
 			upkeep:
 			[
 				{

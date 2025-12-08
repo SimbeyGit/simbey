@@ -450,5 +450,144 @@
 	{
 		package: "midi",
 		name: "MOM116.MID"
+	},
+	{
+		package: "json",
+		name: "music.json",
+		data:
+		[
+			{
+				ref: "mom:overland/a",
+				file: "MOM100.MID"
+			},
+			{
+				ref: "mom:overland/b",
+				file: "MOM101.MID"
+			},
+			{
+				ref: "mom:overland/c",
+				file: "MOM102.MID"
+			},
+			{
+				ref: "mom:combat/a",
+				file: "MOM103.MID"
+			},
+			{
+				ref: "mom:combat/b",
+				file: "MOM104.MID"
+			},
+			{
+				ref: "mom:ariel/a",
+				file: "MOM94.MID"
+			},
+			{
+				ref: "mom:ariel/b",
+				file: "MOM95.MID"
+			},
+			{
+				ref: "mom:freya/a",
+				file: "MOM90.MID"
+			},
+			{
+				ref: "mom:freya/b",
+				file: "MOM91.MID"
+			},
+			{
+				ref: "mom:horus/a",
+				file: "MOM92.MID"
+			},
+			{
+				ref: "mom:horus/b",
+				file: "MOM93.MID"
+			},
+			{
+				ref: "mom:jafar/a",
+				file: "MOM80.MID"
+			},
+			{
+				ref: "mom:jafar/b",
+				file: "MOM81.MID"
+			},
+			{
+				ref: "mom:kali/a",
+				file: "MOM98.MID"
+			},
+			{
+				ref: "mom:kali/b",
+				file: "MOM99.MID"
+			},
+			{
+				ref: "mom:lopan/a",
+				file: "MOM78.MID"
+			},
+			{
+				ref: "mom:merlin/a",
+				file: "MOM72.MID"
+			},
+			{
+				ref: "mom:merlin/b",
+				file: "MOM73.MID"
+			},
+			{
+				ref: "mom:oberic/a",
+				file: "MOM82.MID"
+			},
+			{
+				ref: "mom:oberic/b",
+				file: "MOM83.MID"
+			},
+			{
+				ref: "mom:raven/a",
+				file: "MOM74.MID"
+			},
+			{
+				ref: "mom:raven/b",
+				file: "MOM75.MID"
+			},
+			{
+				ref: "mom:rjak/a",
+				file: "MOM84.MID"
+			},
+			{
+				ref: "mom:rjak/b",
+				file: "MOM85.MID"
+			},
+			{
+				ref: "mom:sharee/a",
+				file: "MOM76.MID"
+			},
+			{
+				ref: "mom:sharee/b",
+				file: "MOM77.MID"
+			},
+			{
+				ref: "mom:sssra/a",
+				file: "MOM86.MID"
+			},
+			{
+				ref: "mom:sssra/b",
+				file: "MOM87.MID"
+			},
+			{
+				ref: "mom:tauron/a",
+				file: "MOM88.MID"
+			},
+			{
+				ref: "mom:tauron/b",
+				file: "MOM89.MID"
+			},
+			{
+				ref: "mom:tlaloc/a",
+				file: "MOM96.MID"
+			},
+			{
+				ref: "mom:tlaloc/b",
+				file: "MOM97.MID"
+			},
+			{
+				ref: "mom:new_building",
+				file: "MOM109.MID"
+			}
+		]
 	}
 ]

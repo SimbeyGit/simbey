@@ -24,6 +24,7 @@
 			race:"mom:high_elf",
 			figures:4,
 			animation:"flying_unit",
+			cost:160,
 			upkeep:
 			[
 				{

@@ -11,6 +11,7 @@
 			race:"mom:dark_elf",
 			figures:1,
 			animation:"water_unit",
+			cost:100,
 			upkeep:
 			[
 				{

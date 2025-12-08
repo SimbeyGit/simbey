@@ -31,7 +31,8 @@
 				"mom:nature_mastery"
 			],
 			music: [ "mom:freya/a", "mom:freya/b" ],
-			startingRaces: [ "mom:high_elf" ]
+			startingRaces: [ "mom:high_elf" ],
+			familiar: "mom:familiar/ui/snake"
 		}
 	}
 ]

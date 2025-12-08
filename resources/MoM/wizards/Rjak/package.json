@@ -31,7 +31,8 @@
 				"mom:infernal_power"
 			],
 			music: [ "mom:rjak/a", "mom:rjak/b" ],
-			startingRaces: [ "mom:high_men", "mom:high_elf" ]
+			startingRaces: [ "mom:high_men", "mom:high_elf" ],
+			familiar: "mom:familiar/ui/scarab"
 		}
 	}
 ]

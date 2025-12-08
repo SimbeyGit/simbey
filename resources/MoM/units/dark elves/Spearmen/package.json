@@ -24,6 +24,7 @@
 			race:"mom:dark_elf",
 			figures:8,
 			animation:"ground_unit",
+			cost:25,
 			upkeep:
 			[
 				{

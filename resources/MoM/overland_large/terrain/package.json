@@ -705,6 +705,35 @@
 				},
 				rivers: 60,
 				nodes: [60, 50]
+			},
+			{
+				name: "Mega Epic",
+				width: 256,
+				height: 192,
+				depth: 2,
+				maxOpponents: 12,
+				zone:
+				{
+					width: 25,
+					height: 19
+				},
+				lairs:
+				{
+					normal: 100,
+					weak: 130
+				},
+				towers:
+				{
+					count: 30,
+					separation: 15
+				},
+				cities:
+				{
+					separation: 8,
+					raiders: 60
+				},
+				rivers: 80,
+				nodes: [80, 75]
 			}
 		]
 	},
@@ -848,7 +877,8 @@
 			{
 				cities: true,
 				food: 0.75,
-				production: 4.0
+				production: 4.0,
+				bonus: "mom:dark_forest_bonus"
 			},
 			desert:
 			{
@@ -902,7 +932,8 @@
 			{
 				cities: true,
 				food: 2.0,
-				production: 4.0
+				production: 4.0,
+				bonus: "mom:river_bonus"
 			},
 			shore:
 			{

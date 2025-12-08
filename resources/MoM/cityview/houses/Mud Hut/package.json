@@ -1,0 +1,19 @@
+[
+	{
+		package: "buildsif",
+		name: "house.sif",
+		double: true,
+		files: ["*.png"],
+		trim: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "house.json",
+		data:
+		{
+			ref: "mom:cityview/house/mudhut",
+			animated: false
+		}
+	}
+]

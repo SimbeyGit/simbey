@@ -11,6 +11,7 @@
 			race:"mom:barbarian",
 			figures:1,
 			animation:"water_unit",
+			cost:60,
 			upkeep:
 			[
 				{

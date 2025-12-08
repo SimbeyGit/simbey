@@ -31,7 +31,8 @@
 				"mom:alchemy"
 			],
 			music: [ "mom:jafar/a", "mom:jafar/b" ],
-			startingRaces: [ "mom:nomad" ]
+			startingRaces: [ "mom:nomad" ],
+			familiar: "mom:familiar/ui/scarab"
 		}
 	}
 ]

@@ -24,6 +24,7 @@
 			race:"mom:high_elf",
 			figures:6,
 			animation:"ground_unit",
+			cost:60,
 			upkeep:
 			[
 				{

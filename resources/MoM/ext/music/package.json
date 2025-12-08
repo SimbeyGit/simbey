@@ -1,0 +1,17 @@
+[
+	{
+		package: "midi",
+		name: "VIEPHREN.MID"
+	},
+	{
+		package: "json",
+		name: "music.json",
+		data:
+		[
+			{
+				ref: "mom_ext:viephren_battle_music",
+				file: "VIEPHREN.MID"
+			}
+		]
+	}
+]

@@ -578,13 +578,232 @@
 			},
 			{
 				ref: "mom:ability/unit/chaotic",
+				name: "Chaotic",
 				type: "moves",
 				image: "Unit_Chaotic.png"
 			},
 			{
-				ref: "ability/unit/aura_damage",
+				ref: "mom:ability/unit/aura_damage",
+				name: "Aura Damage",
 				type: "aura",
 				image: "Unit_AuraDamage.png"
+			},
+			{
+				ref: "mom:ability/spell/resist_elements",
+				name: "Resist Elements",
+				type: "ability",
+				image: "Spell_ResistElements.png"
+			},
+			{
+				ref: "mom:ability/spell/giant_strength",
+				name: "Giant Strength",
+				type: "ability",
+				image: "Spell_GiantStrength.png"
+			},
+			{
+				ref: "mom:ability/spell/stone_skin",
+				name: "Stone Skin",
+				type: "ability",
+				image: "Spell_StoneSkin.png"
+			},
+			{
+				ref: "mom:ability/spell/water_walking",
+				name: "Water Walking",
+				type: "ability",
+				image: "Spell_WaterWalking.png"
+			},
+			{
+				ref: "mom:ability/spell/path_finding",
+				name: "Path Finding",
+				type: "ability",
+				image: "Spell_PathFinding.png"
+			},
+			{
+				ref: "mom:ability/spell/elemental_armor",
+				name: "Elemental Armor",
+				type: "ability",
+				image: "Spell_ElementalArmor.png"
+			},
+			{
+				ref: "mom:ability/spell/iron_skin",
+				name: "Iron Skin",
+				type: "ability",
+				image: "Spell_IronSkin.png"
+			},
+			{
+				ref: "mom:ability/spell/regeneration",
+				name: "Regeneration",
+				type: "ability",
+				image: "Spell_Regeneration.png"
+			},
+			{
+				ref: "mom:ability/spell/resist_magic",
+				name: "Resist Magic",
+				type: "ability",
+				image: "Spell_ResistMagic.png"
+			},
+			{
+				ref: "mom:ability/spell/guardian_wind",
+				name: "Guardian Wind",
+				type: "ability",
+				image: "Spell_GuardianWind.png"
+			},
+			{
+				ref: "mom:ability/spell/spell_lock",
+				name: "Spell Lock",
+				type: "ability",
+				image: "Spell_SpellLock.png"
+			},
+			{
+				ref: "mom:ability/spell/flight",
+				name: "Flight",
+				type: "ability",
+				image: "Spell_Flight.png"
+			},
+			{
+				ref: "mom:ability/spell/invisibility",
+				name: "Invisibility",
+				type: "ability",
+				image: "Spell_Invisibility.png"
+			},
+			{
+				ref: "mom:ability/spell/wind_walking",
+				name: "Wind Walking",
+				type: "ability",
+				image: "Spell_WindWalking.png"
+			},
+			{
+				ref: "mom:ability/spell/magic_immunity",
+				name: "Magic Immunity",
+				type: "immunity",
+				immunity: ["magic","fire","lightning","stoning","death","life steal","fear"],
+				image: "Spell_MagicImmunity.png"
+			},
+			{
+				ref: "mom:ability/spell/haste",
+				name: "Haste",
+				type: "ability",
+				image: "Spell_Haste.png"
+			},
+			{
+				ref: "mom:ability/spell/eldritch_weapon",
+				name: "Eldritch Weapon",
+				type: "ability",
+				image: "Spell_EldritchWeapon.png"
+			},
+			{
+				ref: "mom:ability/spell/chaos_channels_a",
+				name: "Demon Skin Armor",
+				type: "ability",
+				image: "Spell_ChaosChannelsA.png"
+			},
+			{
+				ref: "mom:ability/spell/chaos_channels_b",
+				name: "Fire Breath",
+				type: "ability",
+				image: "Spell_ChaosChannelsB.png"
+			},
+			{
+				ref: "mom:ability/spell/chaos_channels_c",
+				name: "Flight",
+				type: "ability",
+				image: "Spell_ChaosChannelsC.png"
+			},
+			{
+				ref: "mom:ability/spell/flame_blade",
+				name: "Flame Blade",
+				type: "ability",
+				image: "Spell_FlameBlade.png"
+			},
+			{
+				ref: "mom:ability/spell/immolation",
+				name: "Immolation",
+				type: "ability",
+				image: "Spell_Immolation.png"
+			},
+			{
+				ref: "mom:ability/spell/bless",
+				name: "Bless",
+				type: "ability",
+				image: "Spell_Bless.png"
+			},
+			{
+				ref: "mom:ability/spell/endurance",
+				name: "Endurance",
+				type: "ability",
+				image: "Spell_Endurance.png"
+			},
+			{
+				ref: "mom:ability/spell/holy_weapon",
+				name: "Holy Weapon",
+				type: "ability",
+				image: "Spell_HolyWeapon.png"
+			},
+			{
+				ref: "mom:ability/spell/holy_armor",
+				name: "Holy Armor",
+				type: "ability",
+				image: "Spell_HolyArmor.png"
+			},
+			{
+				ref: "mom:ability/spell/heroism",
+				name: "Heroism",
+				type: "ability",
+				image: "Spell_Heroism.png"
+			},
+			{
+				ref: "mom:ability/spell/true_sight",
+				name: "True Sight",
+				type: "ability",
+				image: "Spell_TrueSight.png"
+			},
+			{
+				ref: "mom:ability/spell/planar_travel",
+				name: "Planar Travel",
+				type: "ability",
+				image: "Spell_PlanarTravel.png"
+			},
+			{
+				ref: "mom:ability/spell/lionheart",
+				name: "Lionheart",
+				type: "ability",
+				image: "Spell_Lionheart.png"
+			},
+			{
+				ref: "mom:ability/spell/invulnerability",
+				name: "Invulnerability",
+				type: "ability",
+				image: "Spell_Invulnerability.png"
+			},
+			{
+				ref: "mom:ability/spell/righteousness",
+				name: "Righteousness",
+				type: "ability",
+				image: "Spell_Righteousness.png"
+			},
+			{
+				ref: "mom:ability/spell/cloak_of_fear",
+				name: "Cloak of Fear",
+				type: "ability",
+				image: "Spell_CloakOfFear.png"
+			},
+			{
+				ref: "mom:ability/spell/black_channels",
+				name: "Black Channels",
+				type: "ability",
+				image: "Spell_BlackChannels.png"
+			},
+			{
+				ref: "mom:ability/spell/berserk",
+				name: "Berserk",
+				type: "ability",
+				image: "Spell_Berserk.png"
+			},
+			{
+				ref: "mom:ability/spell/wraith_form",
+				name: "Wraith Form",
+				type: "ability",
+				image: "Spell_WraithForm.png"
 			}
 		]
 	}

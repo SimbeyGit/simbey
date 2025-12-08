@@ -24,6 +24,7 @@
 			race:"mom:lizardmen",
 			figures:8,
 			animation:"ground_unit",
+			cost:10,
 			upkeep:
 			[
 				{

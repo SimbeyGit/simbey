@@ -24,6 +24,7 @@
 			race:"mom:halfling",
 			figures:8,
 			animation:"ground_unit",
+			cost:100,
 			upkeep:
 			[
 				{

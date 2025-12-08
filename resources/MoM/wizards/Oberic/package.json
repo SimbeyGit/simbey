@@ -35,7 +35,8 @@
 				"mom:mana_focusing"
 			],
 			music: [ "mom:oberic/a", "mom:oberic/b" ],
-			startingRaces: [ "mom:high_men" ]
+			startingRaces: [ "mom:high_men" ],
+			familiar: "mom:familiar/ui/snake"
 		}
 	}
 ]

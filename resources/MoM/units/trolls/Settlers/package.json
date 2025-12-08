@@ -11,6 +11,7 @@
 			race:"mom:troll",
 			figures:1,
 			animation:"ground_unit",
+			cost:180,
 			upkeep:
 			[
 				{

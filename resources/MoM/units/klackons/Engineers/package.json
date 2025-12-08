@@ -24,6 +24,7 @@
 			race:"mom:klackon",
 			figures:6,
 			animation:"ground_unit",
+			cost:80,
 			upkeep:
 			[
 				{

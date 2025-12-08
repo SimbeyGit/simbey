@@ -114,5 +114,128 @@
 	{
 		package: "sound",
 		name: "Whoosh.mp3"
+	},
+	{
+		package: "json",
+		name: "sounds.json",
+		data:
+		[
+			{
+				ref: "mom:sounds/armor",
+				sound: "Armor.mp3"
+			},
+			{
+				ref: "mom:sounds/arrow",
+				sound: "Arrow.mp3"
+			},
+			{
+				ref: "mom:sounds/behemoth",
+				sound: "BehemothAttack.mp3"
+			},
+			{
+				ref: "mom:sounds/cavalry",
+				sound: "Cavalry.mp3"
+			},
+			{
+				ref: "mom:sounds/colossus",
+				sound: "Colossus.mp3"
+			},
+			{
+				ref: "mom:sounds/cracks_call",
+				sound: "CracksCall.mp3"
+			},
+			{
+				ref: "mom:sounds/creature_a",
+				sound: "CreatureA.mp3"
+			},
+			{
+				ref: "mom:sounds/creature_b",
+				sound: "CreatureB.mp3"
+			},
+			{
+				ref: "mom:sounds/death_bolt",
+				sound: "DeathBolt.mp3"
+			},
+			{
+				ref: "mom:sounds/disintegrate",
+				sound: "Disintegrate.mp3"
+			},
+			{
+				ref: "mom:sounds/doom_bolt",
+				sound: "DoomBolt.mp3"
+			},
+			{
+				ref: "mom:sounds/drake_attack",
+				sound: "DrakeAttack.mp3"
+			},
+			{
+				ref: "mom:sounds/drake_fly",
+				sound: "DrakeFly.mp3"
+			},
+			{
+				ref: "mom:sounds/fire_bolt",
+				sound: "FireBolt.mp3"
+			},
+			{
+				ref: "mom:sounds/heavenly_light",
+				sound: "HeavenlyLight.mp3"
+			},
+			{
+				ref: "mom:sounds/heavy_walking",
+				sound: "HeavyWalking.mp3"
+			},
+			{
+				ref: "mom:sounds/ice_bolt",
+				sound: "IceBolt.mp3"
+			},
+			{
+				ref: "mom:sounds/lightning_bolt",
+				sound: "LightningBolt.mp3"
+			},
+			{
+				ref: "mom:sounds/lion",
+				sound: "LionRoar.mp3"
+			},
+			{
+				ref: "mom:sounds/magic_missile",
+				sound: "MagicMissile.mp3"
+			},
+			{
+				ref: "mom:sounds/merge",
+				sound: "Merge.mp3"
+			},
+			{
+				ref: "mom:sounds/pebble",
+				sound: "Pebble.mp3"
+			},
+			{
+				ref: "mom:sounds/psionic_blast",
+				sound: "PsionicBlast.mp3"
+			},
+			{
+				ref: "mom:sounds/rock",
+				sound: "Rock.mp3"
+			},
+			{
+				ref: "mom:sounds/scuttle",
+				sound: "Scuttle.mp3"
+			},
+			{
+				ref: "mom:sounds/sprites",
+				sound: "SpritesAttack.mp3"
+			},
+			{
+				ref: "mom:sounds/summoning",
+				sound: "Summoning.mp3"
+			},
+			{
+				ref: "mom:sounds/sword",
+				sound: "SwordAttack.mp3"
+			},
+			{
+				ref: "mom:sounds/whoosh",
+				sound: "Whoosh.mp3"
+			}
+		]
 	}
 ]

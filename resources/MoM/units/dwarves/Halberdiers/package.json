@@ -24,6 +24,7 @@
 			race:"mom:dwarven",
 			figures:6,
 			animation:"ground_unit",
+			cost:100,
 			upkeep:
 			[
 				{

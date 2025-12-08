@@ -35,7 +35,8 @@
 				"mom:channeler"
 			],
 			music: [ "mom:lopan/a" ],
-			startingRaces: [ "mom:high_men", "mom:barbarian" ]
+			startingRaces: [ "mom:high_men", "mom:barbarian" ],
+			familiar: "mom:familiar/ui/demon"
 		}
 	}
 ]

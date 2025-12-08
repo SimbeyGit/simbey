@@ -35,7 +35,8 @@
 				"mom:myrran"
 			],
 			music: [ "mom:sssra/a", "mom:sssra/b" ],
-			startingRaces: [ "mom:draconian" ]
+			startingRaces: [ "mom:draconian" ],
+			familiar: "mom:familiar/ui/demon"
 		}
 	}
 ]

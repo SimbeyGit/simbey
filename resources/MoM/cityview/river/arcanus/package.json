@@ -1,0 +1,10 @@
+[
+	{
+		package: "buildsif",
+		name: "river.sif",
+		files: ["*.png"],
+		trim: true,
+		double: true,
+		canvas: 256
+	}
+]

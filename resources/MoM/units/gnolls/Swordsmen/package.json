@@ -24,6 +24,7 @@
 			race:"mom:gnoll",
 			figures:6,
 			animation:"ground_unit",
+			cost:20,
 			upkeep:
 			[
 				{
