@@ -587,6 +587,14 @@
 			{
 				ref: "mom:new_building",
 				file: "MOM109.MID"
+			},
+			{
+				ref: "mom:encounter",
+				file: "MOM106.MID"
+			},
+			{
+				ref: "mom:spell_researched",
+				file: "MOM41.MID"
 			}
 		]
 	}

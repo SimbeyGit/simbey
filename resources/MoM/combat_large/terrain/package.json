@@ -72,7 +72,35 @@
 				features: 70
 			},
 			{
+				name: "natureNode",
+				tiles: "default",
+				dark: 35,
+				ridge: 25,
+				features: 70
+			},
+			{
+				name: "natureNodeMonsters",
+				tiles: "default",
+				dark: 35,
+				ridge: 25,
+				features: 70
+			},
+			{
 				name: "grasslands",
+				tiles: "default",
+				dark: 30,
+				ridge: 20,
+				features: 20
+			},
+			{
+				name: "sorceryNode",
+				tiles: "default",
+				dark: 30,
+				ridge: 20,
+				features: 20
+			},
+			{
+				name: "sorceryNodeMonsters",
 				tiles: "default",
 				dark: 30,
 				ridge: 20,
@@ -87,6 +115,20 @@
 			},
 			{
 				name: "mountains",
+				tiles: "mountains",
+				dark: 40,
+				ridge: 60,
+				features: 15
+			},
+			{
+				name: "chaosNode",
+				tiles: "mountains",
+				dark: 40,
+				ridge: 60,
+				features: 15
+			},
+			{
+				name: "chaosNodeMonsters",
 				tiles: "mountains",
 				dark: 40,
 				ridge: 60,
