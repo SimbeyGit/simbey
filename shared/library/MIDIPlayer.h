@@ -51,7 +51,7 @@ namespace MIDI
 	{
 		ULONG time;
 		ULONG msg;
-		ULONG track;
+		ULONG_PTR track;
 	};
 
 	class CPlayer;

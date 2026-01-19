@@ -1,0 +1,20 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files: ["*.png"],
+		trim: true,
+		double: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:combat/structure/city_roads",
+			size: 5,
+			animated: false
+		}
+	}
+]

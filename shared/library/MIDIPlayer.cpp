@@ -223,7 +223,7 @@ namespace MIDI
 		Check(pStream->Write(&m_nResumePoint, sizeof(m_nResumePoint), &cb));
 
 		m_aMessages.GetData(&pMessages, &cMessages);
-		Check(pStream->Write(pMessages, cMessages * sizeof(MERGEDMSG), &cb));
+		Check(pStream->Write(pMessages, static_cast<ULONG>(cMessages * sizeof(MERGEDMSG)), &cb));
 
 	Cleanup:
 		LeaveCriticalSection(&m_cs);
@@ -385,7 +385,7 @@ namespace MIDI
 	HRESULT ReadMIDIVar (__inout PBYTE& pbPtr, const BYTE* pcbEnd, __out ULONG* pnValue)
 	{
 		HRESULT hr = S_OK;
-		ULONG var = 0, cbRead = 0;
+		ULONG var = 0;
 		BYTE c;
 
 		do
@@ -419,6 +419,7 @@ namespace MIDI
 		pbData = __new BYTE[cbSize];
 		CheckAlloc(pbData);
 		Check(pStream->Read(pbData, cbSize, &cb));
+		CheckIf(cb != cbSize, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
 
 		pbPtr = pbData;
 		pbEnd = pbData + cbSize;
@@ -440,6 +441,7 @@ namespace MIDI
 
 			if(cmd == 0xFF)					// Meta event
 			{
+				ULONG len;
 				BYTE meta;
 
 				pbPtr++;
@@ -451,8 +453,12 @@ namespace MIDI
 				{
 				case 0x51:
 					{
-						BYTE a, b, c, len;
-						len = *pbPtr++;		// Get the length byte, should be 3
+						BYTE a, b, c;
+
+						Check(ReadMIDIVar(pbPtr, pbEnd, &len));	// Get the length byte, should be 3
+						CheckIf(len != 3, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
+						CheckIf(pbEnd - pbPtr < 3, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
+
 						a = *pbPtr++;
 						b = *pbPtr++;
 						c = *pbPtr++;
@@ -469,6 +475,12 @@ namespace MIDI
 						absTime += nTime;
 					}
 					break;
+				case 0x2f: // end of track
+					Check(ReadMIDIVar(pbPtr, pbEnd, &len));	// pbPtr advances past the VLQ
+					CheckIf((ULONGLONG)(pbEnd - pbPtr) < len, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
+					absTime += nTime;
+					pbPtr = pbEnd;
+					break;
 				case 0x00:
 				case 0x01:
 				case 0x02:
@@ -478,25 +490,24 @@ namespace MIDI
 				case 0x06:
 				case 0x07:
 				case 0x21:
-				case 0x2f: // end of track
 				case 0x54:
 				case 0x58: // time signature
 				case 0x59: // key signature
 				case 0x7f:
 				default:
-					{
-						BYTE len = *pbPtr++; // ignore event, skip all data
-						pbPtr += len;
-						break;
-					}
+					Check(ReadMIDIVar(pbPtr, pbEnd, &len));	// pbPtr advances past the VLQ
+					CheckIf((ULONGLONG)(pbEnd - pbPtr) < len, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
+					pbPtr += len;							// skip payload
+					break;
 				}
 			}
 			else if(0 == (cmd & 0x80))		// Running mode
 			{
 				CheckIf(pbPtr >= pbEnd, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
+
 				msg = static_cast<ULONG>(bLastCmd) | (static_cast<ULONG>(*pbPtr++) << 8);
 
-				if(!((cmd & 0xf0) == 0xc0 || (cmd & 0xf0) == 0xd0))
+				if((bLastCmd & 0xF0) != 0xC0 && (bLastCmd & 0xF0) != 0xD0)
 				{
 					CheckIf(pbPtr >= pbEnd, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
 					msg |= static_cast<ULONG>(*pbPtr++) << 16;
