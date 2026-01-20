@@ -6,6 +6,13 @@
 		files: ["*.png"]
 	},
 	{
+		package: "buildsif",
+		name: "race2.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
 		package: "json",
 		name: "race.json",
 		data:
@@ -18,19 +25,22 @@
 			{
 				food: 2.0,
 				production: 0.5,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			workers:
 			{
 				food: 0.0,
 				production: 3.0,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			rebels:
 			{
 				food: 0.0,
 				production: 0.0,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			growth: -10,
 			mining: 1.0,
@@ -67,7 +77,15 @@
 				"mom:temple",
 				"mom:ship_yard"
 			],
-			combatHouses: "mom:combat/house/mudhut"
+			startingUnits: [ "mom:unit/klackon/spearmen", "mom:unit/klackon/swordsmen" ],
+			combatHouses: "mom:combat/house/mudhut",
+			cityViewHouses: "mom:cityview/house/mudhut",
+			housingProdRef: "mom:mudhut_housing",
+			qualities:
+			{
+				traits: ["insectoid", "hive-minded", "industrious"],
+				base_unrest: 0.15
+			}
 		}
 	}
 ]

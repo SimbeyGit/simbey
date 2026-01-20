@@ -6,6 +6,13 @@
 		files: ["*.png"]
 	},
 	{
+		package: "buildsif",
+		name: "race2.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
 		package: "json",
 		name: "race.json",
 		data:
@@ -18,19 +25,22 @@
 			{
 				food: 2.0,
 				production: 0.5,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			workers:
 			{
 				food: 0.0,
 				production: 2.0,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			rebels:
 			{
 				food: 0.0,
 				production: 0.0,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			growth: 0,
 			mining: 1.0,
@@ -65,7 +75,15 @@
 			[
 				"mom:fantastic_stable"
 			],
-			combatHouses: "mom:combat/house/standard"
+			startingUnits: [ "mom:unit/high_men/spearmen", "mom:unit/high_men/swordsmen" ],
+			combatHouses: "mom:combat/house/standard",
+			cityViewHouses: "mom:cityview/house/standard",
+			housingProdRef: "mom:standard_housing",
+			qualities:
+			{
+				traits: ["human", "civilized", "noble", "pious", "adaptive", "diplomatic"],
+				base_unrest: 0.08
+			}
 		}
 	}
 ]

@@ -6,6 +6,13 @@
 		files: ["*.png"]
 	},
 	{
+		package: "buildsif",
+		name: "race2.sif",
+		trim: true,
+		double: true,
+		files: ["*.png"]
+	},
+	{
 		package: "json",
 		name: "race.json",
 		data:
@@ -18,19 +25,22 @@
 			{
 				food: 2.0,
 				production: 0.5,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			workers:
 			{
 				food: 0.0,
 				production: 3.0,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			rebels:
 			{
 				food: 0.0,
 				production: 0.0,
-				power: 0.0
+				power: 0.0,
+				research: 0.0
 			},
 			growth: -20,
 			mining: 2.0,
@@ -68,7 +78,15 @@
 				"mom:parthenon",
 				"mom:stables"
 			],
-			combatHouses: "mom:combat/house/standard"
+			startingUnits: [ "mom:unit/dwarf/engineers", "mom:unit/dwarf/swordsmen" ],
+			combatHouses: "mom:combat/house/standard",
+			cityViewHouses: "mom:cityview/house/standard",
+			housingProdRef: "mom:standard_housing",
+			qualities:
+			{
+				traits: ["myrran", "human", "industrious", "mountain-dwelling", "hardy"],
+				base_unrest: 0.15
+			}
 		}
 	}
 ]
