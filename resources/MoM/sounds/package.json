@@ -138,7 +138,7 @@
 			},
 			{
 				ref: "mom:sounds/colossus",
-				sound: "Colossus.mp3"
+				sound: "ColossusAttack.mp3"
 			},
 			{
 				ref: "mom:sounds/cracks_call",

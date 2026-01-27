@@ -321,3 +321,5 @@ BOOL WINAPI sifDrawMaskedBits32ToDIB24Pitch (__out PBYTE pDIB24, INT xDest, INT 
 BOOL WINAPI sifDrawTileBits32ToDIB24Pitch (__out PBYTE pDIB24, INT xDest, INT yDest, INT nWidth, INT nHeight, LONG lPitch, __in_bcount(nWidthBits * nHeightBits * 4) const BYTE* pBits, INT nWidthBits, INT nHeightBits, LONG lPitchBits, SIF_LINE_OFFSET* pslOffsets);
 BOOL WINAPI sifDrawColorizedBits32ToDIB24Pitch (__out PBYTE pDIB24, INT xDest, INT yDest, INT nWidth, INT nHeight, LONG lPitch, __in_bcount(nWidthBits * nHeightBits * 4) const BYTE* pBits, INT nWidthBits, INT nHeightBits, LONG lPitchBits, COLORREF cr);
 BOOL WINAPI sifDrawBits32PToDIB24Pitch (__out PBYTE pDIB24, INT xDest, INT yDest, INT nWidth, INT nHeight, LONG lPitch, __in_bcount(nWidthBits * nHeightBits * 4) const BYTE* pBits32P, INT nWidthBits, INT nHeightBits, LONG lPitchBits);
+
+HRESULT WINAPI sifCreateCursorFromBits (__in_bcount(nWidth * nHeight * 4) const BYTE* pBits32, INT nWidth, INT nHeight, const POINT* pcptHot, __in_opt const BYTE* pcbMask, __out HCURSOR* phCursor);
