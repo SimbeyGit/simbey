@@ -1,0 +1,50 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files:
+		[
+			"b*.png"
+		],
+		trim: true,
+		double: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:stream_of_life",
+			type: "spell",
+			name: "Stream of Life",
+			desc: "Turns the target city into a fertile utopia.",
+			realm: "life",
+			upkeep:
+			[
+				{
+					ref: "mom:stat/mana/one",
+					amount: 8
+				}
+			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			prereqs: [],
+			benefits: {},
+			immuneToTransformations: false
+		}
+	}
+]

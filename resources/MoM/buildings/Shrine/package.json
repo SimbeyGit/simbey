@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,14 +18,47 @@
 			ref: "mom:shrine",
 			type: "normal",
 			name: "Shrine",
+			desc: "A shrine provides spiritual comfort to the citizenry. It adds +1 mana, allows use of nightshade, and reduces the unrest level by 1.",
 			cost: 100,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 1
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				fixed_position:
+				{
+					x: -1,
+					y: -1
+				},
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -33,7 +70,8 @@
 			{
 				mana: 1,
 				unrest: -1
-			}
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

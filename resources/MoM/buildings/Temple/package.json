@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,14 +18,48 @@
 			ref: "mom:Temple",
 			type: "normal",
 			name: "Temple",
+			desc: "A temple serves as a center for basic religious instruction. It adds +2 mana, allows use of nightshade, and reduces the unrest level by 1.",
 			cost: 200,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 2
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				replaces: "mom:shrine",
+				fixed_position:
+				{
+					x: -1,
+					y: -1
+				},
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -33,7 +71,8 @@
 			{
 				mana: 2,
 				unrest: -1
-			}
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

@@ -1,0 +1,53 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files:
+		[
+			"b*.png"
+		],
+		trim: true,
+		double: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:altar_of_battle",
+			type: "spell",
+			name: "Altar of Battle",
+			desc: "All units built in the target city are Elite.",
+			realm: "life",
+			upkeep:
+			[
+				{
+					ref: "mom:stat/mana/one",
+					amount: 5
+				}
+			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			prereqs: [],
+			benefits:
+			{
+				exp: 100
+			},
+			immuneToTransformations: false
+		}
+	}
+]

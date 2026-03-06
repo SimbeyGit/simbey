@@ -79,6 +79,7 @@
 			combatHouses: "mom:combat/house/treehouse",
 			cityViewHouses: "mom:cityview/house/treehouse",
 			housingProdRef: "mom:treehouse_housing",
+			outpost_growth: 5,
 			qualities:
 			{
 				traits: ["nature-aligned", "magical", "peaceful", "forest-dwelling"],

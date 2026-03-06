@@ -78,6 +78,7 @@
 			combatHouses: "mom:combat/house/standard",
 			cityViewHouses: "mom:cityview/house/standard",
 			housingProdRef: "mom:standard_housing",
+			outpost_growth: 10,
 			qualities:
 			{
 				traits: ["human", "civilized", "noble", "pious", "adaptive", "diplomatic"],

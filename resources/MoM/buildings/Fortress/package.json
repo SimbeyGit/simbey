@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -12,19 +16,41 @@
 		data:
 		{
 			ref: "mom:fortress",
-			type: "special",
+			type: "normal",
 			name: "Fortress",
-			cost: 0,
+			desc: "Each wizard resides in his or her own fortress. This serves as a base of operations. If the fortress is lost, the wizard is banished and must cast the Spell of Return.",
 			start: true,
-			upkeep:
-			[
-			],
-			prereqs:
-			[
-			],
-			benefits:
+			upkeep: [],
+			prereqs: [],
+			benefits: {},
+			is_ruin: false,
+			categories: [],
+			size:
 			{
-			}
+				width: 3,
+				height: 3
+			},
+			placement:
+			{
+				type: "random",
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 100,
+				mounted_on_citywalls: false,
+				ignore_occupation: true,
+				method: "grid"
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

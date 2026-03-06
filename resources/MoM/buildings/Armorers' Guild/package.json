@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,14 +18,43 @@
 			ref: "mom:armorers_guild",
 			type: "normal",
 			name: "Armorers' Guild",
+			desc: "An armorers' guild provides troops with training in fighting techniques and basic battle tactics.",
 			cost: 350,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 4
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				replaces: "mom:fighters_guild",
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -29,9 +62,8 @@
 					ref: "mom:fighters_guild"
 				}
 			],
-			benefits:
-			{
-			}
+			benefits: {},
+			immuneToTransformations: false
 		}
 	}
 ]

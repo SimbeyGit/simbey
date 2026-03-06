@@ -80,6 +80,7 @@
 			combatHouses: "mom:combat/house/mudhut",
 			cityViewHouses: "mom:cityview/house/mudhut",
 			housingProdRef: "mom:mudhut_housing",
+			outpost_growth: 5,
 			qualities:
 			{
 				traits: ["insectoid", "hive-minded", "industrious"],

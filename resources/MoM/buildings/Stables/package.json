@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,15 +18,48 @@
 			ref: "mom:stables",
 			type: "normal",
 			name: "Stables",
+			desc: "A stable provides training, housing and care of mounted troops and/or war beasts.",
 			cost: 80,
 			startRaiders: 8,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 2
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				fixed_position:
+				{
+					x: -1,
+					y: -1
+				},
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -30,9 +67,8 @@
 					ref: "mom:smithy"
 				}
 			],
-			benefits:
-			{
-			}
+			benefits: {},
+			immuneToTransformations: false
 		}
 	}
 ]

@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,14 +18,47 @@
 			ref: "mom:sages_guild",
 			type: "normal",
 			name: "Sages' Guild",
+			desc: "A sages' guild is dedicated to the advanced study of magic. It adds +3 spell research points and allows use of nightshade.",
 			cost: 120,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 2
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				fixed_position:
+				{
+					x: -1,
+					y: -1
+				},
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -32,7 +69,8 @@
 			benefits:
 			{
 				research: 3
-			}
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

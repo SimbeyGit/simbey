@@ -1,0 +1,89 @@
+[
+	{
+		package: "buildsif",
+		name: "race.sif",
+		trim: true,
+		files: ["*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "race2.sif",
+		trim: true,
+		files: ["large\\*.png"]
+	},
+	{
+		package: "json",
+		name: "race.json",
+		data:
+		{
+			ref: "mom:elyran",
+			name: "Elyran",
+			origin: "Primordia",
+			description: "Elyran cities receive 1/4 power/population and a small research bonus per population, grow very slowly (-20 people/turn), and cannot build Shipwrights' Guild.",
+			farmers:
+			{
+				food: 2.0,
+				production: 0.5,
+				power: 0.25,
+				research: 0.1
+			},
+			workers:
+			{
+				food: 0.0,
+				production: 2.0,
+				power: 0.25,
+				research: 0.15
+			},
+			rebels:
+			{
+				food: 0.0,
+				production: 0.0,
+				power: 0.25,
+				research: 0.0
+			},
+			growth: -20,
+			mining: 1.0,
+			taxes: 1.0,
+			capitol_unrest: 0,
+			trade_bonus_pct: 0,
+			raiderWeight: 0,
+			cityNames:
+			[
+				"Prigynthia",
+				"Elyrion",
+				"Serethis",
+				"Valyra",
+				"Caelith",
+				"Lorynth",
+				"Iseryn",
+				"Evaris",
+				"Nereth",
+				"Olythra",
+				"Paraleth",
+				"Calythra",
+				"Virelion",
+				"Zorynth",
+				"Elyndra",
+				"Kaelora",
+				"Seryth",
+				"Vesryn",
+				"Asceryn",
+				"Khayeris"
+			],
+			no_build:
+			[
+				"mom:shipwrights_guild"
+			],
+			startingUnits: [ "mom:unit/elyran/sentinels", "mom:unit/elyran/sentinels" ],
+			combatHouses: "mom:combat/house/elyran",
+			cityViewHouses: "mom:cityview/house/elyran",
+			housingProdRef: "mom:elyran_housing",
+			outpost_growth: 10,
+			qualities:
+			{
+				traits: ["human", "industrious", "magical", "peaceful", "noble"],
+				base_unrest: 0.01
+			}
+		}
+	}
+]

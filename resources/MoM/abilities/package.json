@@ -12,6 +12,60 @@
 		data:
 		[
 			{
+				ref: "mom:ability/exp/level0",
+				name: "Level0",
+				type: "level",
+				image: "Exp_Level0.png"
+			},
+			{
+				ref: "mom:ability/exp/level1",
+				name: "Level1",
+				type: "level",
+				image: "Exp_Level1.png"
+			},
+			{
+				ref: "mom:ability/exp/level2",
+				name: "Level2",
+				type: "level",
+				image: "Exp_Level2.png"
+			},
+			{
+				ref: "mom:ability/exp/level3",
+				name: "Level3",
+				type: "level",
+				image: "Exp_Level3.png"
+			},
+			{
+				ref: "mom:ability/exp/level4",
+				name: "Level4",
+				type: "level",
+				image: "Exp_Level4.png"
+			},
+			{
+				ref: "mom:ability/exp/level5",
+				name: "Level5",
+				type: "level",
+				image: "Exp_Level5.png"
+			},
+			{
+				ref: "mom:ability/exp/level6",
+				name: "Level6",
+				type: "level",
+				image: "Exp_Level6.png"
+			},
+			{
+				ref: "mom:ability/exp/level7",
+				name: "Level7",
+				type: "level",
+				image: "Exp_Level7.png"
+			},
+			{
+				ref: "mom:ability/exp/level8",
+				name: "Level8",
+				type: "level",
+				image: "Exp_Level8.png"
+			},
+			{
 				ref: "mom:ability/hero/super_agility",
 				name: "Super Agility",
 				type: "hero",
@@ -462,6 +516,7 @@
 				ref: "mom:ability/unit/regeneration",
 				name: "Regeneration",
 				type: "ability",
+				regeneration: true,
 				image: "Unit_Regeneration.png"
 			},
 			{
@@ -634,6 +689,7 @@
 				ref: "mom:ability/spell/regeneration",
 				name: "Regeneration",
 				type: "ability",
+				regeneration: true,
 				image: "Spell_Regeneration.png"
 			},
 			{
@@ -804,6 +860,74 @@
 				name: "Wraith Form",
 				type: "ability",
 				image: "Spell_WraithForm.png"
+			},
+			{
+				ref: "mom:ability/spell/shatter",
+				name: "Shatter",
+				type: "ability",
+				image: "Spell_Shatter.png"
+			},
+			{
+				ref: "mom:ability/spell/warp_creature_a",
+				name: "Warp Creature Offensive",
+				type: "ability",
+				image: "Spell_WarpCreatureA.png"
+			},
+			{
+				ref: "mom:ability/spell/warp_creature_b",
+				name: "Warp Creature Defensive",
+				type: "ability",
+				image: "Spell_WarpCreatureB.png"
+			},
+			{
+				ref: "mom:ability/spell/warp_creature_c",
+				name: "Warp Creature Resist",
+				type: "ability",
+				image: "Spell_WarpCreatureC.png"
+			},
+			{
+				ref: "mom:ability/spell/creature_binding",
+				name: "Creature Binding",
+				type: "ability",
+				image: "Spell_CreatureBinding.png"
+			},
+			{
+				ref: "mom:ability/spell/confusion",
+				name: "Confusion",
+				type: "ability",
+				image: "Spell_Confusion.png"
+			},
+			{
+				ref: "mom:ability/spell/mind_storm",
+				name: "Mind Storm",
+				type: "ability",
+				image: "Spell_MindStorm.png"
+			},
+			{
+				ref: "mom:ability/spell/vertigo",
+				name: "Vertigo",
+				type: "ability",
+				image: "Spell_Vertigo.png"
+			},
+			{
+				ref: "mom:ability/spell/black_sleep",
+				name: "Black Sleep",
+				type: "ability",
+				image: "Spell_BlackSleep.png"
+			},
+			{
+				ref: "mom:ability/spell/lycanthropy",
+				name: "Lycanthropy",
+				type: "immunity",
+				immunity: ["poison","weapon","illusions","cold","death"],
+				regeneration: true,
+				image: "Spell_Lycanthropy.png"
+			},
+			{
+				ref: "mom:ability/spell/web",
+				name: "Web",
+				type: "ability",
+				image: "Spell_Web.png"
 			}
 		]
 	}

@@ -1,0 +1,525 @@
+[
+	{
+		package: "json",
+		name: "spells.json",
+		data:
+		[
+			{
+				ref: "mom:spell/sorcery/air_elemental",
+				name: "Air Elemental",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 1300,
+				effects:
+				{
+					summon: "mom:unit/sorcery/air_elemental"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/aura_majesty",
+				name: "Aura of Majesty",
+				rarity: "uncommon",
+				type: "environment",
+				target: null,
+				overland_cost: 400,
+				combat_cost: null,
+				upkeep: 5,
+				research: 740
+			},
+			{
+				ref: "mom:spell/sorcery/banish",
+				name: "Banish",
+				rarity: "rare",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 20,
+				upkeep: null,
+				research: 1120
+			},
+			{
+				ref: "mom:spell/sorcery/blur",
+				name: "Blur",
+				rarity: "uncommon",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 25,
+				upkeep: null,
+				research: 300
+			},
+			{
+				ref: "mom:spell/sorcery/confusion",
+				name: "Confusion",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 15,
+				upkeep: null,
+				research: 130,
+				effects:
+				{
+					ability: "mom:ability/spell/confusion"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/counter_magic",
+				name: "Counter Magic",
+				rarity: "common",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 190
+			},
+			{
+				ref: "mom:spell/sorcery/creature_binding",
+				name: "Creature Binding",
+				rarity: "very_rare",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 70,
+				upkeep: null,
+				research: 2250,
+				effects:
+				{
+					ability: "mom:ability/spell/creature_binding"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/disenchant_true",
+				name: "Disenchant True",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 50,
+				combat_cost: 50,
+				upkeep: null,
+				research: 350
+			},
+			{
+				ref: "mom:spell/sorcery/disjunction_true",
+				name: "Disjunction True",
+				rarity: "rare",
+				type: "environment",
+				target: "wizard",
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: null,
+				research: 880
+			},
+			{
+				ref: "mom:spell/sorcery/dispel_magic_true",
+				name: "Dispel Magic True",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 40
+			},
+			{
+				ref: "mom:spell/sorcery/djinn",
+				name: "Djinn",
+				rarity: "very_rare",
+				type: "summon",
+				target: "map",
+				overland_cost: 650,
+				combat_cost: null,
+				upkeep: 17,
+				research: 1850,
+				effects:
+				{
+					summon: "mom:unit/sorcery/djinn"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/enchant_road",
+				name: "Enchant Road",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 100,
+				combat_cost: null,
+				upkeep: null,
+				research: 500
+			},
+			{
+				ref: "mom:spell/sorcery/flight",
+				name: "Flight",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 125,
+				combat_cost: 25,
+				upkeep: 3,
+				research: 560,
+				effects:
+				{
+					ability: "mom:ability/spell/flight"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/floating_island",
+				name: "Floating Island",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 2,
+				research: 60,
+				effects:
+				{
+					summon: "mom:unit/sorcery/floating_island"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/flying_fortress",
+				name: "Flying Fortress",
+				rarity: "very_rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: 25,
+				research: 4000
+			},
+			{
+				ref: "mom:spell/sorcery/great_unsummoning",
+				name: "Great Unsummoning",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 2,
+				research: 3000
+			},
+			{
+				ref: "mom:spell/sorcery/guardian_wind",
+				name: "Guardian Wind",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 50,
+				combat_cost: 10,
+				upkeep: 2,
+				research: 80,
+				effects:
+				{
+					ability: "mom:ability/spell/guardian_wind"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/haste",
+				name: "Haste",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 1700,
+				effects:
+				{
+					ability: "mom:ability/spell/haste"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/invisibility",
+				name: "Invisibility",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 175,
+				combat_cost: 35,
+				upkeep: 10,
+				research: 960,
+				effects:
+				{
+					ability: "mom:ability/spell/invisibility"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/magic_immunity",
+				name: "Magic Immunity",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 250,
+				combat_cost: 50,
+				upkeep: 5,
+				research: 1600,
+				effects:
+				{
+					ability: "mom:ability/spell/magic_immunity"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/mass_invisibility",
+				name: "Mass Invisibility",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 80,
+				upkeep: null,
+				research: 2500
+			},
+			{
+				ref: "mom:spell/sorcery/mind_storm",
+				name: "Mind Storm",
+				rarity: "rare",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 35,
+				upkeep: null,
+				research: 220,
+				effects:
+				{
+					ability: "mom:ability/spell/mind_storm"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/nagas",
+				name: "Nagas",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 100,
+				combat_cost: null,
+				upkeep: 2,
+				research: 220
+			},
+			{
+				ref: "mom:spell/sorcery/phantom_beast",
+				name: "Phantom Beast",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: null,
+				combat_cost: 35,
+				upkeep: null,
+				research: 800,
+				effects:
+				{
+					summon: "mom:unit/sorcery/phantom_beast"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/phantom_warriors",
+				name: "Phantom Warriors",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 100,
+				effects:
+				{
+					summon: "mom:unit/sorcery/phantom_warriors"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/psionic_blast",
+				name: "Psionic Blast",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 250
+			},
+			{
+				ref: "mom:spell/sorcery/resist_magic",
+				name: "Resist Magic",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 25,
+				combat_cost: 5,
+				upkeep: 1,
+				research: 20,
+				effects:
+				{
+					ability: "mom:ability/spell/resist_magic"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/sky_drake",
+				name: "Sky Drake",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 25,
+				research: 4500,
+				effects:
+				{
+					summon: "mom:unit/sorcery/sky_drake"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/spell_binding",
+				name: "Spell Binding",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: null,
+				research: 3500
+			},
+			{
+				ref: "mom:spell/sorcery/spell_blast",
+				name: "Spell Blast",
+				rarity: "uncommon",
+				type: "environment",
+				target: "wizard",
+				overland_cost: 50,
+				combat_cost: null,
+				upkeep: null,
+				research: 680
+			},
+			{
+				ref: "mom:spell/sorcery/spell_lock",
+				name: "Spell Lock",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 100,
+				combat_cost: null,
+				upkeep: 5,
+				research: 1500,
+				effects:
+				{
+					ability: "mom:ability/spell/spell_lock"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/spell_ward",
+				name: "Spell Ward",
+				rarity: "very_rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 350,
+				combat_cost: null,
+				upkeep: 5,
+				research: 2000
+			},
+			{
+				ref: "mom:spell/sorcery/stasis",
+				name: "Stasis",
+				rarity: "rare",
+				type: "environment",
+				target: "map",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: null,
+				research: 1500
+			},
+			{
+				ref: "mom:spell/sorcery/storm_giant",
+				name: "Storm Giant",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: 10,
+				research: 1200,
+				effects:
+				{
+					summon: "mom:unit/sorcery/storm_giant"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/suppress_magic",
+				name: "Suppress Magic",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1250,
+				combat_cost: null,
+				upkeep: 50,
+				research: 5000
+			},
+			{
+				ref: "mom:spell/sorcery/time_stop",
+				name: "Time Stop",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1500,
+				combat_cost: null,
+				upkeep: 200,
+				research: 6000
+			},
+			{
+				ref: "mom:spell/sorcery/vertigo",
+				name: "Vertigo",
+				rarity: "uncommon",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 25,
+				upkeep: null,
+				research: 4000,
+				effects:
+				{
+					ability: "mom:ability/spell/vertigo"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/wind_mastery",
+				name: "Wind Mastery",
+				rarity: "uncommon",
+				type: "environment",
+				target: null,
+				overland_cost: 400,
+				combat_cost: null,
+				upkeep: 5,
+				research: 620
+			},
+			{
+				ref: "mom:spell/sorcery/wind_walking",
+				name: "Wind Walking",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: 10,
+				research: 1040,
+				effects:
+				{
+					ability: "mom:ability/spell/wind_walking"
+				}
+			},
+			{
+				ref: "mom:spell/sorcery/word_recall",
+				name: "Word of Recall",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 20,
+				combat_cost: 20,
+				upkeep: null,
+				research: 160
+			}
+		]
+	}
+]

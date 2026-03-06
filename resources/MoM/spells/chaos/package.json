@@ -1,0 +1,527 @@
+[
+	{
+		package: "json",
+		name: "spells.json",
+		data:
+		[
+			{
+				ref: "mom:spell/chaos/armageddon",
+				name: "Armageddon",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1250,
+				combat_cost: null,
+				upkeep: 40,
+				research: 6000
+			},
+			{
+				ref: "mom:spell/chaos/call_chaos",
+				name: "Call Chaos",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 75,
+				upkeep: null,
+				research: 3000
+			},
+			{
+				ref: "mom:spell/chaos/call_void",
+				name: "Call the Void",
+				rarity: "very_rare",
+				type: "city",
+				target: "enemy",
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: null,
+				research: 5000
+			},
+			{
+				ref: "mom:spell/chaos/chaos_channels",
+				name: "Chaos Channels",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 50,
+				combat_cost: null,
+				upkeep: null,
+				research: 400,
+				effects:
+				{
+					abilities:
+					[
+						"mom:ability/spell/chaos_channels_a",
+						"mom:ability/spell/chaos_channels_b",
+						"mom:ability/spell/chaos_channels_c"
+					]
+				}
+			},
+			{
+				ref: "mom:spell/chaos/chaos_rift",
+				name: "Chaos Rift",
+				rarity: "rare",
+				type: "city",
+				target: "enemy",
+				overland_cost: 300,
+				combat_cost: null,
+				upkeep: 10,
+				research: 1700
+			},
+			{
+				ref: "mom:spell/chaos/chaos_spawn",
+				name: "Chaos Spawn",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: 12,
+				research: 1040,
+				effects:
+				{
+					summon: "mom:unit/chaos/chaos_spawn"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/chaos_surge",
+				name: "Chaos Surge",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 40,
+				research: 3500
+			},
+			{
+				ref: "mom:spell/chaos/chimeras",
+				name: "Chimeras",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 350,
+				combat_cost: null,
+				upkeep: 10,
+				research: 800,
+				effects:
+				{
+					summon: "mom:unit/chaos/chimeras"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/corruption",
+				name: "Corruption",
+				rarity: "common",
+				type: "environment",
+				target: "map",
+				overland_cost: 40,
+				combat_cost: null,
+				upkeep: null,
+				research: 100
+			},
+			{
+				ref: "mom:spell/chaos/disintegrate",
+				name: "Disintegrate",
+				rarity: "very_rare",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 2000
+			},
+			{
+				ref: "mom:spell/chaos/disrupt",
+				name: "Disrupt",
+				rarity: "common",
+				type: "environment",
+				target: "map",
+				overland_cost: null,
+				combat_cost: 15,
+				upkeep: null,
+				research: 40
+			},
+			{
+				ref: "mom:spell/chaos/doom_bat",
+				name: "Doom Bat",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 300,
+				combat_cost: null,
+				upkeep: 8,
+				research: 620,
+				effects:
+				{
+					summon: "mom:unit/chaos/doom_bat"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/doom_bolt",
+				name: "Doom Bolt",
+				rarity: "rare",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 8,
+				upkeep: null,
+				research: 1120
+			},
+			{
+				ref: "mom:spell/chaos/doom_mastery",
+				name: "Doom Mastery",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1100,
+				combat_cost: null,
+				upkeep: 15,
+				research: 4000
+			},
+			{
+				ref: "mom:spell/chaos/efreet",
+				name: "Efreet",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 550,
+				combat_cost: null,
+				upkeep: 15,
+				research: 1300,
+				effects:
+				{
+					summon: "mom:unit/chaos/efreet"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/eldritch_weapon",
+				name: "Eldritch Weapon",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 75,
+				combat_cost: 15,
+				upkeep: 1,
+				research: 130,
+				effects:
+				{
+					ability: "mom:ability/spell/eldritch_weapon"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/fire_bolt",
+				name: "Fire Bolt",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 5,
+				upkeep: null,
+				research: 60
+			},
+			{
+				ref: "mom:spell/chaos/fire_elemental",
+				name: "Fire Elemental",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: null,
+				combat_cost: 20,
+				upkeep: null,
+				research: 250,
+				effects:
+				{
+					summon: "mom:unit/chaos/fire_elemental"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/fire_giant",
+				name: "Fire Giant",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 150,
+				combat_cost: null,
+				upkeep: 3,
+				research: 350,
+				effects:
+				{
+					summon: "mom:unit/chaos/fire_giant"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/fire_storm",
+				name: "Fire Storm",
+				rarity: "rare",
+				type: "environment",
+				target: "map",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: null,
+				research: 1400
+			},
+			{
+				ref: "mom:spell/chaos/fireball",
+				name: "Fireball",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: null,
+				research: 1400
+			},
+			{
+				ref: "mom:spell/chaos/flame_blade",
+				name: "Flame Blade",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 125,
+				combat_cost: 25,
+				upkeep: 2,
+				research: 450,
+				effects:
+				{
+					ability: "mom:ability/spell/flame_blade"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/flame_strike",
+				name: "Flame Strike",
+				rarity: "rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 60,
+				upkeep: null,
+				research: 1600
+			},
+			{
+				ref: "mom:spell/chaos/gargoyles",
+				name: "Gargoyles",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: 5,
+				research: 500,
+				effects:
+				{
+					summon: "mom:unit/chaos/gargoyles"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/great_drake",
+				name: "Great Drake",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 900,
+				combat_cost: null,
+				upkeep: 30,
+				research: 4500,
+				effects:
+				{
+					summon: "mom:unit/chaos/great_drake"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/great_wasting",
+				name: "Great Wasting",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 20,
+				research: 2500
+			},
+			{
+				ref: "mom:spell/chaos/hell_hounds",
+				name: "Hell Hounds",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 40,
+				combat_cost: null,
+				upkeep: 1,
+				research: 80,
+				effects:
+				{
+					summon: "mom:unit/chaos/hell_hounds"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/hydra",
+				name: "Hydra",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 650,
+				combat_cost: null,
+				upkeep: 14,
+				research: 1850,
+				effects:
+				{
+					summon: "mom:unit/chaos/hydra"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/immolation",
+				name: "Immolation",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 150,
+				combat_cost: 30,
+				upkeep: 2,
+				research: 740,
+				effects:
+				{
+					ability: "mom:ability/spell/immolation"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/lightning_bolt",
+				name: "Lightning Bolt",
+				rarity: "uncommon",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 300
+			},
+			{
+				ref: "mom:spell/chaos/magic_vortex",
+				name: "Magic Vortex",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 1200,
+				effects:
+				{
+					summon: "mom:unit/chaos/magic_vortex"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/metal_fires",
+				name: "Metal Fires",
+				rarity: "rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 40,
+				upkeep: null,
+				research: 960
+			},
+			{
+				ref: "mom:spell/chaos/meteor_storm",
+				name: "Meteor Storm",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 900,
+				combat_cost: 40,
+				upkeep: 10,
+				research: 2250
+			},
+			{
+				ref: "mom:spell/chaos/raise_volcano",
+				name: "Raise Volcano",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: null,
+				research: 680
+			},
+			{
+				ref: "mom:spell/chaos/shatter",
+				name: "Shatter",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 12,
+				upkeep: null,
+				research: 190,
+				effects:
+				{
+					ability: "mom:ability/spell/shatter"
+				}
+			},
+			{
+				ref: "mom:spell/chaos/wall_fire",
+				name: "Wall of Fire",
+				rarity: "common",
+				type: "city",
+				target: "friendly",
+				overland_cost: 150,
+				combat_cost: 30,
+				upkeep: 2,
+				research: 160
+			},
+			{
+				ref: "mom:spell/chaos/warp_creature",
+				name: "Warp Creature",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 18,
+				upkeep: null,
+				research: 220,
+				effects:
+				{
+					abilities:
+					[
+						"mom:ability/spell/warp_creature_a",
+						"mom:ability/spell/warp_creature_b",
+						"mom:ability/spell/warp_creature_c"
+					]
+				}
+			},
+			{
+				ref: "mom:spell/chaos/warp_lightning",
+				name: "Warp Lightning",
+				rarity: "rare",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 35,
+				upkeep: null,
+				research: 880
+			},
+			{
+				ref: "mom:spell/chaos/warp_reality",
+				name: "Warp Reality",
+				rarity: "rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 1500
+			},
+			{
+				ref: "mom:spell/chaos/warp_wood",
+				name: "Warp Wood",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 20
+			}
+		]
+	}
+]

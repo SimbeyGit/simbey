@@ -35,7 +35,7 @@
 				move:
 				[
 					{
-						ref:"mom:stat/move/water",
+						ref:"mom:stat/move/sailing",
 						sound_ref:"mom:sounds/scuttle",
 						value:3
 					}

@@ -1,0 +1,49 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files:
+		[
+			"b*.png"
+		],
+		trim: true,
+		double: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:dark_rituals",
+			type: "spell",
+			name: "Dark Rituals",
+			desc: "Doubles power received from shrines, temples, etc. Reduces city growth by 25%.",
+			realm: "death",
+			upkeep: [],
+			prereqs: [],
+			benefits:
+			{
+				building_mana_factor: 1.0,
+				unrest: 1,
+				pop_growth: -25
+			},
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			immuneToTransformations: false
+		}
+	}
+]

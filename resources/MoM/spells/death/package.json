@@ -1,0 +1,520 @@
+[
+	{
+		package: "json",
+		name: "spells.json",
+		data:
+		[
+			{
+				ref: "mom:spell/death/animate_dead",
+				name: "Animate Dead",
+				rarity: "very_rare",
+				type: "unit",
+				target: "dead_unit",
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 3000
+			},
+			{
+				ref: "mom:spell/death/berserk",
+				name: "Berserk",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: null,
+				combat_cost: 30,
+				upkeep: null,
+				research: 740,
+				effects:
+				{
+					ability: "mom:ability/spell/berserk"
+				}
+			},
+			{
+				ref: "mom:spell/death/black_channels",
+				name: "Black Channels",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 100,
+				combat_cost: null,
+				upkeep: 1,
+				research: 500,
+				effects:
+				{
+					ability: "mom:ability/spell/black_channels"
+				}
+			},
+			{
+				ref: "mom:spell/death/black_prayer",
+				name: "Black Prayer",
+				rarity: "uncommon",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 35,
+				upkeep: null,
+				research: 450
+			},
+			{
+				ref: "mom:spell/death/black_sleep",
+				name: "Black Sleep",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 15,
+				upkeep: null,
+				research: 100,
+				effects:
+				{
+					ability: "mom:ability/spell/black_sleep"
+				}
+			},
+			{
+				ref: "mom:spell/death/black_wind",
+				name: "Black Wind",
+				rarity: "rare",
+				type: "environment",
+				target: "map",
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: null,
+				research: 1400
+			},
+			{
+				ref: "mom:spell/death/cloak_fear",
+				name: "Cloak of Fear",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 60,
+				combat_cost: 12,
+				upkeep: 1,
+				research: 80,
+				effects:
+				{
+					ability: "mom:ability/spell/cloak_of_fear"
+				}
+			},
+			{
+				ref: "mom:spell/death/cloud_shadow",
+				name: "Cloud of Shadow",
+				rarity: "rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 150,
+				combat_cost: null,
+				upkeep: 3,
+				research: 1200
+			},
+			{
+				ref: "mom:spell/death/cruel_unminding",
+				name: "Cruel Unminding",
+				rarity: "very_rare",
+				type: "environment",
+				target: "wizard",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: null,
+				research: 1850
+			},
+			{
+				ref: "mom:spell/death/cursed_lands",
+				name: "Cursed Lands",
+				rarity: "rare",
+				type: "city",
+				target: "enemy",
+				overland_cost: 150,
+				combat_cost: null,
+				upkeep: 2,
+				research: 1700
+			},
+			{
+				ref: "mom:spell/death/dark_rituals",
+				name: "Dark Rituals",
+				rarity: "common",
+				type: "city",
+				target: "friendly",
+				overland_cost: 30,
+				combat_cost: null,
+				upkeep: null,
+				research: 60,
+				effects:
+				{
+					building: "mom:dark_rituals"
+				}
+			},
+			{
+				ref: "mom:spell/death/darkness",
+				name: "Darkness",
+				rarity: "common",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 25,
+				upkeep: null,
+				research: 250
+			},
+			{
+				ref: "mom:spell/death/death_knights",
+				name: "Death Knights",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 600,
+				combat_cost: null,
+				upkeep: 8,
+				research: 2250,
+				effects:
+				{
+					summon: "mom:unit/death/death_knights"
+				}
+			},
+			{
+				ref: "mom:spell/death/death_spell",
+				name: "Death Spell",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 2500
+			},
+			{
+				ref: "mom:spell/death/death_wish",
+				name: "Death Wish",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: null,
+				research: 5000
+			},
+			{
+				ref: "mom:spell/death/demon_lord",
+				name: "Demon Lord",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 15,
+				research: 6000,
+				effects:
+				{
+					summon: "mom:unit/death/demon_lord"
+				}
+			},
+			{
+				ref: "mom:spell/death/drain_power",
+				name: "Drain Power",
+				rarity: "uncommon",
+				type: "environment",
+				target: "wizard",
+				overland_cost: 50,
+				combat_cost: null,
+				upkeep: 15,
+				research: 300
+			},
+			{
+				ref: "mom:spell/death/eternal_night",
+				name: "Eternal Night",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 10,
+				research: 4000
+			},
+			{
+				ref: "mom:spell/death/evil_omens",
+				name: "Evil Omens",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1100,
+				combat_cost: null,
+				upkeep: 10,
+				research: 4500
+			},
+			{
+				ref: "mom:spell/death/evil_presence",
+				name: "Evil Presence",
+				rarity: "rare",
+				type: "city",
+				target: "enemy",
+				overland_cost: 100,
+				combat_cost: null,
+				upkeep: 4,
+				research: 1040,
+				effects:
+				{
+					building: "mom:evil_presence"
+				}
+			},
+			{
+				ref: "mom:spell/death/famine",
+				name: "Famine",
+				rarity: "rare",
+				type: "city",
+				target: "enemy",
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: 5,
+				research: 1600
+			},
+			{
+				ref: "mom:spell/death/ghouls",
+				name: "Ghouls",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 80,
+				combat_cost: null,
+				upkeep: 1,
+				research: 130,
+				effects:
+				{
+					summon: "mom:unit/death/ghouls"
+				}
+			},
+			{
+				ref: "mom:spell/death/life_drain",
+				name: "Life Drain",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 160
+			},
+			{
+				ref: "mom:spell/death/lycanthropy",
+				name: "Lycanthropy",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: 7,
+				research: 900,
+				effects:
+				{
+					ability: "mom:ability/spell/lycanthropy"
+				}
+			},
+			{
+				ref: "mom:spell/death/mana_leak",
+				name: "Mana Leak",
+				rarity: "common",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 20,
+				upkeep: null,
+				research: 220
+			},
+			{
+				ref: "mom:spell/death/night_stalker",
+				name: "Night Stalker",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: 5,
+				research: 560,
+				effects:
+				{
+					summon: "mom:unit/death/night_stalker"
+				}
+			},
+			{
+				ref: "mom:spell/death/pestilence",
+				name: "Pestilence",
+				rarity: "very_rare",
+				type: "city",
+				target: "enemy",
+				overland_cost: 350,
+				combat_cost: null,
+				upkeep: 5,
+				research: 3500
+			},
+			{
+				ref: "mom:spell/death/possession",
+				name: "Possession",
+				rarity: "very_rare",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 30,
+				upkeep: null,
+				research: 350
+			},
+			{
+				ref: "mom:spell/death/shadow_demons",
+				name: "Shadow Demons",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 325,
+				combat_cost: null,
+				upkeep: 7,
+				research: 800,
+				effects:
+				{
+					summon: "mom:unit/death/shadow_demons"
+				}
+			},
+			{
+				ref: "mom:spell/death/skeletons",
+				name: "Skeletons",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 25,
+				combat_cost: null,
+				upkeep: 1,
+				research: 20,
+				effects:
+				{
+					summon: "mom:unit/death/skeletons"
+				}
+			},
+			{
+				ref: "mom:spell/death/subversion",
+				name: "Subversion",
+				rarity: "uncommon",
+				type: "environment",
+				target: "wizard",
+				overland_cost: 100,
+				combat_cost: null,
+				upkeep: null,
+				research: 620
+			},
+			{
+				ref: "mom:spell/death/terror",
+				name: "Terror",
+				rarity: "common",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 20,
+				upkeep: null,
+				research: 190
+			},
+			{
+				ref: "mom:spell/death/wall_darkness",
+				name: "Wall of Darkness",
+				rarity: "uncommon",
+				type: "city",
+				target: "friendly",
+				overland_cost: 200,
+				combat_cost: 40,
+				upkeep: 5,
+				research: 680
+			},
+			{
+				ref: "mom:spell/death/warp_node",
+				name: "Warp Node",
+				rarity: "rare",
+				type: "environment",
+				target: "map",
+				overland_cost: 75,
+				combat_cost: null,
+				upkeep: null,
+				research: 1300
+			},
+			{
+				ref: "mom:spell/death/weakness",
+				name: "Weakness",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 5,
+				upkeep: null,
+				research: 40
+			},
+			{
+				ref: "mom:spell/death/werewolves",
+				name: "Werewolves",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 180,
+				combat_cost: null,
+				upkeep: 5,
+				research: 400
+			},
+			{
+				ref: "mom:spell/death/word_death",
+				name: "Word of Death",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 40,
+				upkeep: null,
+				research: 2000
+			},
+			{
+				ref: "mom:spell/death/wrack",
+				name: "Wrack",
+				rarity: "rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 40,
+				upkeep: null,
+				research: 960
+			},
+			{
+				ref: "mom:spell/death/wraith_form",
+				name: "Wraith Form",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 150,
+				combat_cost: 30,
+				upkeep: 3,
+				research: 880,
+				effects:
+				{
+					ability: "mom:ability/spell/wraith_form"
+				}
+			},
+			{
+				ref: "mom:spell/death/wraiths",
+				name: "Wraiths",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: 5,
+				research: 1120,
+				effects:
+				{
+					summon: "mom:unit/death/wraiths"
+				}
+			},
+			{
+				ref: "mom:spell/death/zombie_mastery",
+				name: "Zombie Mastery",
+				rarity: "rare",
+				type: "environment",
+				target: null,
+				overland_cost: 800,
+				combat_cost: null,
+				upkeep: 40,
+				research: 1500
+			}
+		]
+	}
+]

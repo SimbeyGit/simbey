@@ -1,0 +1,67 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files:
+		[
+			"b*.png"
+		],
+		trim: true,
+		double: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:astral_gate",
+			type: "spell",
+			name: "Astral Gate",
+			desc: "Generates a portal in the target city that allows travel to the other plane.",
+			realm: "life",
+			upkeep:
+			[
+				{
+					ref: "mom:stat/mana/one",
+					amount: 5
+				}
+			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				fixed_position:
+				{
+					x: -1,
+					y: -1
+				},
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			prereqs: [],
+			benefits: {},
+			immuneToTransformations: false
+		}
+	}
+]

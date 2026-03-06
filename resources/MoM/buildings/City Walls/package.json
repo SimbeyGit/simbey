@@ -2,8 +2,22 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		canvas: 512
+	},
+	{
+		package: "buildsif",
+		name: "mini.sif",
+		files:
+		[
+			"mini.png"
+		],
+		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,15 +28,46 @@
 			ref: "mom:city_walls",
 			type: "normal",
 			name: "City Walls",
+			desc: "Surrounds the city with a high brick wall that extends the detection of enemy units out to 3 squares and lends protection in combat.",
+			hasMini: true,
 			cost: 150,
 			startRaiders: 10,
+			start: true,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 2
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 1
+			},
+			placement:
+			{
+				type: "fixed",
+				special: "wall",
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 90,
+				mounted_on_citywalls: false,
+				ignore_occupation: true,
+				method: "pixel"
+			},
 			prereqs:
 			[
 				{
@@ -33,7 +78,8 @@
 			benefits:
 			{
 				sight_range: 3
-			}
+			},
+			immuneToTransformations: true
 		}
 	}
 ]

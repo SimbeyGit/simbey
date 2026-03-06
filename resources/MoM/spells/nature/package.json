@@ -1,0 +1,529 @@
+[
+	{
+		package: "json",
+		name: "spells.json",
+		data:
+		[
+			{
+				ref: "mom:spell/nature/basilisk",
+				name: "Basilisk",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 325,
+				combat_cost: null,
+				upkeep: 7,
+				research: 800,
+				effects:
+				{
+					summon: "mom:unit/nature/basilisk"
+				}
+			},
+			{
+				ref: "mom:spell/nature/behemoth",
+				name: "Behemoth",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 700,
+				combat_cost: null,
+				upkeep: 15,
+				research: 2000,
+				effects:
+				{
+					summon: "mom:unit/nature/behemoth"
+				}
+			},
+			{
+				ref: "mom:spell/nature/call_lightning",
+				name: "Call Lightning",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 60,
+				upkeep: null,
+				research: 3000
+			},
+			{
+				ref: "mom:spell/nature/change_terrain",
+				name: "Change Terrain",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 50,
+				combat_cost: null,
+				upkeep: null,
+				research: 500
+			},
+			{
+				ref: "mom:spell/nature/cockatrices",
+				name: "Cockatrices",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 275,
+				combat_cost: null,
+				upkeep: 8,
+				research: 620,
+				effects:
+				{
+					summon: "mom:unit/nature/cockatrices"
+				}
+			},
+			{
+				ref: "mom:spell/nature/colossus",
+				name: "Colossus",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 800,
+				combat_cost: null,
+				upkeep: 17,
+				research: 3500,
+				effects:
+				{
+					summon: "mom:unit/nature/colossus"
+				}
+			},
+			{
+				ref: "mom:spell/nature/cracks_call",
+				name: "Cracks Call",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: null,
+				combat_cost: 20,
+				upkeep: null,
+				research: 300
+			},
+			{
+				ref: "mom:spell/nature/earth_elemental",
+				name: "Earth Elemental",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: null,
+				combat_cost: 60,
+				upkeep: null,
+				research: 1700,
+				effects:
+				{
+					summon: "mom:unit/nature/earth_elemental"
+				}
+			},
+			{
+				ref: "mom:spell/nature/earth_gate",
+				name: "Earth Gate",
+				rarity: "very_rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: 5,
+				research: 4000
+			},
+			{
+				ref: "mom:spell/nature/earth_lore",
+				name: "Earth Lore",
+				rarity: "common",
+				type: "environment",
+				target: "map",
+				overland_cost: 30,
+				combat_cost: null,
+				upkeep: null,
+				research: 250
+			},
+			{
+				ref: "mom:spell/nature/earth_to_mud",
+				name: "Earth to Mud",
+				rarity: "common",
+				type: "environment",
+				target: "map",
+				overland_cost: null,
+				combat_cost: 15,
+				upkeep: null,
+				research: 20
+			},
+			{
+				ref: "mom:spell/nature/earthquake",
+				name: "Earthquake",
+				rarity: "rare",
+				type: "city",
+				target: "enemy",
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: null,
+				research: 1300
+			},
+			{
+				ref: "mom:spell/nature/elemental_armor",
+				name: "Elemental Armor",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 175,
+				combat_cost: 35,
+				upkeep: 5,
+				research: 880,
+				effects:
+				{
+					ability: "mom:ability/spell/elemental_armor"
+				}
+			},
+			{
+				ref: "mom:spell/nature/entangle",
+				name: "Entangle",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 2250
+			},
+			{
+				ref: "mom:spell/nature/gaias_blessing",
+				name: "Gaia's Blessing",
+				rarity: "rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 300,
+				combat_cost: null,
+				upkeep: 3,
+				research: 1600
+			},
+			{
+				ref: "mom:spell/nature/giant_spiders",
+				name: "Giant Spiders",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: 4,
+				research: 450,
+				effects:
+				{
+					summon: "mom:unit/nature/giant_spiders"
+				}
+			},
+			{
+				ref: "mom:spell/nature/giant_strength",
+				name: "Giant Strength",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 40,
+				combat_cost: 8,
+				upkeep: 1,
+				research: 80,
+				effects:
+				{
+					ability: "mom:ability/spell/giant_strength"
+				}
+			},
+			{
+				ref: "mom:spell/nature/gorgons",
+				name: "Gorgons",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 600,
+				combat_cost: null,
+				upkeep: 15,
+				research: 1400,
+				effects:
+				{
+					summon: "mom:unit/nature/gorgons"
+				}
+			},
+			{
+				ref: "mom:spell/nature/great_wyrm",
+				name: "Great Wyrm",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 20,
+				research: 5000,
+				effects:
+				{
+					summon: "mom:unit/nature/great_wyrm"
+				}
+			},
+			{
+				ref: "mom:spell/nature/herb_mastery",
+				name: "Herb Mastery",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 10,
+				research: 4500
+			},
+			{
+				ref: "mom:spell/nature/ice_bolt",
+				name: "Ice Bolt",
+				rarity: "uncommon",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 400
+			},
+			{
+				ref: "mom:spell/nature/ice_storm",
+				name: "Ice Storm",
+				rarity: "rare",
+				type: "environment",
+				target: "map",
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: null,
+				research: 1200
+			},
+			{
+				ref: "mom:spell/nature/iron_skin",
+				name: "Iron Skin",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 200,
+				combat_cost: 40,
+				upkeep: 5,
+				research: 1120,
+				effects:
+				{
+					ability: "mom:ability/spell/iron_skin"
+				}
+			},
+			{
+				ref: "mom:spell/nature/move_fortress",
+				name: "Move Fortress",
+				rarity: "rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: null,
+				research: 1500
+			},
+			{
+				ref: "mom:spell/nature/nature_awareness",
+				name: "Nature Awareness",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 800,
+				combat_cost: null,
+				upkeep: 7,
+				research: 2500
+			},
+			{
+				ref: "mom:spell/nature/natures_cures",
+				name: "Nature's Cures",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 75,
+				combat_cost: null,
+				upkeep: null,
+				research: 740
+			},
+			{
+				ref: "mom:spell/nature/natures_eye",
+				name: "Nature's Eye",
+				rarity: "uncommon",
+				type: "city",
+				target: "friendly",
+				overland_cost: 75,
+				combat_cost: null,
+				upkeep: 1,
+				research: 350
+			},
+			{
+				ref: "mom:spell/nature/natures_wrath",
+				name: "Nature's Wrath",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1250,
+				combat_cost: null,
+				upkeep: 10,
+				research: 6000
+			},
+			{
+				ref: "mom:spell/nature/path_finding",
+				name: "Path Finding",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 50,
+				combat_cost: null,
+				upkeep: 1,
+				research: 560,
+				effects:
+				{
+					ability: "mom:ability/spell/path_finding"
+				}
+			},
+			{
+				ref: "mom:spell/nature/petrify",
+				name: "Petrify",
+				rarity: "rare",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 35,
+				upkeep: null,
+				research: 960
+			},
+			{
+				ref: "mom:spell/nature/regeneration",
+				name: "Regeneration",
+				rarity: "very_rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 300,
+				combat_cost: 60,
+				upkeep: 10,
+				research: 1850,
+				effects:
+				{
+					ability: "mom:ability/spell/regeneration"
+				}
+			},
+			{
+				ref: "mom:spell/nature/resist_elements",
+				name: "Resist Elements",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 25,
+				combat_cost: 5,
+				upkeep: 1,
+				research: 40,
+				effects:
+				{
+					ability: "mom:ability/spell/resist_elements"
+				}
+			},
+			{
+				ref: "mom:spell/nature/sprites",
+				name: "Sprites",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 100,
+				combat_cost: null,
+				upkeep: 3,
+				research: 220,
+				effects:
+				{
+					summon: "mom:unit/nature/sprites"
+				}
+			},
+			{
+				ref: "mom:spell/nature/stone_giant",
+				name: "Stone Giant",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 450,
+				combat_cost: null,
+				upkeep: 9,
+				research: 1040,
+				effects:
+				{
+					summon: "mom:unit/nature/stone_giant"
+				}
+			},
+			{
+				ref: "mom:spell/nature/stone_skin",
+				name: "Stone Skin",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 50,
+				combat_cost: 10,
+				upkeep: 1,
+				research: 160,
+				effects:
+				{
+					ability: "mom:ability/spell/stone_skin"
+				}
+			},
+			{
+				ref: "mom:spell/nature/transmute",
+				name: "Transmute",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 60,
+				combat_cost: null,
+				upkeep: null,
+				research: 680
+			},
+			{
+				ref: "mom:spell/nature/wall_of_stone",
+				name: "Wall of Stone",
+				rarity: "common",
+				type: "city",
+				target: "friendly",
+				overland_cost: 50,
+				combat_cost: null,
+				upkeep: null,
+				research: 60
+			},
+			{
+				ref: "mom:spell/nature/war_bears",
+				name: "War Bears",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 70,
+				combat_cost: null,
+				upkeep: 2,
+				research: 130,
+				effects:
+				{
+					summon: "mom:unit/nature/war_bears"
+				}
+			},
+			{
+				ref: "mom:spell/nature/water_walking",
+				name: "Water Walking",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 50,
+				combat_cost: null,
+				upkeep: 1,
+				research: 190,
+				effects:
+				{
+					ability: "mom:ability/spell/water_walking"
+				}
+			},
+			{
+				ref: "mom:spell/nature/web",
+				name: "Web",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 100,
+				effects:
+				{
+					ability: "mom:ability/spell/web"
+				}
+			}
+		]
+	}
+]

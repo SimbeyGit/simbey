@@ -1,0 +1,37 @@
+[
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:river_bonus",
+			type: "special",
+			name: "River Bonus",
+			desc: "Cities on a river tile gain 20% more gold.",
+			cost: 0,
+			invisible: true,
+			upkeep: [],
+			prereqs: [],
+			benefits:
+			{
+				gold_pct: 20
+			},
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			immuneToTransformations: false
+		}
+	}
+]

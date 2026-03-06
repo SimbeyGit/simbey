@@ -79,6 +79,7 @@
 			combatHouses: "mom:combat/house/treehouse",
 			cityViewHouses: "mom:cityview/house/treehouse",
 			housingProdRef: "mom:treehouse_housing",
+			outpost_growth: 2,
 			qualities:
 			{
 				traits: ["myrran", "magical", "underworld", "cruel", "night-dwelling", "chaotic"],

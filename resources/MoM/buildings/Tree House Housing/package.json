@@ -1,0 +1,45 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files:
+		[
+			"b*.png"
+		],
+		trim: true,
+		double: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:treehouse_housing",
+			type: "housing",
+			name: "Housing",
+			desc: "This special setting builds new housing for the local populace to draw them into the city and increase the city's population growth rate.",
+			cost: 0,
+			invisible: true,
+			upkeep: [],
+			prereqs: [],
+			benefits: {},
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			immuneToTransformations: false
+		}
+	}
+]

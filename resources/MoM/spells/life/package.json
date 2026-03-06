@@ -1,0 +1,532 @@
+[
+	{
+		package: "json",
+		name: "spells.json",
+		data:
+		[
+			{
+				ref: "mom:spell/life/altar_of_battle",
+				name: "Altar of Battle",
+				rarity: "rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 300,
+				combat_cost: null,
+				upkeep: 5,
+				research: 1300,
+				effects:
+				{
+					building: "mom:altar_of_battle"
+				}
+			},
+			{
+				ref: "mom:spell/life/angel",
+				name: "Angel",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 550,
+				combat_cost: null,
+				upkeep: null,
+				research: 1400,
+				effects:
+				{
+					summon: "mom:unit/life/angel"
+				}
+			},
+			{
+				ref: "mom:spell/life/arch_angel",
+				name: "Arch Angel",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 950,
+				combat_cost: null,
+				upkeep: null,
+				research: 5000,
+				effects:
+				{
+					summon: "mom:unit/life/arch_angel"
+				}
+			},
+			{
+				ref: "mom:spell/life/astral_gate",
+				name: "Astral Gate",
+				rarity: "very_rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 350,
+				combat_cost: null,
+				upkeep: 5,
+				research: 2250,
+				effects:
+				{
+					building: "mom:astral_gate"
+				}
+			},
+			{
+				ref: "mom:spell/life/bless",
+				name: "Bless",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 25,
+				combat_cost: 5,
+				upkeep: 1,
+				research: 20,
+				effects:
+				{
+					ability: "mom:ability/spell/bless"
+				}
+			},
+			{
+				ref: "mom:spell/life/charm_of_life",
+				name: "Charm of Life",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1250,
+				combat_cost: null,
+				upkeep: 10,
+				research: 6000
+			},
+			{
+				ref: "mom:spell/life/consecration",
+				name: "Consecration",
+				rarity: "very_rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 400,
+				combat_cost: null,
+				upkeep: 8,
+				research: 3000
+			},
+			{
+				ref: "mom:spell/life/crusade",
+				name: "Crusade",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1100,
+				combat_cost: null,
+				upkeep: 10,
+				research: 4500
+			},
+			{
+				ref: "mom:spell/life/dispel_evil",
+				name: "Dispel Evil",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1100,
+				combat_cost: null,
+				upkeep: 10,
+				research: 4500
+			},
+			{
+				ref: "mom:spell/life/divine_guardians",
+				name: "Divine Guardians",
+				rarity: "very_rare",
+				type: "summon",
+				target: null,
+				overland_cost: 1150,
+				combat_cost: null,
+				upkeep: 35,
+				research: 5000
+			},
+			{
+				ref: "mom:spell/life/endurance",
+				name: "Endurance",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 30,
+				combat_cost: null,
+				upkeep: 10,
+				research: 60,
+				effects:
+				{
+					ability: "mom:ability/spell/endurance"
+				}
+			},
+			{
+				ref: "mom:spell/life/guardian_spirit",
+				name: "Guardian Spirit",
+				rarity: "common",
+				type: "summon",
+				target: null,
+				overland_cost: 80,
+				combat_cost: null,
+				upkeep: null,
+				research: 220,
+				effects:
+				{
+					summon: "mom:unit/life/guardian_spirit"
+				}
+			},
+			{
+				ref: "mom:spell/life/healing",
+				name: "Healing",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: null,
+				combat_cost: 15,
+				upkeep: null,
+				research: 100
+			},
+			{
+				ref: "mom:spell/life/heavenly_light",
+				name: "Heavenly Light",
+				rarity: "uncommon",
+				type: "city",
+				target: "friendly",
+				overland_cost: 150,
+				combat_cost: null,
+				upkeep: 2,
+				research: 740
+			},
+			{
+				ref: "mom:spell/life/heroism",
+				name: "Heroism",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 100,
+				combat_cost: 20,
+				upkeep: 2,
+				research: 250,
+				effects:
+				{
+					ability: "mom:ability/spell/heroism"
+				}
+			},
+			{
+				ref: "mom:spell/life/high_prayer",
+				name: "High Prayer",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 60,
+				upkeep: null,
+				research: 1850
+			},
+			{
+				ref: "mom:spell/life/holy_armor",
+				name: "Holy Armor",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 90,
+				combat_cost: 18,
+				upkeep: 2,
+				research: 130,
+				effects:
+				{
+					ability: "mom:ability/spell/holy_armor"
+				}
+			},
+			{
+				ref: "mom:spell/life/holy_arms",
+				name: "Holy Arms",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 90,
+				combat_cost: 18,
+				upkeep: 2,
+				research: 2500
+			},
+			{
+				ref: "mom:spell/life/holy_weapon",
+				name: "Holy Weapon",
+				rarity: "common",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 50,
+				combat_cost: 10,
+				upkeep: 1,
+				research: 80,
+				effects:
+				{
+					ability: "mom:ability/spell/holy_weapon"
+				}
+			},
+			{
+				ref: "mom:spell/life/holy_word",
+				name: "Holy Word",
+				rarity: "rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 60,
+				upkeep: null,
+				research: 1700
+			},
+			{
+				ref: "mom:spell/life/incarnation",
+				name: "Incarnation",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: null,
+				research: 960,
+				effects:
+				{
+					summon: "mom:unit/champion/torin"
+				}
+			},
+			{
+				ref: "mom:spell/life/inspirations",
+				name: "Inspirations",
+				rarity: "very_rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 350,
+				combat_cost: null,
+				upkeep: 2,
+				research: 200
+			},
+			{
+				ref: "mom:spell/life/invulnerability",
+				name: "Invulnerability",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 200,
+				combat_cost: 40,
+				upkeep: 5,
+				research: 100,
+				effects:
+				{
+					ability: "mom:ability/spell/invulnerability"
+				}
+			},
+			{
+				ref: "mom:spell/life/just_cause",
+				name: "Just Cause",
+				rarity: "common",
+				type: "environment",
+				target: null,
+				overland_cost: 150,
+				combat_cost: null,
+				upkeep: 3,
+				research: 160
+			},
+			{
+				ref: "mom:spell/life/life_force",
+				name: "Life Force",
+				rarity: "common",
+				type: "environment",
+				target: null,
+				overland_cost: 150,
+				combat_cost: null,
+				upkeep: 3,
+				research: 350
+			},
+			{
+				ref: "mom:spell/life/lionheart",
+				name: "Lionheart",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 200,
+				combat_cost: 40,
+				upkeep: 4,
+				research: 880,
+				effects:
+				{
+					ability: "mom:ability/spell/lionheart"
+				}
+			},
+			{
+				ref: "mom:spell/life/mass_healing",
+				name: "Mass Healing",
+				rarity: "rare",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 50,
+				upkeep: null,
+				research: 160
+			},
+			{
+				ref: "mom:spell/life/planar_seal",
+				name: "Planar Seal",
+				rarity: "uncommon",
+				type: "environment",
+				target: null,
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: 5,
+				research: 500
+			},
+			{
+				ref: "mom:spell/life/planar_travel",
+				name: "Planar Travel",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 150,
+				combat_cost: null,
+				upkeep: 5,
+				research: 680,
+				effects:
+				{
+					ability: "mom:ability/spell/planar_travel"
+				}
+			},
+			{
+				ref: "mom:spell/life/plane_shift",
+				name: "Plane Shift",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 125,
+				combat_cost: null,
+				upkeep: null,
+				research: 350
+			},
+			{
+				ref: "mom:spell/life/prayer",
+				name: "Prayer",
+				rarity: "uncommon",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 30,
+				upkeep: null,
+				research: 800
+			},
+			{
+				ref: "mom:spell/life/prosperity",
+				name: "Prosperity",
+				rarity: "rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: 2,
+				research: 120
+			},
+			{
+				ref: "mom:spell/life/raise_dead",
+				name: "Raise Dead",
+				rarity: "uncommon",
+				type: "unit",
+				target: "dead_unit",
+				overland_cost: null,
+				combat_cost: 35,
+				upkeep: null,
+				research: 620
+			},
+			{
+				ref: "mom:spell/life/resurrection",
+				name: "Resurrection",
+				rarity: "uncommon",
+				type: "unit",
+				target: "dead_hero",
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: null,
+				research: 400
+			},
+			{
+				ref: "mom:spell/life/righteousness",
+				name: "Righteousness",
+				rarity: "rare",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 200,
+				combat_cost: 40,
+				upkeep: 2,
+				research: 1120,
+				effects:
+				{
+					ability: "mom:ability/spell/righteousness"
+				}
+			},
+			{
+				ref: "mom:spell/life/star_fires",
+				name: "Star Fires",
+				rarity: "common",
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 5,
+				upkeep: null,
+				research: 40
+			},
+			{
+				ref: "mom:spell/life/stream_of_life",
+				name: "Stream of Life",
+				rarity: "rare",
+				type: "city",
+				target: "friendly",
+				overland_cost: 300,
+				combat_cost: null,
+				upkeep: 8,
+				research: 150,
+				effects:
+				{
+					building: "mom:stream_of_life"
+				}
+			},
+			{
+				ref: "mom:spell/life/tranquility",
+				name: "Tranquility",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: 10,
+				research: 4000
+			},
+			{
+				ref: "mom:spell/life/true_light",
+				name: "True Light",
+				rarity: "common",
+				type: "environment",
+				target: null,
+				overland_cost: null,
+				combat_cost: 20,
+				upkeep: null,
+				research: 190
+			},
+			{
+				ref: "mom:spell/life/true_sight",
+				name: "True Sight",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: 100,
+				combat_cost: 20,
+				upkeep: 2,
+				research: 300,
+				effects:
+				{
+					ability: "mom:ability/spell/true_sight"
+				}
+			},
+			{
+				ref: "mom:spell/life/unicorns",
+				name: "Unicorns",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 250,
+				combat_cost: null,
+				upkeep: null,
+				research: 560,
+				effects:
+				{
+					summon: "mom:unit/life/unicorns"
+				}
+			}
+		]
+	}
+]

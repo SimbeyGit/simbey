@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,18 +18,46 @@
 			ref: "mom:wizards_guild",
 			type: "normal",
 			name: "Wizards' Guild",
+			desc: "A wizards' guild acts as a center for the advancement of magic. It adds +8 spell research points at an upkeep cost of 3 mana points a turn.",
 			cost: 1000,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 5
 				},
 				{
-					type: "mana",
+					ref: "mom:stat/mana/one",
 					amount: 3
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -36,7 +68,8 @@
 			benefits:
 			{
 				research: 8
-			}
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

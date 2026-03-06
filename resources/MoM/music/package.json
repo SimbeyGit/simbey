@@ -585,7 +585,7 @@
 				file: "MOM97.MID"
 			},
 			{
-				ref: "mom:new_building",
+				ref: "mom:announcement",
 				file: "MOM109.MID"
 			},
 			{

@@ -37,22 +37,21 @@
 				move:
 				[
 					{
+						ref:"mom:stat/move/land",
 						sound_ref:"mom:sounds/armor",
-						value:1,
-						ref:"mom:stat/move/land"
+						value:1
 					}
 				],
 				melee:
 				{
-					value:1,
 					ref:"mom:stat/melee/normal",
-					type:"normal"
+					sound_ref:"mom:sounds/sword",
+					value:1
 				},
 				defense:
 				{
 					ref:"mom:stat/defense/normal",
-					value:2,
-					type:"normal"
+					value:2
 				},
 				resist:
 				{

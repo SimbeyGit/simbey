@@ -81,6 +81,7 @@
 			combatHouses: "mom:combat/house/standard",
 			cityViewHouses: "mom:cityview/house/standard",
 			housingProdRef: "mom:standard_housing",
+			outpost_growth: 7,
 			qualities:
 			{
 				traits: ["myrran", "human", "industrious", "mountain-dwelling", "hardy"],

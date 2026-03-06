@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,14 +18,43 @@
 			ref: "mom:parthenon",
 			type: "normal",
 			name: "Parthenon",
+			desc: "A parthenon provides the city with a central focus for the study and teaching of religion. It adds +3 mana and reduces the unrest by 1.",
 			cost: 400,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 3
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				replaces: "mom:temple",
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -33,7 +66,8 @@
 			{
 				mana: 3,
 				unrest: -1
-			}
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

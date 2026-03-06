@@ -1,0 +1,50 @@
+[
+	{
+		package: "buildsif",
+		name: "building.sif",
+		files:
+		[
+			"b*.png"
+		],
+		trim: true,
+		double: true,
+		canvas: 64
+	},
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:earth_gate",
+			type: "spell",
+			name: "Earth Gate",
+			desc: "Units in a city with an earth gate can instantly travel to any other city with an earth gate.",
+			realm: "nature",
+			upkeep:
+			[
+				{
+					ref: "mom:stat/mana/one",
+					amount: 5
+				}
+			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			prereqs: [],
+			benefits: {},
+			immuneToTransformations: false
+		}
+	}
+]

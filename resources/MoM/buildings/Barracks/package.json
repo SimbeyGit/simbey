@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,18 +18,46 @@
 			ref: "mom:barracks",
 			type: "normal",
 			name: "Barracks",
+			desc: "Without a barracks, a city cannot organize and train regular military units.",
 			cost: 30,
 			start: true,
 			startRaiders: 2,
-			upkeep:
-			[
-			],
-			prereqs:
-			[
-			],
-			benefits:
+			upkeep: [],
+			prereqs: [],
+			benefits: {},
+			is_ruin: false,
+			categories: [],
+			size:
 			{
-			}
+				width: 2,
+				height: 3
+			},
+			placement:
+			{
+				type: "random",
+				fixed_position:
+				{
+					x: -1,
+					y: -1
+				},
+				alignmentBias:
+				{
+					x: -1,
+					y: -1
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

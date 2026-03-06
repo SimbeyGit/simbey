@@ -79,6 +79,7 @@
 			combatHouses: "mom:combat/house/standard",
 			cityViewHouses: "mom:cityview/house/standard",
 			housingProdRef: "mom:standard_housing",
+			outpost_growth: 5,
 			qualities:
 			{
 				traits: ["myrran", "savage", "chaotic", "canine", "strong"],

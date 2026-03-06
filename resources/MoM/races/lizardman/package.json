@@ -83,6 +83,7 @@
 			combatHouses: "mom:combat/house/mudhut",
 			cityViewHouses: "mom:cityview/house/mudhut",
 			housingProdRef: "mom:mudhut_housing",
+			outpost_growth: 10,
 			qualities:
 			{
 				traits: ["swamp-dwelling", "aquatic", "reptilian"],

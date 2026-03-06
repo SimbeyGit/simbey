@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,14 +18,30 @@
 			ref: "mom:mechanicians_guild",
 			type: "normal",
 			name: "Mechanicians' Guild",
+			desc: "A mechanicians' guild teaches advanced engineering techniques, increasing the production points of a city by +50%.",
 			cost: 600,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 5
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -34,13 +54,20 @@
 				},
 				{
 					type: "land",
-					tile: [ "hills", "mountains", "volcano" ]
+					distance: "catchment",
+					tile:
+					[
+						"hills",
+						"mountains",
+						"volcano"
+					]
 				}
 			],
 			benefits:
 			{
 				production: 50
-			}
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

@@ -65,7 +65,7 @@
 				},
 				range:
 				{
-					ref:"mom:stat/arrow/normal",
+					ref:"mom:ranged/arrow",
 					value:1
 				},
 				defense:

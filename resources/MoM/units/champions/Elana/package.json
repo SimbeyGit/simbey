@@ -57,8 +57,7 @@
 				},
 				range:
 				{
-					ref:"mom:stat/magic/chaos",
-					name:"Blue Sparkle",
+					ref:"mom:ranged/blue_sparkle",
 					value:8
 				},
 				defense:

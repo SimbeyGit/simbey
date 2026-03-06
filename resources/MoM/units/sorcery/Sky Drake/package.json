@@ -4,6 +4,7 @@
 		name:"combat.sif",
 		files: [ "d*.png" ],
 		trim:true,
+		clean_alpha: true,
 		canvas:32
 	},
 	{

@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,22 +18,86 @@
 			ref: "mom:builders_hall",
 			type: "normal",
 			name: "Builders' Hall",
+			desc: "The builders' hall educates workers in skilled building techniques.",
 			cost: 60,
 			start: true,
 			startRaiders: 4,
+			mountable_on_wall: false,
+			is_ruin: false,
+			categories: [],
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 1
 				}
 			],
-			prereqs:
-			[
-			],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				is_fixed_position: false,
+				vertical_preference: 0.6,
+				placement_flexibility: 2,
+				requires_river: false,
+				must_be_on_coast: false,
+				fixed_position:
+				{
+					relative_x: 0.5,
+					relative_y: 0.6
+				},
+				requires:
+				{
+					river: false,
+					ocean: false,
+					hill: false,
+					road_adjacency: false
+				},
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			prereqs: [],
+			visuals:
+			{
+				size:
+				{
+					width: 64,
+					height: 64
+				},
+				animation:
+				{
+					frame_count: 1,
+					frame_interval: 0
+				},
+				effects: []
+			},
 			benefits:
 			{
-			}
+				heal_bonus: 0.0,
+				farmer_food_bonus: 0.0,
+				building_mana_factor: 1.0,
+				cost_reduction_factor: 1.0,
+				mana: 0,
+				gold_pct: 0,
+				unrest: 0,
+				sight_range: 0,
+				food: 0,
+				pop_growth: 0,
+				pop_max: 0,
+				exp: 0,
+				production: 0,
+				research: 0,
+				minerals_pct: 0,
+				alchemy: false
+			},
+			benefit_types: [],
+			benefit_values: [],
+			immuneToTransformations: false
 		}
 	}
 ]

@@ -1,0 +1,167 @@
+[
+	{
+		package: "json",
+		name: "spells.json",
+		data:
+		[
+			{
+				ref: "mom:spell/arcane/awareness",
+				name: "Awareness",
+				rarity: "uncommon",
+				type: "environment",
+				target: null,
+				overland_cost: 500,
+				combat_cost: null,
+				upkeep: 3,
+				research: 700
+			},
+			{
+				ref: "mom:spell/arcane/create_artifact",
+				name: "Create Artifact",
+				rarity: "rare",
+				type: "environment",
+				target: null,
+				overland_cost: 0,
+				combat_cost: null,
+				upkeep: null,
+				research: 1000
+			},
+			{
+				ref: "mom:spell/arcane/detect_magic",
+				name: "Detect Magic",
+				rarity: "common",
+				type: "environment",
+				target: null,
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: 3,
+				research: 400
+			},
+			{
+				ref: "mom:spell/arcane/disenchant_area",
+				name: "Disenchant Area",
+				rarity: "uncommon",
+				type: "environment",
+				target: "map",
+				overland_cost: 50,
+				combat_cost: 50,
+				upkeep: null,
+				research: 300
+			},
+			{
+				ref: "mom:spell/arcane/dispel_magic",
+				name: "Dispel Magic",
+				rarity: "common",
+				type: "unit",
+				target: "unit",
+				overland_cost: null,
+				combat_cost: 10,
+				upkeep: null,
+				research: 100
+			},
+			{
+				ref: "mom:spell/arcane/disjunction",
+				name: "Disjunction",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 200,
+				combat_cost: null,
+				upkeep: null,
+				research: 750
+			},
+			{
+				ref: "mom:spell/arcane/enchant_item",
+				name: "Enchant Item",
+				rarity: "uncommon",
+				type: "environment",
+				target: null,
+				overland_cost: 0,
+				combat_cost: null,
+				upkeep: null,
+				research: 450
+			},
+			{
+				ref: "mom:spell/arcane/magic_spirit",
+				name: "Magic Spirit",
+				rarity: "default",
+				type: "summon",
+				target: null,
+				overland_cost: 30,
+				combat_cost: null,
+				upkeep: 1,
+				research: 100,
+				effects:
+				{
+					summon: "mom:unit/arcane/magic_spirit"
+				}
+			},
+			{
+				ref: "mom:spell/arcane/recall_hero",
+				name: "Recall Hero",
+				rarity: "uncommon",
+				type: "unit",
+				target: "friendly",
+				overland_cost: null,
+				combat_cost: 20,
+				upkeep: null,
+				research: 350
+			},
+			{
+				ref: "mom:spell/arcane/spell_of_mastery",
+				name: "Spell of Mastery",
+				rarity: "very_rare",
+				type: "environment",
+				target: null,
+				overland_cost: 5000,
+				combat_cost: null,
+				upkeep: null,
+				research: 60000
+			},
+			{
+				ref: "mom:spell/arcane/spell_of_return",
+				name: "Spell of Return",
+				rarity: "default",
+				type: "city",
+				target: "friendly",
+				overland_cost: 1000,
+				combat_cost: null,
+				upkeep: null,
+				research: 2500
+			},
+			{
+				ref: "mom:spell/arcane/summon_champion",
+				name: "Summon Champion",
+				rarity: "rare",
+				type: "summon",
+				target: null,
+				overland_cost: 750,
+				combat_cost: null,
+				upkeep: null,
+				research: 1250
+			},
+			{
+				ref: "mom:spell/arcane/summon_hero",
+				name: "Summon Hero",
+				rarity: "uncommon",
+				type: "summon",
+				target: null,
+				overland_cost: 300,
+				combat_cost: null,
+				upkeep: null,
+				research: 500
+			},
+			{
+				ref: "mom:spell/arcane/summoning_circle",
+				name: "Summoning Circle",
+				rarity: "common",
+				type: "city",
+				target: "friendly",
+				overland_cost: 50,
+				combat_cost: null,
+				upkeep: null,
+				research: 150
+			}
+		]
+	}
+]

@@ -2,8 +2,12 @@
 	{
 		package: "buildsif",
 		name: "building.sif",
-		files: ["b*.png"],
+		files:
+		[
+			"b*.png"
+		],
 		trim: true,
+		double: true,
 		canvas: 64
 	},
 	{
@@ -14,14 +18,30 @@
 			ref: "mom:miners_guild",
 			type: "normal",
 			name: "Miners' Guild",
+			desc: "A miners' guild increases any special mineral bonuses by +50% and production by +50%.",
 			cost: 300,
 			upkeep:
 			[
 				{
-					type: "gold",
+					ref: "mom:stat/gold/one",
 					amount: 3
 				}
 			],
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
 			prereqs:
 			[
 				{
@@ -30,14 +50,22 @@
 				},
 				{
 					type: "land",
-					tile: [ "hills", "mountains", "volcano" ]
+					distance: "catchment",
+					tile:
+					[
+						"hills",
+						"mountains",
+						"volcano"
+					]
 				}
 			],
 			benefits:
 			{
 				minerals_pct: 50,
-				production: 50
-			}
+				production: 50,
+				cost_reduction_factor: 2.0
+			},
+			immuneToTransformations: false
 		}
 	}
 ]

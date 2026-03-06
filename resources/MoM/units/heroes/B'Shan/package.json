@@ -46,7 +46,7 @@
 				},
 				range:
 				{
-					ref:"mom:ranged/rock",
+					ref:"mom:ranged/arrow",
 					value:4
 				},
 				defense:

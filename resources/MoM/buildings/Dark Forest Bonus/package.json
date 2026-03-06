@@ -1,0 +1,37 @@
+[
+	{
+		package: "json",
+		name: "building.json",
+		data:
+		{
+			ref: "mom:dark_forest_bonus",
+			type: "special",
+			name: "Dark Forest Bonus",
+			desc: "Cities on a dark forest tile gain one mana per turn.",
+			cost: 0,
+			invisible: true,
+			upkeep: [],
+			prereqs: [],
+			benefits:
+			{
+				mana: 1
+			},
+			is_ruin: false,
+			categories: [],
+			size:
+			{
+				width: 2,
+				height: 2
+			},
+			placement:
+			{
+				type: "random",
+				priority: 50,
+				mounted_on_citywalls: false,
+				ignore_occupation: false,
+				method: "grid"
+			},
+			immuneToTransformations: false
+		}
+	}
+]

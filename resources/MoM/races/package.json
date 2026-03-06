@@ -1,0 +1,122 @@
+[
+	{
+		package: "json",
+		name: "conflicts.json",
+		data:
+		{
+			"human": {
+				"human": -0.2
+			},
+			"industrious": {
+				"nature-aligned": 0.25,
+				"peaceful": 0.15
+			},
+			"warlike": {
+				"peaceful": 0.15,
+				"civilized": 0.1,
+				"diplomatic": 0.05
+			},
+			"savage": {
+				"civilized": 0.1,
+				"noble": 0.15
+			},
+			"underworld": {
+				"noble": 0.3,
+				"pious": 0.35
+			},
+			"night-dwelling": {
+				"forest-dwelling": 0.2
+			},
+			"raiders": {
+				"agrarian": 0.3,
+				"peaceful": 0.4
+			},
+			"cruel": {
+				"pious": 0.5,
+				"peaceful": 0.35
+			},
+			"chaotic": {
+				"civilized": 0.2,
+				"noble": 0.15
+			},
+			"insectoid": {
+				"civilized": 0.05,
+				"diplomatic": 0.1,
+				"canine": 0.1,
+				"reptilian": 0.25
+			},
+			"reptilian": {
+				"forest-dwelling": 0.15,
+				"human": 0.05
+			},
+			"aquatic": {
+			}
+			"nature-aligned": {
+				"warlike": 0.05
+			},
+			"magical": {
+				"industrious": 0.1,
+				"human": 0.1
+			},
+			"peaceful": {
+				"warlike": 0.15,
+				"cruel": 0.3,
+				"chaotic": 0.25
+			},
+			"forest-dwelling": {
+				"industrious": 0.25
+			},
+			"opportunistic": {
+				"savage": 0.1
+			},
+			"civilized": {
+				"warlike": 0.1
+			},
+			"noble": {
+				"savage": 0.1
+			},
+			"pious": {
+				"cruel": 0.35,
+				"warlike": 0.1
+			},
+			"tribal": {
+				"civilized": 0.1
+			},
+			"agrarian": {
+				"industrious": 0.25
+			},
+			"canine": {
+				"insectoid": 0.15
+			},
+			"strong": {
+				"diplomatic": 0.05	
+			},
+			"myrran": {
+				"myrran": 0.2
+			},
+			"hive-minded": {
+				"canine": 0.1,
+				"noble": 0.1
+			},
+			"adaptive": {
+				"hive-minded": 0.1
+			},
+			"diplomatic": {
+				"warlike": 0.05
+			},
+			"hardy": {
+			},
+			"lucky": {
+				"strong": 0.05
+			},
+			"swamp-dwelling": {
+				"civilized": 0.05
+			},
+			"mountain-dwelling": {
+				"aquatic": 0.05,
+				"warlike": 0.1,
+				"insectoid": 0.1
+			}
+		}
+	}
+]
