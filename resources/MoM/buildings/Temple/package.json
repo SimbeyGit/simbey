@@ -15,10 +15,10 @@
 		name: "building.json",
 		data:
 		{
-			ref: "mom:Temple",
+			ref: "mom:temple",
 			type: "normal",
 			name: "Temple",
-			desc: "A temple serves as a center for basic religious instruction. It adds +2 mana, allows use of nightshade, and reduces the unrest level by 1.",
+			desc: "A temple serves as a center for basic religious instruction. It adds +2 power, allows use of nightshade, and reduces the unrest level by 1.",
 			cost: 200,
 			upkeep:
 			[
@@ -69,7 +69,7 @@
 			],
 			benefits:
 			{
-				mana: 2,
+				power: 2,
 				unrest: -1
 			},
 			immuneToTransformations: false

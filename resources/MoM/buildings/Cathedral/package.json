@@ -18,7 +18,7 @@
 			ref: "mom:cathedral",
 			type: "normal",
 			name: "Cathedral",
-			desc: "A cathedral provides the city with a major cultural and religious center. It adds +4 mana and reduces the unrest level by 1.",
+			desc: "A cathedral provides the city with a major cultural and religious center. It adds +4 power and reduces the unrest level by 1.",
 			cost: 800,
 			upkeep:
 			[
@@ -64,7 +64,7 @@
 			],
 			benefits:
 			{
-				mana: 4,
+				power: 4,
 				unrest: -1
 			},
 			immuneToTransformations: false

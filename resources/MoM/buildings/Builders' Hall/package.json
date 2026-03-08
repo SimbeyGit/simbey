@@ -80,9 +80,7 @@
 			{
 				heal_bonus: 0.0,
 				farmer_food_bonus: 0.0,
-				building_mana_factor: 1.0,
-				cost_reduction_factor: 1.0,
-				mana: 0,
+				power: 0,
 				gold_pct: 0,
 				unrest: 0,
 				sight_range: 0,

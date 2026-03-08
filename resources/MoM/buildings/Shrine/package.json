@@ -18,8 +18,9 @@
 			ref: "mom:shrine",
 			type: "normal",
 			name: "Shrine",
-			desc: "A shrine provides spiritual comfort to the citizenry. It adds +1 mana, allows use of nightshade, and reduces the unrest level by 1.",
+			desc: "A shrine provides spiritual comfort to the citizenry. It adds +1 power, allows use of nightshade, and reduces the unrest level by 1.",
 			cost: 100,
+			start: true,
 			upkeep:
 			[
 				{
@@ -68,7 +69,7 @@
 			],
 			benefits:
 			{
-				mana: 1,
+				power: 1,
 				unrest: -1
 			},
 			immuneToTransformations: false

@@ -72,7 +72,7 @@
 			],
 			no_build:
 			[
-				"mom:animists:guild",
+				"mom:animists_guild",
 				"mom:sages_guild",
 				"mom:parthenon",
 				"mom:armorers_guild",

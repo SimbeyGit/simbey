@@ -14,7 +14,7 @@
 			prereqs: [],
 			benefits:
 			{
-				mana: 1
+				power: 1
 			},
 			is_ruin: false,
 			categories: [],

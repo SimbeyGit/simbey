@@ -68,7 +68,7 @@
 			],
 			benefits:
 			{
-				mana: 3,
+				power: 3,
 				alchemy: true
 			},
 			immuneToTransformations: false
