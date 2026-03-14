@@ -168,7 +168,8 @@
 				research: 2250,
 				effects:
 				{
-					summon: "mom:unit/death/death_knights"
+					summon: "mom:unit/death/death_knights",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -205,7 +206,8 @@
 				research: 6000,
 				effects:
 				{
-					summon: "mom:unit/death/demon_lord"
+					summon: "mom:unit/death/demon_lord",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -279,7 +281,8 @@
 				research: 130,
 				effects:
 				{
-					summon: "mom:unit/death/ghouls"
+					summon: "mom:unit/death/ghouls",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -331,7 +334,8 @@
 				research: 560,
 				effects:
 				{
-					summon: "mom:unit/death/night_stalker"
+					summon: "mom:unit/death/night_stalker",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -368,7 +372,8 @@
 				research: 800,
 				effects:
 				{
-					summon: "mom:unit/death/shadow_demons"
+					summon: "mom:unit/death/shadow_demons",
+					cast_music: "mom:summon/uncommon"
 				}
 			},
 			{
@@ -383,7 +388,8 @@
 				research: 20,
 				effects:
 				{
-					summon: "mom:unit/death/skeletons"
+					summon: "mom:unit/death/skeletons",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -501,7 +507,8 @@
 				research: 1120,
 				effects:
 				{
-					summon: "mom:unit/death/wraiths"
+					summon: "mom:unit/death/wraiths",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{

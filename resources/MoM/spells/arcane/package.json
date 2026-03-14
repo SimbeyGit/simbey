@@ -93,7 +93,8 @@
 				research: 100,
 				effects:
 				{
-					summon: "mom:unit/arcane/magic_spirit"
+					summon: "mom:unit/arcane/magic_spirit",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{

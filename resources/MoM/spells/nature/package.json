@@ -16,7 +16,8 @@
 				research: 800,
 				effects:
 				{
-					summon: "mom:unit/nature/basilisk"
+					summon: "mom:unit/nature/basilisk",
+					cast_music: "mom:summon/uncommon"
 				}
 			},
 			{
@@ -31,7 +32,8 @@
 				research: 2000,
 				effects:
 				{
-					summon: "mom:unit/nature/behemoth"
+					summon: "mom:unit/nature/behemoth",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -68,7 +70,8 @@
 				research: 620,
 				effects:
 				{
-					summon: "mom:unit/nature/cockatrices"
+					summon: "mom:unit/nature/cockatrices",
+					cast_music: "mom:summon/uncommon"
 				}
 			},
 			{
@@ -83,7 +86,8 @@
 				research: 3500,
 				effects:
 				{
-					summon: "mom:unit/nature/colossus"
+					summon: "mom:unit/nature/colossus",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -109,7 +113,8 @@
 				research: 1700,
 				effects:
 				{
-					summon: "mom:unit/nature/earth_elemental"
+					summon: "mom:unit/nature/earth_elemental",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{
@@ -205,7 +210,8 @@
 				research: 450,
 				effects:
 				{
-					summon: "mom:unit/nature/giant_spiders"
+					summon: "mom:unit/nature/giant_spiders",
+					cast_music: "mom:summon/uncommon"
 				}
 			},
 			{
@@ -235,7 +241,8 @@
 				research: 1400,
 				effects:
 				{
-					summon: "mom:unit/nature/gorgons"
+					summon: "mom:unit/nature/gorgons",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{
@@ -250,7 +257,8 @@
 				research: 5000,
 				effects:
 				{
-					summon: "mom:unit/nature/great_wyrm"
+					summon: "mom:unit/nature/great_wyrm",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -424,7 +432,8 @@
 				research: 220,
 				effects:
 				{
-					summon: "mom:unit/nature/sprites"
+					summon: "mom:unit/nature/sprites",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -439,7 +448,8 @@
 				research: 1040,
 				effects:
 				{
-					summon: "mom:unit/nature/stone_giant"
+					summon: "mom:unit/nature/stone_giant",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{
@@ -491,7 +501,8 @@
 				research: 130,
 				effects:
 				{
-					summon: "mom:unit/nature/war_bears"
+					summon: "mom:unit/nature/war_bears",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{

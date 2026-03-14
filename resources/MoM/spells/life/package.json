@@ -31,7 +31,8 @@
 				research: 1400,
 				effects:
 				{
-					summon: "mom:unit/life/angel"
+					summon: "mom:unit/life/angel",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{
@@ -46,7 +47,8 @@
 				research: 5000,
 				effects:
 				{
-					summon: "mom:unit/life/arch_angel"
+					summon: "mom:unit/life/arch_angel",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -124,15 +126,20 @@
 				research: 4500
 			},
 			{
-				ref: "mom:spell/life/divine_guardians",
-				name: "Divine Guardians",
+				ref: "mom:spell/life/divine_guardian",
+				name: "Divine Guardian",
 				rarity: "very_rare",
 				type: "summon",
 				target: null,
 				overland_cost: 1150,
 				combat_cost: null,
 				upkeep: 35,
-				research: 5000
+				research: 5000,
+				effects:
+				{
+					summon: "mom:unit/life/divine_guardian",
+					cast_music: "mom:summon/very_rare"
+				}
 			},
 			{
 				ref: "mom:spell/life/endurance",
@@ -161,7 +168,8 @@
 				research: 220,
 				effects:
 				{
-					summon: "mom:unit/life/guardian_spirit"
+					summon: "mom:unit/life/guardian_spirit",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -276,7 +284,8 @@
 				research: 960,
 				effects:
 				{
-					summon: "mom:unit/champion/torin"
+					summon: "mom:unit/champion/torin",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{
@@ -524,7 +533,8 @@
 				research: 560,
 				effects:
 				{
-					summon: "mom:unit/life/unicorns"
+					summon: "mom:unit/life/unicorns",
+					cast_music: "mom:summon/uncommon"
 				}
 			}
 		]

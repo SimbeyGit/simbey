@@ -80,7 +80,8 @@
 				research: 1040,
 				effects:
 				{
-					summon: "mom:unit/chaos/chaos_spawn"
+					summon: "mom:unit/chaos/chaos_spawn",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{
@@ -106,7 +107,8 @@
 				research: 800,
 				effects:
 				{
-					summon: "mom:unit/chaos/chimeras"
+					summon: "mom:unit/chaos/chimeras",
+					cast_music: "mom:summon/uncommon"
 				}
 			},
 			{
@@ -154,7 +156,8 @@
 				research: 620,
 				effects:
 				{
-					summon: "mom:unit/chaos/doom_bat"
+					summon: "mom:unit/chaos/doom_bat",
+					cast_music: "mom:summon/uncommon",
 				}
 			},
 			{
@@ -191,7 +194,8 @@
 				research: 1300,
 				effects:
 				{
-					summon: "mom:unit/chaos/efreet"
+					summon: "mom:unit/chaos/efreet",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{
@@ -232,7 +236,8 @@
 				research: 250,
 				effects:
 				{
-					summon: "mom:unit/chaos/fire_elemental"
+					summon: "mom:unit/chaos/fire_elemental",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -247,7 +252,8 @@
 				research: 350,
 				effects:
 				{
-					summon: "mom:unit/chaos/fire_giant"
+					summon: "mom:unit/chaos/fire_giant",
+					cast_music: "mom:summon/uncommon"
 				}
 			},
 			{
@@ -310,7 +316,8 @@
 				research: 500,
 				effects:
 				{
-					summon: "mom:unit/chaos/gargoyles"
+					summon: "mom:unit/chaos/gargoyles",
+					cast_music: "mom:summon/uncommon"
 				}
 			},
 			{
@@ -325,7 +332,8 @@
 				research: 4500,
 				effects:
 				{
-					summon: "mom:unit/chaos/great_drake"
+					summon: "mom:unit/chaos/great_drake",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -351,7 +359,8 @@
 				research: 80,
 				effects:
 				{
-					summon: "mom:unit/chaos/hell_hounds"
+					summon: "mom:unit/chaos/hell_hounds",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -366,7 +375,8 @@
 				research: 1850,
 				effects:
 				{
-					summon: "mom:unit/chaos/hydra"
+					summon: "mom:unit/chaos/hydra",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -407,7 +417,8 @@
 				research: 1200,
 				effects:
 				{
-					summon: "mom:unit/chaos/magic_vortex"
+					summon: "mom:unit/chaos/magic_vortex",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{

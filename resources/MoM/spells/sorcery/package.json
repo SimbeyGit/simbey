@@ -16,7 +16,8 @@
 				research: 1300,
 				effects:
 				{
-					summon: "mom:unit/sorcery/air_elemental"
+					summon: "mom:unit/sorcery/air_elemental",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{
@@ -138,7 +139,8 @@
 				research: 1850,
 				effects:
 				{
-					summon: "mom:unit/sorcery/djinn"
+					summon: "mom:unit/sorcery/djinn",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -179,7 +181,8 @@
 				research: 60,
 				effects:
 				{
-					summon: "mom:unit/sorcery/floating_island"
+					summon: "mom:unit/sorcery/floating_island",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -313,7 +316,8 @@
 				research: 800,
 				effects:
 				{
-					summon: "mom:unit/sorcery/phantom_beast"
+					summon: "mom:unit/sorcery/phantom_beast",
+					cast_music: "mom:summon/uncommon"
 				}
 			},
 			{
@@ -328,7 +332,8 @@
 				research: 100,
 				effects:
 				{
-					summon: "mom:unit/sorcery/phantom_warriors"
+					summon: "mom:unit/sorcery/phantom_warriors",
+					cast_music: "mom:summon/common"
 				}
 			},
 			{
@@ -369,7 +374,8 @@
 				research: 4500,
 				effects:
 				{
-					summon: "mom:unit/sorcery/sky_drake"
+					summon: "mom:unit/sorcery/sky_drake",
+					cast_music: "mom:summon/very_rare"
 				}
 			},
 			{
@@ -443,7 +449,8 @@
 				research: 1200,
 				effects:
 				{
-					summon: "mom:unit/sorcery/storm_giant"
+					summon: "mom:unit/sorcery/storm_giant",
+					cast_music: "mom:summon/rare"
 				}
 			},
 			{

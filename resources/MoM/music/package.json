@@ -457,6 +457,22 @@
 		data:
 		[
 			{
+				ref: "mom:summon/common",
+				file: "MOM14.MID"
+			},
+			{
+				ref: "mom:summon/uncommon",
+				file: "MOM15.MID"
+			},
+			{
+				ref: "mom:summon/rare",
+				file: "MOM16.MID"
+			},
+			{
+				ref: "mom:summon/very_rare",
+				file: "MOM17.MID"
+			},
+			{
 				ref: "mom:overland/a",
 				file: "MOM100.MID"
 			},
