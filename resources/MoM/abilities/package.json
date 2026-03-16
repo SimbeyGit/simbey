@@ -510,7 +510,8 @@
 				ref: "mom:ability/unit/ranged_attack",
 				name: "Ranged Attack",
 				type: "range",
-				image: "Unit_Quiver.png"
+				image: "Unit_Quiver.png",
+				label_prefix: "X "
 			},
 			{
 				ref: "mom:ability/unit/regeneration",

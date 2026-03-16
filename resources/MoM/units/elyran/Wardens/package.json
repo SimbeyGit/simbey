@@ -18,29 +18,33 @@
 		name:"data.json",
 		data:
 		{
-			ref:"mom:unit/elyran/sentinels",
+			ref:"mom:unit/elyran/wardens",
 			type:"normal",
-			name:"Sentinels",
+			name:"Wardens",
 			race:"mom:elyran",
-			figures:6,
+			figures:4,
 			animation:"flying_unit",
-			cost:50,
+			cost:80,
 			upkeep:
 			[
 				{
 					amount:1,
 					ref:"mom:stat/food/one"
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:1
 				}
 			],
 			prereqs:
 			[
 				{
 					type: "building",
-					ref: "mom:smithy"
+					ref: "mom:stables"
 				},
 				{
 					type: "building",
-					ref: "mom:barracks"
+					ref: "mom:armory"
 				}
 			],
 			stats:
@@ -50,24 +54,24 @@
 					{
 						ref:"mom:stat/move/air",
 						sound_ref:"mom:sounds/armor",
-						value:1
+						value:2
 					}
 				],
 				melee:
 				{
 					ref:"mom:stat/melee/normal",
 					sound_ref:"mom:sounds/sword",
-					value:3
+					value:4
 				},
 				range:
 				{
 					ref:"mom:ranged/shimmer",
-					value:2
+					value:3
 				},
 				defense:
 				{
 					ref:"mom:stat/defense/normal",
-					value:2
+					value:3
 				},
 				resist:
 				{
@@ -77,7 +81,7 @@
 				hits:
 				{
 					ref:"mom:stat/hits",
-					value:2
+					value:3
 				}
 			},
 			abilities:
