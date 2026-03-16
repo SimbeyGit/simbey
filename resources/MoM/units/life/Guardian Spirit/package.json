@@ -70,7 +70,7 @@
 			},
 			abilities:
 			[
-				{ ref: "mom:ability/unit/meld" },
+				{ ref: "mom:ability/unit/meld", value:2 },
 				{ ref: "mom:ability/unit/noncorporeal" },
 				{ ref: "mom:ability/unit/resistance_all", value: 1 }
 			]

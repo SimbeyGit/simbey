@@ -456,7 +456,12 @@
 				overland_cost: 180,
 				combat_cost: null,
 				upkeep: 5,
-				research: 400
+				research: 400,
+				effects:
+				{
+					summon: "mom:unit/death/werewolves",
+					cast_music: "mom:summon/uncommon"
+				}
 			},
 			{
 				ref: "mom:spell/death/word_death",
