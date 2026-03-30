@@ -37,6 +37,7 @@
 			placement:
 			{
 				type: "random",
+				replaces: "mom:library",
 				fixed_position:
 				{
 					x: -1,

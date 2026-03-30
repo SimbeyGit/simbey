@@ -1,0 +1,96 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		clean_alpha:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/elyran/zealots",
+			type:"normal",
+			name:"Zealots",
+			race:"mom:elyran",
+			figures:4,
+			animation:"flying_unit",
+			cost:100,
+			upkeep:
+			[
+				{
+					amount:1,
+					ref:"mom:stat/food/one"
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:2
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:temple"
+				},
+				{
+					type: "building",
+					ref: "mom:armory"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/armor",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:5
+				},
+				range:
+				{
+					ref:"mom:ranged/shimmer",
+					value:2
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:4
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:5
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:4
+				}
+			},
+			abilities:
+			[
+				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
+				{ ref: "mom:ability/unit/illusions_immunity" }
+				{ ref: "mom:ability/unit/thrown", value: 3 },
+			]
+		}
+	}
+]
