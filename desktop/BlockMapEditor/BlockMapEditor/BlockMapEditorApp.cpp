@@ -17,6 +17,7 @@
 #include "ExportDlg.h"
 #include "DifficultyDlg.h"
 #include "ReplaceWallDlg.h"
+#include "DialogueDlg.h"
 #include "BlockMapEditorApp.h"
 
 const WCHAR c_wzAppClassName[] = L"BlockMapEditorAppCls";
@@ -205,6 +206,7 @@ CBlockMapEditorApp::CBlockMapEditorApp (HINSTANCE hInstance) :
 	m_pRibbon(NULL),
 	m_rstrFile(NULL),
 	m_pBlockMap(NULL),
+	m_pAdditional(NULL),
 	m_fPainting(FALSE),
 	m_xInfo(0), m_zInfo(0),
 	m_fInfoBalloon(FALSE),
@@ -237,6 +239,7 @@ CBlockMapEditorApp::~CBlockMapEditorApp ()
 	m_Graph.AttachContainer(NULL);
 
 	RStrRelease(m_rstrFile);
+	SafeRelease(m_pAdditional);
 	SafeDelete(m_pBlockMap);
 	SafeRelease(m_pRibbon);
 
@@ -281,6 +284,7 @@ HRESULT CBlockMapEditorApp::Initialize (LPWSTR lpCmdLine, INT nCmdShow)
 
 	Check(CSIFRibbon::Create(DPI::Scale, &m_pRibbon));
 	Check(CreateBlockMap(&m_pBlockMap));
+	Check(JSONCreateObject(&m_pAdditional));
 	Check(InitializePaintItems(m_pBlockMap));
 
 	Check(Create(WS_EX_APPWINDOW | WS_EX_WINDOWEDGE, WS_OVERLAPPEDWINDOW, c_wzAppClassName, c_wzAppTitle, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, nCmdShow));
@@ -359,7 +363,7 @@ HRESULT STDMETHODCALLTYPE CBlockMapEditorApp::OnDestroyUICommand (UINT32 command
 
 HRESULT WINAPI CBlockMapEditorApp::GetRibbonSettingsKey (__out_ecount(cchMaxKey) PSTR pszKeyName, INT cchMaxKey)
 {
-	return TStrCchCpy(pszKeyName, cchMaxKey, "\\Software\\Simbey\\InfiniteWolfenstein");
+	return TStrCchCpy(pszKeyName, cchMaxKey, "\\Software\\Simbey\\BlockMapEditor");
 }
 
 HRESULT WINAPI CBlockMapEditorApp::GetRibbonSettingsValue (__out_ecount(cchMaxValue) PSTR pszValueName, INT cchMaxValue)
@@ -397,8 +401,10 @@ HRESULT STDMETHODCALLTYPE CBlockMapEditorApp::Execute (UINT32 commandId, UI_EXEC
 		{
 		case ID_NEW:
 			SafeDelete(m_pBlockMap);
+			SafeRelease(m_pAdditional);
 			RStrRelease(m_rstrFile); m_rstrFile = NULL;
 			Check(CreateBlockMap(&m_pBlockMap));
+			Check(JSONCreateObject(&m_pAdditional));
 			Check(InitializePaintItems(m_pBlockMap));
 			Check(UpdateAppTitle());
 			Check(Invalidate(FALSE));
@@ -412,6 +418,9 @@ HRESULT STDMETHODCALLTYPE CBlockMapEditorApp::Execute (UINT32 commandId, UI_EXEC
 			break;
 		case ID_PROPERTIES:
 			CheckNoTrace(ShowProperties());
+			break;
+		case ID_DIALOGUE:
+			CheckNoTrace(ShowDialogueResource());
 			break;
 		case ID_REPLACE_WALL:
 			CheckNoTrace(ReplaceWall());
@@ -793,6 +802,7 @@ HRESULT CBlockMapEditorApp::InitializePaintItems (CBlockMap* pMap)
 	TStackRef<CSecretDoor> srSecret;
 	TStackRef<CEndSpot> srEndSpot;
 	TStackRef<CSkyLight> srSkyLight;
+	TStackRef<CStoryPoint> srStoryPoint;
 	TEXTURE* pTexture, *pAltTexture;
 
 	ClearPaintItems();
@@ -927,6 +937,18 @@ HRESULT CBlockMapEditorApp::InitializePaintItems (CBlockMap* pMap)
 	Check(RegisterPaintItem(srSkyLight, PAINT_ITEM::Special));
 	srSkyLight.Release();
 
+	Check(CStoryPoint::Create(m_pRibbon, 100, &srStoryPoint));
+	Check(RegisterPaintItem(srStoryPoint, PAINT_ITEM::Special));
+	srStoryPoint.Release();
+
+	Check(CStoryPoint::Create(m_pRibbon, 101, &srStoryPoint));
+	Check(RegisterPaintItem(srStoryPoint, PAINT_ITEM::Special));
+	srStoryPoint.Release();
+
+	Check(CStoryPoint::Create(m_pRibbon, 102, &srStoryPoint));
+	Check(RegisterPaintItem(srStoryPoint, PAINT_ITEM::Special));
+	srStoryPoint.Release();
+
 	// TODO - add more painting items here
 
 	INT nMaxFloor = pMap->GetHighestFloor();
@@ -1057,6 +1079,7 @@ HRESULT CBlockMapEditorApp::OpenMap (VOID)
 	CChooseFile choose;
 	RSTRING rstrFile = NULL;
 	CBlockMap* pBlockMap = NULL;
+	IJSONObject* pAdditional = NULL;
 
 	Check(choose.Initialize());
 	CheckIfIgnore(!choose.OpenSingleFile(m_hwnd, L"Block Map (*.map)\0*.map\0\0"), E_ABORT);
@@ -1065,8 +1088,12 @@ HRESULT CBlockMapEditorApp::OpenMap (VOID)
 	Check(RStrCreateW(TStrLenAssert(pcwzFile), pcwzFile, &rstrFile));
 
 	Check(CreateBlockMap(&pBlockMap));
-	Check(pBlockMap->Load(this, pcwzFile, m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName));
+	Check(pBlockMap->Load(this, pcwzFile, m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName, &pAdditional));
 
+	if(NULL == pAdditional)
+		Check(JSONCreateObject(&pAdditional));
+
+	SwapData(m_pAdditional, pAdditional);
 	SwapData(m_pBlockMap, pBlockMap);
 	SwapData(m_rstrFile, rstrFile);
 
@@ -1075,6 +1102,7 @@ HRESULT CBlockMapEditorApp::OpenMap (VOID)
 	Check(m_pRibbon->InvalidateEnabled());
 
 Cleanup:
+	SafeRelease(pAdditional);
 	__delete pBlockMap;
 	RStrRelease(rstrFile);
 	return hr;
@@ -1094,13 +1122,13 @@ HRESULT CBlockMapEditorApp::SaveMap (VOID)
 		PCWSTR pcwzFile = choose.GetFile(0);
 		Check(RStrCreateW(TStrLenAssert(pcwzFile), pcwzFile, &rstrFile));
 
-		Check(m_pBlockMap->Save(pcwzFile, m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName));
+		Check(m_pBlockMap->Save(pcwzFile, m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName, m_pAdditional));
 
 		m_rstrFile = rstrFile;
 		rstrFile = NULL;
 	}
 	else
-		Check(m_pBlockMap->Save(RStrToWide(m_rstrFile), m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName));
+		Check(m_pBlockMap->Save(RStrToWide(m_rstrFile), m_dlgConfig.m_wzCeilingName, m_dlgConfig.m_wzFloorName, m_dlgConfig.m_wzCutoutName, m_pAdditional));
 
 	Check(UpdateAppTitle());
 
@@ -1118,6 +1146,19 @@ HRESULT CBlockMapEditorApp::ShowProperties (VOID)
 	Check(dlgHost.Display(m_hwnd, &dlgProperties));
 	CheckIfIgnore(IDOK != dlgHost.GetReturnValue(), E_ABORT);
 	m_pBlockMap->SetLighting(dlgProperties.GetLighting());
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CBlockMapEditorApp::ShowDialogueResource (VOID)
+{
+	HRESULT hr;
+	CDialogHost dlgHost(m_hInstance);
+	CDialogueDlg dlgDialogue(m_hInstance, m_pAdditional);
+
+	Check(dlgHost.Display(m_hwnd, &dlgDialogue));
+	CheckIfIgnore(IDOK != dlgHost.GetReturnValue(), E_ABORT);
 
 Cleanup:
 	return hr;
@@ -1169,7 +1210,7 @@ HRESULT CBlockMapEditorApp::ExportMap (VOID)
 	else
 		Check(TStrCchCpy(wzLevel, ARRAYSIZE(wzLevel), pcwzName));
 
-	Check(dlgExport.Initialize(m_pBlockMap, pcwzName, &m_dlgConfig));
+	Check(dlgExport.Initialize(m_pBlockMap, pcwzName, &m_dlgConfig, m_pAdditional));
 	Check(dlgHost.Display(m_hwnd, &dlgExport));
 	CheckIfIgnore(IDOK != dlgHost.GetReturnValue(), E_ABORT);
 

@@ -114,7 +114,7 @@ VOID CBlockMap::Paint (IGrapher* pGraph)
 	}
 }
 
-HRESULT CBlockMap::Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR pwzCeiling, PWSTR pwzFloor, PWSTR pwzCutout)
+HRESULT CBlockMap::Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR pwzCeiling, PWSTR pwzFloor, PWSTR pwzCutout, __deref_out IJSONObject** ppAdditional)
 {
 	HRESULT hr;
 	TStackRef<CFileStream> srFile;
@@ -131,7 +131,7 @@ HRESULT CBlockMap::Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR p
 	Check(srFile->Read(&bFormat, sizeof(bFormat), &cb));
 
 	if(bFormat[0] == 'J' && bFormat[1] == 'S' && bFormat[2] == 'O' && bFormat[3] == 'N')
-		Check(ReadJSONProperties(srFile, pwzCeiling, pwzFloor, pwzCutout));
+		Check(ReadJSONProperties(srFile, pwzCeiling, pwzFloor, pwzCutout, ppAdditional));
 	else
 	{
 		// Old format
@@ -150,6 +150,8 @@ HRESULT CBlockMap::Load (IResolveItemPalette* pResolve, PCWSTR pcwzFile, PWSTR p
 			Check(srFile->Read(pwzFloor, cch * sizeof(WCHAR), &cb));
 			pwzFloor[cch] = L'\0';
 		}
+
+		*ppAdditional = NULL;
 	}
 
 	Check(srFile->Read(&cbPalette, sizeof(cbPalette), &cb));
@@ -185,7 +187,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CBlockMap::Save (PCWSTR pcwzFile, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, PCWSTR pcwzCutout)
+HRESULT CBlockMap::Save (PCWSTR pcwzFile, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, PCWSTR pcwzCutout, __in_opt IJSONObject* pAdditional)
 {
 	HRESULT hr;
 	MAP_BLOCK* pMap = m_pMap;
@@ -225,7 +227,7 @@ HRESULT CBlockMap::Save (PCWSTR pcwzFile, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, 
 	bFormat[3] = 'N';
 	Check(srFile->Write(bFormat, sizeof(bFormat), &cb));
 
-	Check(SerializeProperties(&stmProperties, pcwzCeiling, pcwzFloor, pcwzCutout));
+	Check(SerializeProperties(&stmProperties, pcwzCeiling, pcwzFloor, pcwzCutout, pAdditional));
 	Check(InsertStream(srFile, &stmProperties));
 
 	Check(InsertStream(srFile, &stmPalette));
@@ -489,6 +491,7 @@ CPaintItem* CBlockMap::InternalSetCellData (INT idxCell, __in_opt CPaintItem* pT
 	case MapCell::SecretDoor:
 	case MapCell::End:
 	case MapCell::Sky:
+	case MapCell::StoryPoint:
 		pOld = m_pMap[idxCell].pObject;
 		m_pMap[idxCell].pObject = pType;
 		break;
@@ -564,7 +567,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CBlockMap::SerializeProperties (CMemoryStream* pProperties, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, PCWSTR pcwzCutout)
+HRESULT CBlockMap::SerializeProperties (CMemoryStream* pProperties, PCWSTR pcwzCeiling, PCWSTR pcwzFloor, PCWSTR pcwzCutout, __in_opt IJSONObject* pAdditional)
 {
 	HRESULT hr;
 	TStackRef<IJSONObject> srProperties;
@@ -589,6 +592,12 @@ HRESULT CBlockMap::SerializeProperties (CMemoryStream* pProperties, PCWSTR pcwzC
 	Check(srProperties->AddValueW(L"cutout", srv));
 	srv.Release();
 
+	if(pAdditional && 0 < pAdditional->Count())
+	{
+		Check(JSONWrapObject(pAdditional, &srv));
+		Check(srProperties->AddValueW(L"additional", srv));
+	}
+
 	Check(JSONSerializeObject(srProperties, &stmPropertiesW));
 	Check(ScCopyWideToStreamA(CP_UTF8, pProperties, stmPropertiesW.TGetReadPtr<WCHAR>(), stmPropertiesW.TDataRemaining<WCHAR>(), -1));
 
@@ -596,7 +605,7 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CBlockMap::ReadJSONProperties (CFileStream* pFile, PWSTR pwzCeiling, PWSTR pwzFloor, PWSTR pwzCutout)
+HRESULT CBlockMap::ReadJSONProperties (CFileStream* pFile, PWSTR pwzCeiling, PWSTR pwzFloor, PWSTR pwzCutout, __deref_out IJSONObject** ppAdditional)
 {
 	HRESULT hr;
 	DWORD cbJSON, cb;
@@ -618,10 +627,14 @@ HRESULT CBlockMap::ReadJSONProperties (CFileStream* pFile, PWSTR pwzCeiling, PWS
 
 	Check(srProperties->FindNonNullValueW(L"lighting", &srv));
 	Check(srv->GetInteger(&m_nLighting));
+	srv.Release();
 
 	Check(CopyPropertyTo(srProperties, L"ceiling", pwzCeiling, 12));
 	Check(CopyPropertyTo(srProperties, L"floor", pwzFloor, 12));
 	Check(CopyPropertyTo(srProperties, L"cutout", pwzCutout, 12));
+
+	if(SUCCEEDED(srProperties->FindNonNullValueW(L"additional", &srv)))
+		Check(srv->GetObject(ppAdditional));
 
 Cleanup:
 	RStrRelease(rstrJSONW);

@@ -222,10 +222,11 @@ int CZDBSPFS::LogV (const char* pcszFormat, va_list vArgs)
 // CMapConverterView
 ///////////////////////////////////////////////////////////////////////////////
 
-CMapConverterView::CMapConverterView (CBlockMap* pBlockMap, PCWSTR pcwzName, INT xCell, INT zCell, CConfigDlg* pdlgConfig) :
+CMapConverterView::CMapConverterView (CBlockMap* pBlockMap, PCWSTR pcwzName, INT xCell, INT zCell, CConfigDlg* pdlgConfig, IJSONObject* pAdditional) :
 	m_pAdapter(NULL),
 	m_pBlockMap(pBlockMap),
 	m_pdlgConfig(pdlgConfig),
+	m_pAdditional(pAdditional),
 	m_pConvert(NULL),
 	m_hThread(NULL),
 	m_xSpan(-1),
@@ -241,6 +242,9 @@ CMapConverterView::CMapConverterView (CBlockMap* pBlockMap, PCWSTR pcwzName, INT
 	else
 		WideCharToMultiByte(CP_ACP, 0, pcwzName, -1, m_szLevel, ARRAYSIZE(m_szLevel), NULL, NULL);
 	TStrUprAssert(m_szLevel);
+
+	if(m_pAdditional)
+		m_pAdditional->AddRef();
 
 	m_Graph.SetGraphType(GRAPH_XZ);
 	m_Graph.SetGridType(GRID_AXIS_POINTS);
@@ -262,6 +266,8 @@ CMapConverterView::~CMapConverterView ()
 	m_aThings.DeleteAll();
 
 	m_Graph.AttachContainer(NULL);
+
+	SafeRelease(m_pAdditional);
 }
 
 VOID CMapConverterView::GetMapSize (__out SHORT& x, __out SHORT& y)
@@ -644,7 +650,7 @@ HRESULT CMapConverterView::ConvertMapAsync (VOID)
 	data.zSize = MAP_HEIGHT;
 	data.pMap = m_pBlockMap;
 	data.yFloor = 0;
-	Check(m_pConvert->RunConversion(this, m_szLevel, &m_memFile, &data, m_pdlgConfig));
+	Check(m_pConvert->RunConversion(this, m_szLevel, &m_memFile, &data, m_pdlgConfig, m_pAdditional));
 	m_pConvert->GetMapSize(m_xSpan, m_ySpan);
 	Check(BuildNodes());
 
@@ -683,14 +689,14 @@ CExportDlg::~CExportDlg ()
 	SafeRelease(m_pConverter);
 }
 
-HRESULT CExportDlg::Initialize (CBlockMap* pBlockMap, PCWSTR pcwzName, CConfigDlg* pdlgConfig)
+HRESULT CExportDlg::Initialize (CBlockMap* pBlockMap, PCWSTR pcwzName, CConfigDlg* pdlgConfig, IJSONObject* pAdditional)
 {
 	HRESULT hr;
 	INT xCell, zCell;
 
 	Check(pBlockMap->FindStartSpot(xCell, zCell));
 
-	m_pConverter = __new CMapConverterView(pBlockMap, pcwzName, xCell, zCell, pdlgConfig);
+	m_pConverter = __new CMapConverterView(pBlockMap, pcwzName, xCell, zCell, pdlgConfig, pAdditional);
 	CheckAlloc(m_pConverter);
 	Check(m_pConverter->GetFile()->InitializeNew());
 

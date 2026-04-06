@@ -12,6 +12,8 @@
 #include "ConfigDlg.h"
 #include "LoaderDlg.h"
 
+interface IJSONObject;
+
 class CBlockMap;
 
 struct PAINT_ITEM
@@ -64,6 +66,7 @@ protected:
 
 	RSTRING m_rstrFile;
 	CBlockMap* m_pBlockMap;
+	IJSONObject* m_pAdditional;
 	BOOL m_fPainting;
 
 	INT m_xInfo, m_zInfo;
@@ -163,6 +166,7 @@ protected:
 	HRESULT OpenMap (VOID);
 	HRESULT SaveMap (VOID);
 	HRESULT ShowProperties (VOID);
+	HRESULT ShowDialogueResource (VOID);
 	HRESULT ReplaceWall (VOID);
 	HRESULT ExportMap (VOID);
 	HRESULT LoadPackage (HWND hwndStatus, PCWSTR pcwzPackage);

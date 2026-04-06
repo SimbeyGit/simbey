@@ -1,6 +1,7 @@
 #include <math.h>
 #include <windows.h>
 #include "Library\Core\CoreDefs.h"
+#include "Library\Util\Formatting.h"
 #include "Library\Spatial\Geometry.h"
 #include "Library\DPI.h"
 #include "BlockMap.h"
@@ -1112,6 +1113,94 @@ HRESULT STDMETHODCALLTYPE CSkyLight::GetValue (REFPROPERTYKEY key, PROPVARIANT* 
 			hr = DrawImageToDIB(m_pRibbon, DrawSkyLight, (INT)DPI::Scale(32.0f), 0, value);
 		else if(UI_PKEY_SmallImage == key)
 			hr = DrawImageToDIB(m_pRibbon, DrawSkyLight, (INT)DPI::Scale(16.0f), 0, value);
+	}
+
+	return hr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// CStoryPoint
+///////////////////////////////////////////////////////////////////////////////
+
+HRESULT CStoryPoint::Create (CSIFRibbon* pRibbon, USHORT nConversation, __deref_out CStoryPoint** ppItem)
+{
+	HRESULT hr;
+	WCHAR wzText[20];
+
+	CheckIf(NULL == pRibbon, E_INVALIDARG);
+
+	*ppItem = __new CStoryPoint(pRibbon, nConversation);
+	CheckAlloc(*ppItem);
+	Check(Formatting::TPrintF(wzText, ARRAYSIZE(wzText), NULL, L"Story Point %u", nConversation));
+	Check((*ppItem)->SetItemText(wzText));
+
+Cleanup:
+	return hr;
+}
+
+CStoryPoint::CStoryPoint (CSIFRibbon* pRibbon, USHORT nConversation) :
+	CPaintItem(pRibbon),
+	m_nConversation(nConversation)
+{
+}
+
+CStoryPoint::~CStoryPoint ()
+{
+}
+
+// CPaintItem
+
+VOID CStoryPoint::Paint (IGrapher* pGraph, FLOAT x, FLOAT z)
+{
+	HBRUSH hbr = CreateSolidBrush(RGB(255, 200, 0));
+	pGraph->FillRect(x, 0.0f, z, x + CELL_SCALE, 0.0f, z + CELL_SCALE, hbr);
+	DeleteObject(hbr);
+}
+
+VOID CStoryPoint::InfoPaint (SIF_SURFACE* psifSurface, HDC hdc, INT x, INT y)
+{
+	RECT rc = { x, y, x + 64, y + 64 };
+	HBRUSH hbr = CreateSolidBrush(RGB(255, 200, 0));
+	FillRect(hdc, &rc, hbr);
+	DeleteObject(hbr);
+}
+
+HRESULT CStoryPoint::Serialize (ISequentialStream* pstmDef)
+{
+	HRESULT hr;
+	DWORD cb;
+
+	Check(SerializeType(pstmDef));
+	Check(pstmDef->Write(&m_nConversation, sizeof(m_nConversation), &cb));
+
+Cleanup:
+	return hr;
+}
+
+BOOL CStoryPoint::Deserialize (const BYTE* pcb, DWORD cb)
+{
+	USHORT nConversation;
+
+	if(cb == sizeof(nConversation))
+	{
+		CopyMemory(&nConversation, pcb, sizeof(nConversation));
+		return nConversation == m_nConversation;
+	}
+	return FALSE;
+}
+
+// IUISimplePropertySet
+
+HRESULT STDMETHODCALLTYPE CStoryPoint::GetValue (REFPROPERTYKEY key, PROPVARIANT* value)
+{
+	HRESULT hr = __super::GetValue(key, value);
+
+	if(E_NOTIMPL == hr)
+	{
+		if(UI_PKEY_ItemImage == key || UI_PKEY_LargeImage == key)
+			hr = SquareSwatchImage(m_pRibbon, (INT)DPI::Scale(32.0f), RGB(255, 200, 0), value);
+		else if(UI_PKEY_SmallImage == key)
+			hr = SquareSwatchImage(m_pRibbon, (INT)DPI::Scale(16.0f), RGB(255, 200, 0), value);
 	}
 
 	return hr;

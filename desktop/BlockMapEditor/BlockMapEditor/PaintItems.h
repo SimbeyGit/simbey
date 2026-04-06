@@ -21,7 +21,8 @@ namespace MapCell
 		SecretDoor,
 		WallCage,
 		End,
-		Sky
+		Sky,
+		StoryPoint
 	};
 };
 
@@ -319,6 +320,32 @@ protected:
 public:
 	// CPaintItem
 	virtual MapCell::Type GetType (VOID) { return MapCell::Sky; }
+	virtual VOID Paint (IGrapher* pGraph, FLOAT x, FLOAT z);
+	virtual VOID InfoPaint (SIF_SURFACE* psifSurface, HDC hdc, INT x, INT y);
+	virtual HRESULT Serialize (ISequentialStream* pstmDef);
+	virtual BOOL Deserialize (const BYTE* pcb, DWORD cb);
+
+	// IUISimplePropertySet
+	virtual HRESULT STDMETHODCALLTYPE GetValue (REFPROPERTYKEY key, PROPVARIANT* value);
+};
+
+class CStoryPoint : public CPaintItem
+{
+private:
+	USHORT m_nConversation;
+
+public:
+	static HRESULT Create (CSIFRibbon* pRibbon, USHORT nConversation, __deref_out CStoryPoint** ppItem);
+
+protected:
+	CStoryPoint (CSIFRibbon* pRibbon, USHORT nConversation);
+	~CStoryPoint ();
+
+public:
+	inline USHORT GetConversation (VOID) { return m_nConversation; }
+
+	// CPaintItem
+	virtual MapCell::Type GetType (VOID) { return MapCell::StoryPoint; }
 	virtual VOID Paint (IGrapher* pGraph, FLOAT x, FLOAT z);
 	virtual VOID InfoPaint (SIF_SURFACE* psifSurface, HDC hdc, INT x, INT y);
 	virtual HRESULT Serialize (ISequentialStream* pstmDef);

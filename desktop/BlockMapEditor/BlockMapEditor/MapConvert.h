@@ -2,6 +2,8 @@
 #define	_H_CONVERT
 
 interface ISeekableStream;
+interface IJSONObject;
+interface IJSONArray;
 
 struct TEXTURE;
 
@@ -211,7 +213,7 @@ public:
 
 	VOID ResetConversion (VOID);
 
-	HRESULT RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLevel, ISeekableStream* pFile, LPWOLFDATA lpMap, CConfigDlg* pdlgConfig);
+	HRESULT RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLevel, ISeekableStream* pFile, LPWOLFDATA lpMap, CConfigDlg* pdlgConfig, IJSONObject* pAdditional);
 
 	SHORT GetNewSector (VOID);
 
@@ -248,6 +250,7 @@ protected:
 	HRESULT BuildSecretDoors (LPWOLFDATA lpMap);
 	HRESULT EndSpotTriggers (LPWOLFDATA lpMap);
 	HRESULT BuildSkyLights (LPWOLFDATA lpMap);
+	HRESULT BuildStoryPoints (LPWOLFDATA lpMap);
 	HRESULT AssignEndSpotTrigger (LPWOLFDATA lpMap, BOOL* pfEndMap, INT x, INT y, SHORT nSector);
 	HRESULT AssignSkyLightTrigger (LPWOLFDATA lpMap, BOOL* pfSkyMap, INT x, INT y, SHORT nSector);
 	VOID BuildDoor (LPWOLFDATA lpMap, INT x, INT y, INT iType, INT bDir, INT bSilence, CDoorObject* pDoor);
@@ -267,7 +270,7 @@ protected:
 
 	VOID ExtendOutside (SECTOR* pAdjacent, CMapLine* lpLine, INT iDir, PCWSTR pcwzTexture);
 	HRESULT BuildCage (LPWOLFDATA lpMap, INT x, INT y, INT nLine, CMapLine* pLine, CWallCage* pCage);
-	HRESULT BuildWadFile (PCSTR pcszMapName, ISeekableStream* pFile, CConfigDlg* pdlgConfig);
+	HRESULT BuildWadFile (PCSTR pcszMapName, ISeekableStream* pFile, CConfigDlg* pdlgConfig, IJSONObject* pAdditional);
 
 	ULONG SerializeThings (ISeekableStream* pFile);
 	ULONG SerializeLinedefs (ISeekableStream* pFile);
@@ -275,6 +278,7 @@ protected:
 	ULONG SerializeVertices (ISeekableStream* pFile);
 	ULONG SerializeSectors (ISeekableStream* pFile);
 	ULONG SerializeLump (ISeekableStream* pFile, PCWSTR pcwzPath, LPSTR lpszFile);
+	ULONG SerializeConversations (ISeekableStream* pFile, IJSONArray* pConversations);
 
 	static VOID CompareVertexForMapSize (const VERTEX& v, SHORT& xMin, SHORT& yMin, SHORT& xMax, SHORT& yMax);
 };

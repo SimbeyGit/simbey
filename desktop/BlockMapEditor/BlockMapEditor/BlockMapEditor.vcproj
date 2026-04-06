@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogueDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DifficultyDlg.cpp"
 				>
 			</File>
@@ -250,6 +254,10 @@
 			</File>
 			<File
 				RelativePath=".\ConfigDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogueDlg.h"
 				>
 			</File>
 			<File

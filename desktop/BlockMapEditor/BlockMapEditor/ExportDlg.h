@@ -6,6 +6,7 @@
 #include "Library\Window\BaseDialog.h"
 #include "Library\Window\AdapterWindow.h"
 #include "Library\GraphCtrl.h"
+#include "Published\JSON.h"
 #include "..\Published\zdbsp_published.h"
 #include "BlockMap.h"
 #include "MapConvert.h"
@@ -80,6 +81,7 @@ class CMapConverterView :
 private:
 	IBaseWindow* m_pAdapter;
 	CBlockMap* m_pBlockMap;
+	IJSONObject* m_pAdditional;
 	CHAR m_szLevel[12];
 	CGraphCtrl m_Graph;
 
@@ -104,7 +106,7 @@ public:
 	END_UNK_MAP
 
 public:
-	CMapConverterView (CBlockMap* pBlockMap, PCWSTR pcwzName, INT xCell, INT zCell, CConfigDlg* pdlgConfig);
+	CMapConverterView (CBlockMap* pBlockMap, PCWSTR pcwzName, INT xCell, INT zCell, CConfigDlg* pdlgConfig, IJSONObject* pAdditional);
 	~CMapConverterView ();
 
 	CMemoryStream* GetLogs (VOID) { return &m_stmLogs; }
@@ -173,7 +175,7 @@ public:
 	CExportDlg ();
 	~CExportDlg ();
 
-	HRESULT Initialize (CBlockMap* pBlockMap, PCWSTR pcwzName, CConfigDlg* pdlgConfig);
+	HRESULT Initialize (CBlockMap* pBlockMap, PCWSTR pcwzName, CConfigDlg* pdlgConfig, IJSONObject* pAdditional);
 
 	virtual BOOL DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 

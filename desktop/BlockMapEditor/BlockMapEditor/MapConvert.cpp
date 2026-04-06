@@ -2,6 +2,8 @@
 #include "Library\Core\CoreDefs.h"
 #include "Library\Core\ISeekableStream.h"
 #include "Library\Util\Formatting.h"
+#include "Library\Util\StreamHelpers.h"
+#include "Published\JSON.h"
 #include "ConfigDlg.h"
 #include "BlockMap.h"
 #include "PaintItems.h"
@@ -87,7 +89,7 @@ VOID CMapConvert::ResetConversion (VOID)
 	m_iNextPoly = 1;
 }
 
-HRESULT CMapConvert::RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLevel, ISeekableStream* pFile, LPWOLFDATA lpMap, CConfigDlg* pdlgConfig)
+HRESULT CMapConvert::RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLevel, ISeekableStream* pFile, LPWOLFDATA lpMap, CConfigDlg* pdlgConfig, IJSONObject* pAdditional)
 {
 	HRESULT hr;
 	INT cSectorTable = lpMap->xSize * lpMap->zSize;
@@ -108,6 +110,7 @@ HRESULT CMapConvert::RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLe
 	Check(BuildSecretDoors(lpMap));
 	Check(EndSpotTriggers(lpMap));
 	Check(BuildSkyLights(lpMap));
+	Check(BuildStoryPoints(lpMap));
 
 	MergeLines();
 
@@ -120,7 +123,7 @@ HRESULT CMapConvert::RunConversion (IMapConvertProgress* pProgress, PCSTR pcszLe
 	BuildVertexList();
 
 	CheckIf(NULL == m_lpList, HRESULT_FROM_WIN32(ERROR_EMPTY));
-	Check(BuildWadFile(pcszLevel, pFile, pdlgConfig));
+	Check(BuildWadFile(pcszLevel, pFile, pdlgConfig, pAdditional));
 
 Cleanup:
 	SafeDeleteArray(m_lpSectorTable);
@@ -880,6 +883,96 @@ HRESULT CMapConvert::BuildSkyLights (LPWOLFDATA lpMap)
 
 Cleanup:
 	__delete_array pfSkyMap;
+	return hr;
+}
+
+HRESULT CMapConvert::BuildStoryPoints (LPWOLFDATA lpMap)
+{
+	HRESULT hr = S_FALSE;
+	CBlockMap* pBlockMap = lpMap->pMap;
+
+	for(INT y = 0; y < lpMap->zSize; y++)
+	{
+		for(INT x = 0; x < lpMap->xSize; x++)
+		{
+			TStackRef<CPaintItem> srBlock, srObject;
+
+			SideAssertHr(pBlockMap->GetCellData(x, y, &srBlock, &srObject));
+
+			if(srObject && MapCell::StoryPoint == srObject->GetType())
+			{
+				INT nConversation = srObject.StaticCast<CStoryPoint>()->GetConversation();
+				CMapLine Line;
+				CMapThing Thing;
+				USHORT nCellSector = FindSector(lpMap, x, y);
+				SECTOR Sector;
+				SHORT nSector;
+
+				FillSector(&Sector, lpMap->yFloor);
+				lstrcpyA(Sector.szFloor, "FLOOR3");
+				Sector.Light = 200;
+				Sector.Floor += 16;
+				nSector = AddSector(&Sector);
+
+				CopyTexture(Line.m_sRight.szUpper, L"-");
+				CopyTexture(Line.m_sRight.szMiddle, L"-");
+				CopyTexture(Line.m_sRight.szLower, L"STRYSTEP");
+				CopyTexture(Line.m_sLeft.szUpper, L"-");
+				CopyTexture(Line.m_sLeft.szMiddle, L"-");
+				CopyTexture(Line.m_sLeft.szLower, L"-");
+
+				Line.m_sLeft.Sector = nSector;
+				Line.m_sRight.Sector = nCellSector;
+				Line.m_Special = 80;
+				Line.m_Args[0] = 3;
+				Line.m_Args[1] = 0;
+				Line.m_Args[2] = nConversation;
+				Line.m_Flags |= 0x0200 /* repeatable */ | 0x0004 /* double sided */ | 0x0400 /* used by player */;
+
+				PositionLine(lpMap, &Line, x, y, LINE_LEFT);
+				Line.m_vFrom.x += 8;
+				Line.m_vFrom.y += 8;
+				Line.m_vTo.x += 8;
+				Line.m_vTo.y -= 8;
+				FlipLinedef(&Line, FALSE);
+				Check(AddLine(&Line));
+
+				PositionLine(lpMap, &Line, x, y, LINE_RIGHT);
+				Line.m_vFrom.x -= 8;
+				Line.m_vFrom.y -= 8;
+				Line.m_vTo.x -= 8;
+				Line.m_vTo.y += 8;
+				FlipLinedef(&Line, FALSE);
+				Check(AddLine(&Line));
+
+				PositionLine(lpMap, &Line, x, y, LINE_ABOVE);
+				Line.m_vFrom.x += 8;
+				Line.m_vFrom.y -= 8;
+				Line.m_vTo.x -= 8;
+				Line.m_vTo.y -= 8;
+				FlipLinedef(&Line, FALSE);
+				Check(AddLine(&Line));
+
+				PositionLine(lpMap, &Line, x, y, LINE_BELOW);
+				Line.m_vFrom.x -= 8;
+				Line.m_vFrom.y += 8;
+				Line.m_vTo.x += 8;
+				Line.m_vTo.y += 8;
+				FlipLinedef(&Line, FALSE);
+				Check(AddLine(&Line));
+
+				Thing.m_Options = 7;
+				Thing.m_Angle = 0;
+				Thing.m_Type = 21063 + (nConversation - 100);
+				Thing.m_Options |= 775;
+
+				PositionThing(lpMap, &Thing, x, y);
+				AddThing(&Thing);
+			}
+		}
+	}
+
+Cleanup:
 	return hr;
 }
 
@@ -2267,22 +2360,31 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CMapConvert::BuildWadFile (PCSTR pcszMapName, ISeekableStream* pFile, CConfigDlg* pdlgConfig)
+HRESULT CMapConvert::BuildWadFile (PCSTR pcszMapName, ISeekableStream* pFile, CConfigDlg* pdlgConfig, IJSONObject* pAdditional)
 {
 	HRESULT hr;
 	if(pFile)
 	{
-		PCSTR pcszNames[] = {pcszMapName,"THINGS","LINEDEFS","SIDEDEFS","VERTEXES","SECTORS","BEHAVIOR","SCRIPTS"};
+		PCSTR pcszNames[] = {pcszMapName,"THINGS","LINEDEFS","SIDEDEFS","VERTEXES","SECTORS","BEHAVIOR","SCRIPTS","DIALOGUE"};
 		PCSTR pcszName;
 		DWORD dwTemp;
 		LONG i, iSize, iOffset;
 		HEADER Header;
 		DIRECTORY Dir[10];
 		LARGE_INTEGER li = {0};
+		TStackRef<IJSONValue> srv;
+		TStackRef<IJSONArray> srConversations;
 
 		CopyMemory(Header.ID,"PWAD",4);
 
 		Header.cLumps = 8;
+		if(pAdditional && SUCCEEDED(pAdditional->FindNonNullValueW(L"dialogue", &srv)) && SUCCEEDED(srv->GetArray(&srConversations)))
+		{
+			if(0 < srConversations->Count())
+				Header.cLumps++;
+			else
+				srConversations.Release();
+		}
 
 		ZeroMemory(Dir,sizeof(DIRECTORY) * Header.cLumps);
 		Header.iDir = 12;
@@ -2323,6 +2425,9 @@ HRESULT CMapConvert::BuildWadFile (PCSTR pcszMapName, ISeekableStream* pFile, CC
 				break;
 			case 7:	// SCRIPTS
 				iSize = SerializeLump(pFile, pdlgConfig->m_wzBehaviorPath, "SCRIPTS.LMP");
+				break;
+			case 8:	// DIALOGUE
+				iSize = SerializeConversations(pFile, srConversations);
 				break;
 			}
 			Dir[i].iOffset = iOffset;
@@ -2466,6 +2571,49 @@ ULONG CMapConvert::SerializeLump (ISeekableStream* pFile, PCWSTR pcwzPath, LPSTR
 			iSize = 0;
 		}
 	}
+	return iSize;
+}
+
+ULONG CMapConvert::SerializeConversations (ISeekableStream* pFile, IJSONArray* pConversations)
+{
+	ULONG iSize = 0, cb;
+	HRESULT hr;
+	CMemoryStream stmConversationsA;
+	RSTRING rstrActor = NULL;
+	RSTRING rstrScript = NULL;
+
+	Check(stmConversationsA.TWrite(SLP("namespace = \"ZDoom\";\r\n\r\n"), &cb));
+
+	for(sysint i = 0; i < pConversations->Count(); i++)
+	{
+		TStackRef<IJSONObject> srConversation;
+		TStackRef<IJSONValue> srv;
+		DWORD id;
+
+		Check(pConversations->GetObject(i, &srConversation));
+		Check(srConversation->FindNonNullValueW(L"id", &srv));
+		Check(srv->GetDWord(&id));
+
+		srv.Release();
+		Check(srConversation->FindNonNullValueW(L"actor", &srv));
+		Check(srv->GetString(&rstrActor));
+
+		srv.Release();
+		Check(srConversation->FindNonNullValueW(L"script", &srv));
+		Check(srv->GetString(&rstrScript));
+
+		if(0 < RStrLen(rstrActor))
+			Check(Stream::TPrintF(&stmConversationsA, "conversation\r\n{\r\n\tid = %u;\r\n\tactor = \"%r\";\r\n%r}\r\n\r\n", id, rstrActor, rstrScript));
+		else
+			Check(Stream::TPrintF(&stmConversationsA, "conversation\r\n{\r\n\tid = %u;\r\n%r}\r\n\r\n", id, rstrScript));
+		RStrRelease(rstrScript); rstrScript = NULL;
+	}
+
+	Check(pFile->Write(stmConversationsA.GetReadPtr(), stmConversationsA.DataRemaining(), &iSize));
+
+Cleanup:
+	RStrRelease(rstrScript);
+	RStrRelease(rstrActor);
 	return iSize;
 }
 

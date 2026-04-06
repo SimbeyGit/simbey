@@ -11,6 +11,8 @@
 #define IDD_SELECT_SIF                  107
 #define IDD_REPLACE_WALLS               108
 #define IDR_ACCELERATOR                 109
+#define IDD_DIALOGUE                    110
+#define IDD_CONVERSATION                111
 #define IDC_CONVERSION                  1001
 #define IDC_STATUS                      1002
 #define IDC_TEXTURE_DATA                1003
@@ -33,6 +35,13 @@
 #define IDC_NEW_TEXTURE                 1020
 #define IDC_SELECT_OLD_TEXTURE          1021
 #define IDC_SELECT_NEW_TEXTURE          1022
+#define IDC_CONVERSATIONS               1023
+#define IDC_ADD_DIALOGUE                1024
+#define IDC_DELETE_DIALOGUE             1025
+#define IDC_EDIT_DIALOGUE               1026
+#define IDC_CONVERSATION_ID             1027
+#define IDC_ACTOR_ID                    1028
+#define IDC_DIALOGUE_SCRIPT             1029
 #define ID_ACCEL_UNDO                   40001
 #define ID_ACCEL_REDO                   40002
 
@@ -40,9 +49,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        110
+#define _APS_NEXT_RESOURCE_VALUE        112
 #define _APS_NEXT_COMMAND_VALUE         40003
-#define _APS_NEXT_CONTROL_VALUE         1023
+#define _APS_NEXT_CONTROL_VALUE         1030
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
