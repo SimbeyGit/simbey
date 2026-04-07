@@ -19,13 +19,13 @@
 		name:"data.json",
 		data:
 		{
-			ref:"mom:unit/elyran/zealots",
+			ref:"mom:unit/elyran/harmonists",
 			type:"normal",
-			name:"Zealots",
+			name:"Harmonists",
 			race:"mom:elyran",
 			figures:4,
 			animation:"flying_unit",
-			cost:100,
+			cost:90,
 			upkeep:
 			[
 				{
@@ -34,18 +34,18 @@
 				},
 				{
 					ref:"mom:stat/gold/one",
-					amount:2
+					amount:3
 				}
 			],
 			prereqs:
 			[
 				{
 					type: "building",
-					ref: "mom:temple"
+					ref: "mom:armory"
 				},
 				{
 					type: "building",
-					ref: "mom:armory"
+					ref: "mom:wizards_guild"
 				}
 			],
 			stats:
@@ -62,12 +62,12 @@
 				{
 					ref:"mom:stat/melee/normal",
 					sound_ref:"mom:sounds/sword",
-					value:5
+					value:1
 				},
 				range:
 				{
-					ref:"mom:ranged/shimmer",
-					value:2
+					ref:"mom:ranged/fire_bolt",
+					value:5
 				},
 				defense:
 				{
@@ -89,7 +89,10 @@
 			[
 				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
 				{ ref: "mom:ability/unit/illusions_immunity" },
-				{ ref: "mom:ability/unit/thrown", value: 3 }
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/fireball_spell", value: 5 },
+				{ ref: "mom:ability/unit/healing_spell", value: 5 },
+				{ ref: "mom:ability/unit/purify" }
 			]
 		}
 	}
