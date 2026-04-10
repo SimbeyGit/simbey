@@ -86,6 +86,14 @@ interface ICADHost : IGraphContainer
 class CCADCtrl
 {
 private:
+	struct SEGMENT_INTERSECTION
+	{
+		FPOINT pt;
+		DWORD idLine;
+		FLOAT t;
+	};
+
+private:
 	ICADHost* m_pHost;
 
 	VertexMap* m_pVertices;
@@ -101,6 +109,12 @@ private:
 	DWORD m_idNewPolygon;
 	TArray<XYPOINT> m_aNewPoints;
 
+	bool m_fDrawActive;
+	DWORD m_idDrawStartVertex;
+	DWORD m_idDrawLastVertex;
+	TArray<DWORD> m_aDrawVertices;
+	TArray<DWORD> m_aDrawLines;
+
 	HPEN m_pnNormal;
 	HPEN m_pnTwoSided;
 	HPEN m_pnSelected;
@@ -111,7 +125,7 @@ public:
 	CCADCtrl(ICADHost* pHost, VertexMap* pVertices, LineMap* pLines, PolygonMap* pPolygons, IGrapher* pGraph, CAD::Mode eMode);
 	~CCADCtrl();
 
-	VOID SetMode(CAD::Mode eMode);
+	VOID SetMode (CAD::Mode eMode);
 
 	CAD::Mode GetMode (VOID) const { return m_eMode; }
 
@@ -150,7 +164,6 @@ private:
 	VOID DeselectAll (UINT nRemove = CAD_SELECTED | CAD_HOVER | CAD_DRAWING);
 	HRESULT SplitLine (FLOAT x, FLOAT y, __out_opt DWORD* pidVertex);
 	HRESULT FindOrCreateVertex (FLOAT x, FLOAT y, __out DWORD* pidVertex);
-	HRESULT IntegrateLine (DWORD idVertexA, DWORD idVertexB);
 
 	BOOL VertexHover (FLOAT x, FLOAT y);
 	BOOL LineHover (FLOAT x, FLOAT y);
@@ -176,6 +189,38 @@ private:
 
 	HRESULT DiffPolygon (DWORD subPolygonKey, DWORD clipPolygonKey);
 	HRESULT GetPolygonPoints (DWORD polygonId, __out TArray<FPOINT>& polygonPoints);
-	HRESULT OrderPolygonPoints (TArray<DWORD>& polygon, __out TArray<DWORD>& orderedPolygon);
+	HRESULT OrderPolygonPoints (DWORD polygonId, TArray<DWORD>& polygon, __out TArray<DWORD>& orderedPolygon);
 	VOID SetPolygonIDToLine (DWORD idVertexA, DWORD idVertexB, DWORD subPolygonKey, DWORD clipPoligonKey);
+
+	VOID ResetDrawState (VOID);
+	HRESULT StartDrawMode (FLOAT x, FLOAT y);
+	HRESULT CommitDrawClick (FLOAT x, FLOAT y);
+	HRESULT FinishDrawMode (VOID);
+	VOID CancelDrawMode (VOID);
+	BOOL UndoLastDrawStep (VOID);
+
+	HRESULT IntegrateDrawSegment (DWORD idVertexA, DWORD idVertexB, __out_opt DWORD* pidLine = NULL);
+	HRESULT GetVertexPoint (DWORD idVertex, __out FPOINT& pt);
+	bool SegmentIntersection (const FPOINT& a1, const FPOINT& a2, const FPOINT& b1, const FPOINT& b2, __out FPOINT& out, __out_opt FLOAT* ptA = NULL);
+	HRESULT FindSegmentIntersections (const FPOINT& a, const FPOINT& b, DWORD idVertexA, DWORD idVertexB, __out TArray<SEGMENT_INTERSECTION>& intersections);
+	HRESULT SortAndUniqueIntersections (__inout TArray<SEGMENT_INTERSECTION>& intersections);
+	DWORD FindExistingLine (DWORD idVertexA, DWORD idVertexB);
+	VOID RemoveLineById (DWORD idLine);
+	bool IsLineUsedByPolygon (const CAD_LINE* pCadLine, DWORD polygonId) const;
+	FLOAT PolygonSignedArea (const TArray<FPOINT>& pts) const;
+	VOID EnsureClockwise (__inout TArray<FPOINT>& pts);
+	bool PolygonExists (DWORD polygonId) const;
+	TArray<DWORD> FindIntersectingLines (const FPOINT& vFrom, const FPOINT& vTo);
+	FLOAT PolygonArea (const TArray<FPOINT>& polygon);
+	void DeleteSoloVertexes (TArray<DWORD> &usedVertices);
+	HRESULT IntegrateLine (DWORD idVertexA, DWORD idVertexB, __out_opt DWORD* pidLastLine);
+	bool IsSegmentOnPolygonBoundary (DWORD polygonId, TArray<FPOINT> &newPolyPts, const FPOINT& a, const FPOINT& b, __out_opt int* pId);
+	HRESULT GetPolygonLines (DWORD polygonId, __out TArray<DWORD>& polygonLines);
+	bool IsPointInPolygonLines (const TArray<DWORD>& polygonLines, const FPOINT& pt);
+
+	void TraceLoop (TArray<DWORD>& lines, TArray<DWORD>& usedLines,  __out_opt TArray<FPOINT>& points);
+
+	HRESULT BuildPolygonLoops (DWORD polygonId, TArray<DWORD>& allLines, __out_opt TArray<FPOINT>& outer, __out_opt TArray<TArray<FPOINT>*>& holes);
+
+	bool IsPointInPolygonWithHoles (DWORD polygonId, const FPOINT& pt);
 };
