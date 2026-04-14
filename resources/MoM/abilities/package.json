@@ -309,7 +309,7 @@
 				ref: "mom:ability/unit/doom_bolt",
 				name: "Doom Bolt",
 				type: "spell",
-				image: "Unit_DoomBolt.png"
+				image: "Unit_DoomBoltSpell.png"
 			},
 			{
 				ref: "mom:ability/unit/doom_gaze",
@@ -929,6 +929,12 @@
 				name: "Web",
 				type: "ability",
 				image: "Spell_Web.png"
+			},
+			{
+				ref: "mom:ability/item/vampiric",
+				name: "Vampiric",
+				type: "ability",
+				image: "Item_Vampiric.png"
 			}
 		]
 	}

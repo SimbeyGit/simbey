@@ -1,0 +1,99 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		clean_alpha:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/elyran/seraphs",
+			type:"normal",
+			name:"Seraphs",
+			race:"mom:elyran",
+			figures:4,
+			animation:"flying_unit",
+			cost:140,
+			upkeep:
+			[
+				{
+					amount:1,
+					ref:"mom:stat/food/one"
+				},
+				{
+					ref:"mom:stat/gold/one",
+					amount:4
+				}
+			],
+			prereqs:
+			[
+				{
+					type: "building",
+					ref: "mom:fighters_guild"
+				},
+				{
+					type: "building",
+					ref: "mom:oracle"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/armor",
+						value:1
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:6
+				},
+				range:
+				{
+					ref:"mom:ranged/lightning_bolt",
+					value:5
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:6
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:7
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:5
+				}
+			},
+			abilities:
+			[
+				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/armor_piercing" },
+				{ ref: "mom:ability/unit/negate_first_strike" },
+				{ ref: "mom:ability/unit/doom_bolt" }
+			]
+		}
+	}
+]
