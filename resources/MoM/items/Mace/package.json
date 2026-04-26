@@ -1,0 +1,20 @@
+[
+	{
+		package: "buildsif",
+		name: "items.sif",
+		trim: false,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "item.json",
+		data:
+		{
+			ref: "mom:item/class/mace",
+			name: "Mace",
+			base_cost: 100,
+			applied: ["melee"]
+ 		}
+	}
+]

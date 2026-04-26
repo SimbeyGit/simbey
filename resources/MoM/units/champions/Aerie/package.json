@@ -32,7 +32,7 @@
 					amount:10
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -78,9 +78,9 @@
 			},
 			slots:
 			[
-				"staff",
-				"item",
-				"item"
+				"mom:slot/class/magic",
+				"mom:slot/class/misc"
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -92,9 +92,9 @@
 			],
 			spells:
 			[
-				"Psionic Blast",
-				"Vertigo",
-				"Mind Storm"
+				"mom:spell/sorcery/psionic_blast",
+				"mom:spell/sorcery/vertigo",
+				"mom:spell/sorcery/mind_storm"
 			]
 		}
 	}

@@ -1,0 +1,20 @@
+[
+	{
+		package: "buildsif",
+		name: "items.sif",
+		trim: false,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "item.json",
+		data:
+		{
+			ref: "mom:item/class/shield",
+			name: "Shield",
+			base_cost: 100,
+			applied: []
+ 		}
+	}
+]

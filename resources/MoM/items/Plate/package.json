@@ -1,0 +1,20 @@
+[
+	{
+		package: "buildsif",
+		name: "items.sif",
+		trim: false,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "item.json",
+		data:
+		{
+			ref: "mom:item/class/plate",
+			name: "Plate Mail",
+			base_cost: 300,
+			applied: []
+ 		}
+	}
+]

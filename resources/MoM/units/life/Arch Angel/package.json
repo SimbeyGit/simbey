@@ -72,20 +72,20 @@
 			],
 			spells:
 			[
-				"Bless",
-				"Star Fires",
-				"Holy Weapon",
-				"Healing",
-				"Holy Armor",
-				"Heroism",
-				"True Light",
-				"True Sight",
-				"Dispel Evil",
-				"Prayer",
-				"Raise Dead",
-				"Invulnerability",
-				"Lionheart",
-				"Righteousness"
+				"mom:spell/life/bless",
+				"mom:spell/life/star_fires",
+				"mom:spell/life/holy_weapon",
+				"mom:spell/life/healing",
+				"mom:spell/life/holy_armor",
+				"mom:spell/life/heroism",
+				"mom:spell/life/true_light",
+				"mom:spell/life/true_sight",
+				"mom:spell/life/dispel_evil",
+				"mom:spell/life/prayer",
+				"mom:spell/life/raise_dead",
+				"mom:spell/life/invulnerability",
+				"mom:spell/life/lionheart",
+				"mom:spell/life/righteousness"
 			]
 		}
 	}

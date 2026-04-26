@@ -32,7 +32,7 @@
 					ref:"mom:stat/gold/one"
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -82,9 +82,9 @@
 			},
 			slots:
 			[
-				"staff",
-				"item",
-				"item"
+				"mom:slot/class/magic",
+				"mom:slot/class/misc"
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -97,10 +97,10 @@
 			],
 			spells:
 			[
-				"Weakness",
-				"Black Sleep",
-				"Animate Dead",
-				"Wrack"
+				"mom:spell/death/weakness",
+				"mom:spell/death/black_sleep",
+				"mom:spell/death/animate_dead",
+				"mom:spell/death/wrack"
 			]
 		}
 	}

@@ -32,7 +32,7 @@
 					amount:4
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -78,9 +78,9 @@
 			},
 			slots:
 			[
-				"staff",
-				"item",
-				"item"
+				"mom:slot/class/magic",
+				"mom:slot/class/misc"
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -92,10 +92,10 @@
 			],
 			spells:
 			[
-				"Darkness",
-				"Possession",
-				"Black Prayer",
-				"Mana Leak"
+				"mom:spell/death/darkness",
+				"mom:spell/death/possession",
+				"mom:spell/death/black_prayer",
+				"mom:spell/death/mana_leak"
 			]
 		}
 	}

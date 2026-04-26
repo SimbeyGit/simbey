@@ -32,7 +32,7 @@
 					amount:6
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -78,9 +78,9 @@
 			},
 			slots:
 			[
-				"staff",
-				"item",
-				"item"
+				"mom:slot/class/magic",
+				"mom:slot/class/misc"
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -90,9 +90,9 @@
 			],
 			spells:
 			[
-				"Lightning Bolt",
-				"Doom Bolt",
-				"Warp Lightning"
+				"mom:spell/chaos/lightning_bolt",
+				"mom:spell/chaos/doom_bolt",
+				"mom:spell/chaos/warp_creature"
 			]
 		}
 	}

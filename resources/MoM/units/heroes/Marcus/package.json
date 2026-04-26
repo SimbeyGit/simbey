@@ -32,7 +32,7 @@
 					amount:4
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -78,9 +78,9 @@
 			},
 			slots:
 			[
-				"bow",
-				"shield",
-				"item"
+				"mom:slot/class/bow_melee",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -92,8 +92,8 @@
 			],
 			spells:
 			[
-				"Resist Elements",
-				"Stone Skin"
+				"mom:spell/nature/resist_elements",
+				"mom:spell/nature/stone_skin"
 			]
 		}
 	}

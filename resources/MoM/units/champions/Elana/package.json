@@ -28,7 +28,7 @@
 			upkeep:
 			[
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -78,9 +78,9 @@
 			},
 			slots:
 			[
-				"staff",
-				"shield",
-				"item"
+				"mom:slot/class/magic",
+				"mom:slot/class/misc"
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -94,10 +94,10 @@
 			],
 			spells:
 			[
-				"Dispel Evil",
-				"Healing",
-				"Prayer",
-				"Holy Word"
+				"mom:spell/life/dispel_evil",
+				"mom:spell/life/healing",
+				"mom:spell/life/prayer",
+				"mom:spell/life/holy_word"
 			]
 		}
 	}

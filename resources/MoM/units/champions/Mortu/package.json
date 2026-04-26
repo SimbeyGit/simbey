@@ -32,7 +32,7 @@
 					ref:"mom:stat/gold/one"
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -77,9 +77,9 @@
 			},
 			slots:
 			[
-				"sword",
-				"shield",
-				"item"
+				"mom:slot/class/melee",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[

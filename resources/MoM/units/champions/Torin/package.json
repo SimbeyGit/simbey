@@ -66,9 +66,9 @@
 			},
 			slots:
 			[
-				"sword",
-				"shield",
-				"item"
+				"mom:slot/class/melee",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -84,9 +84,9 @@
 			],
 			spells:
 			[
-				"Healing",
-				"Holy Armor",
-				"Lionheart"
+				"mom:spell/life/healing",
+				"mom:spell/life/holy_armor",
+				"mom:spell/life/lionheart"
 			]
 		}
 	}

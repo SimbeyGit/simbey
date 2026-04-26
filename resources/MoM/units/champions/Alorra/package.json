@@ -32,7 +32,7 @@
 					amount:10
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -78,9 +78,9 @@
 			},
 			slots:
 			[
-				"bow",
-				"shield",
-				"item"
+				"mom:slot/class/bow_melee",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -94,8 +94,8 @@
 			],
 			spells:
 			[
-				"Resist Magic",
-				"Flight"
+				"mom:spell/sorcery/resist_magic",
+				"mom:spell/sorcery/flight"
 			]
 		}
 	}

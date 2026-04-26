@@ -1,0 +1,52 @@
+[
+	{
+		package: "buildsif",
+		name: "slots.sif",
+		trim: false,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "slots.json",
+		data:
+		[
+			{
+				ref: "mom:slot/class/armor",
+				name: "Armor",
+				image: "armor.png",
+				accepts: ["mom:item/class/chain", "mom:item/class/plate", "mom:item/class/shield"]
+			},
+			{
+				ref: "mom:slot/class/bow_melee",
+				name: "Bow or Melee",
+				image: "bow_melee.png",
+				accepts: ["mom:item/class/bow", "mom:item/class/axe", "mom:item/class/mace", "mom:item/class/sword"]
+			},
+			{
+				ref: "mom:slot/class/magic",
+				name: "Magic",
+				image: "magic.png",
+				accepts: ["mom:item/class/staff", "mom:item/class/wand"]
+			},
+			{
+				ref: "mom:slot/class/melee",
+				name: "Melee",
+				image: "melee.png",
+				accepts: ["mom:item/class/axe", "mom:item/class/mace", "mom:item/class/sword"]
+			},
+			{
+				ref: "mom:slot/class/melee_magic",
+				name: "Melee or Magic",
+				image: "melee_magic.png",
+				accepts: ["mom:item/class/axe", "mom:item/class/mace", "mom:item/class/sword", "mom:item/class/staff", "mom:item/class/wand"]
+			},
+			{
+				ref: "mom:slot/class/misc",
+				name: "Misc",
+				image: "misc.png",
+				accepts: ["mom:item/class/misc"]
+			}
+ 		]
+	}
+]

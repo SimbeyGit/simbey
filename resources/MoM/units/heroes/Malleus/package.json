@@ -32,7 +32,7 @@
 					amount:3
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -78,9 +78,9 @@
 			},
 			slots:
 			[
-				"staff",
-				"item",
-				"item"
+				"mom:slot/class/magic",
+				"mom:slot/class/misc"
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -91,10 +91,10 @@
 			],
 			spells:
 			[
-				"Fire Bolt",
-				"Fireball",
-				"Flame Strike",
-				"Fire Elemental"
+				"mom:spell/chaos/fire_bolt",
+				"mom:spell/chaos/fireball",
+				"mom:spell/chaos/flame_strike",
+				"mom:spell/chaos/fire_elemental"
 			]
 		}
 	}

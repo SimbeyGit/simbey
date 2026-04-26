@@ -71,9 +71,9 @@
 			},
 			slots:
 			[
-				"sword",
-				"shield",
-				"item"
+				"mom:slot/class/magic",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -83,7 +83,7 @@
 			],
 			spells:
 			[
-				"Healing"
+				"mom:spell/life/healing"
 			]
 		}
 	}

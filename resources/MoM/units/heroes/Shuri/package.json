@@ -71,9 +71,9 @@
 			},
 			slots:
 			[
-				"bow",
-				"shield",
-				"item"
+				"mom:slot/class/bow_melee",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[

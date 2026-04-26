@@ -71,9 +71,9 @@
 			},
 			slots:
 			[
-				"staff",
-				"item",
-				"item"
+				"mom:slot/class/magic",
+				"mom:slot/class/misc"
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
@@ -82,8 +82,8 @@
 			],
 			spells:
 			[
-				"Counter Magic",
-				"Dispel Magic True"
+				"mom:spell/sorcery/counter_magic",
+				"mom:spell/sorcery/dispel_magic_true"
 			]
 		}
 	}

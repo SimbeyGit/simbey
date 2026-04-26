@@ -1072,16 +1072,14 @@ bool CCADCtrl::DeleteSelectedVertex (VOID)
 {
 	TArray<DWORD> verticesToDelete;
 
-	for(sysint vertexIndex = 0; vertexIndex < m_pVertices->Length(); ++vertexIndex)
+	for(sysint vertexIndex = 0; vertexIndex < m_pVertices->Length();)
 	{
 		CAD_VERTEX* pCadVertex = NULL;
-		SideAssertHr(m_pVertices->GetValueChecked(vertexIndex, &pCadVertex));
+		DWORD vertexKey = CAD_INVALID;
+		SideAssertHr(m_pVertices->GetKeyAndValue(vertexIndex, &vertexKey, &pCadVertex));
 
 		if(pCadVertex->nFlags & CAD_SELECTED)
 		{
-			const DWORD vertexKey = m_pVertices->GetKey(vertexIndex);
-
-			// Count lines connected to this vertex
 			TArray<DWORD> connectedLines;
 			TArray<DWORD> connectedVertices;
 			for(sysint lineIndex = 0; lineIndex < m_pLines->Length(); ++lineIndex)
@@ -1103,12 +1101,10 @@ bool CCADCtrl::DeleteSelectedVertex (VOID)
 
 			if(connectedLines.Length() == 2)
 			{
-				// exactly two lines -> merge them
 				MergeVertex(vertexKey, connectedVertices[0]);
 			}
 			else
 			{
-				// more than 2 lines or isolated -> remove vertex + connected lines
 				for(sysint i = 0; i < connectedLines.Length(); ++i)
 				{
 					CAD_LINE* pLine;
@@ -1120,9 +1116,11 @@ bool CCADCtrl::DeleteSelectedVertex (VOID)
 				if(SUCCEEDED(m_pVertices->Remove(vertexKey, &pVertex)))
 					__delete pVertex;
 			}
+			continue;
 		}
+		++vertexIndex;
 	}
-
+	
 	return TRUE;
 }
 
@@ -2802,23 +2800,21 @@ bool CCADCtrl::IsPointInPolygonWithHoles (DWORD polygonId, const FPOINT& pt)
 	BuildPolygonLoops(polygonId, allLines, outer, holes);
 
 	fInPolygonWithHoles = IsPointInPolygon(outer, pt);
-	if(fInPolygonWithHoles)
+	
+	int iHolesCount = 0;
+	for(sysint i = 0; i < holes.Length(); i++)
 	{
-		for(sysint i = 0; i < holes.Length(); i++)
+		TArray<FPOINT>* paTempHoles = holes[i], polygonPoints;
+		for(sysint j = 0; j < paTempHoles->Length(); j++)
+			polygonPoints.Append((*paTempHoles)[j]);
+		if(IsPointInPolygon(polygonPoints, pt))
 		{
-			TArray<FPOINT>* paTempHoles = holes[i], polygonPoints;
-
-			for(sysint j = 0; j < paTempHoles->Length(); j++)
-				polygonPoints.Append((*paTempHoles)[j]);
-			if(IsPointInPolygon(polygonPoints, pt))
-			{
-				fInPolygonWithHoles = false;
-				break;
-			}
+			iHolesCount++;
 		}
 	}
+	
 
 	holes.DeleteAll();
 
-	return fInPolygonWithHoles;
+	return (!fInPolygonWithHoles && iHolesCount > 0) || (fInPolygonWithHoles && iHolesCount == 0);
 }

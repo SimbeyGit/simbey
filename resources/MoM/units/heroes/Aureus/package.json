@@ -32,7 +32,7 @@
 					amount:4
 				}
 			],
-			prereq:
+			prereqs:
 			[
 				{
 					type:"fame",
@@ -78,9 +78,9 @@
 			},
 			slots:
 			[
-				"sword",
-				"shield",
-				"item"
+				"mom:slot/class/melee_magic",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
 			],
 			abilities:
 			[
