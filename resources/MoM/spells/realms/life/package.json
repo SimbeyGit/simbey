@@ -78,7 +78,9 @@
 				research: 20,
 				effects:
 				{
-					ability: "mom:ability/spell/bless"
+					ability: "mom:ability/spell/bless",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -153,7 +155,9 @@
 				research: 60,
 				effects:
 				{
-					ability: "mom:ability/spell/endurance"
+					ability: "mom:ability/spell/endurance",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -206,7 +210,9 @@
 				research: 250,
 				effects:
 				{
-					ability: "mom:ability/spell/heroism"
+					ability: "mom:ability/spell/heroism",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -232,7 +238,9 @@
 				research: 130,
 				effects:
 				{
-					ability: "mom:ability/spell/holy_armor"
+					ability: "mom:ability/spell/holy_armor",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -258,7 +266,9 @@
 				research: 80,
 				effects:
 				{
-					ability: "mom:ability/spell/holy_weapon"
+					ability: "mom:ability/spell/holy_weapon",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -311,7 +321,9 @@
 				research: 100,
 				effects:
 				{
-					ability: "mom:ability/spell/invulnerability"
+					ability: "mom:ability/spell/invulnerability",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -348,7 +360,9 @@
 				research: 880,
 				effects:
 				{
-					ability: "mom:ability/spell/lionheart"
+					ability: "mom:ability/spell/lionheart",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -385,7 +399,9 @@
 				research: 680,
 				effects:
 				{
-					ability: "mom:ability/spell/planar_travel"
+					ability: "mom:ability/spell/planar_travel",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -455,7 +471,9 @@
 				research: 1120,
 				effects:
 				{
-					ability: "mom:ability/spell/righteousness"
+					ability: "mom:ability/spell/righteousness",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{
@@ -518,7 +536,9 @@
 				research: 300,
 				effects:
 				{
-					ability: "mom:ability/spell/true_sight"
+					ability: "mom:ability/spell/true_sight",
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
 				}
 			},
 			{

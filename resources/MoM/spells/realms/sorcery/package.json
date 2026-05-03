@@ -65,7 +65,9 @@
 				research: 130,
 				effects:
 				{
-					ability: "mom:ability/spell/confusion"
+					ability: "mom:ability/spell/confusion",
+					cast_sound: "mom:sounds/confusion",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -91,7 +93,9 @@
 				research: 2250,
 				effects:
 				{
-					ability: "mom:ability/spell/creature_binding"
+					ability: "mom:ability/spell/creature_binding",
+					cast_sound: "mom:sounds/vertigo",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -166,7 +170,9 @@
 				research: 560,
 				effects:
 				{
-					ability: "mom:ability/spell/flight"
+					ability: "mom:ability/spell/flight",
+					cast_sound: "mom:sounds/resist_magic",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -219,7 +225,9 @@
 				research: 80,
 				effects:
 				{
-					ability: "mom:ability/spell/guardian_wind"
+					ability: "mom:ability/spell/guardian_wind",
+					cast_sound: "mom:sounds/resist_magic",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -234,7 +242,9 @@
 				research: 1700,
 				effects:
 				{
-					ability: "mom:ability/spell/haste"
+					ability: "mom:ability/spell/haste",
+					cast_sound: "mom:sounds/resist_magic",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -249,7 +259,9 @@
 				research: 960,
 				effects:
 				{
-					ability: "mom:ability/spell/invisibility"
+					ability: "mom:ability/spell/invisibility",
+					cast_sound: "mom:sounds/resist_magic",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -264,7 +276,9 @@
 				research: 1600,
 				effects:
 				{
-					ability: "mom:ability/spell/magic_immunity"
+					ability: "mom:ability/spell/magic_immunity",
+					cast_sound: "mom:sounds/resist_magic",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -290,7 +304,9 @@
 				research: 220,
 				effects:
 				{
-					ability: "mom:ability/spell/mind_storm"
+					ability: "mom:ability/spell/mind_storm",
+					cast_sound: "mom:sounds/mind_storm",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -359,7 +375,9 @@
 				research: 20,
 				effects:
 				{
-					ability: "mom:ability/spell/resist_magic"
+					ability: "mom:ability/spell/resist_magic",
+					cast_sound: "mom:sounds/resist_magic",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -412,7 +430,9 @@
 				research: 1500,
 				effects:
 				{
-					ability: "mom:ability/spell/spell_lock"
+					ability: "mom:ability/spell/spell_lock",
+					cast_sound: "mom:sounds/resist_magic",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -487,7 +507,9 @@
 				research: 4000,
 				effects:
 				{
-					ability: "mom:ability/spell/vertigo"
+					ability: "mom:ability/spell/vertigo",
+					cast_sound: "mom:sounds/vertigo",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{
@@ -513,7 +535,9 @@
 				research: 1040,
 				effects:
 				{
-					ability: "mom:ability/spell/wind_walking"
+					ability: "mom:ability/spell/wind_walking",
+					cast_sound: "mom:sounds/resist_magic",
+					animation: "mom:spell/effect/enchant_sorcery"
 				}
 			},
 			{

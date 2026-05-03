@@ -1,0 +1,24 @@
+[
+	{
+		package: "buildsif",
+		name: "frames.sif",
+		trim: false,
+		double: true,
+		files: ["*.png"]
+	},
+	{
+		package: "json",
+		name: "frames.json",
+		data:
+		{
+			ref: "mom:spell/effect/enchant_sorcery",
+			ticks: 10,
+			repeat: 1,
+			overland:
+			{
+				x_offset: -40,
+				y_offset: -36
+			}
+ 		}
+	}
+]

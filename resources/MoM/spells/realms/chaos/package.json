@@ -54,7 +54,9 @@
 						"mom:ability/spell/chaos_channels_a",
 						"mom:ability/spell/chaos_channels_b",
 						"mom:ability/spell/chaos_channels_c"
-					]
+					],
+					cast_sound: "mom:sounds/chaos_rift",
+					animation: "mom:spell/effect/enchant_chaos"
 				}
 			},
 			{
@@ -210,7 +212,9 @@
 				research: 130,
 				effects:
 				{
-					ability: "mom:ability/spell/eldritch_weapon"
+					ability: "mom:ability/spell/eldritch_weapon",
+					cast_sound: "mom:sounds/chaos_rift",
+					animation: "mom:spell/effect/enchant_chaos"
 				}
 			},
 			{
@@ -290,7 +294,9 @@
 				research: 450,
 				effects:
 				{
-					ability: "mom:ability/spell/flame_blade"
+					ability: "mom:ability/spell/flame_blade",
+					cast_sound: "mom:sounds/chaos_rift",
+					animation: "mom:spell/effect/enchant_chaos"
 				}
 			},
 			{
@@ -391,7 +397,9 @@
 				research: 740,
 				effects:
 				{
-					ability: "mom:ability/spell/immolation"
+					ability: "mom:ability/spell/immolation",
+					cast_sound: "mom:sounds/chaos_rift",
+					animation: "mom:spell/effect/enchant_chaos"
 				}
 			},
 			{
@@ -466,7 +474,9 @@
 				research: 190,
 				effects:
 				{
-					ability: "mom:ability/spell/shatter"
+					ability: "mom:ability/spell/shatter",
+					cast_sound: "mom:sounds/dispel_magic_true",
+					animation: "mom:spell/effect/enchant_chaos"
 				}
 			},
 			{
@@ -497,7 +507,9 @@
 						"mom:ability/spell/warp_creature_a",
 						"mom:ability/spell/warp_creature_b",
 						"mom:ability/spell/warp_creature_c"
-					]
+					],
+					cast_sound: "mom:sounds/warp_creature",
+					animation: "mom:spell/effect/enchant_chaos"
 				}
 			},
 			{

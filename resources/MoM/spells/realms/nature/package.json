@@ -173,7 +173,9 @@
 				research: 880,
 				effects:
 				{
-					ability: "mom:ability/spell/elemental_armor"
+					ability: "mom:ability/spell/elemental_armor",
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			},
 			{
@@ -226,7 +228,9 @@
 				research: 80,
 				effects:
 				{
-					ability: "mom:ability/spell/giant_strength"
+					ability: "mom:ability/spell/giant_strength",
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			},
 			{
@@ -306,7 +310,9 @@
 				research: 1120,
 				effects:
 				{
-					ability: "mom:ability/spell/iron_skin"
+					ability: "mom:ability/spell/iron_skin",
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			},
 			{
@@ -376,7 +382,9 @@
 				research: 560,
 				effects:
 				{
-					ability: "mom:ability/spell/path_finding"
+					ability: "mom:ability/spell/path_finding",
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			},
 			{
@@ -402,7 +410,9 @@
 				research: 1850,
 				effects:
 				{
-					ability: "mom:ability/spell/regeneration"
+					ability: "mom:ability/spell/regeneration",
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			},
 			{
@@ -417,7 +427,9 @@
 				research: 40,
 				effects:
 				{
-					ability: "mom:ability/spell/resist_elements"
+					ability: "mom:ability/spell/resist_elements",
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			},
 			{
@@ -464,7 +476,9 @@
 				research: 160,
 				effects:
 				{
-					ability: "mom:ability/spell/stone_skin"
+					ability: "mom:ability/spell/stone_skin",
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			},
 			{
@@ -517,7 +531,9 @@
 				research: 190,
 				effects:
 				{
-					ability: "mom:ability/spell/water_walking"
+					ability: "mom:ability/spell/water_walking",
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			},
 			{
@@ -532,7 +548,9 @@
 				research: 100,
 				effects:
 				{
-					ability: "mom:ability/spell/web"
+					ability: "mom:ability/spell/web",
+					cast_sound: "mom:sounds/pebble",
+					animation: "mom:spell/effect/enchant_nature"
 				}
 			}
 		]

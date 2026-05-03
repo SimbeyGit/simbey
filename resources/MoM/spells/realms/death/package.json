@@ -27,7 +27,9 @@
 				research: 740,
 				effects:
 				{
-					ability: "mom:ability/spell/berserk"
+					ability: "mom:ability/spell/berserk",
+					cast_sound: "mom:sounds/evil_presence",
+					animation: "mom:spell/effect/enchant_death"
 				}
 			},
 			{
@@ -42,7 +44,9 @@
 				research: 500,
 				effects:
 				{
-					ability: "mom:ability/spell/black_channels"
+					ability: "mom:ability/spell/black_channels",
+					cast_sound: "mom:sounds/evil_presence",
+					animation: "mom:spell/effect/enchant_death"
 				}
 			},
 			{
@@ -68,7 +72,9 @@
 				research: 100,
 				effects:
 				{
-					ability: "mom:ability/spell/black_sleep"
+					ability: "mom:ability/spell/black_sleep",
+					cast_sound: "mom:sounds/black_sleep",
+					animation: "mom:spell/effect/enchant_death"
 				}
 			},
 			{
@@ -94,7 +100,9 @@
 				research: 80,
 				effects:
 				{
-					ability: "mom:ability/spell/cloak_of_fear"
+					ability: "mom:ability/spell/cloak_of_fear",
+					cast_sound: "mom:sounds/evil_presence",
+					animation: "mom:spell/effect/enchant_death"
 				}
 			},
 			{
@@ -308,7 +316,9 @@
 				research: 900,
 				effects:
 				{
-					ability: "mom:ability/spell/lycanthropy"
+					ability: "mom:ability/spell/lycanthropy",
+					cast_sound: "mom:sounds/black_sleep",
+					animation: "mom:spell/effect/enchant_death"
 				}
 			},
 			{
@@ -497,7 +507,9 @@
 				research: 880,
 				effects:
 				{
-					ability: "mom:ability/spell/wraith_form"
+					ability: "mom:ability/spell/wraith_form",
+					cast_sound: "mom:sounds/evil_presence",
+					animation: "mom:spell/effect/enchant_death"
 				}
 			},
 			{

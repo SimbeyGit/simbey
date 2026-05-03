@@ -13,11 +13,23 @@
 	},
 	{
 		package: "sound",
+		name: "BlackSleep.mp3"
+	},
+	{
+		package: "sound",
 		name: "Cavalry.mp3"
 	},
 	{
 		package: "sound",
+		name: "ChaosRift.mp3"
+	},
+	{
+		package: "sound",
 		name: "ColossusAttack.mp3"
+	},
+	{
+		package: "sound",
+		name: "Confusion.mp3"
 	},
 	{
 		package: "sound",
@@ -41,6 +53,10 @@
 	},
 	{
 		package: "sound",
+		name: "DispelMagicTrue.mp3"
+	},
+	{
+		package: "sound",
 		name: "DoomBolt.mp3"
 	},
 	{
@@ -50,6 +66,10 @@
 	{
 		package: "sound",
 		name: "DrakeFly.mp3"
+	},
+	{
+		package: "sound",
+		name: "EvilPresence.mp3"
 	},
 	{
 		package: "sound",
@@ -85,11 +105,19 @@
 	},
 	{
 		package: "sound",
+		name: "MindStorm.mp3"
+	},
+	{
+		package: "sound",
 		name: "Pebble.mp3"
 	},
 	{
 		package: "sound",
 		name: "PsionicBlast.mp3"
+	},
+	{
+		package: "sound",
+		name: "ResistMagic.mp3"
 	},
 	{
 		package: "sound",
@@ -109,7 +137,19 @@
 	},
 	{
 		package: "sound",
+		name: "StoneSkin.mp3"
+	},
+	{
+		package: "sound",
 		name: "SwordAttack.mp3"
+	},
+	{
+		package: "sound",
+		name: "Vertigo.mp3"
+	},
+	{
+		package: "sound",
+		name: "WarpCreature.mp3"
 	},
 	{
 		package: "sound",
@@ -133,12 +173,24 @@
 				sound: "BehemothAttack.mp3"
 			},
 			{
+				ref: "mom:sounds/black_sleep",
+				sound: "BlackSleep.mp3"
+			},
+			{
 				ref: "mom:sounds/cavalry",
 				sound: "Cavalry.mp3"
 			},
 			{
+				ref: "mom:sounds/chaos_rift",
+				sound: "ChaosRift.mp3"
+			},
+			{
 				ref: "mom:sounds/colossus",
 				sound: "ColossusAttack.mp3"
+			},
+			{
+				ref: "mom:sounds/confusion",
+				sound: "Confusion.mp3"
 			},
 			{
 				ref: "mom:sounds/cracks_call",
@@ -161,6 +213,10 @@
 				sound: "Disintegrate.mp3"
 			},
 			{
+				ref: "mom:sounds/dispel_magic_true",
+				sound: "DispelMagicTrue.mp3"
+			},
+			{
 				ref: "mom:sounds/doom_bolt",
 				sound: "DoomBolt.mp3"
 			},
@@ -171,6 +227,10 @@
 			{
 				ref: "mom:sounds/drake_fly",
 				sound: "DrakeFly.mp3"
+			},
+			{
+				ref: "mom:sounds/evil_presence",
+				sound: "EvilPresence.mp3"
 			},
 			{
 				ref: "mom:sounds/fire_bolt",
@@ -205,12 +265,20 @@
 				sound: "Merge.mp3"
 			},
 			{
+				ref: "mom:sounds/mind_storm",
+				sound: "MindStorm.mp3"
+			},
+			{
 				ref: "mom:sounds/pebble",
 				sound: "Pebble.mp3"
 			},
 			{
 				ref: "mom:sounds/psionic_blast",
 				sound: "PsionicBlast.mp3"
+			},
+			{
+				ref: "mom:sounds/resist_magic",
+				sound: "ResistMagic.mp3"
 			},
 			{
 				ref: "mom:sounds/rock",
@@ -225,12 +293,24 @@
 				sound: "SpritesAttack.mp3"
 			},
 			{
+				ref: "mom:sounds/stone_skin",
+				sound: "StoneSkin.mp3"
+			},
+			{
 				ref: "mom:sounds/summoning",
 				sound: "Summoning.mp3"
 			},
 			{
 				ref: "mom:sounds/sword",
 				sound: "SwordAttack.mp3"
+			},
+			{
+				ref: "mom:sounds/vertigo",
+				sound: "Vertigo.mp3"
+			},
+			{
+				ref: "mom:sounds/warp_creature",
+				sound: "WarpCreature.mp3"
 			},
 			{
 				ref: "mom:sounds/whoosh",
