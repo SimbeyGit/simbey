@@ -13,7 +13,11 @@
 				overland_cost: 500,
 				combat_cost: null,
 				upkeep: 3,
-				research: 700
+				research: 700,
+				effects:
+				{
+					cast_music: "mom:spell_researched"
+				}
 			},
 			{
 				ref: "mom:spell/arcane/create_artifact",
@@ -35,7 +39,11 @@
 				overland_cost: 200,
 				combat_cost: null,
 				upkeep: 3,
-				research: 400
+				research: 400,
+				effects:
+				{
+					cast_music: "mom:spell_researched"
+				}
 			},
 			{
 				ref: "mom:spell/arcane/disenchant_area",

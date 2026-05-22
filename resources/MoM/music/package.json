@@ -611,6 +611,82 @@
 			{
 				ref: "mom:spell_researched",
 				file: "MOM41.MID"
+			},
+			{
+				ref: "mom:cast/eternal_night",
+				file: "MOM20.MID"
+			},
+			{
+				ref: "mom:cast/evil_omens",
+				file: "MOM21.MID"
+			},
+			{
+				ref: "mom:cast/zombie_mastery",
+				file: "MOM22.MID"
+			},
+			{
+				ref: "mom:cast/aura_majesty",
+				file: "MOM23.MID"
+			},
+			{
+				ref: "mom:cast/wind_mastery",
+				file: "MOM24.MID"
+			},
+			{
+				ref: "mom:cast/suppress_magic",
+				file: "MOM25.MID"
+			},
+			{
+				ref: "mom:cast/time_stop",
+				file: "MOM26.MID"
+			},
+			{
+				ref: "mom:cast/nature_awareness",
+				file: "MOM27.MID"
+			},
+			{
+				ref: "mom:cast/nature_wrath",
+				file: "MOM28.MID"
+			},
+			{
+				ref: "mom:cast/herb_mastery",
+				file: "MOM29.MID"
+			},
+			{
+				ref: "mom:cast/chaos_surge",
+				file: "MOM30.MID"
+			},
+			{
+				ref: "mom:cast/doom_mastery",
+				file: "MOM31.MID"
+			},
+			{
+				ref: "mom:cast/great_wasting",
+				file: "MOM32.MID"
+			},
+			{
+				ref: "mom:cast/armageddon",
+				file: "MOM34.MID"
+			},
+			{
+				ref: "mom:cast/tranquility",
+				file: "MOM35.MID"
+			},
+			{
+				ref: "mom:cast/life_force",
+				file: "MOM36.MID"
+			},
+			{
+				ref: "mom:cast/crusade",
+				file: "MOM37.MID"
+			},
+			{
+				ref: "mom:cast/just_cause",
+				file: "MOM38.MID"
+			},
+			{
+				ref: "mom:cast/holy_arms",
+				file: "MOM39.MID"
 			}
 		]
 	}

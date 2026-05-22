@@ -15,44 +15,41 @@
 		canvas:128
 	},
 	{
-		package:"buildsif",
-		name:"crystal.sif",
-		files: [ "crystal.png" ],
-		trim:true,
-		canvas:128
-	},
-	{
 		package:"json",
 		name:"data.json",
 		data:
 		{
-			ref:"mom:unit/elyran/harmonists",
+			ref:"mom:unit/elyran/terror",
 			type:"normal",
-			name:"Harmonists",
+			name:"Terror",
 			race:"mom:elyran",
-			figures:4,
+			figures:1,
 			animation:"flying_unit",
-			cost:90,
+			cost:250,
 			upkeep:
 			[
 				{
-					amount:1,
 					ref:"mom:stat/food/one"
+					amount:3,
 				},
 				{
 					ref:"mom:stat/gold/one",
-					amount:3
+					amount:7
+				},
+				{
+					ref:"mom:stat/mana/one",
+					amount:2
 				}
 			],
 			prereqs:
 			[
 				{
 					type: "building",
-					ref: "mom:armory"
+					ref: "mom:fantastic_stable"
 				},
 				{
 					type: "building",
-					ref: "mom:wizards_guild"
+					ref: "mom:oracle"
 				}
 			],
 			stats:
@@ -62,51 +59,40 @@
 					{
 						ref:"mom:stat/move/air",
 						sound_ref:"mom:sounds/armor",
-						value:1
+						value:3
 					}
 				],
 				melee:
 				{
 					ref:"mom:stat/melee/normal",
 					sound_ref:"mom:sounds/sword",
-					value:1
-				},
-				range:
-				{
-					ref:"mom:ranged/fire_bolt",
-					value:5
+					value:15
 				},
 				defense:
 				{
 					ref:"mom:stat/defense/normal",
-					value:4
+					value:8
 				},
 				resist:
 				{
 					ref:"mom:stat/resist",
-					value:5
+					value:9
 				},
 				hits:
 				{
 					ref:"mom:stat/hits",
-					value:4
+					value:22
 				}
 			},
 			abilities:
 			[
-				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
+				{ ref: "mom:ability/unit/to_hit", value: 3 },
 				{ ref: "mom:ability/unit/illusions_immunity" },
 				{ ref: "mom:ability/unit/missile_immunity" },
-				{ ref: "mom:ability/unit/fireball_spell", value: 5 },
-				{ ref: "mom:ability/unit/healing_spell", value: 5 },
-				{ ref: "mom:ability/unit/purify" }
-			],
-			effects:
-			{
-				animation: "crystal.sif",
-				type: "revolve",
-				offset: -3
-			}
+				{ ref: "mom:ability/unit/lightning_breath", value: 15 }
+				{ ref: "mom:ability/unit/armor_piercing" },
+				{ ref: "mom:ability/unit/cause_fear" }
+			]
 		}
 	}
 ]

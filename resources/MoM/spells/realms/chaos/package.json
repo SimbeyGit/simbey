@@ -13,7 +13,11 @@
 				overland_cost: 1250,
 				combat_cost: null,
 				upkeep: 40,
-				research: 6000
+				research: 6000,
+				effects:
+				{
+					cast_music: "mom:cast/armageddon"
+				}
 			},
 			{
 				ref: "mom:spell/chaos/call_chaos",
@@ -68,7 +72,12 @@
 				overland_cost: 300,
 				combat_cost: null,
 				upkeep: 10,
-				research: 1700
+				research: 1700,
+				effects:
+				{
+					cast_sound: "mom:sounds/chaos_rift",
+					sky: "chaos_rift.png"
+				}
 			},
 			{
 				ref: "mom:spell/chaos/chaos_spawn",
@@ -95,7 +104,11 @@
 				overland_cost: 1000,
 				combat_cost: null,
 				upkeep: 40,
-				research: 3500
+				research: 3500,
+				effects:
+				{
+					cast_music: "mom:cast/chaos_surge"
+				}
 			},
 			{
 				ref: "mom:spell/chaos/chimeras",
@@ -182,7 +195,11 @@
 				overland_cost: 1100,
 				combat_cost: null,
 				upkeep: 15,
-				research: 4000
+				research: 4000,
+				effects:
+				{
+					cast_music: "mom:cast/doom_mastery"
+				}
 			},
 			{
 				ref: "mom:spell/chaos/efreet",
@@ -351,7 +368,11 @@
 				overland_cost: 1000,
 				combat_cost: null,
 				upkeep: 20,
-				research: 2500
+				research: 2500,
+				effects:
+				{
+					cast_music: "mom:cast/great_wasting"
+				}
 			},
 			{
 				ref: "mom:spell/chaos/hell_hounds",

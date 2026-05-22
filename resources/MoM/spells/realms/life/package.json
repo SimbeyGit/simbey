@@ -16,6 +16,7 @@
 				research: 1300,
 				effects:
 				{
+					cast_sound: "mom:sounds/heavenly_light",
 					building: "mom:altar_of_battle"
 				}
 			},
@@ -63,6 +64,7 @@
 				research: 2250,
 				effects:
 				{
+					cast_sound: "mom:sounds/heavenly_light",
 					building: "mom:astral_gate"
 				}
 			},
@@ -92,7 +94,11 @@
 				overland_cost: 1250,
 				combat_cost: null,
 				upkeep: 10,
-				research: 6000
+				research: 6000,
+				effects:
+				{
+					cast_music: "mom:spell_researched"
+				}
 			},
 			{
 				ref: "mom:spell/life/consecration",
@@ -114,7 +120,11 @@
 				overland_cost: 1100,
 				combat_cost: null,
 				upkeep: 10,
-				research: 4500
+				research: 4500,
+				effects:
+				{
+					cast_music: "mom:cast/crusade"
+				}
 			},
 			{
 				ref: "mom:spell/life/dispel_evil",
@@ -196,7 +206,12 @@
 				overland_cost: 150,
 				combat_cost: null,
 				upkeep: 2,
-				research: 740
+				research: 740,
+				effects:
+				{
+					cast_sound: "mom:sounds/heavenly_light",
+					sky: "heavenly_light.png"
+				}
 			},
 			{
 				ref: "mom:spell/life/heroism",
@@ -252,7 +267,11 @@
 				overland_cost: 90,
 				combat_cost: 18,
 				upkeep: 2,
-				research: 2500
+				research: 2500,
+				effects:
+				{
+					cast_music: "mom:cast/holy_arms"
+				}
 			},
 			{
 				ref: "mom:spell/life/holy_weapon",
@@ -335,7 +354,11 @@
 				overland_cost: 150,
 				combat_cost: null,
 				upkeep: 3,
-				research: 160
+				research: 160,
+				effects:
+				{
+					cast_music: "mom:cast/just_cause"
+				}
 			},
 			{
 				ref: "mom:spell/life/life_force",
@@ -346,7 +369,11 @@
 				overland_cost: 150,
 				combat_cost: null,
 				upkeep: 3,
-				research: 350
+				research: 350,
+				effects:
+				{
+					cast_music: "mom:cast/life_force"
+				}
 			},
 			{
 				ref: "mom:spell/life/lionheart",
@@ -385,7 +412,11 @@
 				overland_cost: 500,
 				combat_cost: null,
 				upkeep: 5,
-				research: 500
+				research: 500,
+				effects:
+				{
+					cast_music: "mom:summon/uncommon"
+				}
 			},
 			{
 				ref: "mom:spell/life/planar_travel",
@@ -499,6 +530,7 @@
 				research: 150,
 				effects:
 				{
+					cast_sound: "mom:sounds/heavenly_light",
 					building: "mom:stream_of_life"
 				}
 			},
@@ -511,7 +543,11 @@
 				overland_cost: 1000,
 				combat_cost: null,
 				upkeep: 10,
-				research: 4000
+				research: 4000,
+				effects:
+				{
+					cast_music: "mom:cast/tranquility"
+				}
 			},
 			{
 				ref: "mom:spell/life/true_light",

@@ -29,7 +29,11 @@
 				overland_cost: 400,
 				combat_cost: null,
 				upkeep: 5,
-				research: 740
+				research: 740,
+				effects:
+				{
+					cast_music: "mom:cast/aura_majesty"
+				}
 			},
 			{
 				ref: "mom:spell/sorcery/banish",
@@ -482,7 +486,11 @@
 				overland_cost: 1250,
 				combat_cost: null,
 				upkeep: 50,
-				research: 5000
+				research: 5000,
+				effects:
+				{
+					cast_music: "mom:cast/suppress_magic"
+				}
 			},
 			{
 				ref: "mom:spell/sorcery/time_stop",
@@ -493,7 +501,11 @@
 				overland_cost: 1500,
 				combat_cost: null,
 				upkeep: 200,
-				research: 6000
+				research: 6000,
+				effects:
+				{
+					cast_music: "mom:cast/time_stop"
+				}
 			},
 			{
 				ref: "mom:spell/sorcery/vertigo",
@@ -521,7 +533,11 @@
 				overland_cost: 400,
 				combat_cost: null,
 				upkeep: 5,
-				research: 620
+				research: 620,
+				effects:
+				{
+					cast_music: "mom:cast/wind_mastery"
+				}
 			},
 			{
 				ref: "mom:spell/sorcery/wind_walking",

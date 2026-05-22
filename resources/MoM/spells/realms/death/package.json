@@ -114,7 +114,12 @@
 				overland_cost: 150,
 				combat_cost: null,
 				upkeep: 3,
-				research: 1200
+				research: 1200,
+				effects:
+				{
+					cast_sound: "mom:sounds/evil_presence",
+					sky: "cloud_of_shadow.png"
+				}
 			},
 			{
 				ref: "mom:spell/death/cruel_unminding",
@@ -136,7 +141,12 @@
 				overland_cost: 150,
 				combat_cost: null,
 				upkeep: 2,
-				research: 1700
+				research: 1700,
+				effects:
+				{
+					cast_sound: "mom:sounds/evil_presence",
+					terrain: "cursed.png"
+				}
 			},
 			{
 				ref: "mom:spell/death/dark_rituals",
@@ -150,6 +160,7 @@
 				research: 60,
 				effects:
 				{
+					cast_sound: "mom:sounds/evil_presence",
 					building: "mom:dark_rituals"
 				}
 			},
@@ -238,7 +249,11 @@
 				overland_cost: 1000,
 				combat_cost: null,
 				upkeep: 10,
-				research: 4000
+				research: 4000,
+				effects:
+				{
+					cast_music: "mom:cast/eternal_night"
+				}
 			},
 			{
 				ref: "mom:spell/death/evil_omens",
@@ -249,7 +264,11 @@
 				overland_cost: 1100,
 				combat_cost: null,
 				upkeep: 10,
-				research: 4500
+				research: 4500,
+				effects:
+				{
+					cast_music: "mom:cast/evil_omens"
+				}
 			},
 			{
 				ref: "mom:spell/death/evil_presence",
@@ -263,6 +282,7 @@
 				research: 1040,
 				effects:
 				{
+					cast_sound: "mom:sounds/evil_presence",
 					building: "mom:evil_presence"
 				}
 			},
@@ -275,7 +295,12 @@
 				overland_cost: 200,
 				combat_cost: null,
 				upkeep: 5,
-				research: 1600
+				research: 1600,
+				effects:
+				{
+					cast_sound: "mom:sounds/evil_presence",
+					terrain: "famine.png"
+				}
 			},
 			{
 				ref: "mom:spell/death/ghouls",
@@ -537,7 +562,11 @@
 				overland_cost: 800,
 				combat_cost: null,
 				upkeep: 40,
-				research: 1500
+				research: 1500,
+				effects:
+				{
+					cast_music: "mom:cast/zombie_mastery"
+				}
 			}
 		]
 	}

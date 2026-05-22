@@ -198,7 +198,12 @@
 				overland_cost: 300,
 				combat_cost: null,
 				upkeep: 3,
-				research: 1600
+				research: 1600,
+				effects:
+				{
+					cast_sound: "mom:sounds/stone_skin",
+					terrain: "gaia.png"
+				}
 			},
 			{
 				ref: "mom:spell/nature/giant_spiders",
@@ -274,7 +279,11 @@
 				overland_cost: 1000,
 				combat_cost: null,
 				upkeep: 10,
-				research: 4500
+				research: 4500,
+				effects:
+				{
+					cast_music: "mom:cast/herb_mastery"
+				}
 			},
 			{
 				ref: "mom:spell/nature/ice_bolt",
@@ -335,7 +344,11 @@
 				overland_cost: 800,
 				combat_cost: null,
 				upkeep: 7,
-				research: 2500
+				research: 2500,
+				effects:
+				{
+					cast_music: "mom:cast/nature_awareness"
+				}
 			},
 			{
 				ref: "mom:spell/nature/natures_cures",
@@ -368,7 +381,11 @@
 				overland_cost: 1250,
 				combat_cost: null,
 				upkeep: 10,
-				research: 6000
+				research: 6000,
+				effects:
+				{
+					cast_music: "mom:cast/nature_wrath"
+				}
 			},
 			{
 				ref: "mom:spell/nature/path_finding",
