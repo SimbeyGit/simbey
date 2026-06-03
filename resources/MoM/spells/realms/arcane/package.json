@@ -1,5 +1,13 @@
 [
 	{
+		package: "buildsif",
+		name: "spells.sif",
+		files: ["*.png"],
+		trim: false,
+		double: true,
+		canvas: 512
+	},
+	{
 		package: "json",
 		name: "spells.json",
 		data:
@@ -16,7 +24,8 @@
 				research: 700,
 				effects:
 				{
-					cast_music: "mom:spell_researched"
+					cast_music: "mom:spell_researched",
+					global: "awareness.png"
 				}
 			},
 			{
@@ -42,7 +51,8 @@
 				research: 400,
 				effects:
 				{
-					cast_music: "mom:spell_researched"
+					cast_music: "mom:spell_researched",
+					global: "detect_magic.png"
 				}
 			},
 			{

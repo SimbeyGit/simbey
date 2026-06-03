@@ -1,5 +1,13 @@
 [
 	{
+		package: "buildsif",
+		name: "spells.sif",
+		files: ["*.png"],
+		trim: false,
+		double: true,
+		canvas: 512
+	},
+	{
 		package: "json",
 		name: "spells.json",
 		data:
@@ -252,7 +260,8 @@
 				research: 4000,
 				effects:
 				{
-					cast_music: "mom:cast/eternal_night"
+					cast_music: "mom:cast/eternal_night",
+					global: "eternal_night.png"
 				}
 			},
 			{
@@ -267,7 +276,8 @@
 				research: 4500,
 				effects:
 				{
-					cast_music: "mom:cast/evil_omens"
+					cast_music: "mom:cast/evil_omens",
+					global: "evil_omens.png"
 				}
 			},
 			{
@@ -565,7 +575,8 @@
 				research: 1500,
 				effects:
 				{
-					cast_music: "mom:cast/zombie_mastery"
+					cast_music: "mom:cast/zombie_mastery",
+					global: "zombie_mastery.png"
 				}
 			}
 		]

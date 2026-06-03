@@ -7,37 +7,41 @@
 			"b*.png"
 		],
 		trim: true,
-		double: true,
-		canvas: 64
+		canvas: 512
 	},
 	{
 		package: "json",
 		name: "building.json",
 		data:
 		{
-			ref: "mom:parthenon",
+			ref: "mom:paragon",
 			type: "normal",
-			name: "Parthenon",
-			desc: "A parthenon provides the city with a central focus for the study and teaching of religion. It adds +3 power and reduces the unrest by 1.",
-			cost: 400,
+			name: "Paragon",
+			races: ["mom:elyran"],
+			desc: "The Paragon is the pinnacle of Elyran civilization. It increases a city's taxable revenues by +75%, in addition to the gains from the Marketplace and Bank, adds +2 power, and reduces unrest by 1. Its perfected harmony also enables the forging of Elyran Terrors when combined with a Fantastic Stable.",
+			cost: 1000,
 			upkeep:
 			[
 				{
 					ref: "mom:stat/gold/one",
-					amount: 3
+					amount: 5
 				}
 			],
 			is_ruin: false,
 			categories: [],
 			size:
 			{
-				width: 2,
-				height: 2
+				width: 3,
+				height: 3
 			},
 			placement:
 			{
 				type: "random",
-				replaces: "mom:temple",
+				fixed_position:
+				{
+					x: -1,
+					y: -1
+				},
 				alignmentBias:
 				{
 					x: -1,
@@ -50,7 +54,7 @@
 					hill: false,
 					road_adjacency: false
 				},
-				priority: 50,
+				priority: 75,
 				mounted_on_citywalls: false,
 				ignore_occupation: false,
 				method: "grid"
@@ -59,12 +63,17 @@
 			[
 				{
 					type: "building",
-					ref: "mom:temple"
+					ref: "mom:oracle"
+				},
+				{
+					type: "building",
+					ref: "mom:bank"
 				}
 			],
 			benefits:
 			{
-				power: 3,
+				gold_pct: 75,
+				power: 5,
 				unrest: -1
 			},
 			immuneToTransformations: false

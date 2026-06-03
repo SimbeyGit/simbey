@@ -1,5 +1,13 @@
 [
 	{
+		package: "buildsif",
+		name: "spells.sif",
+		files: ["*.png"],
+		trim: false,
+		double: true,
+		canvas: 512
+	},
+	{
 		package: "json",
 		name: "spells.json",
 		data:
@@ -16,7 +24,8 @@
 				research: 6000,
 				effects:
 				{
-					cast_music: "mom:cast/armageddon"
+					cast_music: "mom:cast/armageddon",
+					global: "armageddon.png"
 				}
 			},
 			{
@@ -107,7 +116,8 @@
 				research: 3500,
 				effects:
 				{
-					cast_music: "mom:cast/chaos_surge"
+					cast_music: "mom:cast/chaos_surge",
+					global: "chaos_surge.png"
 				}
 			},
 			{
@@ -198,7 +208,8 @@
 				research: 4000,
 				effects:
 				{
-					cast_music: "mom:cast/doom_mastery"
+					cast_music: "mom:cast/doom_mastery",
+					global: "doom_mastery.png"
 				}
 			},
 			{
@@ -371,7 +382,8 @@
 				research: 2500,
 				effects:
 				{
-					cast_music: "mom:cast/great_wasting"
+					cast_music: "mom:cast/great_wasting",
+					global: "great_wasting.png"
 				}
 			},
 			{

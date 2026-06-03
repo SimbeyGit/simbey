@@ -1,5 +1,13 @@
 [
 	{
+		package: "buildsif",
+		name: "spells.sif",
+		files: ["*.png"],
+		trim: false,
+		double: true,
+		canvas: 512
+	},
+	{
 		package: "json",
 		name: "spells.json",
 		data:
@@ -282,7 +290,8 @@
 				research: 4500,
 				effects:
 				{
-					cast_music: "mom:cast/herb_mastery"
+					cast_music: "mom:cast/herb_mastery",
+					global: "herb_mastery.png"
 				}
 			},
 			{
@@ -347,7 +356,8 @@
 				research: 2500,
 				effects:
 				{
-					cast_music: "mom:cast/nature_awareness"
+					cast_music: "mom:cast/nature_awareness",
+					global: "nature_awareness.png"
 				}
 			},
 			{
@@ -384,7 +394,8 @@
 				research: 6000,
 				effects:
 				{
-					cast_music: "mom:cast/nature_wrath"
+					cast_music: "mom:cast/nature_wrath",
+					global: "nature_wrath.png"
 				}
 			},
 			{

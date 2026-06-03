@@ -16,7 +16,7 @@
 		data:
 		{
 			ref: "mom:summoning_circle",
-			type: "normal",
+			type: "special",
 			name: "Summoning Circle",
 			desc: "When creatures are summoned by the wizard, they appear here in the summoning circle.",
 			start: true,

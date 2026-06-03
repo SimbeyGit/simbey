@@ -16,7 +16,7 @@
 		data:
 		{
 			ref: "mom:fortress",
-			type: "normal",
+			type: "special",
 			name: "Fortress",
 			desc: "Each wizard resides in his or her own fortress. This serves as a base of operations. If the fortress is lost, the wizard is banished and must cast the Spell of Return.",
 			start: true,

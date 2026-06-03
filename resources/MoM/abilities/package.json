@@ -249,6 +249,7 @@
 				ref: "mom:ability/unit/cause_fear",
 				name: "Cause Fear",
 				type: "ability",
+				resist: true,
 				image: "Unit_CauseFear.png"
 			},
 			{
@@ -290,6 +291,7 @@
 				type: "gaze",
 				damage: "death",
 				armor_piercing: false,
+				resist: true,
 				image: "Unit_DeathGaze.png"
 			},
 			{
@@ -303,6 +305,7 @@
 				ref: "mom:ability/unit/dispel_evil",
 				name: "Dispel Evil",
 				type: "ability",
+				resist: true,
 				image: "Unit_DispelEvil.png"
 			},
 			{
@@ -407,6 +410,7 @@
 				type: "touch",
 				damage: "life steal",
 				armor_piercing: false,
+				resist: true,
 				image: "Unit_LifeSteal.png"
 			},
 			{
@@ -498,6 +502,7 @@
 				type: "touch",
 				damage: "poison",
 				armor_piercing: false,
+				resist: true,
 				image: "Unit_PoisonTouch.png"
 			},
 			{
@@ -538,6 +543,7 @@
 				type: "gaze",
 				damage: "stoning",
 				armor_piercing: false,
+				resist: true,
 				image: "Unit_StoningGaze.png"
 			},
 			{

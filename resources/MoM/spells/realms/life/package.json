@@ -1,5 +1,13 @@
 [
 	{
+		package: "buildsif",
+		name: "spells.sif",
+		files: ["*.png"],
+		trim: false,
+		double: true,
+		canvas: 512
+	},
+	{
 		package: "json",
 		name: "spells.json",
 		data:
@@ -97,7 +105,8 @@
 				research: 6000,
 				effects:
 				{
-					cast_music: "mom:spell_researched"
+					cast_music: "mom:spell_researched",
+					global: "charm_of_life.png"
 				}
 			},
 			{
@@ -123,7 +132,8 @@
 				research: 4500,
 				effects:
 				{
-					cast_music: "mom:cast/crusade"
+					cast_music: "mom:cast/crusade",
+					global: "crusade.png"
 				}
 			},
 			{
@@ -270,7 +280,8 @@
 				research: 2500,
 				effects:
 				{
-					cast_music: "mom:cast/holy_arms"
+					cast_music: "mom:cast/holy_arms",
+					global: "holy_arms.png"
 				}
 			},
 			{
@@ -357,7 +368,8 @@
 				research: 160,
 				effects:
 				{
-					cast_music: "mom:cast/just_cause"
+					cast_music: "mom:cast/just_cause",
+					global: "just_cause.png"
 				}
 			},
 			{
@@ -372,7 +384,8 @@
 				research: 350,
 				effects:
 				{
-					cast_music: "mom:cast/life_force"
+					cast_music: "mom:cast/life_force",
+					global: "life_force.png"
 				}
 			},
 			{
@@ -415,7 +428,8 @@
 				research: 500,
 				effects:
 				{
-					cast_music: "mom:summon/uncommon"
+					cast_music: "mom:summon/uncommon",
+					global: "planar_seal.png"
 				}
 			},
 			{
@@ -546,7 +560,8 @@
 				research: 4000,
 				effects:
 				{
-					cast_music: "mom:cast/tranquility"
+					cast_music: "mom:cast/tranquility",
+					global: "tranquility.png"
 				}
 			},
 			{

@@ -605,6 +605,10 @@
 				file: "MOM109.MID"
 			},
 			{
+				ref: "mom:hero_level",
+				file: "MOM116.MID"
+			},
+			{
 				ref: "mom:encounter",
 				file: "MOM106.MID"
 			},
