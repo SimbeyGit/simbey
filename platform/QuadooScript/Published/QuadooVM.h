@@ -363,6 +363,14 @@ namespace QuadooVM
 		PVOID pvFiber;
 	};
 
+	struct DEBUG_STACK_FRAME
+	{
+		ULONG ip;
+		ULONG sp;
+		ULONG fp;
+		ULONG nExecutionDepth;
+	};
+
 	struct VM
 	{
 		PBYTE pbCode;
@@ -409,6 +417,23 @@ namespace QuadooVM
 		USHORT nDefaultMethod;
 		USHORT nDefaultProperty;
 	};
+
+	namespace Debug
+	{
+		enum Breakpoint
+		{
+			CodeStep,
+			Conditional,
+			HardStop
+		};
+
+		enum VariableClass
+		{
+			Local = 1,
+			Global,
+			Member
+		};
+	}
 }
 
 interface __declspec(uuid("B67EA814-F7EC-4613-A74B-909C0BAF7289")) IExternalScriptSite : IUnknown
@@ -495,6 +520,9 @@ interface __declspec(uuid("0ED2B4A2-61E3-4054-B3E5-9D6149AF18E8")) IQuadooDebugP
 	virtual HRESULT STDMETHODCALLTYPE GetFileAndLine (__inout ULONG* pIP, __out RSTRING* prstrFile, __out ULONG* pnLine) = 0;
 	virtual HRESULT STDMETHODCALLTYPE GetBreakpoints (ULONG nFile, ULONG nLine, __out ISequentialStream* pstmIP) = 0;
 	virtual HRESULT STDMETHODCALLTYPE SetBreakpoint (ULONG idxIP, QuadooVM::Instruction eBreakpoint) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetStackFrames (ULONG nCurrentIP, __out ISequentialStream* pstmFrames) = 0;
+	virtual HRESULT STDMETHODCALLTYPE GetVariableValue (QuadooVM::Debug::VariableClass eClass, LONG nOffset,
+		LONG nBaseOffset, __deref_out RSTRING* prstrValue) = 0;
 };
 
 interface __declspec(uuid("23A1B25B-587A-4a4e-9506-396BE62A50CE")) IQuadooContainer : IUnknown
@@ -581,7 +609,7 @@ interface __declspec(uuid("67DF4FAC-B9C2-44a6-82AB-ADBC6FC9BB2E")) IQuadooDebugg
 	// InvokeBreakpoint() and UnhandledException() receive the IQuadooVM instance, the
 	// IP that triggered the call, and the VM data, which includes the next IP position.
 	// fConditional is true if a DBG_COND instruction was encountered.
-	virtual VOID STDMETHODCALLTYPE InvokeBreakpoint (IQuadooVM* pVM, ULONG nIP, QuadooVM::VM* pQVM, bool fConditional) = 0;
+	virtual VOID STDMETHODCALLTYPE InvokeBreakpoint (IQuadooVM* pVM, ULONG nIP, QuadooVM::VM* pQVM, QuadooVM::Debug::Breakpoint eBreakpoint) = 0;
 	virtual VOID STDMETHODCALLTYPE UnhandledException (IQuadooVM* pVM, ULONG nIP, QuadooVM::VM* pQVM) = 0;
 };
 

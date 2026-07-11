@@ -82,8 +82,15 @@ BEGIN
     BEGIN
         MENUITEM "Edit Run &Parameters...",     ID_PROJECT_RUNPARAMETERS
         MENUITEM SEPARATOR
-        MENUITEM "&Start Without Debugging\tCtrl+F5", ID_RUN_SCRIPT
+        MENUITEM "&Start Debugging\tF5",        ID_DEBUG_SCRIPT
+        MENUITEM "Start Wit&hout Debugging\tCtrl+F5", ID_RUN_SCRIPT
         MENUITEM "&Compile...",                 ID_PROJECT_COMPILE
+        MENUITEM SEPARATOR
+        MENUITEM "Step &Into\tF11",             ID_STEP_INTO
+        MENUITEM "Step &Over\tF10",             ID_STEP_OVER
+        MENUITEM "Stop Debugging\tShift+F5",    ID_DEBUG_STOP
+        MENUITEM SEPARATOR
+        MENUITEM "To&ggle Breakpoint\tF9",      ID_TOGGLE_BREAKPOINT
         MENUITEM SEPARATOR
         MENUITEM "&Add File...",                ID_PROJECT_ADDFILE
         MENUITEM "&New File...",                ID_PROJECT_NEWFILE
@@ -133,7 +140,7 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,60,120,50,14
 END
 
-IDD_RUN_PARAMS DIALOGEX 0, 0, 196, 146
+IDD_RUN_PARAMS DIALOGEX 0, 0, 196, 200
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Run Parameters"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -144,8 +151,14 @@ BEGIN
     EDITTEXT        IDC_COMMAND_ARGS,6,54,180,14,ES_AUTOHSCROLL
     LTEXT           "Starting Directory:",IDC_STATIC,6,78,60,8
     EDITTEXT        IDC_STARTING_DIR,6,90,180,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,6,126,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,60,126,50,14
+    GROUPBOX        "Debugging Connection",IDC_STATIC,6,114,180,60
+    CONTROL         "Auto Start Debugger",IDC_AUTO_START_DEBUGGER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,126,83,10
+    LTEXT           "Remote Host Address:",IDC_STATIC,12,144,73,8
+    EDITTEXT        IDC_DEBUG_HOST,12,156,102,14,ES_AUTOHSCROLL
+    LTEXT           "Connection Port:",IDC_STATIC,120,144,55,8
+    EDITTEXT        IDC_DEBUG_PORT,120,156,48,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,6,180,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,180,50,14
 END
 
 IDD_COMPILE_TO_EXE DIALOGEX 0, 0, 202, 164
@@ -226,6 +239,16 @@ BEGIN
     PUSHBUTTON      "Close",IDCANCEL,270,300,50,14
 END
 
+IDD_START_DEBUGGER DIALOGEX 0, 0, 196, 56
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Start Debugger"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    ICON            "",IDC_DEBUGGER_ICON,6,6,20,20
+    LTEXT           "Compiling...",IDC_STATUS,32,12,154,8
+    DEFPUSHBUTTON   "Abort",IDC_ABORT,72,36,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -248,7 +271,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 189
         TOPMARGIN, 7
-        BOTTOMMARGIN, 139
+        BOTTOMMARGIN, 193
     END
 
     IDD_COMPILE_TO_EXE, DIALOG
@@ -282,6 +305,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 313
     END
+
+    IDD_START_DEBUGGER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 189
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 49
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -293,8 +324,15 @@ END
 
 IDR_ACCELERATOR ACCELERATORS 
 BEGIN
-    VK_F5,          ID_RUN_SCRIPT,          VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          ID_DEBUG_SCRIPT,        VIRTKEY, NOINVERT
+    VK_F5,          ID_DEBUG_STOP,          VIRTKEY, SHIFT, NOINVERT
     "S",            ID_FILE_SAVEFILE,       VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          ID_RUN_SCRIPT,          VIRTKEY, CONTROL, NOINVERT
+    VK_F11,         ID_STEP_INTO,           VIRTKEY, NOINVERT
+    VK_F10,         ID_STEP_OVER,           VIRTKEY, NOINVERT
+    VK_F9,          ID_TOGGLE_BREAKPOINT,   VIRTKEY, NOINVERT
+    VK_TAB,         ID_NEXT_TAB,            VIRTKEY, CONTROL, NOINVERT
+    VK_F4,          ID_CLOSE_TAB,           VIRTKEY, CONTROL, NOINVERT
 END
 
 

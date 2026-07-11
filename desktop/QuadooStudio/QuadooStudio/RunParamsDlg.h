@@ -21,4 +21,5 @@ public:
 private:
 	HRESULT ReadArgsAndDir (VOID);
 	HRESULT WriteArgsAndDir (VOID);
+	VOID UpdateDebugHostState (VOID);
 };

@@ -1,7 +1,6 @@
 #include <windows.h>
 #include <shlwapi.h>
 #include <commctrl.h>
-#include <richedit.h>
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
 #include "Library\Core\MemoryStream.h"
@@ -13,6 +12,7 @@
 #include "Library\MenuUtil.h"
 #include "Library\Window\DialogHost.h"
 #include "Published\JSON.h"
+#include "Published\QuadooParser.h"
 #include "Keywords.h"
 #include "Tabs.h"
 #include "DarkMode.h"
@@ -22,10 +22,75 @@
 #include "ProjectCompilerDlg.h"
 #include "GotoDefinitionDlg.h"
 #include "RunWebServiceDlg.h"
+#include "StartDebuggerDlg.h"
+#include "DebugProtocol.h"
+#include "DebugSession.h"
+#include "QuadooCallStackDisplay.h"
 #include "QuadooProject.h"
 
 const WCHAR c_wzQuadooProjectClass[] = L"QuadooProjectCls";
 const WCHAR c_wzFontKey[] = L"Software\\Simbey\\QuadooStudio";
+
+class CVariableResolver :
+	public CBaseUnknown,
+	public IQuadooEnumVariables
+{
+private:
+	RSTRING m_rstrName;
+	BOOL m_fFound;
+	QUADOO_DEBUG_VARIABLE_QUERY m_query;
+
+public:
+	IMP_BASE_UNKNOWN
+
+	BEGIN_UNK_MAP
+		UNK_INTERFACE(IQuadooEnumVariables)
+	END_UNK_MAP
+
+	CVariableResolver (RSTRING rstrName) :
+		m_rstrName(rstrName),
+		m_fFound(FALSE)
+	{
+		RStrAddRef(m_rstrName);
+		ZeroMemory(&m_query, sizeof(m_query));
+	}
+
+	~CVariableResolver ()
+	{
+		RStrRelease(m_rstrName);
+	}
+
+	BOOL GetQuery (__out QUADOO_DEBUG_VARIABLE_QUERY* pQuery) const
+	{
+		if(!m_fFound)
+			return FALSE;
+		*pQuery = m_query;
+		return TRUE;
+	}
+
+	virtual STDMETHODIMP EnumCallback (const SCOPE_PARENT& scope, RSTRING rstrVariableW,
+		PCWSTR pcwzDeclaredType, BOOL fStatic, LONG idxOffset, __out BOOL* pfContinue)
+	{
+		UNREFERENCED_PARAMETER(pcwzDeclaredType);
+		if(0 == TStrCmpAssert(RStrToWide(m_rstrName), RStrToWide(rstrVariableW)))
+		{
+			if(fStatic)
+				m_query.nKind = QDVC_GLOBAL;
+			else if(scope.pcwzType && (0 == TStrCmpAssert(scope.pcwzType, L"class") ||
+				0 == TStrCmpAssert(scope.pcwzType, L"lambda")))
+			{
+				m_query.nKind = QDVC_MEMBER;
+				m_query.nBaseOffset = -1;
+			}
+			else
+				m_query.nKind = QDVC_LOCAL;
+			m_query.nOffset = idxOffset;
+			m_fFound = TRUE;
+			*pfContinue = FALSE;
+		}
+		return S_OK;
+	}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // CProjectFile
@@ -155,12 +220,110 @@ INT CProjectFile::ScanIndentationSyntax (PCWSTR pcwzCode, size_w cchCode)
 	return nIndentation;
 }
 
+bool CProjectFile::HasBreakpoint (ULONG nLine) const
+{
+	sysint idx;
+	return m_aBreakpoints.IndexOf(nLine, idx);
+}
+
+HRESULT CProjectFile::ToggleBreakpoint (ULONG nLine)
+{
+	sysint idx;
+	if(m_aBreakpoints.IndexOf(nLine, idx))
+	{
+		m_aBreakpoints.Remove(idx, NULL);
+		return S_FALSE;
+	}
+	return m_aBreakpoints.Append(nLine);
+}
+
+VOID CProjectFile::AdjustBreakpoints (const TVNLINESCHANGED* pLinesChanged, __out BOOL* pfChanged)
+{
+	ULONG nAdjustLine = pLinesChanged->fAtLineStart ? pLinesChanged->nLineNo : pLinesChanged->nLineNo + 1;
+	ULONG nRemoveEnd = nAdjustLine + pLinesChanged->cOldLines;
+	LONG nDelta = static_cast<LONG>(pLinesChanged->cNewLines) - static_cast<LONG>(pLinesChanged->cOldLines);
+
+	*pfChanged = FALSE;
+
+	if(0 < pLinesChanged->cOldLines)
+	{
+		for(sysint i = m_aBreakpoints.Length() - 1; i >= 0; i--)
+		{
+			ULONG nBreakpoint = m_aBreakpoints[i];
+			if(nAdjustLine <= nBreakpoint && nBreakpoint < nRemoveEnd)
+			{
+				m_aBreakpoints.Remove(i, NULL);
+				*pfChanged = TRUE;
+			}
+		}
+	}
+
+	if(0 != nDelta)
+	{
+		for(sysint i = 0; i < m_aBreakpoints.Length(); i++)
+		{
+			if(m_aBreakpoints[i] >= nRemoveEnd)
+			{
+				m_aBreakpoints[i] = static_cast<ULONG>(static_cast<LONG>(m_aBreakpoints[i]) + nDelta);
+				*pfChanged = TRUE;
+			}
+		}
+	}
+}
+
+HRESULT CProjectFile::LoadBreakpoints (IJSONArray* pBreakpoints)
+{
+	HRESULT hr = S_OK;
+
+	m_aBreakpoints.Clear();
+	if(pBreakpoints)
+	{
+		for(sysint i = 0; i < pBreakpoints->Count(); i++)
+		{
+			TStackRef<IJSONValue> srv;
+			INT nLine;
+
+			Check(pBreakpoints->GetValue(i, &srv));
+			if(srv && SUCCEEDED(srv->GetInteger(&nLine)) && 0 < nLine)
+			{
+				ULONG nEditorLine = static_cast<ULONG>(nLine - 1);
+				if(!HasBreakpoint(nEditorLine))
+					Check(m_aBreakpoints.Append(nEditorLine));
+			}
+		}
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CProjectFile::SaveBreakpoints (__deref_out IJSONArray** ppBreakpoints)
+{
+	HRESULT hr;
+	TStackRef<IJSONArray> srBreakpoints;
+	TStackRef<IJSONValue> srv;
+
+	Check(JSONCreateArray(&srBreakpoints));
+	for(sysint i = 0; i < m_aBreakpoints.Length(); i++)
+	{
+		Check(JSONCreateInteger(static_cast<INT>(m_aBreakpoints[i] + 1), &srv));
+		Check(srBreakpoints->Add(srv));
+		srv.Release();
+	}
+
+	*ppBreakpoints = srBreakpoints.Detach();
+
+Cleanup:
+	return hr;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // CQuadooProject
 ///////////////////////////////////////////////////////////////////////////////
 
-CQuadooProject::CQuadooProject (HINSTANCE hInstance, CDarkMode* pdm, HWND hwndTree) :
+CQuadooProject::CQuadooProject (HINSTANCE hInstance, IUpdateTitle* pTitle, CDarkMode* pdm, HWND hwndTree) :
 	m_hInstance(hInstance),
+	m_pTitle(pTitle),
 	m_pdm(pdm),
 	m_hwndTree(hwndTree),
 	m_hCloseIcon(NULL),
@@ -170,15 +333,31 @@ CQuadooProject::CQuadooProject (HINSTANCE hInstance, CDarkMode* pdm, HWND hwndTr
 	m_rstrProjectDir(NULL),
 	m_pProject(NULL),
 	m_hProjectRoot(NULL),
-	m_pEditor(NULL)
+	m_pEditor(NULL),
+	m_pDebugger(NULL),
+	m_pCallStack(NULL),
+	m_pDebugTree(NULL),
+	m_hwndDebugTip(NULL),
+	m_nHoverRequest(0),
+	m_fHoverPending(FALSE),
+	m_rstrHoverName(NULL),
+	m_rstrTooltipText(NULL)
 {
+	m_pTitle->AddRef();
 }
 
 CQuadooProject::~CQuadooProject()
 {
+	Assert(NULL == m_pCallStack);
 	Assert(NULL == m_pEditor);
 
+	SafeDelete(m_pDebugger);
+	SafeRelease(m_pDebugTree);
 	SafeDelete(m_pTabs);
+	if(m_hwndDebugTip)
+		DestroyWindow(m_hwndDebugTip);
+	RStrRelease(m_rstrTooltipText);
+	RStrRelease(m_rstrHoverName);
 
 	DestroyIcon(m_hCloseIcon);
 	DestroyIcon(m_hDropDown);
@@ -186,6 +365,8 @@ CQuadooProject::~CQuadooProject()
 	SafeRelease(m_pProject);
 	RStrRelease(m_rstrProjectDir);
 	RStrRelease(m_rstrProject);
+
+	m_pTitle->Release();
 }
 
 HRESULT CQuadooProject::Register (HINSTANCE hInstance)
@@ -276,6 +457,14 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 		Check(AddFile(rstrPath, &pFile));
 
 		srv.Release();
+		if(SUCCEEDED(srFile->FindNonNullValueW(L"breakpoints", &srv)))
+		{
+			TStackRef<IJSONArray> srBreakpoints;
+			Check(srv->GetArray(&srBreakpoints));
+			Check(static_cast<CProjectFile*>(pFile)->LoadBreakpoints(srBreakpoints));
+		}
+
+		srv.Release();
 		if(SUCCEEDED(srFile->FindNonNullValueW(L"default", &srv)))
 		{
 			Check(srv->GetBoolean(&pFile->m_fDefault));
@@ -344,6 +533,16 @@ HRESULT CQuadooProject::UpdateFiles (VOID)
 			srv.Release();
 		}
 
+		CProjectFile* pProjectFile = static_cast<CProjectFile*>(pFile);
+		if(0 < pProjectFile->Breakpoints())
+		{
+			TStackRef<IJSONArray> srBreakpoints;
+			Check(pProjectFile->SaveBreakpoints(&srBreakpoints));
+			Check(JSONWrapArray(srBreakpoints, &srv));
+			Check(srFile->AddValueW(L"breakpoints", srv));
+			srv.Release();
+		}
+
 		Check(JSONWrapObject(srFile, &srv));
 		Check(srFiles->Add(srv));
 		srv.Release();
@@ -367,6 +566,7 @@ HRESULT CQuadooProject::CloseProject (BOOL fPromptUserForSave)
 		}
 	}
 
+	StopDebugger();
 	m_mapFiles.DeleteAll();
 
 	Destroy();
@@ -418,6 +618,9 @@ VOID CQuadooProject::UpdateColorScheme (VOID)
 
 	m_pEditor->SetDarkMode(m_pdm->IsDarkMode(), !m_pdm->HasThemes());
 	UpdateColors();
+
+	if(m_pCallStack)
+		m_pCallStack->UpdateColorScheme(m_pdm->IsDarkMode());
 }
 
 VOID CQuadooProject::ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen)
@@ -481,6 +684,9 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 	OLECMD* prgCmds,
 	OLECMDTEXT* pCmdText)
 {
+	BOOL fDebugging = IsDebugging();
+	BOOL fDebugPaused = fDebugging && m_pDebugger->IsPaused();
+
 	for(ULONG i = 0; i < cCmds; i++)
 	{
 		switch(prgCmds[i].cmdID)
@@ -494,12 +700,17 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 			break;
 		case ID_RUN_SCRIPT:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
-			if(NULL != FindDefaultScript())
+			if(!fDebugging && NULL != FindDefaultScript())
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
+			break;
+		case ID_DEBUG_SCRIPT:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(fDebugPaused || (!fDebugging && NULL != FindDefaultScript() && !IsWebProject()))
 				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 			break;
 		case ID_PROJECT_COMPILE:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
-			if(NULL != FindDefaultScript() && !IsWebProject())
+			if(!fDebugging && NULL != FindDefaultScript() && !IsWebProject())
 				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 			break;
 		case ID_FILE_SAVEFILE:
@@ -507,6 +718,31 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 			if(m_pTabs->GetActiveTabHighlight())
 				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 			break;
+		case ID_STEP_INTO:
+		case ID_STEP_OVER:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(fDebugPaused)
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
+			break;
+		case ID_DEBUG_STOP:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(fDebugging)
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
+			break;
+		case ID_TOGGLE_BREAKPOINT:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(!IsWebProject())
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
+			break;
+		case ID_NEXT_TAB:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(1 < m_pTabs->GetVisibleTabs())
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
+			break;
+		case ID_CLOSE_TAB:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(0 < m_pTabs->GetVisibleTabs())
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 		}
 	}
 
@@ -570,12 +806,19 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 		}
 		break;
 
+	case ID_DEBUG_SCRIPT:
+		if(IsDebugging())
+			hr = m_pDebugger->IsPaused() ? SendDebuggerCommand(QDM_CONTINUE) : HRESULT_FROM_WIN32(ERROR_BUSY);
+		else
+			hr = DebugScript();
+		break;
+
 	case ID_RUN_SCRIPT:
-		hr = RunScript();
+		hr = IsDebugging() ? HRESULT_FROM_WIN32(ERROR_BUSY) : RunScript();
 		break;
 
 	case ID_PROJECT_COMPILE:
-		hr = ShowProjectCompiler();
+		hr = IsDebugging() ? HRESULT_FROM_WIN32(ERROR_BUSY) : ShowProjectCompiler();
 		break;
 
 	case ID_VIEW_OPTIONS:
@@ -594,6 +837,43 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 				SaveDefaultFont(nFontSize);
 			}
 		}
+		break;
+
+	case ID_STEP_INTO:
+		hr = SendDebuggerCommand(QDM_STEP_INTO);
+		break;
+
+	case ID_STEP_OVER:
+		hr = SendDebuggerCommand(QDM_STEP_OVER);
+		break;
+
+	case ID_DEBUG_STOP:
+		StopDebugger();
+		hr = S_OK;
+		break;
+
+	case ID_TOGGLE_BREAKPOINT:
+		{
+			TEXT_EDIT_VIEW tev;
+
+			m_pEditor->GetTextEditView(&tev);
+			hr = ToggleBreakpoint(tev.nCurrentLine);
+		}
+		break;
+
+	case ID_NEXT_TAB:
+		{
+			sysint idxVisualTab = m_pTabs->ResolveVisualIndex(m_pTabs->GetActiveTab());
+			if(idxVisualTab < m_pTabs->GetVisibleTabs() - 1)
+				idxVisualTab++;
+			else
+				idxVisualTab = 0;
+			hr = SwitchToFile(m_pTabs->TGetTabData<CProjectTab>(m_pTabs->GetTabByVisualIndex(idxVisualTab)));
+		}
+		break;
+
+	case ID_CLOSE_TAB:
+		hr = CloseTab(m_pTabs->GetActiveTab()) ? S_OK : S_FALSE;
 		break;
 
 	default:
@@ -626,6 +906,22 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 {
 	switch(message)
 	{
+	case WM_QUADOO_DEBUG_SOCKET:
+		if(m_pDebugger)
+		{
+			if(FAILED(m_pDebugger->OnSocketEvent(wParam, lParam)))
+				StopDebugger();
+			else
+			{
+				SideAssertHr(ShowDebuggerLocation());
+				if(m_pCallStack)
+					SideAssertHr(m_pCallStack->SetFrames(m_pDebugger));
+				UpdateVariableTooltip();
+			}
+		}
+		lResult = 0;
+		return TRUE;
+
 	case WM_CREATE:
 		{
 			RECT rcSite;
@@ -637,11 +933,16 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 				return TRUE;
 			}
 
-			m_pEditor->SetStyleMask(0, TXS_SELMARGIN);
+			m_pEditor->SetStyleMask(0, TXS_SELMARGIN | TXS_LEFTMARGIN);
 			LoadDefaultFont();
 		}
 
 		m_pEditor->EnableEditor(FALSE);
+		break;
+
+	case WM_DRAWITEM:
+		if(DrawBreakpoint(reinterpret_cast<DRAWITEMSTRUCT*>(lParam)))
+			return TRUE;
 		break;
 
 	case WM_PAINT:
@@ -728,8 +1029,25 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 
 			switch(pnmhdr->code)
 			{
+			case TVN_MOUSE_HOVER:
+				SideAssertHr(BeginVariableHover(static_cast<TVNMOUSEHOVER*>(pnmhdr)));
+				break;
+			case TVN_MOUSE_MOVE:
+			case TVN_MOUSE_LEAVE:
+				HideDebuggerTooltip();
+				break;
 			case TVN_CURSOR_CHANGE:
 				SendMessage(GetParent(m_hwnd), WM_NOTIFY, wParam, lParam);
+				break;
+			case TVN_MARGIN_CLICK:
+				{
+					TVNMARGINCLICK* pMarginClick = static_cast<TVNMARGINCLICK*>(pnmhdr);
+					if(SUCCEEDED(ToggleBreakpoint(pMarginClick->nLineNo)))
+						pMarginClick->fHandled = TRUE;
+				}
+				break;
+			case TVN_LINES_CHANGED:
+				SideAssertHr(AdjustBreakpoints(static_cast<TVNLINESCHANGED*>(pnmhdr)));
 				break;
 			case TVN_SYNTAX_HIGHLIGHT:
 				{
@@ -1061,7 +1379,17 @@ VOID CQuadooProject::ResizeEditor (INT nWindowHeight)
 		pFile->ResizeCustomLayout(1, pcszTabs->cy, pcszTabs->cx - 2, nEditorHeight, &nDocHeight);
 	}
 
-	srEditorWin->Move(1, pcszTabs->cy + nDocHeight, pcszTabs->cx - 2, nEditorHeight - nDocHeight, TRUE);
+	if(NULL == m_pCallStack)
+		srEditorWin->Move(1, pcszTabs->cy + nDocHeight, pcszTabs->cx - 2, nEditorHeight - nDocHeight, TRUE);
+	else
+	{
+		const INT nCallStackHeight = CQuadooCallStackDisplay::GetDefaultHeight();
+		INT nCodeHeight = max(0, nEditorHeight - nDocHeight - nCallStackHeight);
+		INT yCallStack = pcszTabs->cy + nDocHeight + nCodeHeight;
+
+		srEditorWin->Move(1, pcszTabs->cy + nDocHeight, pcszTabs->cx - 2, nCodeHeight, TRUE);
+		SideAssertHr(m_pCallStack->Move(1, yCallStack, pcszTabs->cx - 2, nCallStackHeight, TRUE));
+	}
 }
 
 HRESULT CQuadooProject::UpdateColors (VOID)
@@ -1295,6 +1623,142 @@ VOID CQuadooProject::ColorKeyword (TVNSYNTAXHIGHLIGHT* pHighlight, WCHAR wchPrev
 	}
 }
 
+CProjectFile* CQuadooProject::GetActiveProjectFile (VOID)
+{
+	sysint idxTab = m_pTabs->GetActiveTab();
+	if(-1 != idxTab)
+		return static_cast<CProjectFile*>(m_pTabs->TGetTabData<CProjectTab>(idxTab));
+	return NULL;
+}
+
+BOOL CQuadooProject::DrawBreakpoint (DRAWITEMSTRUCT* pdis)
+{
+	CProjectFile* pFile = GetActiveProjectFile();
+	ITextDocument* pDocument = m_pEditor ? m_pEditor->GetTextDocument() : NULL;
+
+	if(NULL == pdis || ODT_STATIC != pdis->CtlType || reinterpret_cast<ULONG_PTR>(pDocument) != pdis->itemData)
+		return FALSE;
+
+	if(pFile)
+	{
+		if(pFile->HasBreakpoint(pdis->itemID))
+		{
+			RECT rc = pdis->rcItem;
+			INT nWidth = rc.right - rc.left;
+			INT nHeight = rc.bottom - rc.top;
+			INT nSize = min(nWidth - 6, nHeight - 4);
+			if(2 < nSize)
+			{
+				INT x = rc.left + (nWidth - nSize) / 2 - 1;
+				INT y = rc.top + (nHeight - nSize) / 2;
+				HBRUSH hbrRed = CreateSolidBrush(RGB(255, 160, 160));
+				HPEN hpnRed = CreatePen(PS_SOLID, 1, RGB(170, 40, 40));
+				HGDIOBJ hbrOld = SelectObject(pdis->hDC, hbrRed);
+				HGDIOBJ hpnOld = SelectObject(pdis->hDC, hpnRed);
+
+				Ellipse(pdis->hDC, x, y, x + nSize, y + nSize);
+
+				SelectObject(pdis->hDC, hpnOld);
+				SelectObject(pdis->hDC, hbrOld);
+				DeleteObject(hpnRed);
+				DeleteObject(hbrRed);
+			}
+		}
+
+		// Draw the active-line arrow after the breakpoint so it remains visible
+		// when both indicators occupy the same margin cell.
+		if(m_pDebugger && m_pDebugger->IsCurrentLocation(pFile->m_pwzAbsolutePath, pdis->itemID + 1))
+		{
+			RECT rc = pdis->rcItem;
+			INT nWidth = rc.right - rc.left;
+			INT nHeight = rc.bottom - rc.top;
+			if(5 >= nWidth || 5 >= nHeight)
+				return TRUE;
+			INT xLeft = rc.left + 2;
+			INT xTail = rc.left + max(3, nWidth / 3);
+			INT xTip = rc.right - 2;
+			INT yTop = rc.top + 2;
+			INT yMid = rc.top + nHeight / 2;
+			INT yBottom = rc.bottom - 2;
+			INT nTailHalf = max(1, nHeight / 6);
+			POINT rgArrow[] =
+			{
+				{xLeft, yMid - nTailHalf},
+				{xTail, yMid - nTailHalf},
+				{xTail, yTop},
+				{xTip, yMid},
+				{xTail, yBottom},
+				{xTail, yMid + nTailHalf},
+				{xLeft, yMid + nTailHalf}
+			};
+			HBRUSH hbrYellow = CreateSolidBrush(RGB(255, 220, 40));
+			HPEN hpnYellow = CreatePen(PS_SOLID, 1, RGB(150, 115, 0));
+			HGDIOBJ hbrOld = SelectObject(pdis->hDC, hbrYellow);
+			HGDIOBJ hpnOld = SelectObject(pdis->hDC, hpnYellow);
+
+			Polygon(pdis->hDC, rgArrow, ARRAYSIZE(rgArrow));
+
+			SelectObject(pdis->hDC, hpnOld);
+			SelectObject(pdis->hDC, hbrOld);
+			DeleteObject(hpnYellow);
+			DeleteObject(hbrYellow);
+		}
+	}
+
+	return TRUE;
+}
+
+HRESULT CQuadooProject::ToggleBreakpoint (ULONG nLine)
+{
+	HRESULT hr;
+	CProjectFile* pFile = GetActiveProjectFile();
+	BOOL fAdd;
+	ITextDocument* pDocument;
+	TStackRef<IOleWindow> srEditorWindow;
+	HWND hwndEditor;
+
+	CheckIf(NULL == pFile, E_FAIL);
+	pDocument = m_pEditor->GetTextDocument();
+	CheckIf(NULL == pDocument || nLine >= pDocument->LineCount(), HRESULT_FROM_WIN32(ERROR_INVALID_INDEX));
+
+	fAdd = !pFile->HasBreakpoint(nLine);
+	Check(pFile->ToggleBreakpoint(nLine));
+	Check(UpdateFiles());
+	Check(Save());
+	if(IsDebugging() && FAILED(SendDebuggerBreakpoint(pFile, nLine, fAdd)))
+		StopDebugger();
+
+	if(SUCCEEDED(m_pEditor->QueryInterface(&srEditorWindow)) && SUCCEEDED(srEditorWindow->GetWindow(&hwndEditor)))
+		InvalidateRect(hwndEditor, NULL, FALSE);
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CQuadooProject::AdjustBreakpoints (const TVNLINESCHANGED* pLinesChanged)
+{
+	HRESULT hr = S_FALSE;
+	CProjectFile* pFile = GetActiveProjectFile();
+	BOOL fChanged = FALSE;
+
+	CheckIf(NULL == pFile || NULL == pLinesChanged, E_FAIL);
+	pFile->AdjustBreakpoints(pLinesChanged, &fChanged);
+	if(fChanged)
+	{
+		TStackRef<IOleWindow> srEditorWindow;
+		HWND hwndEditor;
+
+		Check(UpdateFiles());
+		Check(Save());
+
+		if(SUCCEEDED(m_pEditor->QueryInterface(&srEditorWindow)) && SUCCEEDED(srEditorWindow->GetWindow(&hwndEditor)))
+			InvalidateRect(hwndEditor, NULL, FALSE);
+	}
+
+Cleanup:
+	return hr;
+}
+
 HRESULT CQuadooProject::SaveAll (VOID)
 {
 	HRESULT hr = S_FALSE;
@@ -1421,6 +1885,462 @@ Cleanup:
 	RStrRelease(rstrTarget);
 	RStrRelease(rstrEngine);
 	return hr;
+}
+
+HRESULT CQuadooProject::DebugScript (VOID)
+{
+	HRESULT hr;
+	RSTRING rstrEngine = NULL, rstrArgs = NULL, rstrScriptArgs = NULL, rstrStartDir = NULL;
+	TStackRef<IJSONValue> srv;
+	CProjectTab* pFile = FindDefaultScript();
+	PCWSTR pcwzDotExe;
+	PWSTR pwzStartDir = NULL;
+	INT cchStartDir = 0, cchBaseEngine, nPort;
+	WCHAR wzDebugger[MAX_PATH];
+
+	Check(SaveAll());
+	CheckIf(NULL == pFile, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
+	CheckIf(IsWebProject(), E_UNEXPECTED);
+
+	Check(FindInstalledEngine(&rstrEngine));
+
+	pcwzDotExe = TStrCchRChr(RStrToWide(rstrEngine), RStrLen(rstrEngine), L'.');
+	CheckIf(NULL == pcwzDotExe, E_UNEXPECTED);
+	Check(TStrCchCpyLen(wzDebugger, ARRAYSIZE(wzDebugger), RStrToWide(rstrEngine), static_cast<INT>(pcwzDotExe - RStrToWide(rstrEngine)), &cchBaseEngine));
+	Check(TStrCchCpy(wzDebugger + cchBaseEngine, ARRAYSIZE(wzDebugger) - cchBaseEngine, L"Dbg.exe"));
+
+	Check(m_pProject->FindNonNullValueW(L"args", &srv));
+	Check(srv->GetString(&rstrArgs));
+	srv.Release();
+
+	if(0 < RStrLen(rstrArgs))
+		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\" %r", pFile->m_pwzAbsolutePath, rstrArgs));
+	else
+		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\"", pFile->m_pwzAbsolutePath));
+
+	Check(m_pProject->FindNonNullValueW(L"startDir", &srv));
+	Check(srv->GetString(&rstrStartDir));
+	Check(Formatting::TBuildDirectory(RStrToWide(m_rstrProjectDir), RStrLen(m_rstrProjectDir), RStrToWide(rstrStartDir), RStrLen(rstrStartDir), &pwzStartDir, &cchStartDir));
+	srv.Release();
+
+	if(SUCCEEDED(m_pProject->FindNonNullValueW(L"debugPort", &srv)))
+		Check(srv->GetInteger(&nPort));
+	else
+		nPort = 1200;
+
+	{
+		CDialogHost dlgHost(m_hInstance);
+		CStartDebuggerDlg dlgStartDebugger(this, wzDebugger, pwzStartDir, pFile->m_pwzAbsolutePath, rstrScriptArgs, nPort);
+
+		Check(dlgHost.Display(m_hwnd, &dlgStartDebugger));
+	}
+
+Cleanup:
+	SafeDeleteArray(pwzStartDir);
+
+	RStrRelease(rstrStartDir);
+	RStrRelease(rstrScriptArgs);
+	RStrRelease(rstrArgs);
+	RStrRelease(rstrEngine);
+	return hr;
+}
+
+HRESULT CQuadooProject::BuildBreakpointData (__out CMemoryStream* pstmBreakpoints)
+{
+	HRESULT hr;
+	DWORD cBreakpoints = 0, cb;
+
+	for(sysint i = 0; i < m_mapFiles.Length(); i++)
+	{
+		CProjectFile* pFile = static_cast<CProjectFile*>(*m_mapFiles.GetValuePtr(i));
+		Check(HrSafeAdd(cBreakpoints, static_cast<DWORD>(pFile->Breakpoints()), &cBreakpoints));
+	}
+
+	Check(pstmBreakpoints->Write(&cBreakpoints, sizeof(cBreakpoints), &cb));
+	for(sysint i = 0; i < m_mapFiles.Length(); i++)
+	{
+		CProjectFile* pFile = static_cast<CProjectFile*>(*m_mapFiles.GetValuePtr(i));
+		DWORD cchFile = static_cast<DWORD>(pFile->m_cchAbsolutePath);
+		DWORD cbFile;
+
+		Check(HrSafeMult(cchFile, static_cast<DWORD>(sizeof(WCHAR)), &cbFile));
+		for(sysint n = 0; n < pFile->Breakpoints(); n++)
+		{
+			QUADOO_DEBUG_BREAKPOINT breakpoint;
+
+			breakpoint.cchFile = cchFile;
+			breakpoint.nLine = pFile->GetBreakpoint(n) + 1;
+			Check(pstmBreakpoints->Write(&breakpoint, sizeof(breakpoint), &cb));
+			Check(pstmBreakpoints->Write(pFile->m_pwzAbsolutePath, cbFile, &cb));
+		}
+	}
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CQuadooProject::CreateDebugger (__deref_out CQuadooDebugSession** ppDebugger, __out CMemoryStream* pstmBreakpoints, __deref_out RSTRING* prstrRemoteHost)
+{
+	HRESULT hr;
+	TStackRef<IJSONValue> srv;
+	CQuadooDebugSession* pDebugger = NULL;
+	bool fAutoStartDebugger = true;
+
+	CheckIf(IsDebugging(), HRESULT_FROM_WIN32(ERROR_BUSY));
+	Check(BuildBreakpointData(pstmBreakpoints));
+
+	if(SUCCEEDED(m_pProject->FindNonNullValueW(L"autoStartDebugger", &srv)))
+	{
+		Check(srv->GetBoolean(&fAutoStartDebugger));
+		srv.Release();
+	}
+
+	pDebugger = __new CQuadooDebugSession(fAutoStartDebugger);
+	CheckAlloc(pDebugger);
+	Check(pDebugger->Initialize());
+
+	if(!fAutoStartDebugger && SUCCEEDED(m_pProject->FindNonNullValueW(L"remoteHost", &srv)))
+		Check(srv->GetString(prstrRemoteHost));
+
+	*ppDebugger = pDebugger;
+	pDebugger = NULL;
+
+Cleanup:
+	SafeDelete(pDebugger);
+	return hr;
+}
+
+HRESULT CQuadooProject::AttachDebugger (CQuadooDebugSession* pDebugger, IQuadooDebugTree* pDebugTree)
+{
+	HRESULT hr;
+	CQuadooCallStackDisplay* pCallStack = NULL;
+	RECT rc;
+
+	CheckIf(NULL != m_pDebugger, E_UNEXPECTED);
+	CheckIf(NULL == pDebugger || NULL == pDebugTree, E_INVALIDARG);
+
+	pCallStack = __new CQuadooCallStackDisplay(m_hInstance, m_pTabs);
+	CheckAlloc(pCallStack);
+	Check(pCallStack->Initialize(m_hwnd));
+
+	Check(pDebugger->AssociateSocket(m_hwnd));
+
+	m_pDebugger = pDebugger;
+	pDebugger = NULL;
+	SetInterface(m_pDebugTree, pDebugTree);
+	m_pCallStack = pCallStack;
+	pCallStack = NULL;
+	UpdateDebuggerUI();
+
+	m_pEditor->SetReadOnly(TRUE);
+	GetClientRect(m_hwnd, &rc);
+	ResizeEditor(rc.bottom);
+	SideAssertHr(InitializeDebuggerTooltip());
+
+Cleanup:
+	SafeDelete(pDebugger);
+	if(pCallStack)
+	{
+		pCallStack->Destroy();
+		SafeRelease(pCallStack);
+	}
+	return hr;
+}
+
+HRESULT CQuadooProject::SendDebuggerCommand (DWORD nMessage)
+{
+	HRESULT hr;
+
+	if(!IsDebugging())
+		return HRESULT_FROM_WIN32(ERROR_DEBUGGER_INACTIVE);
+	hr = m_pDebugger->SendCommand(nMessage);
+	if(FAILED(hr))
+		StopDebugger();
+	else
+	{
+		HideDebuggerTooltip();
+		if(m_pCallStack)
+			m_pCallStack->Clear();
+		UpdateDebuggerUI();
+	}
+	return hr;
+}
+
+HRESULT CQuadooProject::SendDebuggerBreakpoint (CProjectFile* pFile, DWORD nLine, BOOL fAdd)
+{
+	if(NULL == pFile || !IsDebugging())
+		return HRESULT_FROM_WIN32(ERROR_DEBUGGER_INACTIVE);
+	return m_pDebugger->SendBreakpoint(fAdd, pFile->m_pwzAbsolutePath, nLine + 1);
+}
+
+HRESULT CQuadooProject::ShowDebuggerLocation (VOID)
+{
+	HRESULT hr;
+	RSTRING rstrFile = NULL;
+	DWORD nLine;
+	BOOL fException;
+	CProjectTab* pFile = NULL;
+
+	CheckIf(NULL == m_pDebugger, HRESULT_FROM_WIN32(ERROR_DEBUGGER_INACTIVE));
+	hr = m_pDebugger->GetCurrentLocation(&rstrFile, &nLine, &fException);
+	CheckIfIgnore(S_FALSE == hr, S_FALSE);
+	Check(hr);
+
+	for(sysint i = 0; i < m_mapFiles.Length(); i++)
+	{
+		CProjectTab* pProjectFile = *m_mapFiles.GetValuePtr(i);
+		if(0 == TStrCmpIAssert(pProjectFile->m_pwzAbsolutePath, RStrToWide(rstrFile)))
+		{
+			pFile = pProjectFile;
+			break;
+		}
+	}
+	CheckIf(NULL == pFile, HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND));
+	Check(SwitchToFile(pFile));
+	m_pEditor->ScrollView(0, nLine - 1);
+	m_pEditor->SetFocus();
+	UpdateDebuggerUI();
+
+Cleanup:
+	RStrRelease(rstrFile);
+	return hr;
+}
+
+HRESULT CQuadooProject::InitializeDebuggerTooltip (VOID)
+{
+	HRESULT hr;
+	TStackRef<IOleWindow> srEditorWindow;
+	HWND hwndEditor;
+	TOOLINFO ti = {0};
+
+	CheckIf(NULL != m_hwndDebugTip, S_FALSE);
+	Check(m_pEditor->QueryInterface(&srEditorWindow));
+	Check(srEditorWindow->GetWindow(&hwndEditor));
+	m_hwndDebugTip = CreateWindowEx(WS_EX_TOPMOST, TOOLTIPS_CLASS, NULL,
+		WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT, m_hwnd, NULL, m_hInstance, NULL);
+	CheckIfGetLastError(NULL == m_hwndDebugTip);
+
+	ti.cbSize = sizeof(ti);
+	ti.uFlags = TTF_TRACK | TTF_ABSOLUTE;
+	ti.hwnd = hwndEditor;
+	ti.uId = 1;
+	ti.lpszText = L"";
+	CheckIf(!SendMessage(m_hwndDebugTip, TTM_ADDTOOL, 0, reinterpret_cast<LPARAM>(&ti)), E_FAIL);
+	SendMessage(m_hwndDebugTip, TTM_SETMAXTIPWIDTH, 0, 500);
+	hr = S_OK;
+
+Cleanup:
+	if(FAILED(hr) && m_hwndDebugTip)
+	{
+		DestroyWindow(m_hwndDebugTip);
+		m_hwndDebugTip = NULL;
+	}
+	return hr;
+}
+
+VOID CQuadooProject::HideDebuggerTooltip (BOOL fInvalidateRequest)
+{
+	if(m_hwndDebugTip)
+	{
+		TStackRef<IOleWindow> srEditorWindow;
+		HWND hwndEditor;
+		if(SUCCEEDED(m_pEditor->QueryInterface(&srEditorWindow)) &&
+			SUCCEEDED(srEditorWindow->GetWindow(&hwndEditor)))
+		{
+			TOOLINFO ti = {0};
+			ti.cbSize = sizeof(ti);
+			ti.hwnd = hwndEditor;
+			ti.uId = 1;
+			SendMessage(m_hwndDebugTip, TTM_TRACKACTIVATE, FALSE, reinterpret_cast<LPARAM>(&ti));
+		}
+	}
+	m_fHoverPending = FALSE;
+	RStrRelease(m_rstrHoverName); m_rstrHoverName = NULL;
+	RStrRelease(m_rstrTooltipText); m_rstrTooltipText = NULL;
+	if(fInvalidateRequest)
+		m_nHoverRequest++;
+}
+
+HRESULT CQuadooProject::ExtractHoverIdentifier (ULONG nLine, ULONG nOffset, RSTRING* prstrIdentifier)
+{
+	HRESULT hr;
+	ITextDocument* pDocument = m_pEditor->GetTextDocument();
+	PWSTR pwzLine = NULL;
+	size_w idxLine, cchLine, cchCopied;
+	size_w idxChar, idxStart, idxEnd, idxPrev;
+
+	CheckIf(NULL == prstrIdentifier, E_POINTER);
+	*prstrIdentifier = NULL;
+	CheckIf(NULL == pDocument || nLine >= pDocument->LineCount(), HRESULT_FROM_WIN32(ERROR_INVALID_INDEX));
+	idxLine = pDocument->LineOffset(nLine);
+	cchLine = pDocument->LineLength(nLine);
+	CheckIf(0 == cchLine || nOffset < idxLine || nOffset > idxLine + cchLine, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
+
+	pwzLine = __new WCHAR[static_cast<sysint>(cchLine) + 1];
+	CheckAlloc(pwzLine);
+	Check(pDocument->Render(idxLine, pwzLine, cchLine, &cchCopied));
+	pwzLine[cchCopied] = L'\0';
+	idxChar = nOffset - idxLine;
+	if(idxChar >= cchCopied || !(L'_' == pwzLine[idxChar] || iswalnum(pwzLine[idxChar])))
+	{
+		CheckIfIgnore(0 == idxChar || !(L'_' == pwzLine[idxChar - 1] || iswalnum(pwzLine[idxChar - 1])),
+			HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
+		idxChar--;
+	}
+
+	idxStart = idxChar;
+	while(0 < idxStart && (L'_' == pwzLine[idxStart - 1] || iswalnum(pwzLine[idxStart - 1])))
+		idxStart--;
+	idxEnd = idxChar + 1;
+	while(idxEnd < cchCopied && (L'_' == pwzLine[idxEnd] || iswalnum(pwzLine[idxEnd])))
+		idxEnd++;
+
+	idxPrev = idxStart;
+	while(0 < idxPrev && iswspace(pwzLine[idxPrev - 1]))
+		idxPrev--;
+	CheckIf(0 < idxPrev && L'.' == pwzLine[idxPrev - 1], HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
+	Check(RStrCreateW(static_cast<INT>(idxEnd - idxStart), pwzLine + idxStart, prstrIdentifier));
+
+Cleanup:
+	SafeDeleteArray(pwzLine);
+	return hr;
+}
+
+HRESULT CQuadooProject::BeginVariableHover (const TVNMOUSEHOVER* pHover)
+{
+	HRESULT hr;
+	RSTRING rstrIdentifier = NULL, rstrFile = NULL;
+	INT nCompare;
+	DWORD nLine;
+	BOOL fException;
+	CProjectFile* pFile;
+	QUADOO_DEBUG_VARIABLE_QUERY query = {0};
+
+	CheckIfIgnore(NULL == pHover || NULL == m_pDebugger || NULL == m_pDebugTree || !m_pDebugger->IsPaused(), S_FALSE);
+	Check(m_pDebugger->GetCurrentLocation(&rstrFile, &nLine, &fException));
+	pFile = GetActiveProjectFile();
+	CheckIf(NULL == pFile || NULL == rstrFile ||
+		0 != TStrCmpIAssert(pFile->m_pwzAbsolutePath, RStrToWide(rstrFile)), S_FALSE);
+	hr = ExtractHoverIdentifier(pHover->nLineNo, pHover->nOffset, &rstrIdentifier);
+	CheckIfIgnore(HRESULT_FROM_WIN32(ERROR_NOT_FOUND) == hr, S_FALSE);
+	Check(hr);
+	if(!m_fHoverPending && m_rstrHoverName &&
+		SUCCEEDED(RStrCompareRStr(m_rstrHoverName, rstrIdentifier, &nCompare)) && 0 == nCompare)
+	{
+		hr = S_OK;
+		goto Cleanup;
+	}
+
+	{
+		TStackRef<CVariableResolver> srResolver;
+
+		srResolver.Attach(__new CVariableResolver(rstrIdentifier));
+		CheckAlloc(srResolver);
+		Check(m_pDebugTree->EnumVariables(rstrFile, static_cast<INT>(nLine), srResolver));
+		CheckIf(!srResolver->GetQuery(&query), S_FALSE);
+	}
+
+	query.requestId = m_nHoverRequest;
+	RStrSet(m_rstrHoverName, rstrIdentifier);
+	m_fHoverPending = TRUE;
+	Check(m_pDebugger->SendVariableQuery(query));
+
+Cleanup:
+	if(S_OK != hr)
+		HideDebuggerTooltip();
+	RStrRelease(rstrFile);
+	RStrRelease(rstrIdentifier);
+	return hr;
+}
+
+VOID CQuadooProject::UpdateVariableTooltip (VOID)
+{
+	DWORD nRequestId;
+	HRESULT hrValue;
+	RSTRING rstrValue = NULL;
+
+	if(NULL == m_pDebugger || S_OK != m_pDebugger->GetVariableValue(&nRequestId, &hrValue, &rstrValue))
+		return;
+	if(m_fHoverPending && nRequestId == m_nHoverRequest && SUCCEEDED(hrValue) &&
+		m_pDebugger->IsPaused() && m_hwndDebugTip && m_rstrHoverName)
+	{
+		TStackRef<IOleWindow> srEditorWindow;
+		HWND hwndEditor;
+		POINT pt;
+
+		if(m_rstrTooltipText)
+		{
+			RStrRelease(m_rstrTooltipText);
+			m_rstrTooltipText = NULL;
+		}
+
+		if(SUCCEEDED(RStrFormatW(&m_rstrTooltipText, L"%r = %r", m_rstrHoverName, rstrValue)) &&
+			SUCCEEDED(m_pEditor->QueryInterface(&srEditorWindow)) &&
+			SUCCEEDED(srEditorWindow->GetWindow(&hwndEditor)))
+		{
+			TOOLINFO ti = {0};
+			ti.cbSize = sizeof(ti);
+			ti.hwnd = hwndEditor;
+			ti.uId = 1;
+			ti.lpszText = const_cast<PWSTR>(RStrToWide(m_rstrTooltipText));
+			SendMessage(m_hwndDebugTip, TTM_UPDATETIPTEXT, 0, reinterpret_cast<LPARAM>(&ti));
+			GetCursorPos(&pt);
+			SendMessage(m_hwndDebugTip, TTM_TRACKPOSITION, 0, MAKELPARAM(pt.x + 12, pt.y + 20));
+			SendMessage(m_hwndDebugTip, TTM_TRACKACTIVATE, TRUE, reinterpret_cast<LPARAM>(&ti));
+		}
+	}
+	m_fHoverPending = FALSE;
+	RStrRelease(rstrValue);
+}
+
+VOID CQuadooProject::UpdateDebuggerUI (VOID)
+{
+	if(m_pDebugger)
+		m_pTitle->UpdateTitle(RStrToWide(m_rstrProject), m_pDebugger->IsPaused() ? L"Debugging" : L"Running");
+	else
+		m_pTitle->UpdateTitle(RStrToWide(m_rstrProject), NULL);
+
+	if(m_pEditor)
+	{
+		TStackRef<IOleWindow> srEditorWindow;
+		HWND hwndEditor;
+		if(SUCCEEDED(m_pEditor->QueryInterface(&srEditorWindow)) && SUCCEEDED(srEditorWindow->GetWindow(&hwndEditor)))
+			InvalidateRect(hwndEditor, NULL, FALSE);
+	}
+}
+
+VOID CQuadooProject::StopDebugger (VOID)
+{
+	HideDebuggerTooltip();
+	if(m_hwndDebugTip)
+	{
+		DestroyWindow(m_hwndDebugTip);
+		m_hwndDebugTip = NULL;
+	}
+	SafeRelease(m_pDebugTree);
+	SafeDelete(m_pDebugger);
+	UpdateDebuggerUI();
+
+	if(m_pCallStack)
+	{
+		RECT rc;
+
+		m_pCallStack->Destroy();
+		SafeRelease(m_pCallStack);
+
+		GetClientRect(m_hwnd, &rc);
+		ResizeEditor(rc.bottom);
+	}
+
+	m_pEditor->SetReadOnly(FALSE);
+}
+
+BOOL CQuadooProject::IsDebugging (VOID)
+{
+	if(m_pDebugger && !m_pDebugger->IsActive())
+		StopDebugger();
+	return NULL != m_pDebugger;
 }
 
 HRESULT CQuadooProject::GetProjectTarget (__deref_out RSTRING* prstrTarget)

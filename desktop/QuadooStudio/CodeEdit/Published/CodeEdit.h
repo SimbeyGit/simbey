@@ -46,6 +46,10 @@
 #define TVN_INIT_CONTEXT_MENU	(TVN_BASE + 4)
 #define	TVN_CLOSE_CONTEXT_MENU	(TVN_BASE + 5)
 #define TVN_ENTER_CHAR			(TVN_BASE + 6)
+#define TVN_LINES_CHANGED		(TVN_BASE + 7)
+#define TVN_MOUSE_HOVER			(TVN_BASE + 8)
+#define TVN_MOUSE_LEAVE			(TVN_BASE + 9)
+#define TVN_MOUSE_MOVE			(TVN_BASE + 10)
 
 struct TEXT_EDIT_VIEW
 {
@@ -74,10 +78,25 @@ struct TVNENTERCHAR : TVNCURSORINFO
 	WCHAR wch;
 };
 
+struct TVNLINESCHANGED : NMHDR
+{
+	ULONG	nLineNo;
+	BOOL	fAtLineStart;
+	ULONG	cOldLines;
+	ULONG	cNewLines;
+};
+
 struct TVNMARGINCLICK : NMHDR
 {
 	ULONG	nLineNo;
 	BOOL	fHandled;
+};
+
+struct TVNMOUSEHOVER : NMHDR
+{
+	ULONG nLineNo;
+	ULONG nOffset;
+	POINT ptClient;
 };
 
 struct TVNSYNTAXHIGHLIGHT : NMHDR
@@ -171,6 +190,7 @@ interface __declspec(uuid("CF4C929F-A311-40ec-90D4-45AE343597B7")) ICodeEditor :
 
 	STDMETHOD(Prepare) (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText) = 0;
 	STDMETHOD_(VOID, EnableEditor) (BOOL fEnable) = 0;
+	STDMETHOD_(VOID, SetReadOnly) (BOOL fReadOnly) = 0;
 	STDMETHOD_(VOID, SetFocus) (VOID) = 0;
 
 	STDMETHOD_(bool, IsModified) (VOID) = 0;

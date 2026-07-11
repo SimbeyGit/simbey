@@ -19,6 +19,7 @@
 #define IDR_WEBSERVICE                  115
 #define IDD_WEB_PARAMS                  116
 #define IDD_RUN_WEBSERVICE              117
+#define IDD_START_DEBUGGER              118
 #define ID_STATUS_BAR                   1001
 #define IDC_PROJECT_FILES               1002
 #define IDC_QVM                         1003
@@ -51,6 +52,11 @@
 #define IDC_RESPONSE                    1030
 #define IDC_STATUS                      1031
 #define IDC_AGENT                       1032
+#define IDC_DEBUG_PORT                  1033
+#define IDC_AUTO_START_DEBUGGER         1034
+#define IDC_DEBUG_HOST                  1035
+#define IDC_ABORT                       1036
+#define IDC_DEBUGGER_ICON               1037
 #define ID_FILE_EXIT                    40001
 #define ID_FILE_NEW_PROJECT             40003
 #define ID_PROJECT_ADDFILE              40004
@@ -65,14 +71,21 @@
 #define ID_PROJECT_COMPILE              40013
 #define ID_FIND_SYMBOL                  40014
 #define ID_VIEW_OPTIONS                 40015
+#define ID_DEBUG_SCRIPT                 40016
+#define ID_STEP_INTO                    40017
+#define ID_STEP_OVER                    40018
+#define ID_DEBUG_STOP                   40019
+#define ID_TOGGLE_BREAKPOINT            40020
+#define ID_NEXT_TAB                     40021
+#define ID_CLOSE_TAB                    40022
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        118
-#define _APS_NEXT_COMMAND_VALUE         40016
-#define _APS_NEXT_CONTROL_VALUE         1033
+#define _APS_NEXT_RESOURCE_VALUE        119
+#define _APS_NEXT_COMMAND_VALUE         40023
+#define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

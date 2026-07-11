@@ -238,6 +238,7 @@ interface __declspec(uuid("D9578F6E-0FE6-417f-9F35-7D5827940E94")) ISimbeyInterc
 	STDMETHOD_(INT, GetImageCount) (VOID) = 0;
 	STDMETHOD(GetImage) (INT nImage, PBYTE* ppBits32P, INT* pnWidth, INT* pnHeight) = 0;
 	STDMETHOD(GetImageOffset) (INT nImage, __out INT* pxOffset, __out INT* pyOffset) = 0;
+	STDMETHOD(SetImageOffset) (INT nImage, INT xOffset, INT yOffset) = 0;
 
 	STDMETHOD(Duplicate) (__deref_out ISimbeyInterchangeAnimator** ppAnimator) = 0;
 };

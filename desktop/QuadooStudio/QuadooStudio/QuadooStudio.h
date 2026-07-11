@@ -6,6 +6,7 @@
 #include "Library\Window\BaseWindow.h"
 #include "DarkMode.h"
 #include "CustomMenu.h"
+#include "UpdateTitle.h"
 
 class CSplitter;
 class CQuadooProject;
@@ -13,6 +14,7 @@ class CQuadooProject;
 class CQuadooStudio :
 	public CBaseUnknown,
 	public CBaseWindow,
+	public IUpdateTitle,
 	public IOleCommandTarget
 {
 protected:
@@ -38,6 +40,7 @@ public:
 		UNK_INTERFACE(IOleWindow)
 		UNK_INTERFACE(IOleCommandTarget)
 		UNK_INTERFACE(IBaseWindow)
+		UNK_INTERFACE(IUpdateTitle)
 	END_UNK_MAP
 
 public:
@@ -49,6 +52,9 @@ public:
 
 	HRESULT Initialize (PCWSTR pcwzCmdLine, INT nWidth, INT nHeight, INT nCmdShow);
 	BOOL PreTranslate (__inout MSG* pmsg);
+
+	// IUpdateTitle
+	virtual HRESULT UpdateTitle (PCWSTR pcwzProject, __in_opt PCWSTR pcwzStatus);
 
 	// IOleCommandTarget
 	virtual HRESULT STDMETHODCALLTYPE QueryStatus (
@@ -67,7 +73,6 @@ private:
 	HRESULT CreateNewProject (VOID);
 	HRESULT OpenProjectPrompt (VOID);
 	HRESULT OpenProject (PCWSTR pcwzProject);
-	HRESULT UpdateTitle (PCWSTR pcwzProject);
 	VOID UpdateColorScheme (VOID);
 
 	// CBaseWindow

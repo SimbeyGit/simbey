@@ -6,11 +6,17 @@
 #include "Library\Core\BaseUnknown.h"
 #include "Library\Window\BaseWindow.h"
 #include "Published\CodeEdit.h"
+#include "UpdateTitle.h"
 
 interface IJSONObject;
+interface IJSONArray;
+interface IQuadooDebugTree;
 
 class CDarkMode;
 class CTabs;
+class CMemoryStream;
+class CQuadooDebugSession;
+class CQuadooCallStackDisplay;
 
 struct TVNSYNTAXHIGHLIGHT;
 
@@ -74,6 +80,7 @@ class CProjectFile : public CProjectTab
 private:
 	ITextDocument* m_pTabDocument;
 	TEXT_EDIT_VIEW m_tev;
+	TArray<ULONG> m_aBreakpoints;
 
 public:
 	CProjectFile (RSTRING rstrPath) :
@@ -97,6 +104,14 @@ public:
 	virtual HRESULT CloseCustomLayout (VOID) { return S_FALSE; }
 	virtual VOID CheckAutoIndent (ICodeEditor* pEditor, ULONG nLine, WCHAR wchInsert);
 
+	bool HasBreakpoint (ULONG nLine) const;
+	sysint Breakpoints (VOID) const { return m_aBreakpoints.Length(); }
+	ULONG GetBreakpoint (sysint idxBreakpoint) const { return m_aBreakpoints[idxBreakpoint]; }
+	HRESULT ToggleBreakpoint (ULONG nLine);
+	VOID AdjustBreakpoints (const TVNLINESCHANGED* pLinesChanged, __out BOOL* pfChanged);
+	HRESULT LoadBreakpoints (IJSONArray* pBreakpoints);
+	HRESULT SaveBreakpoints (__deref_out IJSONArray** ppBreakpoints);
+
 	static INT ScanIndentationSyntax (PCWSTR pcwzCode, size_w cchCode);
 };
 
@@ -107,6 +122,7 @@ class CQuadooProject :
 {
 private:
 	HINSTANCE m_hInstance;
+	IUpdateTitle* m_pTitle;
 	CDarkMode* m_pdm;
 	HWND m_hwndTree;
 
@@ -122,6 +138,14 @@ private:
 
 	TNamedMapW<COLORREF> m_mapKeywords;
 	ICodeEditor* m_pEditor;
+	CQuadooDebugSession* m_pDebugger;
+	CQuadooCallStackDisplay* m_pCallStack;
+	IQuadooDebugTree* m_pDebugTree;
+	HWND m_hwndDebugTip;
+	DWORD m_nHoverRequest;
+	BOOL m_fHoverPending;
+	RSTRING m_rstrHoverName;
+	RSTRING m_rstrTooltipText;
 
 	COLORREF m_crStrings, m_crCommentForeground, m_crCommentHighlight;
 
@@ -137,7 +161,7 @@ public:
 	END_UNK_MAP
 
 public:
-	CQuadooProject (HINSTANCE hInstance, CDarkMode* pdm, HWND hwndTree);
+	CQuadooProject (HINSTANCE hInstance, IUpdateTitle* pTitle, CDarkMode* pdm, HWND hwndTree);
 	~CQuadooProject ();
 
 	static HRESULT Register (HINSTANCE hInstance);
@@ -181,6 +205,8 @@ public:
 	HRESULT AddFilePrompt (VOID);
 	HRESULT NewFilePrompt (VOID);
 	HRESULT AddFile (RSTRING rstrPath, __deref_out CProjectTab** ppFile);
+	HRESULT CreateDebugger (__deref_out CQuadooDebugSession** ppDebugger, __out CMemoryStream* pstmBreakpoints, __deref_out RSTRING* prstrRemoteHost);
+	HRESULT AttachDebugger (CQuadooDebugSession* pDebugger, IQuadooDebugTree* pDebugTree);
 
 private:
 	VOID ResizeEditor (INT nWindowHeight);
@@ -192,9 +218,26 @@ private:
 
 	VOID ApplySyntaxColoring (TVNSYNTAXHIGHLIGHT* pHighlight);
 	VOID ColorKeyword (TVNSYNTAXHIGHLIGHT* pHighlight, WCHAR wchPrevKeyword, INT idxStart, INT idxEnd);
+	BOOL DrawBreakpoint (DRAWITEMSTRUCT* pdis);
+	HRESULT ToggleBreakpoint (ULONG nLine);
+	HRESULT AdjustBreakpoints (const TVNLINESCHANGED* pLinesChanged);
+	CProjectFile* GetActiveProjectFile (VOID);
 
 	HRESULT SaveAll (VOID);
 	HRESULT RunScript (VOID);
+	HRESULT DebugScript (VOID);
+	HRESULT BuildBreakpointData (__out CMemoryStream* pstmBreakpoints);
+	HRESULT SendDebuggerCommand (DWORD nMessage);
+	HRESULT SendDebuggerBreakpoint (CProjectFile* pFile, DWORD nLine, BOOL fAdd);
+	HRESULT ShowDebuggerLocation (VOID);
+	HRESULT BeginVariableHover (const TVNMOUSEHOVER* pHover);
+	HRESULT ExtractHoverIdentifier (ULONG nLine, ULONG nOffset, __deref_out RSTRING* prstrIdentifier);
+	HRESULT InitializeDebuggerTooltip (VOID);
+	VOID UpdateVariableTooltip (VOID);
+	VOID HideDebuggerTooltip (BOOL fInvalidateRequest = TRUE);
+	VOID UpdateDebuggerUI (VOID);
+	VOID StopDebugger (VOID);
+	BOOL IsDebugging (VOID);
 
 	HRESULT GetProjectTarget (__deref_out RSTRING* prstrTarget);
 	HRESULT FindInstalledEngine (__deref_out RSTRING* prstrEngine);

@@ -65,7 +65,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib"
+				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib ws2_32.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\target\lib\debug"
 				GenerateDebugInformation="true"
@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib"
+				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib ws2_32.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\..\target\lib\debug\x64"
 				GenerateDebugInformation="true"
@@ -219,7 +219,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib"
+				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib ws2_32.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\target\lib\release"
 				GenerateDebugInformation="true"
@@ -299,7 +299,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib"
+				AdditionalDependencies="comctl32.lib Shlwapi.lib gdiplus.lib SimbeyCore.lib JSON.lib QuadooParser.lib ws2_32.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\target\lib\release\x64"
 				GenerateDebugInformation="true"
@@ -349,6 +349,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DebugSession.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GotoDefinitionDlg.cpp"
 				>
 			</File>
@@ -362,6 +366,10 @@
 			</File>
 			<File
 				RelativePath=".\ProjectCompilerDlg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\QuadooCallStackDisplay.cpp"
 				>
 			</File>
 			<File
@@ -382,6 +390,10 @@
 			</File>
 			<File
 				RelativePath=".\Splitter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StartDebuggerDlg.cpp"
 				>
 			</File>
 			<File
@@ -411,6 +423,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DebugProtocol.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DebugSession.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GotoDefinitionDlg.h"
 				>
 			</File>
@@ -424,6 +444,10 @@
 			</File>
 			<File
 				RelativePath=".\ProjectCompilerDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\QuadooCallStackDisplay.h"
 				>
 			</File>
 			<File
@@ -451,7 +475,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\StartDebuggerDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Tabs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UpdateTitle.h"
 				>
 			</File>
 			<File

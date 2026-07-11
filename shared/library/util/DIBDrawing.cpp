@@ -56,6 +56,42 @@ namespace DIBDrawing
 		return fIntersection;
 	}
 
+	BOOL AlphaFill32 (LPBYTE lpPtr, INT xView, INT yView, LONG lPitch, const RECT* lprc, COLORREF cr, BYTE bAlpha)
+	{
+		BOOL fIntersection = FALSE;
+		RECT rc, rcView;
+		rcView.left = 0;
+		rcView.top = 0;
+		rcView.right = xView;
+		rcView.bottom = yView;
+		if(IntersectRect(&rc,&rcView,lprc))
+		{
+			INT Red = GetRValue(cr) * bAlpha;
+			INT Green = GetGValue(cr) * bAlpha;
+			INT Blue = GetBValue(cr) * bAlpha;
+			INT xSize = rc.right - rc.left;
+			INT ySize = rc.bottom - rc.top;
+			INT x, y, iAlpha = (INT)bAlpha, iDiff = 255 - iAlpha;
+			LPBYTE lpPixel;
+			lpPtr += (yView - rc.top - 1) * lPitch + rc.left * 4;
+			for(y = 0; y < ySize; y++)
+			{
+				lpPixel = lpPtr;
+				for(x = 0; x < xSize; x++)
+				{
+					lpPixel[0] = (BYTE)((Blue + lpPixel[0] * iDiff) / 255);
+					lpPixel[1] = (BYTE)((Green + lpPixel[1] * iDiff) / 255);
+					lpPixel[2] = (BYTE)((Red + lpPixel[2] * iDiff) / 255);
+					lpPixel[3] = (BYTE)(iAlpha + (lpPixel[3] * iDiff + 127) / 255);
+					lpPixel += 4;
+				}
+				lpPtr -= lPitch;
+			}
+			fIntersection = TRUE;
+		}
+		return fIntersection;
+	}
+
 	BOOL InvertRect (LPBYTE lpPtr, INT xView, INT yView, LONG lPitch, const RECT* lprc)
 	{
 		BOOL fIntersection = FALSE;

@@ -202,8 +202,10 @@ CTextEditor::CTextEditor (HINSTANCE hInstance, bool fDarkMode, bool fUseSystemCo
 	// Runtime data
 	m_nSelectionMode	= SEL_NONE;
 	m_nEditMode			= MODE_INSERT;
+	m_nEditModeBeforeReadOnly = MODE_INSERT;
 	m_nScrollTimer		= 0;
 	m_fHideCaret		= false;
+	m_fTrackingMouse	= false;
 }
 
 CTextEditor::~CTextEditor ()
@@ -384,6 +386,14 @@ BOOL CTextEditor::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRE
 		lResult = OnMouseMove(wParam, (short)LOWORD(lParam), (short)HIWORD(lParam));
 		return TRUE;
 
+	case WM_MOUSEHOVER:
+		lResult = OnMouseHover((short)LOWORD(lParam), (short)HIWORD(lParam));
+		return TRUE;
+
+	case WM_MOUSELEAVE:
+		lResult = OnMouseLeave();
+		return TRUE;
+
 	case WM_KEYDOWN:
 		lResult = OnKeyDown(wParam, lParam);
 		return TRUE;
@@ -515,13 +525,17 @@ IFACEMETHODIMP_(bool) CTextEditor::IsModified (VOID)
 
 IFACEMETHODIMP_(bool) CTextEditor::Undo (VOID)
 {
+	ULONG cOldLineCount;
+
 	if(m_nEditMode == MODE_READONLY)
 		return false;
 
+	cOldLineCount = m_pTextDoc->LineCount();
 	if(FAILED(m_pTextDoc->Undo(&m_nSelectionStart, &m_nSelectionEnd)))
 		return false;
 
 	m_nCursorOffset = m_nSelectionEnd;
+	SideAssertHr(NotifyUndoRedoLineChange(cOldLineCount, m_pTextDoc->LineCount(), m_nSelectionStart));
 
 	ResetLineCache();
 	SendUpdateCommand();
@@ -533,13 +547,17 @@ IFACEMETHODIMP_(bool) CTextEditor::Undo (VOID)
 
 IFACEMETHODIMP_(bool) CTextEditor::Redo (VOID)
 {
+	ULONG cOldLineCount;
+
 	if(m_nEditMode == MODE_READONLY)
 		return false;
 
+	cOldLineCount = m_pTextDoc->LineCount();
 	if(FAILED(m_pTextDoc->Redo(&m_nSelectionStart, &m_nSelectionEnd)))
 		return false;
 
 	m_nCursorOffset = m_nSelectionEnd;
+	SideAssertHr(NotifyUndoRedoLineChange(cOldLineCount, m_pTextDoc->LineCount(), m_nSelectionStart));
 
 	ResetLineCache();
 	SendUpdateCommand();
@@ -679,7 +697,8 @@ BOOL CTextEditor::ForwardDelete (VOID)
 
 	if(selstart != selend)
 	{
-		m_pTextDoc->Erase(selstart, selend-selstart);
+		if(SUCCEEDED(NotifyTextChange(selstart, selend - selstart, NULL, 0)))
+			m_pTextDoc->Erase(selstart, selend-selstart);
 		m_nCursorOffset = selstart;
 
 		m_pTextDoc->Break();
@@ -709,7 +728,8 @@ BOOL CTextEditor::ForwardDelete (VOID)
 		ULONG oldpos = m_nCursorOffset;
 		MoveCharNext();
 
-		m_pTextDoc->Erase(oldpos, m_nCursorOffset - oldpos);
+		if(SUCCEEDED(NotifyTextChange(oldpos, m_nCursorOffset - oldpos, NULL, 0)))
+			m_pTextDoc->Erase(oldpos, m_nCursorOffset - oldpos);
 		m_nCursorOffset = oldpos;
 
 		//if(tmp[0] == '\r')
@@ -737,7 +757,8 @@ BOOL CTextEditor::BackDelete (VOID)
 	// if there's a selection then delete it
 	if(selstart != selend)
 	{
-		m_pTextDoc->Erase(selstart, selend - selstart);
+		if(SUCCEEDED(NotifyTextChange(selstart, selend - selstart, NULL, 0)))
+			m_pTextDoc->Erase(selstart, selend - selstart);
 		m_nCursorOffset = selstart;
 		m_pTextDoc->Break();
 	}
@@ -748,7 +769,8 @@ BOOL CTextEditor::BackDelete (VOID)
 		ULONG oldpos = m_nCursorOffset;
 		MoveCharPrev();
 		//m_pTextDoc->erase_text(m_nCursorOffset, 1);
-		m_pTextDoc->Erase(m_nCursorOffset, oldpos - m_nCursorOffset);
+		if(SUCCEEDED(NotifyTextChange(m_nCursorOffset, oldpos - m_nCursorOffset, NULL, 0)))
+			m_pTextDoc->Erase(m_nCursorOffset, oldpos - m_nCursorOffset);
 	}
 
 	m_nSelectionStart = m_nCursorOffset;
@@ -781,10 +803,12 @@ ULONG CTextEditor::EnterText (PCWSTR pcwzText, ULONG nLength)
 		{
 			// group this erase with the insert/replace operation
 			m_pTextDoc->Group();
-			m_pTextDoc->Erase(selstart, selend - selstart);
+			if(SUCCEEDED(NotifyTextChange(selstart, selend - selstart, NULL, 0)))
+				m_pTextDoc->Erase(selstart, selend - selstart);
 			m_nCursorOffset = selstart;
 		}
 
+		SideAssertHr(NotifyTextChange(m_nCursorOffset, 0, pcwzText, nLength));
 		if(FAILED(m_pTextDoc->Insert(m_nCursorOffset, pcwzText, nLength)))
 			return 0;
 
@@ -819,6 +843,7 @@ ULONG CTextEditor::EnterText (PCWSTR pcwzText, ULONG nLength)
 				erase_len = 0;
 		}
 
+		SideAssertHr(NotifyTextChange(m_nCursorOffset, erase_len, pcwzText, nLength));
 		if(FAILED(m_pTextDoc->Replace(m_nCursorOffset, pcwzText, nLength, erase_len)))
 			return 0;
 		break;
@@ -845,6 +870,24 @@ ULONG CTextEditor::EnterText (PCWSTR pcwzText, ULONG nLength)
 VOID CTextEditor::EnableEditor (BOOL fEnable)
 {
 	EnableWindow(m_hwnd, fEnable);
+}
+
+VOID CTextEditor::SetReadOnly (BOOL fReadOnly)
+{
+	if(fReadOnly)
+	{
+		if(MODE_READONLY != m_nEditMode)
+		{
+			m_nEditModeBeforeReadOnly = m_nEditMode;
+			m_nEditMode = MODE_READONLY;
+			NotifyParent(TVN_EDITMODE_CHANGE);
+		}
+	}
+	else if(MODE_READONLY == m_nEditMode)
+	{
+		m_nEditMode = m_nEditModeBeforeReadOnly;
+		NotifyParent(TVN_EDITMODE_CHANGE);
+	}
 }
 
 VOID CTextEditor::SetFocus (VOID)
@@ -951,6 +994,95 @@ VOID CTextEditor::NotifyEnterChar (WCHAR wch)
 	NotifyParent(TVN_ENTER_CHAR, &ec);
 }
 
+VOID CTextEditor::NotifyLinesChanged (ULONG nLineNo, BOOL fAtLineStart, ULONG cOldLines, ULONG cNewLines)
+{
+	if(cOldLines || cNewLines)
+	{
+		TVNLINESCHANGED lc;
+
+		lc.nLineNo = nLineNo;
+		lc.fAtLineStart = fAtLineStart;
+		lc.cOldLines = cOldLines;
+		lc.cNewLines = cNewLines;
+		NotifyParent(TVN_LINES_CHANGED, &lc);
+	}
+}
+
+ULONG CTextEditor::CountLineBreaks (PCWSTR pcwzText, ULONG cchText)
+{
+	ULONG cLineBreaks = 0;
+
+	for(ULONG i = 0; i < cchText; i++)
+	{
+		if(L'\n' == pcwzText[i])
+			cLineBreaks++;
+	}
+
+	return cLineBreaks;
+}
+
+HRESULT CTextEditor::CountLineBreaksInRange (size_w index, size_w cchText, __out ULONG* pcLineBreaks)
+{
+	HRESULT hr = S_OK;
+	PWSTR pwzText = NULL;
+	size_w cchCopied;
+
+	*pcLineBreaks = 0;
+	if(0 < cchText)
+	{
+		CheckIf(cchText > static_cast<size_w>(0xFFFFFFFFUL), E_INVALIDARG);
+		pwzText = __new WCHAR[cchText];
+		CheckAlloc(pwzText);
+		Check(m_pTextDoc->Render(index, pwzText, cchText, &cchCopied));
+		*pcLineBreaks = CountLineBreaks(pwzText, static_cast<ULONG>(cchCopied));
+	}
+
+Cleanup:
+	SafeDeleteArray(pwzText);
+	return hr;
+}
+
+HRESULT CTextEditor::NotifyTextChange (size_w index, size_w cchErase, PCWSTR pcwzInsert, ULONG cchInsert)
+{
+	HRESULT hr;
+	ULONG nLine, nLineOffset, cOldLines, cNewLines;
+
+	CheckIf(index > static_cast<size_w>(0xFFFFFFFFUL), E_INVALIDARG);
+	if(!m_pTextDoc->GetLineFromOffset(index, &nLine, &nLineOffset))
+	{
+		nLine = 0;
+		nLineOffset = 0;
+	}
+
+	Check(CountLineBreaksInRange(index, cchErase, &cOldLines));
+	cNewLines = pcwzInsert ? CountLineBreaks(pcwzInsert, cchInsert) : 0;
+	NotifyLinesChanged(nLine, index == nLineOffset, cOldLines, cNewLines);
+
+Cleanup:
+	return hr;
+}
+
+HRESULT CTextEditor::NotifyUndoRedoLineChange (ULONG cOldLineCount, ULONG cNewLineCount, ULONG nOffset)
+{
+	ULONG nLine, nLineOffset;
+
+	if(cOldLineCount != cNewLineCount)
+	{
+		if(!m_pTextDoc->GetLineFromOffset(nOffset, &nLine, &nLineOffset))
+		{
+			nLine = 0;
+			nLineOffset = 0;
+		}
+
+		if(cOldLineCount < cNewLineCount)
+			NotifyLinesChanged(nLine, nOffset == nLineOffset, 0, cNewLineCount - cOldLineCount);
+		else
+			NotifyLinesChanged(nLine, nOffset == nLineOffset, cOldLineCount - cNewLineCount, 0);
+	}
+
+	return S_OK;
+}
+
 IFACEMETHODIMP_(ULONG) CTextEditor::GetStyleMask (ULONG uMask)
 {
 	return m_uStyleFlags & uMask;
@@ -1010,7 +1142,10 @@ IFACEMETHODIMP CTextEditor::AdjustIndentation (ULONG nLine, INT nIndentation)
 	if(cIndents != nIndentation)
 	{
 		if(0 == nIndentation)
+		{
+			Check(NotifyTextChange(idxCur, cSpaces, NULL, 0));
 			Check(m_pTextDoc->Erase(idxCur, cSpaces));
+		}
 		else
 		{
 			pwzIndentation = __new WCHAR[nIndentation + 1];
@@ -1020,6 +1155,7 @@ IFACEMETHODIMP CTextEditor::AdjustIndentation (ULONG nLine, INT nIndentation)
 				pwzIndentation[i] = L'\t';
 			pwzIndentation[nIndentation] = L'\0';
 
+			Check(NotifyTextChange(idxCur, cSpaces, pwzIndentation, nIndentation));
 			Check(m_pTextDoc->Replace(idxCur, pwzIndentation, nIndentation, cSpaces));
 		}
 
@@ -2407,6 +2543,7 @@ LRESULT CTextEditor::OnSize (WPARAM nFlags, int width, int height)
 LRESULT CTextEditor::OnVScroll (UINT nSBCode, UINT nPos)
 {
 	ULONG oldpos = m_nVScrollPos;
+	NotifyParent(TVN_MOUSE_MOVE);
 
 	switch(nSBCode)
 	{
@@ -2455,6 +2592,7 @@ LRESULT CTextEditor::OnVScroll (UINT nSBCode, UINT nPos)
 LRESULT CTextEditor::OnHScroll (UINT nSBCode, UINT nPos)
 {
 	int oldpos = m_nHScrollPos;
+	NotifyParent(TVN_MOUSE_MOVE);
 
 	switch(nSBCode)
 	{
@@ -2568,6 +2706,7 @@ LRESULT CTextEditor::OnContextMenu (HWND wParam, int x, int y)
 
 LRESULT CTextEditor::OnMouseWheel (int nDelta)
 {
+	NotifyParent(TVN_MOUSE_MOVE);
 #ifndef	SPI_GETWHEELSCROLLLINES	
 #define SPI_GETWHEELSCROLLLINES   104
 #endif
@@ -2830,6 +2969,13 @@ LRESULT CTextEditor::OnLButtonDblClick (WPARAM nFlags, int mx, int my)
 
 LRESULT CTextEditor::OnMouseMove (WPARAM nFlags, int mx, int my)
 {
+	if(!m_fTrackingMouse)
+	{
+		TRACKMOUSEEVENT tme = {sizeof(tme), TME_HOVER | TME_LEAVE, m_hwnd, HOVER_DEFAULT};
+		if(TrackMouseEvent(&tme))
+			m_fTrackingMouse = true;
+	}
+
 	if(m_nSelectionMode)
 	{
 		ULONG	nLineNo, nFileOff;
@@ -2944,11 +3090,37 @@ LRESULT CTextEditor::OnMouseMove (WPARAM nFlags, int mx, int my)
 	return 0;
 }
 
+LRESULT CTextEditor::OnMouseHover (int mx, int my)
+{
+	TVNMOUSEHOVER hover;
+	RECT rc;
+	INT xCaret;
+
+	m_fTrackingMouse = false;
+	GetClientRect(m_hwnd, &rc);
+	hover.ptClient.x = mx;
+	hover.ptClient.y = my;
+	if(mx >= LeftMarginWidth() && PtInRect(&rc, hover.ptClient))
+	{
+		MouseCoordToFilePos(mx, my, &hover.nLineNo, &hover.nOffset, &xCaret);
+		NotifyParent(TVN_MOUSE_HOVER, &hover);
+	}
+	return 0;
+}
+
+LRESULT CTextEditor::OnMouseLeave (VOID)
+{
+	m_fTrackingMouse = false;
+	NotifyParent(TVN_MOUSE_LEAVE);
+	return 0;
+}
+
 LRESULT CTextEditor::OnKeyDown (WPARAM nKeyCode, LPARAM nFlags)
 {
 	bool fCtrlDown	= IsKeyPressed(VK_CONTROL);
 	bool fShiftDown	= IsKeyPressed(VK_SHIFT);
 	BOOL fAdvancing = FALSE;
+	NotifyParent(TVN_MOUSE_MOVE);
 
 	switch(nKeyCode)
 	{

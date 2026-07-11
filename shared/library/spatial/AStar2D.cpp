@@ -1,7 +1,8 @@
 #include <windows.h>
 #include "AStar2D.h"
 
-CAStar2D::CAStar2D ()
+CAStar2D::CAStar2D () :
+	m_cxWrap(0)
 {
 }
 
@@ -109,7 +110,7 @@ HRESULT CAStar2D::FindPath (INT xFrom, INT yFrom, INT xDest, INT yDest, INT nRan
 			}
 		}
 
-		CheckIf(0 == m_mapOpen.Length(), HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
+		CheckIfIgnore(0 == m_mapOpen.Length(), HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
 	}
 
 Cleanup:
@@ -198,4 +199,15 @@ BOOL CAStar2D::GetAndAdjustValue (IAStarCallback2D* pCallback, INT x, INT y, NOD
 		return TRUE;
 	}
 	return FALSE;
+}
+
+INT CAStar2D::MoveDistance (INT x, INT y, INT xDest, INT yDest) const
+{
+	INT dx = abs(x - xDest);
+	INT dy = abs(y - yDest);
+
+	if(m_cxWrap > 0)
+		dx = min(dx, m_cxWrap - dx);
+
+	return (dx + dy) * DISTANCE_ESTIMATE_MULTIPLIER;
 }

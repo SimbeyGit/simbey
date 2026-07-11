@@ -13,7 +13,9 @@
 
 class CMersenneTwister
 {
-private:
+public:
+	// Normal access should use the Random() methods, but keeping
+	// these values public makes it easier to load/save the RNG state
 	ULONG m_mt[STATE_VECTOR_LENGTH];
 	INT m_index;
 

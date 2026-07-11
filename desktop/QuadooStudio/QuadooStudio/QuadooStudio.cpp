@@ -101,6 +101,39 @@ BOOL CQuadooStudio::PreTranslate (__inout MSG* pmsg)
 	return TranslateAccelerator(m_hwnd, m_hAccel, pmsg);
 }
 
+// IUpdateTitle
+
+HRESULT CQuadooStudio::UpdateTitle (PCWSTR pcwzProject, __in_opt PCWSTR pcwzStatus)
+{
+	HRESULT hr;
+	RSTRING rstrLabel = NULL, rstrTitle = NULL;
+	PCWSTR pcwzLabel = TStrRChr(pcwzProject, L'\\'), pcwzExt;
+	INT cchLabel;
+
+	if(pcwzLabel)
+		pcwzLabel++;
+	else
+		pcwzLabel = pcwzProject;
+
+	pcwzExt = TStrRChr(pcwzLabel, L'.');
+	if(pcwzExt)
+		cchLabel = static_cast<INT>(pcwzExt - pcwzLabel);
+	else
+		cchLabel = TStrLenAssert(pcwzLabel);
+	Check(RStrCreateW(cchLabel, pcwzLabel, &rstrLabel));
+
+	if(pcwzStatus)
+		Check(RStrFormatW(&rstrTitle, L"%r - %ls (%ls)", rstrLabel, c_wzQuadooStudioTitle, pcwzStatus));
+	else
+		Check(RStrFormatW(&rstrTitle, L"%r - %ls", rstrLabel, c_wzQuadooStudioTitle));
+	SetWindowText(m_hwnd, RStrToWide(rstrTitle));
+
+Cleanup:
+	RStrRelease(rstrTitle);
+	RStrRelease(rstrLabel);
+	return hr;
+}
+
 // IOleCommandTarget
 
 HRESULT STDMETHODCALLTYPE CQuadooStudio::QueryStatus (
@@ -236,6 +269,16 @@ HRESULT CQuadooStudio::CreateNewProject (VOID)
 	Check(JSONAddStringWToObject(srProject, rstrField, SLP(L".\\")));
 	RStrRelease(rstrField); rstrField = NULL;
 
+	Check(RStrCreateW(LSP(L"debugPort"), &rstrField));
+	Check(JSONCreateInteger(1200, &srv));
+	Check(srProject->AddValue(rstrField, srv));
+	srv.Release();
+	RStrRelease(rstrField); rstrField = NULL;
+
+	Check(RStrCreateW(LSP(L"remoteHost"), &rstrField));
+	Check(JSONAddStringWToObject(srProject, rstrField, SLP(L"")));
+	RStrRelease(rstrField); rstrField = NULL;
+
 	Check(JSONCreateArray(&srFiles));
 	Check(JSONWrapArray(srFiles, &srv));
 	Check(srProject->AddValueW(L"files", srv));
@@ -279,11 +322,11 @@ HRESULT CQuadooStudio::OpenProject (PCWSTR pcwzProject)
 	GetClientRect(m_hwndStatus, &rcStatus);
 	rcSite.bottom -= (rcStatus.bottom - rcStatus.top);
 
-	pProject = __new CQuadooProject(m_hInstance, &m_dm, m_hwndTree);
+	pProject = __new CQuadooProject(m_hInstance, this, &m_dm, m_hwndTree);
 	CheckAlloc(pProject);
 	Check(pProject->Initialize(m_hwnd, rcSite, pcwzProject));
 
-	UpdateTitle(pcwzProject);
+	UpdateTitle(pcwzProject, NULL);
 
 	m_pProject = pProject;
 	pProject = NULL;
@@ -297,34 +340,6 @@ Cleanup:
 		TreeView_DeleteAllItems(m_hwndTree);
 		SetWindowText(m_hwnd, c_wzQuadooStudioTitle);
 	}
-	return hr;
-}
-
-HRESULT CQuadooStudio::UpdateTitle (PCWSTR pcwzProject)
-{
-	HRESULT hr;
-	RSTRING rstrLabel = NULL, rstrTitle = NULL;
-	PCWSTR pcwzLabel = TStrRChr(pcwzProject, L'\\'), pcwzExt;
-	INT cchLabel;
-
-	if(pcwzLabel)
-		pcwzLabel++;
-	else
-		pcwzLabel = pcwzProject;
-
-	pcwzExt = TStrRChr(pcwzLabel, L'.');
-	if(pcwzExt)
-		cchLabel = static_cast<INT>(pcwzExt - pcwzLabel);
-	else
-		cchLabel = TStrLenAssert(pcwzLabel);
-	Check(RStrCreateW(cchLabel, pcwzLabel, &rstrLabel));
-
-	Check(RStrFormatW(&rstrTitle, L"%r - %ls", rstrLabel, c_wzQuadooStudioTitle));
-	SetWindowText(m_hwnd, RStrToWide(rstrTitle));
-
-Cleanup:
-	RStrRelease(rstrTitle);
-	RStrRelease(rstrLabel);
 	return hr;
 }
 

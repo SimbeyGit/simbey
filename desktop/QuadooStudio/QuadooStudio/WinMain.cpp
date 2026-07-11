@@ -10,6 +10,7 @@
 #include "Published\CodeEdit.h"
 #include "Splitter.h"
 #include "QuadooProject.h"
+#include "QuadooCallStackDisplay.h"
 #include "QuadooStudio.h"
 
 HRESULT StartCommonControls (DWORD flags)
@@ -40,6 +41,7 @@ INT WINAPI wWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	Check(CodeEditRegister());
 	Check(CQuadooProject::Register(hInstance));
 	Check(CQuadooStudio::Register(hInstance));
+	Check(CQuadooCallStackDisplay::Register(hInstance));
 
 	pQuadooStudio = __new CQuadooStudio(hInstance);
 	CheckAlloc(pQuadooStudio);
@@ -59,6 +61,7 @@ Cleanup:
 	SafeRelease(pQuadooStudio);
 
 	CQuadooStudio::Unregister(hInstance);
+	CQuadooCallStackDisplay::Unregister(hInstance);
 	CQuadooProject::Unregister(hInstance);
 	CodeEditUnregister();
 	CSplitter::Unregister(hInstance);

@@ -476,6 +476,30 @@ BOOL CTabs::PopupTabs (HWND hwnd, LONG x, LONG y, __out sysint* pidxTab)
 	return fSuccess;
 }
 
+sysint CTabs::ResolveVisualIndex (sysint idxTab)
+{
+	sysint idxVisualTab = 0;
+	FLOAT xTab = m_aTabs[idxTab]->m_xCalculated;
+
+	for(sysint i = 0; i < m_cVisible; i++)
+	{
+		if(m_aTabs[i]->m_xCalculated < xTab)
+			idxVisualTab++;
+	}
+
+	return idxVisualTab;
+}
+
+sysint CTabs::GetTabByVisualIndex (sysint idxVisual)
+{
+	for(sysint i = 0; i < m_cVisible; i++)
+	{
+		if(idxVisual == ResolveVisualIndex(i))
+			return i;
+	}
+	return -1;
+}
+
 VOID CTabs::DrawButton (Gdiplus::Graphics& graphics, LONG xLeft, LONG yCenter, HICON hButton, const SIZE& szButton, BOOL fHover)
 {
 	if(fHover)

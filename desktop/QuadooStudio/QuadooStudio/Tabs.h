@@ -113,6 +113,7 @@ public:
 	~CTabs ();
 
 	VOID SetDarkMode (bool fDarkMode);
+	const TAB_COLORS& GetTabColors (VOID) { return m_tabColors; }
 
 	HRESULT LoadMetrics (HWND hwnd);
 	VOID Resize (LONG nWidth, LONG nHeight);
@@ -137,6 +138,10 @@ public:
 	VOID ClearHoverFlags (VOID);
 
 	BOOL PopupTabs (HWND hwnd, LONG x, LONG y, __out sysint* pidxTab);
+
+	sysint GetVisibleTabs (VOID) { return m_cVisible; }
+	sysint ResolveVisualIndex (sysint idxTab);
+	sysint GetTabByVisualIndex (sysint idxVisual);
 
 	template<typename T>
 	T* TFindTabFromPoint (LONG x, LONG y)

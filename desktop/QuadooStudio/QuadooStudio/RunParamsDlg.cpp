@@ -37,6 +37,11 @@ BOOL CRunParamsDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 	case WM_COMMAND:
 		switch(LOWORD(wParam))
 		{
+		case IDC_AUTO_START_DEBUGGER:
+			if(BN_CLICKED == HIWORD(wParam))
+				UpdateDebugHostState();
+			break;
+
 		case IDOK:
 			if(FAILED(WriteArgsAndDir()))
 				break;
@@ -77,6 +82,47 @@ HRESULT CRunParamsDlg::ReadArgsAndDir (VOID)
 		SetWindowText(GetDlgItem(IDC_STARTING_DIR), pwzAbsolute);
 
 		__delete_array pwzAbsolute;
+		RStrRelease(rstrValue); rstrValue = NULL;
+		srv.Release();
+	}
+
+	if(SUCCEEDED(m_pProject->FindNonNullValueW(L"debugPort", &srv)))
+	{
+		INT nDebugPort;
+		WCHAR wzDebugPort[32];
+
+		Check(srv->GetInteger(&nDebugPort));
+		srv.Release();
+
+		Check(Formatting::TInt32ToAsc(nDebugPort, wzDebugPort, ARRAYSIZE(wzDebugPort), 10, NULL));
+		SetWindowText(GetDlgItem(IDC_DEBUG_PORT), wzDebugPort);
+	}
+	else
+		SetWindowText(GetDlgItem(IDC_DEBUG_PORT), L"1200");
+
+	if(SUCCEEDED(m_pProject->FindNonNullValueW(L"autoStartDebugger", &srv)))
+	{
+		bool fChecked;
+
+		Check(srv->GetBoolean(&fChecked));
+		srv.Release();
+
+		if(fChecked)
+			SendMessage(GetDlgItem(IDC_AUTO_START_DEBUGGER), BM_SETCHECK, BST_CHECKED, 0);
+	}
+	else
+	{
+		// Default the option to be checked
+		SendMessage(GetDlgItem(IDC_AUTO_START_DEBUGGER), BM_SETCHECK, BST_CHECKED, 0);
+	}
+	UpdateDebugHostState();
+
+	if(SUCCEEDED(m_pProject->FindNonNullValueW(L"remoteHost", &srv)))
+	{
+		Check(srv->GetString(&rstrValue));
+		SetWindowText(GetDlgItem(IDC_DEBUG_HOST), RStrToWide(rstrValue));
+		RStrRelease(rstrValue); rstrValue = NULL;
+		srv.Release();
 	}
 
 	hr = S_OK;
@@ -92,6 +138,7 @@ HRESULT CRunParamsDlg::WriteArgsAndDir (VOID)
 	HWND hwnd;
 	INT cch;
 	PWSTR pwzPtr;
+	WCHAR wzDebugPort[32];
 	RSTRING rstrValue = NULL;
 	WCHAR wzRelative[MAX_PATH];
 	TStackRef<IJSONValue> srv;
@@ -119,8 +166,33 @@ HRESULT CRunParamsDlg::WriteArgsAndDir (VOID)
 	GetWindowText(hwnd, pwzPtr, cch + 1);
 	Check(JSONCreateString(rstrValue, &srv));
 	Check(m_pProject->AddValueW(L"args", srv));
+	srv.Release();
+
+	GetWindowText(GetDlgItem(IDC_DEBUG_PORT), wzDebugPort, ARRAYSIZE(wzDebugPort));
+	Check(JSONCreateInteger(Formatting::TAscToInt32(wzDebugPort), &srv));
+	Check(m_pProject->AddValueW(L"debugPort", srv));
+	srv.Release();
+
+	Check(JSONCreateBool(BST_CHECKED == (SendMessage(GetDlgItem(IDC_AUTO_START_DEBUGGER), BM_GETCHECK, 0, 0) & BST_CHECKED), &srv));
+	Check(m_pProject->AddValueW(L"autoStartDebugger", srv));
+	srv.Release();
+
+	hwnd = GetDlgItem(IDC_DEBUG_HOST);
+	cch = GetWindowTextLength(hwnd);
+	RStrRelease(rstrValue); rstrValue = NULL;
+	Check(RStrAllocW(cch, &rstrValue, &pwzPtr));
+	GetWindowText(hwnd, pwzPtr, cch + 1);
+	Check(JSONCreateString(rstrValue, &srv));
+	Check(m_pProject->AddValueW(L"remoteHost", srv));
 
 Cleanup:
 	RStrRelease(rstrValue);
 	return hr;
+}
+
+VOID CRunParamsDlg::UpdateDebugHostState (VOID)
+{
+	BOOL fAutoStart = BST_CHECKED ==
+		(SendMessage(GetDlgItem(IDC_AUTO_START_DEBUGGER), BM_GETCHECK, 0, 0) & BST_CHECKED);
+	EnableWindow(GetDlgItem(IDC_DEBUG_HOST), !fAutoStart);
 }

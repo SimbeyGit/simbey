@@ -859,6 +859,15 @@ VOID CGraphCtrl::RoundRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FL
 	GdipRoundRect(m_pcSurface->pgpGraphics, m_rcPos, xClient1, yClient1, xClient2, yClient2, rWidth * m_fScale, rHeight * m_fScale, pgpPen, pgpFill);
 }
 
+VOID CGraphCtrl::TextOut (FLOAT x, FLOAT y, FLOAT z, PCWSTR pcwzText, INT cchText,
+	GpFont* pgpFont, GpStringFormat* pgpFormat, GpBrush* pgpBrush)
+{
+	INT xClient, yClient;
+	PointToClient(x, y, z, xClient, yClient);
+	RectF rcLayout(static_cast<FLOAT>(m_rcPos.left + xClient), static_cast<FLOAT>(m_rcPos.top + yClient), 0.0f, 0.0f);
+	DllExports::GdipDrawString(m_pcSurface->pgpGraphics, pcwzText, cchText, pgpFont, &rcLayout, pgpFormat, pgpBrush);
+}
+
 #endif
 
 BOOL CGraphCtrl::GetRawBuffer (LPBYTE& lpBuffer, INT& nWidth, INT& nHeight, LONG& lPitch)

@@ -76,6 +76,7 @@ interface IGrapher
 	virtual VOID DrawLine (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpPen* pgpPen) = 0;
 	virtual VOID FillRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpBrush* pgpFill) = 0;
 	virtual VOID RoundRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, FLOAT rWidth, FLOAT rHeight, GpPen* pgpPen, GpBrush* pgpFill) = 0;
+	virtual VOID TextOut (FLOAT x, FLOAT y, FLOAT z, PCWSTR pcwzText, INT cchText, GpFont* pgpFont, GpStringFormat* pgpFormat, GpBrush* pgpBrush) = 0;
 #endif
 
 	virtual BOOL GetRawBuffer (LPBYTE& lpBuffer, INT& nWidth, INT& nHeight, LONG& lPitch) = 0;
@@ -251,6 +252,7 @@ public:
 	virtual VOID DrawLine (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpPen* pgpPen);
 	virtual VOID FillRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, GpBrush* pgpFill);
 	virtual VOID RoundRect (FLOAT x1, FLOAT y1, FLOAT z1, FLOAT x2, FLOAT y2, FLOAT z2, FLOAT rWidth, FLOAT rHeight, GpPen* pgpPen, GpBrush* pgpFill);
+	virtual VOID TextOut (FLOAT x, FLOAT y, FLOAT z, PCWSTR pcwzText, INT cchText, GpFont* pgpFont, GpStringFormat* pgpFormat, GpBrush* pgpBrush);
 #endif
 
 	virtual BOOL GetRawBuffer (LPBYTE& lpBuffer, INT& nWidth, INT& nHeight, LONG& lPitch);

@@ -84,6 +84,7 @@ private:
 	CURPOS		m_cpBlockStart;
 	CURPOS		m_cpBlockEnd;
 	UINT		m_nEditMode;
+	UINT		m_nEditModeBeforeReadOnly;
 
 	DWORD		m_nCaretWidth;
 	int			m_nLongLineLimit;
@@ -92,6 +93,7 @@ private:
 	UINT_PTR	m_nScrollTimer;
 	int			m_nScrollCounter;
 	bool		m_fHideCaret;
+	bool		m_fTrackingMouse;
 
 	HCURSOR		m_hMarginCursor;
 
@@ -125,6 +127,7 @@ public:
 
 	IFACEMETHOD(Prepare) (__in_ecount_opt(cchText) PCWSTR pcwzText, INT cchText);
 	IFACEMETHOD_(VOID, EnableEditor) (BOOL fEnable);
+	IFACEMETHOD_(VOID, SetReadOnly) (BOOL fReadOnly);
 	IFACEMETHOD_(VOID, SetFocus) (VOID);
 
 	IFACEMETHOD_(bool, IsModified) (VOID);
@@ -166,6 +169,11 @@ private:
 	ULONG_PTR NotifyParent (UINT nNotifyCode, NMHDR* optional = NULL);
 	VOID NotifyCursorChange (VOID);
 	VOID NotifyEnterChar (WCHAR wch);
+	VOID NotifyLinesChanged (ULONG nLineNo, BOOL fAtLineStart, ULONG cOldLines, ULONG cNewLines);
+	ULONG CountLineBreaks (PCWSTR pcwzText, ULONG cchText);
+	HRESULT CountLineBreaksInRange (size_w index, size_w cchText, __out ULONG* pcLineBreaks);
+	HRESULT NotifyTextChange (size_w index, size_w cchErase, PCWSTR pcwzInsert, ULONG cchInsert);
+	HRESULT NotifyUndoRedoLineChange (ULONG cOldLineCount, ULONG cNewLineCount, ULONG nOffset);
 
 	bool CheckStyle (ULONG uMask);
 
@@ -245,6 +253,8 @@ private:
 	LRESULT OnLButtonUp (WPARAM nFlags, int mx, int my);
 	LRESULT OnLButtonDblClick (WPARAM nFlags, int mx, int my);
 	LRESULT OnMouseMove (WPARAM nFlags, int mx, int my);
+	LRESULT OnMouseHover (int mx, int my);
+	LRESULT OnMouseLeave (VOID);
 	LRESULT OnKeyDown (WPARAM nKeyCode, LPARAM nFlags);
 	LRESULT OnChar (WPARAM nChar, LPARAM nFlags);
 	LRESULT OnPaint (VOID);
