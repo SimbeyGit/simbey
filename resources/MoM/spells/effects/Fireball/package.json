@@ -1,0 +1,93 @@
+[
+	{
+		package: "buildsif",
+		name: "frames.sif",
+		files: ["cast-frame*.png"],
+		trim: true,
+		double: true,
+		canvas: 32
+	},
+	{
+		package: "json",
+		name: "frames.json",
+		data:
+		{
+			ref: "mom:spell/effect/fireball",
+			ticks: 10,
+			repeat: 0,
+			overland:
+			{
+				x_offset: -40,
+				y_offset: -36
+			},
+			slide:
+			{
+				x_start: 200,
+				y_start: -200,
+				x_step: -4,
+				y_step: 4,
+				steps: 50
+			}
+		}
+	},
+	{
+		package: "json",
+		name: "projectile.json",
+		data:
+		{
+			type: "animation",
+			animation: "projectile",
+			images:
+			[
+				{ layer: 0 },	// cast-frame01
+				{ layer: 1 },	// cast-frame02
+				{ layer: 2 },	// cast-frame03
+				{ layer: 3 },	// cast-frame04
+				{ layer: 4 },	// cast-frame05
+				{ layer: 5 },	// cast-frame06
+				{ layer: 6 },	// cast-frame07
+				{ layer: 7 },	// cast-frame08
+				{ layer: 8 },	// cast-frame09
+				{ layer: 9 },	// cast-frame10
+				{ layer: 10 },	// cast-frame11
+				{ layer: 11 },	// cast-frame12
+				{ layer: 12 },	// cast-frame13
+				{ layer: 13 },	// cast-frame14
+				{ layer: 14 },	// cast-frame15
+				{ layer: 15 }	// cast-frame16
+			],
+			animations:
+			[
+				// cast-frame (animation 0)
+				{
+					frames:
+					[
+						{ image: 0, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 1, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 2, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 3, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 4, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 5, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 6, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 7, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 8, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 9, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 10, ticks: 1, xoffset: 4, yoffset: -22 },
+						{ image: 11, ticks: 1, xoffset: 4, yoffset: -22 }
+					]
+				},
+				// strike-frame (animation 1)
+				{
+					frames:
+					[
+						{ image: 12, ticks: 20, xoffset: 4, yoffset: -22 },
+						{ image: 13, ticks: 20, xoffset: 4, yoffset: -22 },
+						{ image: 14, ticks: 20, xoffset: 4, yoffset: -22 },
+						{ image: 15, ticks: 20, xoffset: 4, yoffset: -22 }
+					],
+					next: 0
+				}
+			]
+		}
+	}
+]

@@ -865,111 +865,147 @@
 			{
 				cities: false,
 				food: 0.0,
-				production: 5.0
+				production: 5.0,
+				change: null,
+				movement: 4
 			},
 			chaosNodeMonsters:
 			{
 				cities: false,
 				food: 0.0,
-				production: 5.0
+				production: 5.0,
+				change: null,
+				movement: 4
 			},
 			darkForest:
 			{
 				cities: true,
 				food: 0.75,
 				production: 4.0,
-				bonus: "mom:dark_forest_bonus"
+				bonus: "mom:dark_forest_bonus",
+				change: null,
+				movement: 2
 			},
 			desert:
 			{
 				cities: true,
 				food: 0.0,
-				production: 3.0
+				production: 3.0,
+				change: "grasslands",
+				movement: 1
 			},
 			forest:
 			{
 				cities: true,
 				food: 0.5,
-				production: 3.0
+				production: 3.0,
+				change: "grasslands",
+				movement: 2
 			},
 			grasslands:
 			{
 				cities: true,
 				food: 1.5,
-				production: 0.0
+				production: 0.0,
+				change: "forest",
+				movement: 1
 			},
 			hills:
 			{
 				cities: true,
 				food: 0.5,
-				production: 3.0
+				production: 3.0,
+				change: "grasslands",
+				movement: 3
 			},
 			mountains:
 			{
 				cities: true,
-				food: 0.25,
-				production: 5.0
+				food: 0.0,
+				production: 5.0,
+				change: "hills",
+				movement: 4
 			},
 			natureNode:
 			{
 				cities: false,
 				food: 2.5,
-				production: 3.0
+				production: 3.0,
+				change: null,
+				movement: 2
 			},
 			natureNodeMonsters:
 			{
 				cities: false,
 				food: 0.0,
-				production: 0.0
+				production: 0.0,
+				change: null,
+				movement: 2
 			},
 			ocean:
 			{
 				cities: false,
 				food: 0.0,
-				production: 0.0
+				production: 0.0,
+				change: null,
+				movement: 1
 			},
 			river:
 			{
 				cities: true,
 				food: 2.0,
 				production: 4.0,
-				bonus: "mom:river_bonus"
+				bonus: "mom:river_bonus",
+				change: null,
+				movement: 2
 			},
 			shore:
 			{
 				cities: false,
 				food: 0.5,
-				production: 0.0
+				production: 0.0,
+				change: null,
+				movement: 1
 			},
 			sorceryNode:
 			{
 				cities: false,
 				food: 2.0,
-				production: 0.0
+				production: 0.0,
+				change: null,
+				movement: 1
 			},
 			sorceryNodeMonsters:
 			{
 				cities: false,
 				food: 0.0,
-				production: 0.0
+				production: 0.0,
+				change: null,
+				movement: 1
 			},
 			swamp:
 			{
 				cities: true,
 				food: 0.5,
-				production: 0.0
+				production: 0.0,
+				change: "grasslands",
+				movement: 3
 			},
 			tundra:
 			{
 				cities: true,
 				food: 0.0,
-				production: 0.0
+				production: 0.0,
+				change: null,
+				movement: 2
 			},
 			volcano:
 			{
 				cities: false,
 				food: 0.0,
-				production: 5.0
+				production: 5.0,
+				change: "mountains",
+				movement: 4
 			}
 		}
 	},
@@ -1028,13 +1064,56 @@
 		data:
 		[
 			{
-				name: "Weak"
+				name: "Weak",
+				factor: 0.5,
+				aura:
+				[
+					{
+						world: "Arcanus",
+						base: 5,
+						random: 5
+					},
+					{
+						world: "Myrror",
+						base: 10,
+						random: 10
+					}
+				]
 			},
 			{
-				name: "Normal"
+				name: "Normal",
+				factor: 1.0,
+				aura:
+				[
+					{
+						world: "Arcanus",
+						base: 5,
+						random: 5
+					},
+					{
+						world: "Myrror",
+						base: 10,
+						random: 10
+					}
+				]
 			},
 			{
-				name: "Powerful"
+				name: "Powerful",
+				factor: 1.5,
+				aura:
+				[
+					{
+						world: "Arcanus",
+						base: 5,
+						random: 5
+					},
+					{
+						world: "Myrror",
+						base: 10,
+						random: 10
+					}
+				]
+
 			}
 		]
 	},

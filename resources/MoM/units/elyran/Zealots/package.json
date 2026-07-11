@@ -89,7 +89,8 @@
 			[
 				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
 				{ ref: "mom:ability/unit/illusions_immunity" },
-				{ ref: "mom:ability/unit/thrown", value: 3 }
+				{ ref: "mom:ability/unit/thrown", value: 3 },
+				{ ref: "mom:ability/unit/large_shield" }
 			]
 		}
 	}

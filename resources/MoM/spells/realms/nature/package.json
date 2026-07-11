@@ -64,7 +64,12 @@
 				overland_cost: 50,
 				combat_cost: null,
 				upkeep: null,
-				research: 500
+				research: 500,
+				effects:
+				{
+					cast_sound: "mom:sounds/stone_skin",
+					animation: "mom:spell/effect/enchant_nature"
+				}
 			},
 			{
 				ref: "mom:spell/nature/cockatrices",
@@ -303,7 +308,23 @@
 				overland_cost: null,
 				combat_cost: 10,
 				upkeep: null,
-				research: 400
+				research: 400,
+				effects:
+				{
+					cast_sound: "mom:sounds/ice_bolt",
+					animation: "mom:spell/effect/ice_bolt"
+				},
+				weapon:
+				{
+					type: "magic",
+					damage: "",
+					immunity: "cold",
+					value: 5,
+					realm: "nature",
+					to_hit: 3,
+					adjustable: 40,
+					area_damage: false
+				}
 			},
 			{
 				ref: "mom:spell/nature/ice_storm",

@@ -1,16 +1,30 @@
 [
 	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		clean_alpha:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
 		package:"json",
 		name:"data.json",
 		data:
 		{
 			ref:"mom:unit/elyran/settlers",
-			import:"units\\shared\\Settlers",
 			type:"normal",
 			name:"Settlers",
 			race:"mom:elyran",
 			figures:1,
-			animation:"ground_unit",
+			animation:"flying_unit",
 			cost:75,
 			upkeep:
 			[
@@ -28,8 +42,8 @@
 				move:
 				[
 					{
-						ref:"mom:stat/move/land",
-						sound_ref:"mom:sounds/scuttle",
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/whoosh",
 						value:2
 					}
 				],
@@ -37,6 +51,12 @@
 				{
 					ref:"mom:ranged/shimmer",
 					value:1
+				},
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:2
 				},
 				defense:
 				{

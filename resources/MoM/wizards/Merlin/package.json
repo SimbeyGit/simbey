@@ -12,6 +12,12 @@
 		files: ["chanting*.png"]
 	},
 	{
+		package: "buildsif",
+		name: "banishing.sif",
+		trim: true,
+		files: ["banishing*.png"]
+	},
+	{
 		package: "json",
 		name: "wizard.json",
 		data:
@@ -36,7 +42,27 @@
 			],
 			music: [ "mom:merlin/a", "mom:merlin/b" ],
 			startingRaces: [ "mom:high_men" ],
-			familiar: "mom:familiar/ui/dove"
+			familiar: "mom:familiar/ui/dove",
+			defeated_sound: "mom:sounds/banished_male",
+			ai:
+			{
+				axes:
+				{
+					aggression: 20,
+					honor: 75,
+					ambition: 90,
+					cunning: 40,
+					empathy: 65,
+					stability: 85
+				},
+				axisNoise: 5,
+				driveBoosts:
+				{
+					mastery: 22,
+					legacy: 12,
+					safety: 6
+				}
+			}
 		}
 	}
 ]

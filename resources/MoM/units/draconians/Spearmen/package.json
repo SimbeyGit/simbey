@@ -22,7 +22,7 @@
 			type:"normal",
 			name:"Spearmen",
 			race:"mom:draconian",
-			figures:8,
+			figures:6,
 			animation:"flying_unit",
 			cost:25,
 			upkeep:

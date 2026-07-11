@@ -1,0 +1,25 @@
+[
+	{
+		package: "buildsif",
+		name: "frames.sif",
+		files: ["cast-frame*.png"],
+		trim: true,
+		double: true,
+		canvas: 32
+	},
+	{
+		package: "json",
+		name: "frames.json",
+		data:
+		{
+			ref: "mom:spell/effect/flame_strike",
+			ticks: 10,
+			repeat: 0,
+			overland:
+			{
+				x_offset: 0,
+				y_offset: -36
+			}
+		}
+	}
+]

@@ -22,7 +22,7 @@
 			type:"normal",
 			name:"Spearmen",
 			race:"mom:dark_elf",
-			figures:8,
+			figures:6,
 			animation:"ground_unit",
 			cost:25,
 			upkeep:

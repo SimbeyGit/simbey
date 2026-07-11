@@ -156,7 +156,12 @@
 				overland_cost: null,
 				combat_cost: 50,
 				upkeep: null,
-				research: 2000
+				research: 2000,
+				effects:
+				{
+					cast_sound: "mom:sounds/disintegrate",
+					animation: "mom:spell/effect/disintegrate"
+				}
 			},
 			{
 				ref: "mom:spell/chaos/disrupt",
@@ -194,7 +199,23 @@
 				overland_cost: null,
 				combat_cost: 8,
 				upkeep: null,
-				research: 1120
+				research: 1120,
+				effects:
+				{
+					cast_sound: "mom:sounds/doom_bolt",
+					animation: "mom:spell/effect/doom_bolt"
+				},
+				weapon:
+				{
+					type: "magic",
+					damage: "doom",
+					immunity: "",
+					value: 10,
+					realm: "chaos",
+					to_hit: 10,
+					adjustable: null,
+					area_damage: false
+				}
 			},
 			{
 				ref: "mom:spell/chaos/doom_mastery",
@@ -254,7 +275,23 @@
 				overland_cost: null,
 				combat_cost: 5,
 				upkeep: null,
-				research: 60
+				research: 60,
+				effects:
+				{
+					cast_sound: "mom:sounds/fire_bolt",
+					animation: "mom:spell/effect/fire_bolt"
+				},
+				weapon:
+				{
+					type: "magic",
+					damage: "",
+					immunity: "fire",
+					value: 5,
+					realm: "chaos",
+					to_hit: 3,
+					adjustable: 20,
+					area_damage: false
+				}
 			},
 			{
 				ref: "mom:spell/chaos/fire_elemental",
@@ -303,12 +340,28 @@
 				ref: "mom:spell/chaos/fireball",
 				name: "Fireball",
 				rarity: "uncommon",
-				type: "environment",
-				target: "map",
-				overland_cost: 250,
-				combat_cost: null,
+				type: "unit",
+				target: "enemy",
+				overland_cost: null,
+				combat_cost: 15,
 				upkeep: null,
-				research: 1400
+				research: 560,
+				effects:
+				{
+					cast_sound: "mom:sounds/fire_bolt",
+					animation: "mom:spell/effect/fireball"
+				},
+				weapon:
+				{
+					type: "magic",
+					damage: "",
+					immunity: "fire",
+					value: 5,
+					realm: "chaos",
+					to_hit: 3,
+					adjustable: 60,
+					area_damage: true
+				}
 			},
 			{
 				ref: "mom:spell/chaos/flame_blade",
@@ -336,7 +389,23 @@
 				overland_cost: null,
 				combat_cost: 60,
 				upkeep: null,
-				research: 1600
+				research: 1600,
+				effects:
+				{
+					cast_sound: "mom:sounds/chaos_rift",
+					animation: "mom:spell/effect/flame_strike"
+				},
+				weapon:
+				{
+					type: "magic",
+					damage: "",
+					immunity: "fire",
+					value: 15,
+					realm: "chaos",
+					to_hit: 3,
+					adjustable: null,
+					area_damage: true
+				}
 			},
 			{
 				ref: "mom:spell/chaos/gargoyles",

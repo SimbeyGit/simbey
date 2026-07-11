@@ -937,10 +937,10 @@
 				image: "Spell_Web.png"
 			},
 			{
-				ref: "mom:ability/item/vampiric",
-				name: "Vampiric",
+				ref: "mom:ability/spell/undead",
+				name: "Undead",
 				type: "ability",
-				image: "Item_Vampiric.png"
+				image: "Spell_Undead.png"
 			}
 		]
 	}

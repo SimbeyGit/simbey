@@ -1,0 +1,12 @@
+[
+	{
+		package: "buildsif",
+		name: "aura.sif",
+		files:
+		[
+			"nodeAura-frame*.png"
+		],
+		trim: true,
+		canvas: 64
+	}
+]

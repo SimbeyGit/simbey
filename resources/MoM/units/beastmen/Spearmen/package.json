@@ -22,7 +22,7 @@
 			type:"normal",
 			name:"Spearmen",
 			race:"mom:beastmen",
-			figures:8,
+			figures:6,
 			animation:"ground_unit",
 			cost:20,
 			upkeep:

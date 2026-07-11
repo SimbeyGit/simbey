@@ -12,6 +12,12 @@
 		files: ["chanting*.png"]
 	},
 	{
+		package: "buildsif",
+		name: "banishing.sif",
+		trim: true,
+		files: ["banishing*.png"]
+	},
+	{
 		package: "json",
 		name: "wizard.json",
 		data:
@@ -35,7 +41,27 @@
 			],
 			music: [ "mom:raven/a", "mom:raven/b" ],
 			startingRaces: [ "mom:nomad", "mom:barbarian" ],
-			familiar: "mom:familiar/ui/snake"
+			familiar: "mom:familiar/ui/snake",
+			defeated_sound: "mom:sounds/banished_male",
+			ai:
+			{
+				axes:
+				{
+					aggression: 30,
+					honor: 70,
+					ambition: 40,
+					cunning: 45,
+					empathy: 60,
+					stability: 50
+				},
+				axisNoise: 6,
+				driveBoosts:
+				{
+					safety: 18,
+					belonging: 10,
+					mastery: 4
+				}
+			}
 		}
 	}
 ]

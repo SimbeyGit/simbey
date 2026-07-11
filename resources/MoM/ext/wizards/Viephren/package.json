@@ -12,6 +12,12 @@
 		files: ["chanting*.png"]
 	},
 	{
+		package: "buildsif",
+		name: "banishing.sif",
+		trim: true,
+		files: ["banishing*.png"]
+	},
+	{
 		package: "json",
 		name: "wizard.json",
 		data:
@@ -36,7 +42,28 @@
 			],
 			music: [ "mom_ext:viephren_battle_music" ],
 			startingRaces: [ "mom:high_men", "mom:orc" ],
-			familiar: "mom_ext:familiar/ui/cuttlefish"
+			familiar: "mom_ext:familiar/ui/cuttlefish",
+			defeated_sound: "mom:sounds/banished_male",
+			ai:
+			{
+				axes:
+				{
+					aggression: 50,
+					honor: 20,
+					ambition: 90,
+					cunning: 95,
+					empathy: 10,
+					stability: 75
+				},
+				axisNoise: 9,
+				driveBoosts:
+				{
+					dominance: 12,
+					mastery: 14,
+					legacy: 10,
+					belonging: -4
+				}
+			}
 		}
 	}
 ]

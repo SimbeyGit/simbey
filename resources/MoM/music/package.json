@@ -605,6 +605,14 @@
 				file: "MOM109.MID"
 			},
 			{
+				ref: "mom:victory",
+				file: "MOM110.MID"
+			},
+			{
+				ref: "mom:defeated",
+				file: "MOM111.MID"
+			},
+			{
 				ref: "mom:hero_level",
 				file: "MOM116.MID"
 			},
@@ -615,6 +623,10 @@
 			{
 				ref: "mom:spell_researched",
 				file: "MOM41.MID"
+			},
+			{
+				ref: "mom:spell_dispelled",
+				file: "MOM18.MID"
 			},
 			{
 				ref: "mom:cast/eternal_night",

@@ -205,7 +205,12 @@
 				overland_cost: null,
 				combat_cost: 15,
 				upkeep: null,
-				research: 100
+				research: 100,
+				effects:
+				{
+					cast_sound: "mom:sounds/heavenly_light",
+					animation: "mom:spell/effect/enchant_life"
+				}
 			},
 			{
 				ref: "mom:spell/life/heavenly_light",

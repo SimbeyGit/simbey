@@ -1,0 +1,69 @@
+[
+	{
+		package: "buildsif",
+		name: "portrait.sif",
+		trim: true,
+		files: ["Portrait*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "chanting.sif",
+		trim: true,
+		files: ["chanting*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "banishing.sif",
+		trim: true,
+		files: ["banishing*.png"]
+	},
+	{
+		package: "json",
+		name: "wizard.json",
+		data:
+		{
+			ref: "mom:aethernus",
+			name: "Aethernus",
+			description: "Aethernus is the foremost master of Primordia, a hidden plane where arcane energies flow unbound by the divisions that separate Life, Chaos, Nature, and Sorcery elsewhere. While other wizards seek power, conquest, or immortality, Aethernus pursues perfection through understanding. He has spent centuries guiding the Elyrans toward a civilization of harmony, knowledge, and magical refinement. Yet beneath that radiant vision lies a guarded truth: the Elyrans preserve primordial forces older than recorded history, and Aethernus alone commands the terrible powers hidden beyond the Paragon.\r\n\r\nAethernus appears as a distinguished older man of Elyran stock, with shoulder-length silver-white hair, keen blue eyes, and a calm, thoughtful expression. He wears flowing white robes beneath ornate gold-trimmed armor fashioned in the Elyran style and carries a crystalline staff infused with arcane energy. His composed demeanor conceals a formidable intellect and a mastery of magic rivaled by few living beings.",
+			books:
+			[
+				{
+					school: "Life",
+					books: 4
+				},
+				{
+					school: "Sorcery",
+					books: 6
+				}
+			],
+			retorts:
+			[
+				"mom:archmage"
+			],
+			music: [ "mom:tauron/a", "mom:tauron/b" ],
+			startingRaces: [ "mom:elyran" ],
+			familiar: "mom:familiar/ui/snake",
+			defeated_sound: "mom:sounds/banished_male",
+			playable: false,
+			ai:
+			{
+				axes:
+				{
+					aggression: 50,
+					honor: 10,
+					ambition: 75,
+					cunning: 50,
+					empathy: 15,
+					stability: 50
+				},
+				axisNoise: 8,
+				driveBoosts:
+				{
+					dominance: 10,
+					legacy: 10,
+					vengeance: 20
+				}
+			}
+		}
+	}
+]

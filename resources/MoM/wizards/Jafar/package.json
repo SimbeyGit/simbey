@@ -12,6 +12,12 @@
 		files: ["chanting*.png"]
 	},
 	{
+		package: "buildsif",
+		name: "banishing.sif",
+		trim: true,
+		files: ["banishing*.png"]
+	},
+	{
 		package: "json",
 		name: "wizard.json",
 		data:
@@ -32,7 +38,27 @@
 			],
 			music: [ "mom:jafar/a", "mom:jafar/b" ],
 			startingRaces: [ "mom:nomad" ],
-			familiar: "mom:familiar/ui/scarab"
+			familiar: "mom:familiar/ui/scarab",
+			defeated_sound: "mom:sounds/banished_male",
+			ai:
+			{
+				axes:
+				{
+					aggression: 30,
+					honor: 55,
+					ambition: 75,
+					cunning: 70,
+					empathy: 30,
+					stability: 65
+				},
+				axisNoise: 8,
+				driveBoosts:
+				{
+					mastery: 18,
+					legacy: 8,
+					autonomy: 6
+				}
+			}
 		}
 	}
 ]

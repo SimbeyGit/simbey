@@ -9,6 +9,14 @@
 	},
 	{
 		package: "sound",
+		name: "BanishedFemale.mp3"
+	},
+	{
+		package: "sound",
+		name: "BanishedMale.mp3"
+	},
+	{
+		package: "sound",
 		name: "BehemothAttack.mp3"
 	},
 	{
@@ -167,6 +175,14 @@
 			{
 				ref: "mom:sounds/arrow",
 				sound: "Arrow.mp3"
+			},
+			{
+				ref: "mom:sounds/banished_female",
+				sound: "BanishedFemale.mp3"
+			},
+			{
+				ref: "mom:sounds/banished_male",
+				sound: "BanishedMale.mp3"
 			},
 			{
 				ref: "mom:sounds/behemoth",

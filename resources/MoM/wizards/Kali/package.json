@@ -12,6 +12,12 @@
 		files: ["chanting*.png"]
 	},
 	{
+		package: "buildsif",
+		name: "banishing.sif",
+		trim: true,
+		files: ["banishing*.png"]
+	},
+	{
 		package: "json",
 		name: "wizard.json",
 		data:
@@ -36,7 +42,28 @@
 			],
 			music: [ "mom:kali/a", "mom:kali/b" ],
 			startingRaces: [ "mom:high_men", "mom:barbarian" ],
-			familiar: "mom:familiar/ui/black_cat"
+			familiar: "mom:familiar/ui/black_cat",
+			defeated_sound: "mom:sounds/banished_female",
+			ai:
+			{
+				axes:
+				{
+					aggression: 45,
+					honor: 35,
+					ambition: 70,
+					cunning: 80,
+					empathy: 15,
+					stability: 55
+				},
+				axisNoise: 9,
+				driveBoosts:
+				{
+					mastery: 14,
+					autonomy: 8,
+					legacy: 6,
+					belonging: -2
+				}
+			}
 		}
 	}
 ]
