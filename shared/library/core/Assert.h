@@ -17,14 +17,25 @@ typedef void (WINAPI* SET_ERROR_TRACER)(ASSERT_FAILURE_CALLBACK);
 	void WINAPI _ReportAssertFailure (HRESULT hr, LPCSTR lpcszFile, UINT nLine);
 	void WINAPI _AssertFailure (LPCSTR lpcszFile, UINT nLine);
 
-	// Assert() includes __assume(x) to suppress static code analysis
-	// warnings that result from the check within Assert() itself.
-	#define	Assert(x) \
+	// AssertCore() checks the assertion and calls the failure
+	// callback if the condition fails.  AssertCore() must not use
+	// the __assume() statement because it's also used by the
+	// SideAssert macros, which may introduce unpredictable
+	// behaviors with the __assume macro.
+	#define	AssertCore(x) \
 		BEGIN_MULTI_LINE_MACRO \
 			if(!(x)) \
 			{ \
 				_AssertFailure(__FILE__, __LINE__); \
 			} \
+		END_MULTI_LINE_MACRO
+
+	// Assert() includes __assume(x) to suppress static code analysis
+	// warnings that result from the check within Assert() itself.
+	// Expressions passed to Assert() must have no side effects.
+	#define	Assert(x) \
+		BEGIN_MULTI_LINE_MACRO \
+			AssertCore(x); \
 			__assume(x); \
 		END_MULTI_LINE_MACRO
 
@@ -42,9 +53,9 @@ typedef void (WINAPI* SET_ERROR_TRACER)(ASSERT_FAILURE_CALLBACK);
 
 #endif
 
-	#define	SideAssert(x)			Assert(x)
-	#define	SideAssertHr(x)			Assert(SUCCEEDED(x))
-	#define	SideAssertCompare(x,y)	Assert(x == y)
+	#define	SideAssert(x)			AssertCore(x)
+	#define	SideAssertHr(x)			AssertCore(SUCCEEDED(x))
+	#define	SideAssertCompare(x,y)	AssertCore(x == y)
 
 	// These definitions work on Windows XP and Windows 2000
 	//#define	AssertNoLockOnCS(cs)	Assert(-1 == cs.LockCount || (DWORD_PTR)cs.OwningThread != GetCurrentThreadId())
@@ -58,6 +69,7 @@ typedef void (WINAPI* SET_ERROR_TRACER)(ASSERT_FAILURE_CALLBACK);
 
 #else
 
+	#define	AssertCore(x)
 	#define	Assert(x)
 	#define	SideAssert(x)			x
 	#define	SideAssertHr(x)			x
