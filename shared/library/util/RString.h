@@ -254,8 +254,23 @@ public:
 		return rstrDetached;
 	}
 
-	inline INT Length (VOID)
+	inline INT Length (VOID) const
 	{
 		return RStrLen(m_rstrValue);
+	}
+
+	inline bool IsEmpty (VOID) const
+	{
+		return 0 == RStrLen(m_rstrValue);
+	}
+
+	inline PCSTR c_str (VOID) const
+	{
+		return RStrToAnsi(m_rstrValue);
+	}
+
+	inline PCWSTR c_wstr (VOID) const
+	{
+		return RStrToWide(m_rstrValue);
 	}
 };

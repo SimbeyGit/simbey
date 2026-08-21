@@ -28,6 +28,13 @@
 			upkeep:
 			[
 			],
+			prereqs:
+			[
+				{
+					type:"presence",
+					worlds:["Arcanus","Myrror"]
+				}
+			],
 			stats:
 			{
 				move:

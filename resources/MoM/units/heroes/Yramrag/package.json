@@ -37,6 +37,10 @@
 				{
 					type:"fame",
 					value:20
+				},
+				{
+					type:"presence",
+					worlds:["Arcanus","Myrror"]
 				}
 			],
 			stats:

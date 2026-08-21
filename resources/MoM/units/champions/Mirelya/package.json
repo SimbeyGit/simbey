@@ -1,0 +1,100 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/mirelya",
+			type:"champion",
+			name:"Mirelya",
+			tag_line:"The Thorn Princess",
+			figures:1,
+			animation:"ground_unit",
+			hire_cost:-1,
+			ignore_hero_limit:true,
+			upkeep:
+			[
+			],
+			prereqs:
+			[
+				{
+					type:"presence",
+					worlds:["Arcanus","Myrror"]
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:4
+				},
+				range:
+				{
+					ref:"mom:ranged/green_bolt",
+					value:6
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:9
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:7
+				}
+			},
+			slots:
+			[
+				"mom:slot/class/magic",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
+			],
+			abilities:
+			[
+				{ ref: "mom:ability/hero/caster", value: 9.5 },
+				{ ref: "mom:ability/hero/noble" },
+				{ ref: "mom:ability/unit/poison_immunity" },
+				{ ref: "mom:ability/unit/death_immunity" },
+				{ ref: "mom:ability/unit/regeneration" },
+				{ ref: "mom:ability/unit/random/mage" }
+			],
+			spells:
+			[
+				"mom:spell/nature/cracks_call",
+				"mom:spell/nature/giant_strength",
+				"mom:spell/death/black_prayer",
+				"mom:spell/death/black_sleep"
+			]
+		}
+	}
+]

@@ -24,6 +24,7 @@
 			tag_line:"The Chaos Warrior",
 			figures:1,
 			animation:"ground_unit",
+			hire_cost:500,
 			upkeep:
 			[
 				{
@@ -36,6 +37,10 @@
 				{
 					type:"fame",
 					value:40
+				},
+				{
+					type:"presence",
+					worlds:["Arcanus","Myrror"]
 				}
 			],
 			stats:

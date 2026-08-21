@@ -25,6 +25,7 @@
 			tag_line:"The Chosen One",
 			figures:1,
 			animation:"ground_unit",
+			hire_cost:-1,
 			upkeep:
 			[
 				{

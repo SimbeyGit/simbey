@@ -41,6 +41,10 @@
 				{
 					type:"book",
 					book:"death"
+				},
+				{
+					type:"presence",
+					worlds:["Arcanus","Myrror"]
 				}
 			],
 			stats:

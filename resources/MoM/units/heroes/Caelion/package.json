@@ -1,0 +1,92 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/hero/caelion",
+			type:"hero",
+			name:"Caelion",
+			tag_line:"The Warden",
+			figures:1,
+			animation:"flying_unit",
+			hire_cost:150,
+			upkeep:
+			[
+			],
+			prereqs:
+			[
+				{
+					type:"race",
+					race:"mom:elyran"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/land",
+						sound_ref:"mom:sounds/cavalry",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:6
+				},
+				range:
+				{
+					ref:"mom:ranged/fire_bolt",
+					value:4
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:5
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:7
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:9
+				}
+			},
+			slots:
+			[
+				"mom:slot/class/melee",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
+			],
+			abilities:
+			[
+				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/negate_first_strike" },
+				{ ref: "mom:ability/hero/noble" },
+				{ ref: "mom:ability/hero/might" },
+				{ ref: "mom:ability/hero/arcane_power" }
+			]
+		}
+	}
+]

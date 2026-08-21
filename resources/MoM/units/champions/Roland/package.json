@@ -41,6 +41,10 @@
 				{
 					type:"book",
 					book:"life"
+				},
+				{
+					type:"presence",
+					worlds:["Arcanus","Myrror"]
 				}
 			],
 			stats:

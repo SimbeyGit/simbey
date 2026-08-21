@@ -32,6 +32,13 @@
 					amount:2
 				}
 			],
+			prereqs:
+			[
+				{
+					type:"presence",
+					worlds:["Arcanus","Myrror"]
+				}
+			],
 			stats:
 			{
 				move:
