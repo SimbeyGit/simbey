@@ -4,6 +4,7 @@
 		name:"combat.sif",
 		files: [ "d*.png" ],
 		trim:true,
+		clean_alpha:true,
 		canvas:32
 	},
 	{
@@ -14,19 +15,30 @@
 		canvas:128
 	},
 	{
+		package:"buildsif",
+		name:"crystal.sif",
+		files: [ "crystal.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
 		package:"json",
 		name:"data.json",
 		data:
 		{
-			ref:"mom:unit/hero/caelion",
+			ref:"mom:unit/hero/vesrya",
 			type:"hero",
-			name:"Caelion",
-			tag_line:"The Warden",
+			name:"Vesrya",
+			tag_line:"The Harmonist",
 			figures:1,
 			animation:"flying_unit",
 			hire_cost:150,
 			upkeep:
 			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:3
+				}
 			],
 			prereqs:
 			[
@@ -41,7 +53,7 @@
 				[
 					{
 						ref:"mom:stat/move/air",
-						sound_ref:"mom:sounds/cavalry",
+						sound_ref:"mom:sounds/armor",
 						value:2
 					}
 				],
@@ -49,12 +61,12 @@
 				{
 					ref:"mom:stat/melee/normal",
 					sound_ref:"mom:sounds/sword",
-					value:6
+					value:4
 				},
 				range:
 				{
-					ref:"mom:ranged/fire_bolt",
-					value:4
+					ref:"mom:ranged/ice_bolt",
+					value:5
 				},
 				defense:
 				{
@@ -64,29 +76,37 @@
 				resist:
 				{
 					ref:"mom:stat/resist",
-					value:7
+					value:6
 				},
 				hits:
 				{
 					ref:"mom:stat/hits",
-					value:9
+					value:7
 				}
 			},
 			slots:
 			[
-				"mom:slot/class/melee",
-				"mom:slot/class/armor",
+				"mom:slot/class/magic",
+				"mom:slot/class/misc",
 				"mom:slot/class/misc"
 			],
 			abilities:
 			[
+				{ ref: "mom:ability/hero/caster", value: 5 },
+				{ ref: "mom:ability/hero/leadership" },
+				{ ref: "mom:ability/unit/healer" },
 				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
 				{ ref: "mom:ability/unit/illusions_immunity" },
-				{ ref: "mom:ability/unit/negate_first_strike" },
-				{ ref: "mom:ability/hero/noble" },
-				{ ref: "mom:ability/hero/might" },
-				{ ref: "mom:ability/hero/arcane_power" }
-			]
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/random/mage" }
+			],
+			effects:
+			{
+				animation: "crystal.sif",
+				type: "revolve3",
+				colorize: true,
+				offset: -3
+			}
 		}
 	}
 ]
