@@ -546,7 +546,7 @@
 				overland_cost: 300,
 				combat_cost: null,
 				upkeep: 8,
-				research: 150,
+				research: 1500,
 				effects:
 				{
 					cast_sound: "mom:sounds/heavenly_light",

@@ -530,7 +530,7 @@
 					raiders: 5
 				},
 				rivers: 8,
-				nodes: [4, 3]
+				nodes: [4, 3, 4]
 			},
 			{
 				name: "Small",
@@ -559,7 +559,7 @@
 					raiders: 10
 				},
 				rivers: 12,
-				nodes: [9, 8]
+				nodes: [9, 8, 9]
 			},
 			{
 				name: "Standard",
@@ -588,7 +588,7 @@
 					raiders: 15
 				},
 				rivers: 20,
-				nodes: [16, 14]
+				nodes: [16, 14, 15]
 			},
 			{
 				name: "Large",
@@ -617,7 +617,7 @@
 					raiders: 25
 				},
 				rivers: 30,
-				nodes: [25, 22]
+				nodes: [25, 22, 23]
 			},
 			{
 				name: "Huge",
@@ -646,7 +646,7 @@
 					raiders: 35
 				},
 				rivers: 40,
-				nodes: [36, 32]
+				nodes: [36, 32, 34]
 			},
 			{
 				name: "Gigantic",
@@ -675,7 +675,7 @@
 					raiders: 45
 				},
 				rivers: 40,
-				nodes: [50, 42]
+				nodes: [50, 42, 46]
 			},
 			{
 				name: "Epic",
@@ -704,7 +704,7 @@
 					raiders: 50
 				},
 				rivers: 60,
-				nodes: [60, 50]
+				nodes: [60, 50, 55]
 			},
 			{
 				name: "Mega Epic",
@@ -733,7 +733,7 @@
 					raiders: 60
 				},
 				rivers: 80,
-				nodes: [80, 75]
+				nodes: [80, 75, 77]
 			}
 		]
 	},
@@ -748,7 +748,7 @@
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
 				tundraRowCount: 7,
-				featureChance: [17, 10],
+				featureChance: [17, 10, 15],
 				blobs:
 				[
 					{
@@ -776,7 +776,7 @@
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
 				tundraRowCount: 7,
-				featureChance: [17, 10],
+				featureChance: [17, 10, 15],
 				blobs:
 				[
 					{
@@ -804,7 +804,7 @@
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
 				tundraRowCount: 7,
-				featureChance: [17, 10],
+				featureChance: [17, 10, 15],
 				blobs:
 				[
 					{
@@ -832,7 +832,7 @@
 				percentageOfLandIsHills: 25,
 				percentageOfHillsAreMountains: 45,
 				tundraRowCount: 7,
-				featureChance: [17, 10],
+				featureChance: [17, 10, 15],
 				blobs:
 				[
 					{
@@ -867,7 +867,8 @@
 				food: 0.0,
 				production: 5.0,
 				change: null,
-				movement: 4
+				movement: 4,
+				road_cost: 8
 			},
 			chaosNodeMonsters:
 			{
@@ -875,7 +876,8 @@
 				food: 0.0,
 				production: 5.0,
 				change: null,
-				movement: 4
+				movement: 4,
+				road_cost: 8
 			},
 			darkForest:
 			{
@@ -884,7 +886,8 @@
 				production: 4.0,
 				bonus: "mom:dark_forest_bonus",
 				change: null,
-				movement: 2
+				movement: 2,
+				road_cost: 7
 			},
 			desert:
 			{
@@ -892,7 +895,8 @@
 				food: 0.0,
 				production: 3.0,
 				change: "grasslands",
-				movement: 1
+				movement: 1,
+				road_cost: 4
 			},
 			forest:
 			{
@@ -900,7 +904,8 @@
 				food: 0.5,
 				production: 3.0,
 				change: "grasslands",
-				movement: 2
+				movement: 2,
+				road_cost: 6
 			},
 			grasslands:
 			{
@@ -908,7 +913,8 @@
 				food: 1.5,
 				production: 0.0,
 				change: "forest",
-				movement: 1
+				movement: 1,
+				road_cost: 3
 			},
 			hills:
 			{
@@ -916,7 +922,8 @@
 				food: 0.5,
 				production: 3.0,
 				change: "grasslands",
-				movement: 3
+				movement: 3,
+				road_cost: 6
 			},
 			mountains:
 			{
@@ -924,7 +931,8 @@
 				food: 0.0,
 				production: 5.0,
 				change: "hills",
-				movement: 4
+				movement: 4,
+				road_cost: 8
 			},
 			natureNode:
 			{
@@ -932,7 +940,8 @@
 				food: 2.5,
 				production: 3.0,
 				change: null,
-				movement: 2
+				movement: 2,
+				road_cost: 5
 			},
 			natureNodeMonsters:
 			{
@@ -940,7 +949,8 @@
 				food: 0.0,
 				production: 0.0,
 				change: null,
-				movement: 2
+				movement: 2,
+				road_cost: 5
 			},
 			ocean:
 			{
@@ -948,7 +958,8 @@
 				food: 0.0,
 				production: 0.0,
 				change: null,
-				movement: 1
+				movement: 1,
+				road_cost: 0
 			},
 			river:
 			{
@@ -957,7 +968,8 @@
 				production: 4.0,
 				bonus: "mom:river_bonus",
 				change: null,
-				movement: 2
+				movement: 2,
+				road_cost: 5
 			},
 			shore:
 			{
@@ -965,7 +977,8 @@
 				food: 0.5,
 				production: 0.0,
 				change: null,
-				movement: 1
+				movement: 1,
+				road_cost: 0
 			},
 			sorceryNode:
 			{
@@ -973,7 +986,8 @@
 				food: 2.0,
 				production: 0.0,
 				change: null,
-				movement: 1
+				movement: 1,
+				road_cost: 4
 			},
 			sorceryNodeMonsters:
 			{
@@ -981,7 +995,8 @@
 				food: 0.0,
 				production: 0.0,
 				change: null,
-				movement: 1
+				movement: 1,
+				road_cost: 4
 			},
 			swamp:
 			{
@@ -989,7 +1004,8 @@
 				food: 0.5,
 				production: 0.0,
 				change: "grasslands",
-				movement: 3
+				movement: 3,
+				road_cost: 8
 			},
 			tundra:
 			{
@@ -997,7 +1013,8 @@
 				food: 0.0,
 				production: 0.0,
 				change: null,
-				movement: 2
+				movement: 2,
+				road_cost: 6
 			},
 			volcano:
 			{
@@ -1005,7 +1022,8 @@
 				food: 0.0,
 				production: 5.0,
 				change: "mountains",
-				movement: 4
+				movement: 4,
+				road_cost: 8
 			}
 		}
 	},
@@ -1016,45 +1034,45 @@
 		{
 			grasslands:
 			{
-				wheat: [1,0]
+				wheat: [1,0,1]
 			},
 			mountains:
 			{
-				iron: [4,1],
-				coal: [5,1],
-				silver: [3,1],
-				gold: [3,2],
-				mithril: [3,3],
-				adamantium: [0,2]
+				iron: [4,1,1],
+				coal: [5,1,1],
+				silver: [3,1,2],
+				gold: [3,2,3],
+				mithril: [3,3,4],
+				adamantium: [0,2,5]
 			},
 			hills:
 			{
-				iron: [6,1],
-				coal: [3,1],
-				silver: [4,1],
-				gold: [4,4],
-				mithril: [1,2],
-				adamantium: [0,1]
+				iron: [6,1,1],
+				coal: [3,1,1],
+				silver: [4,1,2],
+				gold: [4,4,3],
+				mithril: [1,2,4],
+				adamantium: [0,1,5]
 			},
 			forest:
 			{
-				wildGame: [1,1]
+				wildGame: [1,1,1]
 			},
 			darkForest:
 			{
-				wildGame: [4,3],
-				gems: [1,0],
-				crysx: [0,1]
+				wildGame: [4,3,1],
+				gems: [1,0,1],
+				crysx: [0,1,2]
 			},
 			desert:
 			{
-				gems: [2,1],
-				quork: [1,3],
-				crysx: [0,1]
+				gems: [2,1,1],
+				quork: [1,3,2],
+				crysx: [0,1,3]
 			},
 			swamp:
 			{
-				nightShade: [1,1]
+				nightShade: [1,1,1]
 			}
 		}
 	},
@@ -1077,6 +1095,11 @@
 						world: "Myrror",
 						base: 10,
 						random: 10
+					},
+					{
+						world: "Primordia",
+						base: 7,
+						random: 12
 					}
 				]
 			},
@@ -1094,6 +1117,11 @@
 						world: "Myrror",
 						base: 10,
 						random: 10
+					},
+					{
+						world: "Primordia",
+						base: 7,
+						random: 12
 					}
 				]
 			},
@@ -1111,6 +1139,11 @@
 						world: "Myrror",
 						base: 10,
 						random: 10
+					},
+					{
+						world: "Primordia",
+						base: 7,
+						random: 12
 					}
 				]
 

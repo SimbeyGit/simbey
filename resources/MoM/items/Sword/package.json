@@ -4,7 +4,14 @@
 		name: "items.sif",
 		trim: false,
 		double: true,
-		files: ["*.png"]
+		files: ["sword*.png"]
+	},
+	{
+		package: "buildsif",
+		name: "summon.sif",
+		trim: true,
+		transparent: 0xFF00FF,
+		files: ["summon.png"]
 	},
 	{
 		package: "json",

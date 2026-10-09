@@ -708,7 +708,8 @@
 			{
 				ref: "mom:ability/spell/guardian_wind",
 				name: "Guardian Wind",
-				type: "ability",
+				type: "immunity",
+				immunity: ["missile"],
 				image: "Spell_GuardianWind.png"
 			},
 			{

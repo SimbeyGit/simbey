@@ -1,0 +1,10 @@
+﻿[
+	{
+		package: "buildsif",
+		name: "roads.sif",
+		files: ["d*.png"],
+		trim: true,
+		double: true,
+		canvas: 128
+	}
+]
