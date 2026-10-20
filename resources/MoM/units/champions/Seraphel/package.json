@@ -1,0 +1,99 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		clean_alpha:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/seraphel",
+			type:"champion",
+			name:"Seraphel",
+			tag_line:"The Ascendant",
+			figures:1,
+			animation:"flying_unit",
+			hire_cost:500,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:4
+				}
+			],
+			prereqs:
+			[
+				{
+					type:"race",
+					race:"mom:elyran"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/armor",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:9
+				},
+				range:
+				{
+					ref:"mom:ranged/lightning_bolt",
+					value:8
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:8
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:8
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:12
+				}
+			},
+			slots:
+			[
+				"mom:slot/class/melee",
+				"mom:slot/class/armor",
+				"mom:slot/class/misc"
+			],
+			abilities:
+			[
+				{ ref: "mom:ability/hero/caster", value: 15 },
+				{ ref: "mom:ability/hero/leadership", value: 15 },
+				{ ref: "mom:ability/unit/ranged_attack", value: 4 },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/first_strike" },
+				{ ref: "mom:ability/unit/armor_piercing" },
+				{ ref: "mom:ability/unit/doom_bolt" }
+			]
+		}
+	}
+]
