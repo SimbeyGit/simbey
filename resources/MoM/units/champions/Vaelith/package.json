@@ -1,0 +1,118 @@
+[
+	{
+		package:"buildsif",
+		name:"combat.sif",
+		files: [ "d*.png" ],
+		trim:true,
+		clean_alpha:true,
+		canvas:32
+	},
+	{
+		package:"buildsif",
+		name:"unit.sif",
+		files: [ "overland.png", "portrait.png" ],
+		trim:true,
+		canvas:128
+	},
+	{
+		package:"buildsif",
+		name:"crystal.sif",
+		files: [ "crystal.png" ],
+		trim:true,
+		canvas:32
+	},
+	{
+		package:"json",
+		name:"data.json",
+		data:
+		{
+			ref:"mom:unit/champion/vaelith",
+			type:"champion",
+			name:"Vaelith",
+			tag_line:"The Astral Sage",
+			figures:1,
+			animation:"flying_unit",
+			hire_cost:700,
+			upkeep:
+			[
+				{
+					ref:"mom:stat/gold/one",
+					amount:4
+				}
+			],
+			prereqs:
+			[
+				{
+					type:"fame",
+					value:40
+				},
+				{
+					type:"race",
+					race:"mom:elyran"
+				}
+			],
+			stats:
+			{
+				move:
+				[
+					{
+						ref:"mom:stat/move/air",
+						sound_ref:"mom:sounds/armor",
+						value:2
+					}
+				],
+				melee:
+				{
+					ref:"mom:stat/melee/normal",
+					sound_ref:"mom:sounds/sword",
+					value:5
+				},
+				range:
+				{
+					ref:"mom:ranged/illusion_ball",
+					value:10
+				},
+				defense:
+				{
+					ref:"mom:stat/defense/normal",
+					value:6
+				},
+				resist:
+				{
+					ref:"mom:stat/resist",
+					value:12
+				},
+				hits:
+				{
+					ref:"mom:stat/hits",
+					value:9
+				}
+			},
+			slots:
+			[
+				"mom:slot/class/melee_magic",
+				"mom:slot/class/mail_misc",
+				"mom:slot/class/misc"
+			],
+			abilities:
+			[
+				{ ref: "mom:ability/hero/caster", value: 20 },
+				{ ref: "mom:ability/hero/sage" },
+				{ ref: "mom:ability/hero/arcane_power" },
+				{ ref: "mom:ability/hero/constitution" },
+				{ ref: "mom:ability/unit/ranged_attack", value: 6 },
+				{ ref: "mom:ability/unit/illusions_immunity" },
+				{ ref: "mom:ability/unit/missile_immunity" },
+				{ ref: "mom:ability/unit/random/mage" },
+				{ ref: "mom:ability/unit/random/any" }
+			],
+			effects:
+			{
+				animation: "crystal.sif",
+				type: "revolve3",
+				colorize: true,
+				offset: -4
+			}
+		}
+	}
+]

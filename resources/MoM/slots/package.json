@@ -3,7 +3,7 @@
 		package: "buildsif",
 		name: "slots.sif",
 		trim: false,
-		double: true,
+		double: false,
 		files: ["*.png"]
 	},
 	{
@@ -40,6 +40,12 @@
 				name: "Melee or Magic",
 				image: "melee_magic.png",
 				accepts: ["mom:item/class/axe", "mom:item/class/mace", "mom:item/class/sword", "mom:item/class/staff", "mom:item/class/wand"]
+			},
+			{
+				ref: "mom:slot/class/mail_misc",
+				name: "Mail or Misc",
+				image: "mail_misc.png",
+				accepts: ["mom:item/class/chain", "mom:item/class/plate", "mom:item/class/misc"]
 			},
 			{
 				ref: "mom:slot/class/misc",

@@ -36,6 +36,10 @@
 			prereqs:
 			[
 				{
+					type:"fame",
+					value:25
+				},
+				{
 					type:"race",
 					race:"mom:elyran"
 				}
@@ -80,7 +84,7 @@
 			slots:
 			[
 				"mom:slot/class/melee",
-				"mom:slot/class/armor",
+				"mom:slot/class/mail_misc",
 				"mom:slot/class/misc"
 			],
 			abilities:

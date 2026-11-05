@@ -19,7 +19,7 @@
 		name:"crystal.sif",
 		files: [ "crystal.png" ],
 		trim:true,
-		canvas:128
+		canvas:32
 	},
 	{
 		package:"json",
