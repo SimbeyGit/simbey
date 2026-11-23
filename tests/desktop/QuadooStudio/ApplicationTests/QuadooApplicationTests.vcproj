@@ -798,12 +798,44 @@
 			</Filter>
 		</Filter>
 		<Filter
+			Name="AQVMT"
+			>
+			<File
+				RelativePath="..\..\..\platform\QuadooScript\TestSupport\AQVMT\ApplicationHost.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\platform\QuadooScript\TestSupport\AQVMT\PluginComponent.h"
+				>
+			</File>
+		</Filter>
+		<Filter
 			Name="QVM"
 			>
+			<File
+				RelativePath="..\..\..\platform\QuadooScript\TestSupport\QVM\IQVMHost.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\platform\QuadooScript\TestSupport\QVM\QVMBaseHost.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\platform\QuadooScript\TestSupport\QVM\QVMModulesHost.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="WQVM"
 			>
+			<File
+				RelativePath="..\..\..\platform\QuadooScript\TestSupport\WQVM\QVMMessagePump.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\platform\QuadooScript\TestSupport\WQVM\QVMWinHost.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Test data"

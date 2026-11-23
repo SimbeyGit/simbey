@@ -6,8 +6,8 @@
 #pragma comment(lib,"dbghelp.lib")
 #include "Library\Core\CoreDefs.h"
 #include "Library\DPI.h"
-#include "..\..\..\..\platform\QuadooScript\Published\TestSupport\AQVMT\ApplicationHost.h"
-#include "..\..\..\..\platform\QuadooScript\Published\TestSupport\WQVM\QVMMessagePump.h"
+#include "..\..\..\platform\QuadooScript\TestSupport\AQVMT\ApplicationHost.h"
+#include "..\..\..\platform\QuadooScript\TestSupport\WQVM\QVMMessagePump.h"
 #include "..\..\..\..\platform\QuadooForm\ScriptAdapter\RuntimeObjects.h"
 #include "..\..\..\platform\QuadooForm\TestExtension\ExternalControl.h"
 #include "Library\Util\TextHelpers.h"
