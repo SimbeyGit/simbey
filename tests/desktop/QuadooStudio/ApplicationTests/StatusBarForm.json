@@ -1,0 +1,16 @@
+{
+	"schemaVersion": 1,
+	"type": "Form",
+	"name": "StatusBarForm",
+	"children": [
+		{
+			"type": "StatusBar",
+			"name": "StatusBar1",
+			"properties": {
+				"Panels": [
+					{"Text": "Ready", "Width": 120, "Icon": -1}
+				]
+			}
+		}
+	]
+}

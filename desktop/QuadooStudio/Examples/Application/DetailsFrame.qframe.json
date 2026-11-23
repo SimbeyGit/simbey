@@ -1,0 +1,10 @@
+﻿{
+  "schemaVersion": 1,
+  "type": "Frame",
+  "name": "DetailsFrame",
+  "id": "{F0BC7EFC-FE53-4AED-8530-4DD242E0227C}",
+  "properties": {
+    "Width": 400,
+    "Height": 240
+  }
+}

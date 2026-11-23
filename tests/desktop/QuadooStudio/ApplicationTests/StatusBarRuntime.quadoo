@@ -1,0 +1,72 @@
+interface IStatusBarForm
+{
+};
+
+class StatusBarForm : extern(Form), IStatusBarForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	property var StatusBar1;
+	StatusBarForm()
+	{
+		Form = Form.Create(this);
+	}
+	function Close()
+	{
+		Form.Close();
+	}
+};
+
+function StatusBars()
+{
+	var form = new StatusBarForm;
+	var bar = form.StatusBar1;
+	var panels = bar.Panels;
+	if(panels.Count != 1 || panels[0].Text != "Ready")
+	{
+		throw "StatusBar initial panels failed";
+	}
+	var first = bar.Panels[0];
+	var second = panels.Add();
+	second.Text = "Working";
+	second.Width = 180;
+	second.Icon = 2;
+	panels.Move(first, 1);
+	if(first.Index != 1 || panels[0].Text != "Working" || panels[0].Width != 180 || panels[0].Icon != 2)
+	{
+		throw "StatusBar panel identity or properties failed";
+	}
+	var inserted = panels.Insert(0);
+	inserted.Text = "Inserted";
+	if(first.Index != 2 || panels.Count != 3)
+	{
+		throw "StatusBar insert failed";
+	}
+	panels.Delete(second);
+	panels.Delete(0);
+	if(panels.Count != 1 || panels.GetAt(0).Text != "Ready")
+	{
+		throw "StatusBar delete failed";
+	}
+	bar.SizeGrip = false;
+	if(bar.SizeGrip || panels[0].Text != "Ready")
+	{
+		throw "StatusBar size grip recreation lost panels";
+	}
+	panels.Clear();
+	if(panels.Count != 0)
+	{
+		throw "StatusBar clear failed";
+	}
+	form.Close();
+	return true;
+}

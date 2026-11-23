@@ -1,0 +1,64 @@
+var imageButtonClicks = 0;
+
+interface IImageButtonForm
+{
+	virtual function ImageClick(args) = 0;
+};
+
+class ImageButtonForm : extern(Form), IImageButtonForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	property var ImageButton1;
+	property var ImageButton2;
+	ImageButtonForm()
+	{
+		Form = Form.Create(this);
+	}
+	function Close()
+	{
+		Form.Close();
+	}
+	virtual function ImageClick(args)
+	{
+		imageButtonClicks++;
+		return true;
+	}
+};
+
+function ImageButtons()
+{
+	var form = new ImageButtonForm;
+	var button = form.ImageButton1;
+	var original = button.Picture;
+	button.ImagePosition = "Top";
+	button.ImageWidth = 20;
+	button.ImageHeight = 24;
+	button.Spacing = 6;
+	button.DisabledPicture = original;
+	if(button.ImagePosition != 1 || button.ImageWidth != 20 || button.ImageHeight != 24 ||
+		button.Spacing != 6 || button.DisabledPicture.data != original.data)
+	{
+		throw "ImageButton descriptor properties failed";
+	}
+	button.DisabledPicture = null;
+	button.Enabled = false;
+	if(button.DisabledPicture != null || button.Enabled)
+	{
+		throw "ImageButton clear or Enabled failed";
+	}
+	button.Enabled = true;
+	button.Click();
+	form.ImageButton2.Click();
+	form.Close();
+	return imageButtonClicks == 2;
+}

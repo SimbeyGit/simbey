@@ -16,6 +16,10 @@ CQuadooDebugSession::CQuadooDebugSession (BOOL fAutoStartDebugger) :
 	m_fLocationChanged(FALSE),
 	m_fException(FALSE),
 	m_fAutoStartDebugger(fAutoStartDebugger),
+	m_started(FALSE),
+	m_application(FALSE),
+	m_startupStatus(NULL),
+	m_startupTick(0),
 	m_rstrCurrentFile(NULL),
 	m_nCurrentLine(0),
 	m_fVariableValueChanged(FALSE),
@@ -83,24 +87,40 @@ Cleanup:
 HRESULT CQuadooDebugSession::Start (PCWSTR pcwzDebugger, PCWSTR pcwzStartDir, __in_opt RSTRING rstrHost, INT nPort,
 	PCWSTR pcwzScriptPath, RSTRING rstrScriptArgs,
 	CMemoryStream* pstmQBC, CMemoryStream* pstmDebug, CMemoryStream* pstmBreakpoints,
-	IStartDebuggerStatus* pDebuggerStatus)
+	IStartDebuggerStatus* pDebuggerStatus, CMemoryStream* application, RSTRING* diagnostic)
 {
 	HRESULT hr;
 
-	CheckIf(NULL == pcwzDebugger || NULL == pcwzScriptPath || NULL == pstmQBC || NULL == pstmDebug || NULL == pstmBreakpoints, E_INVALIDARG);
+	m_application = application != NULL;
+	CheckIf((m_fAutoStartDebugger && !pcwzDebugger) || !pcwzScriptPath || !pstmQBC || !pstmDebug || !pstmBreakpoints || !pDebuggerStatus,E_INVALIDARG);
 	CheckIf(1 > nPort || 65535 < nPort, E_INVALIDARG);
 	CheckIf(NULL != m_hProcess, HRESULT_FROM_WIN32(ERROR_BUSY));
+	CheckIfIgnore(pDebuggerStatus->CheckAbortFlag(),E_ABORT);
 
 	if(m_fAutoStartDebugger)
 		Check(StartProcess(pcwzDebugger, pcwzStartDir, nPort, pDebuggerStatus));
+	m_startupStatus = pDebuggerStatus;
+	m_startupTick = GetTickCount();
 	Check(Connect(rstrHost, nPort, pDebuggerStatus));
 	CheckIfIgnore(pDebuggerStatus->CheckAbortFlag(), E_ABORT);
 	pDebuggerStatus->ReportStatus(SLP(L"Configuring debugger..."));
-	Check(SendStartupData(pcwzScriptPath, rstrScriptArgs, pstmQBC, pstmDebug, pstmBreakpoints));
+	Check(SendStartupData(pcwzScriptPath, rstrScriptArgs, pstmQBC, pstmDebug, pstmBreakpoints, application));
+	m_started = TRUE;
 
 Cleanup:
+	m_startupStatus = NULL;
 	if(FAILED(hr))
+	{
+		if(diagnostic && m_application && hr != E_ABORT)
+		{
+			if(m_applicationError.Length())
+				RStrSet(*diagnostic,m_applicationError);
+			else
+				RStrFormatW(diagnostic,L"Could not start an AQVMDbg Application session (0x%.8x). Expected protocol %u, Application revision %u, %u-bit target.",
+					hr,QUADOO_DEBUG_PROTOCOL_VERSION,QUADOO_APP_DEBUG_REVISION,static_cast<UINT>(sizeof(void*) * 8));
+		}
 		Stop();
+	}
 	return hr;
 }
 
@@ -118,6 +138,10 @@ Cleanup:
 
 BOOL CQuadooDebugSession::IsActive (VOID) const
 {
+	if(INVALID_SOCKET != m_sServer)
+		return TRUE;
+	if(m_started)
+		return FALSE;
 	if(m_fAutoStartDebugger && m_hProcess)
 	{
 		DWORD dwExitCode;
@@ -212,6 +236,7 @@ HRESULT CQuadooDebugSession::OnSocketEvent (WPARAM wParam, LPARAM lParam)
 		Check(ReceiveIncoming());
 		break;
 	case FD_CLOSE:
+		Check(ReceiveIncoming());
 		hr = HRESULT_FROM_WIN32(ERROR_CONNECTION_ABORTED);
 		break;
 	}
@@ -227,22 +252,16 @@ VOID CQuadooDebugSession::Stop (VOID)
 	ClearStackFrames();
 	m_fPaused = FALSE;
 
-	if(IsActive())
+	if(m_started && INVALID_SOCKET != m_sServer)
 	{
-		if(INVALID_SOCKET != m_sServer)
-		{
-			if(SUCCEEDED(SendDbgMsg(QDM_STOP, NULL, 0)))
-			{
-				if(WAIT_TIMEOUT == WaitForSingleObject(m_hProcess, 1500))
-					TerminateProcess(m_hProcess, ERROR_CANCELLED);
-			}
-			else
-				TerminateProcess(m_hProcess, ERROR_CANCELLED);
-		}
-		else
+		HRESULT sent = SendDbgMsg(QDM_STOP, NULL, 0);
+		if(m_hProcess && (FAILED(sent) || WAIT_TIMEOUT == WaitForSingleObject(m_hProcess, 1500)))
 			TerminateProcess(m_hProcess, ERROR_CANCELLED);
 	}
+	else if(m_hProcess && WAIT_TIMEOUT == WaitForSingleObject(m_hProcess, 0))
+		TerminateProcess(m_hProcess, ERROR_CANCELLED);
 
+	m_started = FALSE;
 	SafeCloseHandle(m_hProcess);
 
 	CloseSocket();
@@ -273,7 +292,7 @@ HRESULT CQuadooDebugSession::StartProcess (PCWSTR pcwzDebugger, PCWSTR pcwzStart
 	pDebuggerStatus->ReportStatus(wzCommand, cchStatus);
 
 	si.cb = sizeof(si);
-	Check(Formatting::TPrintF(wzCommand, ARRAYSIZE(wzCommand), NULL, L"\"%ls\" -debug-port %d", pcwzDebugger, nPort));
+	Check(Formatting::TPrintF(wzCommand, ARRAYSIZE(wzCommand), NULL, L"\"%ls\" -debug-port %d -loopback", pcwzDebugger, nPort));
 	CheckIfGetLastError(!CreateProcessW(pcwzDebugger, wzCommand, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, pcwzStartDir, &si, &pi));
 
 	m_hProcess = pi.hProcess;
@@ -315,6 +334,7 @@ HRESULT CQuadooDebugSession::Connect (__in_opt RSTRING rstrHost, INT nPort, ISta
 		ADDRINFOW* pAddress;
 
 		CheckIfIgnore(pDebuggerStatus->CheckAbortFlag(), E_ABORT);
+		CheckIf(GetTickCount() - m_startupTick >= QUADOO_DEBUG_STARTUP_TIMEOUT,HRESULT_FROM_WIN32(ERROR_TIMEOUT));
 
 		if(fRemoteHost)
 			pAddress = pAddresses;
@@ -330,8 +350,10 @@ HRESULT CQuadooDebugSession::Connect (__in_opt RSTRING rstrHost, INT nPort, ISta
 
 		for(; pAddress; pAddress = pAddress->ai_next)
 		{
+			u_long nonblocking = 1;
 			m_sServer = socket(pAddress->ai_family, pAddress->ai_socktype, pAddress->ai_protocol);
 			CheckIf(INVALID_SOCKET == m_sServer, HRESULT_FROM_WIN32(WSAGetLastError()));
+			CheckIf(SOCKET_ERROR == ioctlsocket(m_sServer,FIONBIO,&nonblocking),HRESULT_FROM_WIN32(WSAGetLastError()));
 
 			if(0 == connect(m_sServer, pAddress->ai_addr, static_cast<INT>(pAddress->ai_addrlen)))
 			{
@@ -340,8 +362,21 @@ HRESULT CQuadooDebugSession::Connect (__in_opt RSTRING rstrHost, INT nPort, ISta
 			}
 
 			hr = HRESULT_FROM_WIN32(WSAGetLastError());
-			closesocket(m_sServer);
-			m_sServer = INVALID_SOCKET;
+			if(hr == HRESULT_FROM_WIN32(WSAEWOULDBLOCK))
+			{
+				hr = WaitForStartupSocket(TRUE,500);
+				CheckIfIgnore(hr == E_ABORT,E_ABORT);
+				if(SUCCEEDED(hr))
+				{
+					INT error, size = sizeof(error);
+					CheckIf(SOCKET_ERROR == getsockopt(m_sServer,SOL_SOCKET,SO_ERROR,reinterpret_cast<CHAR*>(&error),&size),
+						HRESULT_FROM_WIN32(WSAGetLastError()));
+					hr = HRESULT_FROM_WIN32(error);
+					if(SUCCEEDED(hr))
+						break;
+				}
+			}
+			CloseSocket();
 		}
 		if(SUCCEEDED(hr))
 			break;
@@ -362,7 +397,7 @@ Cleanup:
 }
 
 HRESULT CQuadooDebugSession::SendStartupData (PCWSTR pcwzScriptPath, RSTRING rstrScriptArgs,
-	CMemoryStream* pstmQBC, CMemoryStream* pstmDebug, CMemoryStream* pstmBreakpoints)
+	CMemoryStream* pstmQBC, CMemoryStream* pstmDebug, CMemoryStream* pstmBreakpoints, CMemoryStream* application)
 {
 	HRESULT hr;
 	DWORD dwVersion = QUADOO_DEBUG_PROTOCOL_VERSION;
@@ -371,14 +406,105 @@ HRESULT CQuadooDebugSession::SendStartupData (PCWSTR pcwzScriptPath, RSTRING rst
 	Check(HrSafeMult(static_cast<DWORD>(TStrLenAssert(pcwzScriptPath)), static_cast<DWORD>(sizeof(WCHAR)), &cbScriptPath));
 	Check(HrSafeMult(static_cast<DWORD>(RStrLen(rstrScriptArgs)), static_cast<DWORD>(sizeof(WCHAR)), &cbScriptArgs));
 
-	Check(SendDbgMsg(QDM_HELLO, &dwVersion, sizeof(dwVersion)));
+	if(application)
+	{
+		const QUADOO_APP_DEBUG_HELLO hello = {QUADOO_DEBUG_PROTOCOL_VERSION, QUADOO_APP_DEBUG_REVISION, sizeof(void*) * 8};
+		QUADOO_APP_DEBUG_HELLO reply;
+		Check(SendDbgMsg(QDM_HELLO,&hello,sizeof(hello)));
+		Check(ReceiveStartupMessage(QDM_HELLO,&reply,sizeof(reply)));
+		CheckIf(reply.nProtocol != hello.nProtocol || reply.nApplication != hello.nApplication || reply.nBits != hello.nBits,
+			HRESULT_FROM_WIN32(ERROR_REVISION_MISMATCH));
+	}
+	else
+	{
+		Check(SendDbgMsg(QDM_HELLO, &dwVersion, sizeof(dwVersion)));
+	}
 	Check(SendDbgMsg(QDM_SCRIPT_PATH, pcwzScriptPath, cbScriptPath));
 	Check(SendDbgMsg(QDM_SCRIPT_ARGUMENTS, RStrToWide(rstrScriptArgs), cbScriptArgs));
 	Check(SendDbgMsg(QDM_SCRIPT_BYTECODE, pstmQBC->GetReadPtr(), pstmQBC->DataRemaining()));
 	Check(SendDbgMsg(QDM_DEBUG_DATA, pstmDebug->GetReadPtr(), pstmDebug->DataRemaining()));
 	Check(SendDbgMsg(QDM_BREAKPOINTS, pstmBreakpoints->GetReadPtr(), pstmBreakpoints->DataRemaining()));
+	if(application)
+	{
+		DWORD message = QDM_APP_CATALOG;
+		while(application->DataRemaining())
+		{
+			DWORD bytes;
+			CheckIf(application->DataRemaining() < sizeof(bytes),E_INVALIDARG);
+			CopyMemory(&bytes,application->GetReadPtr(),sizeof(bytes));
+			Check(application->UpdateReadPtr(sizeof(bytes)));
+			CheckIf(!bytes || bytes > application->DataRemaining(),E_INVALIDARG);
+			Check(SendDbgMsg(message,application->GetReadPtr(),bytes));
+			Check(application->UpdateReadPtr(bytes));
+			message = QDM_APP_DEFINITION;
+		}
+	}
 	Check(SendDbgMsg(QDM_START, NULL, 0));
+	if(application)
+	{
+		QUADOO_APP_DEBUG_STATUS status;
+		Check(ReceiveStartupMessage(QDM_APP_STATUS,&status,sizeof(status)));
+		CheckIf(status.wzDetail[ARRAYSIZE(status.wzDetail) - 1],HRESULT_FROM_WIN32(ERROR_INVALID_DATA));
+		if(FAILED(status.hr))
+		{
+			RStrCreateW(TStrLenAssert(status.wzDetail),status.wzDetail,&m_applicationError);
+			Check(status.hr);
+		}
+	}
 
+Cleanup:
+	return hr;
+}
+
+HRESULT CQuadooDebugSession::WaitForStartupSocket(BOOL write, DWORD timeout)
+{
+	HRESULT hr;
+	DWORD start = GetTickCount();
+	for(;;)
+	{
+		fd_set ready, errors;
+		timeval slice = {0,50000};
+		CheckIfIgnore(m_startupStatus->CheckAbortFlag(),E_ABORT);
+		DWORD now = GetTickCount();
+		CheckIf(now - start >= timeout || now - m_startupTick >= QUADOO_DEBUG_STARTUP_TIMEOUT,HRESULT_FROM_WIN32(ERROR_TIMEOUT));
+		FD_ZERO(&ready);
+		FD_ZERO(&errors);
+		FD_SET(m_sServer,&ready);
+		FD_SET(m_sServer,&errors);
+		INT result = select(0,write ? NULL : &ready,write ? &ready : NULL,&errors,&slice);
+		CheckIf(SOCKET_ERROR == result,HRESULT_FROM_WIN32(WSAGetLastError()));
+		if(result)
+			break;
+	}
+	hr = S_OK;
+Cleanup:
+	return hr;
+}
+
+HRESULT CQuadooDebugSession::ReceiveStartupBytes(PVOID payload, DWORD bytes)
+{
+	HRESULT hr = S_OK;
+	PBYTE output = static_cast<PBYTE>(payload);
+	while(bytes)
+	{
+		Check(WaitForStartupSocket(FALSE,QUADOO_DEBUG_STARTUP_TIMEOUT));
+		INT received = recv(m_sServer,reinterpret_cast<CHAR*>(output),bytes,0);
+		CheckIf(SOCKET_ERROR == received,HRESULT_FROM_WIN32(WSAGetLastError()));
+		CheckIf(!received,HRESULT_FROM_WIN32(ERROR_CONNECTION_ABORTED));
+		output += received;
+		bytes -= received;
+	}
+Cleanup:
+	return hr;
+}
+
+HRESULT CQuadooDebugSession::ReceiveStartupMessage(DWORD message, PVOID payload, DWORD bytes)
+{
+	HRESULT hr;
+	QUADOO_DEBUG_MESSAGE_HEADER header;
+	Check(ReceiveStartupBytes(&header,sizeof(header)));
+	CheckIf(header.nMessage != message || header.cbPayload != bytes,HRESULT_FROM_WIN32(ERROR_INVALID_DATA));
+	Check(ReceiveStartupBytes(payload,bytes));
 Cleanup:
 	return hr;
 }
@@ -388,6 +514,7 @@ HRESULT CQuadooDebugSession::SendDbgMsg (DWORD nMessage, const VOID* pvPayload, 
 	HRESULT hr;
 	QUADOO_DEBUG_MESSAGE_HEADER header;
 
+	CheckIf(cbPayload > QUADOO_DEBUG_MAX_MESSAGE,HRESULT_FROM_WIN32(ERROR_FILE_TOO_LARGE));
 	header.nMessage = nMessage;
 	header.cbPayload = cbPayload;
 
@@ -407,12 +534,22 @@ HRESULT CQuadooDebugSession::SendAll (const BYTE* pbData, DWORD cbData)
 	CheckIf(INVALID_SOCKET == m_sServer, HRESULT_FROM_WIN32(ERROR_INVALID_HANDLE));
 	while(cbSent < cbData)
 	{
+		if(m_startupStatus)
+		{
+			CheckIfIgnore(m_startupStatus->CheckAbortFlag(),E_ABORT);
+			CheckIf(GetTickCount() - m_startupTick >= QUADOO_DEBUG_STARTUP_TIMEOUT,HRESULT_FROM_WIN32(ERROR_TIMEOUT));
+		}
 		INT cb = send(m_sServer, reinterpret_cast<const CHAR*>(pbData + cbSent), static_cast<INT>(min(cbData - cbSent, static_cast<DWORD>(0x7FFFFFFF))), 0);
 		if(SOCKET_ERROR == cb)
 		{
 			INT nError = WSAGetLastError();
 			if(WSAEWOULDBLOCK == nError)
 			{
+				if(m_startupStatus)
+				{
+					Check(WaitForStartupSocket(TRUE,QUADOO_DEBUG_STARTUP_TIMEOUT));
+					continue;
+				}
 				fd_set fdsWrite;
 				timeval timeout = {5, 0};
 				INT nSelect;
@@ -481,7 +618,7 @@ HRESULT CQuadooDebugSession::ProcessIncomingMessages (VOID)
 		const BYTE* pbData = m_stmIncoming.GetReadPtr();
 
 		CopyMemory(&header, pbData, sizeof(header));
-		CheckIf(header.cbPayload > 64 * 1024 * 1024, HRESULT_FROM_WIN32(ERROR_INVALID_DATA));
+		CheckIf(header.cbPayload > QUADOO_DEBUG_MAX_MESSAGE, HRESULT_FROM_WIN32(ERROR_INVALID_DATA));
 		Check(HrSafeAdd(static_cast<DWORD>(sizeof(header)), header.cbPayload, &cbMessage));
 		if(m_stmIncoming.DataRemaining() < cbMessage)
 			break;
@@ -507,6 +644,15 @@ HRESULT CQuadooDebugSession::ProcessIncomingMessage (DWORD nMessage, const BYTE*
 		return StoreStackFrames(pbPayload, cbPayload);
 	if(QDM_VARIABLE_VALUE == nMessage)
 		return StoreVariableValue(pbPayload, cbPayload);
+	if(QDM_APP_STATUS == nMessage && m_application)
+	{
+		QUADOO_APP_DEBUG_STATUS status;
+		CheckIf(cbPayload != sizeof(status),HRESULT_FROM_WIN32(ERROR_INVALID_DATA));
+		CopyMemory(&status,pbPayload,sizeof(status));
+		CheckIf(status.wzDetail[ARRAYSIZE(status.wzDetail) - 1] || SUCCEEDED(status.hr),HRESULT_FROM_WIN32(ERROR_INVALID_DATA));
+		Check(RStrCreateW(TStrLenAssert(status.wzDetail),status.wzDetail,&m_applicationError));
+		Check(status.hr);
+	}
 	if(QDM_BREAKPOINT_HIT != nMessage && QDM_EXCEPTION != nMessage)
 		return HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
 	CheckIf(cbPayload < sizeof(location), HRESULT_FROM_WIN32(ERROR_INVALID_DATA));

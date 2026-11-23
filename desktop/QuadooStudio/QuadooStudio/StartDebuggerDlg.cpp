@@ -18,6 +18,7 @@ CStartDebuggerDlg::CStartDebuggerDlg (CQuadooProject* pProject, PCWSTR pcwzDebug
 	m_rstrScriptArgs(rstrScriptArgs),
 	m_nPort(nPort),
 	m_pDebugTree(NULL),
+	m_applicationMode(pProject->IsApplication()),
 	m_hwndStatus(NULL),
 	m_hDebuggerIcon(NULL),
 	m_hStartThread(NULL),
@@ -45,23 +46,29 @@ CStartDebuggerDlg::~CStartDebuggerDlg ()
 HRESULT CStartDebuggerDlg::Start (VOID)
 {
 	HRESULT hr;
-	HWND hwnd;
 	DWORD idThread;
 
-	Check(GetWindow(&hwnd));
-
-	Check(QuadooParseToStream(m_pcwzScriptPath, QUADOO_COMPILE_LINE_NUMBER_MAP | QUADOO_COMPILE_FOR_DEBUGGING, &m_stmQBC, &m_stmDebug, this, &m_pDebugTree));
+	if(m_applicationMode)
+	{
+		Check(m_pProject->CompileApplicationDebug(m_application,m_stmQBC,m_stmDebug,&m_pDebugTree,m_diagnostic));
+	}
+	else
+	{
+		Check(QuadooParseToStream(m_pcwzScriptPath, QUADOO_COMPILE_LINE_NUMBER_MAP | QUADOO_COMPILE_FOR_DEBUGGING, &m_stmQBC, &m_stmDebug, this, &m_pDebugTree));
+	}
 	SetWindowText(m_hwndStatus, L"Starting debugger...");
 	UpdateWindow(m_hwndStatus);
 
 	Check(m_pProject->CreateDebugger(&m_pDebugger, &m_stmBreakpoints, &m_rstrRemoteHost));
+	if(m_pDebugger->AutoStarts())
+		SetDebuggerIcon();
+	if(m_applicationMode)
+		m_pProject->SetApplicationDebugReadOnly(TRUE);
 
 	m_hStartThread = CreateThread(NULL, 0, _StartAsync, this, 0, &idThread);
 	CheckIfGetLastError(NULL == m_hStartThread);
 
 Cleanup:
-	if(FAILED(hr))
-		PostMessage(hwnd, WM_FINISH_DEBUGGER, (WPARAM)hr, 0);
 	return hr;
 }
 
@@ -73,18 +80,17 @@ BOOL CStartDebuggerDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lPara
 	{
 	case WM_INITDIALOG:
 		m_hwndStatus = GetDlgItem(IDC_STATUS);
-		SetDebuggerIcon();
 		CenterHost();
 		break;
 
 	case WM_SHOWWINDOW:
-		SideAssertHr(GetWindow(&hwnd));
-		PostMessage(hwnd, WM_START_DEBUGGER, 0, 0);
+		if(wParam && SUCCEEDED(GetWindow(&hwnd)))
+			PostMessage(hwnd,WM_START_DEBUGGER,0,0);
 		break;
 
 	case WM_CLOSE:
 		EnableWindow(GetDlgItem(IDC_ABORT), FALSE);
-		m_fAbort = TRUE;
+		InterlockedExchange(&m_fAbort,TRUE);
 		return TRUE;
 
 	case WM_COMMAND:
@@ -92,14 +98,17 @@ BOOL CStartDebuggerDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lPara
 		{
 		case IDC_ABORT:
 			EnableWindow(GetDlgItem(IDC_ABORT), FALSE);
-			m_fAbort = TRUE;
+			InterlockedExchange(&m_fAbort,TRUE);
 			break;
 		}
 		break;
 
 	case WM_START_DEBUGGER:
-		if(FAILED(Start()))
-			End(IDABORT);
+		{
+			HRESULT hr = Start();
+			if(FAILED(hr) && SUCCEEDED(GetWindow(&hwnd)))
+				PostMessage(hwnd,WM_FINISH_DEBUGGER,static_cast<WPARAM>(hr),0);
+		}
 		break;
 
 	case WM_DEBUGGER_STATUS:
@@ -115,12 +124,30 @@ BOOL CStartDebuggerDlg::DefWindowProc (UINT message, WPARAM wParam, LPARAM lPara
 		{
 			HRESULT hr = (HRESULT)wParam;
 			SideAssertHr(GetWindow(&hwnd));
+			if(m_hStartThread)
+			{
+				WaitForSingleObject(m_hStartThread,INFINITE);
+				SafeCloseHandle(m_hStartThread);
+			}
+			if(SUCCEEDED(hr) && CheckAbortFlag())
+				hr = E_ABORT;
 			if(SUCCEEDED(hr))
 			{
 				hr = m_pProject->AttachDebugger(m_pDebugger, m_pDebugTree);
 				m_pDebugger = NULL;	// Either owned by or destroyed by AttachDebugger()
 			}
 			SafeDelete(m_pDebugger);
+			if(FAILED(hr))
+			{
+				if(m_applicationMode)
+					m_pProject->SetApplicationDebugReadOnly(FALSE);
+				if(hr != E_ABORT && !m_fDisplayedErrors)
+				{
+					if(!m_diagnostic.Length())
+						RStrFormatW(&m_diagnostic,L"Could not start debugging (0x%.8x).",hr);
+					MessageBoxW(hwnd,m_diagnostic.c_wstr(),L"Debugger Startup",MB_OK | MB_ICONERROR);
+				}
+			}
 			SetForegroundWindow(hwnd);
 			End(SUCCEEDED(hr) ? IDOK : IDCANCEL);
 		}
@@ -170,7 +197,20 @@ HRESULT CStartDebuggerDlg::StartAsync (VOID)
 	HWND hwnd = NULL;
 
 	Check(GetWindow(&hwnd));
-	Check(m_pDebugger->Start(m_pcwzDebugger, m_pcwzStartDir, m_rstrRemoteHost, m_nPort, m_pcwzScriptPath, m_rstrScriptArgs, &m_stmQBC, &m_stmDebug, &m_stmBreakpoints, this));
+	if(m_applicationMode && m_pDebugger->AutoStarts())
+	{
+		DWORD attributes = GetFileAttributesW(m_pcwzDebugger);
+		if(attributes == INVALID_FILE_ATTRIBUTES || (attributes & FILE_ATTRIBUTE_DIRECTORY))
+		{
+			RStrFormatW(&m_diagnostic,L"Could not find the Application debugger at %ls.",m_pcwzDebugger);
+			Check(HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND));
+		}
+		ReportStatus(SLP(L"Preparing debugger dependencies..."));
+		Check(m_application.PrepareDependencies(m_pcwzDebugger,this,m_diagnostic));
+	}
+	Check(m_pDebugger->Start(m_pcwzDebugger,m_pcwzStartDir,m_rstrRemoteHost,m_nPort,
+		m_applicationMode ? m_application.program.c_wstr() : m_pcwzScriptPath,m_rstrScriptArgs,
+		&m_stmQBC,&m_stmDebug,&m_stmBreakpoints,this,m_applicationMode ? &m_application.bundle : NULL,&m_diagnostic));
 
 Cleanup:
 	if(hwnd)
@@ -198,7 +238,7 @@ VOID CStartDebuggerDlg::ReportStatus (PCWSTR pcwzStatus, INT cchStatus)
 
 BOOL CStartDebuggerDlg::CheckAbortFlag (VOID)
 {
-	return m_fAbort;
+	return InterlockedCompareExchange(&m_fAbort,FALSE,FALSE);
 }
 
 // IQuadooCompilerStatus

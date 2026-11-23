@@ -1,0 +1,17 @@
+{
+	"schemaVersion": 1,
+	"type": "Form",
+	"name": "LifetimeForm",
+	"id": "{F6000000-0000-0000-0000-000000000001}",
+	"properties": {"Width": 160, "Height": 100},
+	"events": {"OnCreate": "Created", "OnDestroy": "Destroyed"},
+	"components": [
+		{
+			"type": "Timer",
+			"name": "Timer1",
+			"id": "{F6000000-0000-0000-0000-000000000002}",
+			"properties": {"Interval": 20},
+			"events": {"OnTimer": "Tick"}
+		}
+	]
+}

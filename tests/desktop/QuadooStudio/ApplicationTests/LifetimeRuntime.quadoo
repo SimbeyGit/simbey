@@ -1,0 +1,174 @@
+var mode = 0;
+var created = 0;
+var destroyed = 0;
+var unbound = 0;
+var destructed = 0;
+var rejected = 0;
+var modalCaller;
+
+interface ILifetimeForm
+{
+	virtual function Created(args) = 0;
+	virtual function Destroyed(args) = 0;
+	virtual function Tick(args) = 0;
+};
+
+class LifetimeForm : extern(Form), ILifetimeForm
+{
+	var identity;
+	var ticks = 0;
+	property var Timer1;
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set (value)
+		{
+			if(value == null)
+			{
+				unbound++;
+			}
+			Form = value;
+			if(value == null && identity == 1 && mode == 9)
+			{
+				Host.ShowForm(new LifetimeForm, 4);
+			}
+		}
+	}
+
+	LifetimeForm()
+	{
+		identity = ++created;
+		Form = Form.Create(this);
+		if(mode == 11)
+		{
+			throw "Deliberate startup helper failure";
+		}
+		if(identity == 1 && mode == 3)
+		{
+			Form.Close();
+		}
+		if(identity == 1 && mode == 4)
+		{
+			Host.ShowForm(new LifetimeForm, 4);
+			Form.Close();
+		}
+	}
+
+	~LifetimeForm()
+	{
+		destructed++;
+		if(mode == 10)
+		{
+			throw "Deliberate destructor failure";
+		}
+		if(identity == 1 && mode == 6)
+		{
+			Host.ShowForm(new LifetimeForm, 4);
+		}
+	}
+
+	virtual function Created(args)
+	{
+		if(mode == 7)
+		{
+			try
+			{
+				Host.RunApplication();
+			}
+			catch (error)
+			{
+				rejected++;
+			}
+		}
+		return true;
+	}
+
+	virtual function Destroyed(args)
+	{
+		destroyed++;
+		if(identity == 1 && mode == 5)
+		{
+			Host.ShowForm(new LifetimeForm, 4);
+		}
+		return true;
+	}
+
+	virtual function Tick(args)
+	{
+		ticks++;
+		if(mode == 8)
+		{
+			if(identity == 1)
+			{
+				modalCaller = this;
+				var other = new LifetimeForm;
+				other.__QuadooRoot.ShowModal();
+			}
+			else if(ticks == 1)
+			{
+				modalCaller.__QuadooRoot.Close();
+				modalCaller = null;
+			}
+			else if(ticks >= 3)
+			{
+				Form.Close();
+			}
+		}
+		else if(identity == 1 && mode == 1)
+		{
+			Host.ShowForm(new LifetimeForm, 4);
+			Form.Close();
+		}
+		else if(identity == 1 && mode == 2)
+		{
+			if(ticks == 1)
+			{
+				var other = new LifetimeForm;
+				Host.ShowForm(other, 4);
+				other.__QuadooRoot.Close();
+			}
+			else if(ticks >= 3)
+			{
+				if(destroyed != 1 || unbound != 1 || destructed != 1)
+				{
+					throw "Other Form was not independently reaped";
+				}
+				Form.Close();
+			}
+		}
+		else if(identity > 1)
+		{
+			if(ticks >= 3)
+			{
+				if(destroyed != 1 || unbound != 1 || destructed != 1)
+				{
+					throw "Startup Form retained after helper returned";
+				}
+				Form.Close();
+			}
+		}
+		else
+		{
+			Form.Close();
+		}
+		return true;
+	}
+};
+
+function ConfigureLifetime(which)
+{
+	mode = which;
+}
+
+function LifetimeCounts()
+{
+	return created * 1000 + destroyed * 100 + unbound * 10 + destructed;
+}
+
+function LifetimeRejected()
+{
+	return rejected;
+}

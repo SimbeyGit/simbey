@@ -1,0 +1,173 @@
+var virtualReads = 0;
+var virtualUpdates = 0;
+var virtualFail = false;
+var virtualReject = false;
+var virtualHandle = true;
+var virtualCaption = "original";
+var virtualCell = "detail";
+var virtualChecked = false;
+var virtualRetained;
+var virtualProposal;
+var virtualPayload = new ListPayload(97);
+
+interface IVirtualListForm
+{
+	virtual function Data(args) = 0;
+	virtual function Update(args) = 0;
+	virtual function Checking(args) = 0;
+};
+class VirtualListForm : extern(Form), IVirtualListForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	property var List1;
+	VirtualListForm()
+	{
+		Form = Form.Create(this);
+	}
+	function Close()
+	{
+		Form.Close();
+	}
+	virtual function Data(args)
+	{
+		virtualReads++;
+		if(virtualFail)
+		{
+			throw "Deliberate virtual provider failure";
+		}
+		var item = args.Item;
+		item.Caption = item.ItemIndex == 1 ? virtualCaption : "Row " + item.ItemIndex;
+		item.SubItems.Add(item.ItemIndex == 1 ? virtualCell : "detail");
+		item.ImageIndex = item.ItemIndex % 2;
+		item.Checked = virtualChecked;
+		item.Data = virtualPayload;
+		virtualRetained = item;
+		return true;
+	}
+	virtual function Update(args)
+	{
+		virtualUpdates++;
+		virtualProposal = args.Item;
+		args.Cancel = virtualReject;
+		args.Handled = virtualHandle;
+		if(!virtualReject && virtualHandle)
+		{
+			if(args.ColumnIndex == 1)
+			{
+				virtualCell = args.Item.SubItems[0];
+			}
+			else
+			{
+				virtualCaption = args.Item.Caption;
+				virtualChecked = args.Item.Checked;
+			}
+		}
+		return true;
+	}
+	virtual function Checking(args)
+	{
+		args.Cancel = virtualReject;
+		return true;
+	}
+};
+
+function VirtualLists()
+{
+	var form = new VirtualListForm;
+	var view = form.List1;
+	var items = view.Items;
+	if(items.Count != 0 || virtualReads != 0)
+	{
+		throw "Virtual construction requested data or persisted Count";
+	}
+	items.Count = 10;
+	var first = items[1];
+	var second = items.GetAt(1);
+	if(first == second || !first.IsVirtual || first.ItemIndex != 1 || !first.Attached ||
+		first.Caption != "original" || first.SubItems[0] != "detail" || first.Data.Value != 97)
+	{
+		throw "Virtual request identity or field binding failed";
+	}
+	var denied = false;
+	try
+	{
+		first.Caption = "late";
+	}
+	catch(error)
+	{
+		denied = true;
+	}
+	if(!denied)
+	{
+		throw "Retained virtual item remained writable";
+	}
+	view.UpdateVirtualText(1,0,"accepted");
+	view.UpdateVirtualText(1,1,"changed detail");
+	view.UpdateVirtualChecked(1,true);
+	var accepted = items.GetAt(1);
+	if(first.Caption != "original" || first.SubItems[0] != "detail" || accepted.Caption != "accepted" ||
+		accepted.SubItems[0] != "changed detail" || !accepted.Checked || virtualUpdates != 3)
+	{
+		throw "Virtual backend writeback or immutable snapshot failed";
+	}
+	virtualReject = true;
+	view.UpdateVirtualText(1,0,"rejected");
+	virtualReject = false;
+	virtualHandle = false;
+	view.UpdateVirtualChecked(1,false);
+	virtualHandle = true;
+	if(items.GetAt(1).Caption != "accepted" || !virtualChecked)
+	{
+		throw "Rejected or unhandled virtual updates were committed";
+	}
+	view.Selected = accepted;
+	view.Focused = accepted;
+	if(view.Selected.ItemIndex != 1 || view.Focused.ItemIndex != 1 || view.SelectedCount != 1)
+	{
+		throw "Virtual selection wrappers failed";
+	}
+	var generation = view.DataGeneration;
+	view.ResetVirtualData(20);
+	if(first.Attached || accepted.Attached || items.Count != 20 || view.DataGeneration == generation || view.SelectedCount != 0)
+	{
+		throw "Virtual generation/reset failed";
+	}
+	view.RefreshRange(0,19);
+	denied = false;
+	try
+	{
+		items.Add("invalid");
+	}
+	catch(error)
+	{
+		denied = true;
+	}
+	if(!denied)
+	{
+		throw "Stored mutation was allowed in OwnerData";
+	}
+	form.Close();
+	if(first.Attached || first.Caption != "original" || first.Data.Value != 97)
+	{
+		throw "Virtual retained payload did not survive source destruction";
+	}
+	return 94;
+}
+
+function VirtualFailureForm()
+{
+	virtualFail = true;
+	var form = new VirtualListForm;
+	form.List1.Items.Count = 4;
+	return form;
+}

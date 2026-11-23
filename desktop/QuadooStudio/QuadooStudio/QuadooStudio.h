@@ -4,9 +4,11 @@
 #include <gdiplus.h>
 #include "Library\Core\BaseUnknown.h"
 #include "Library\Window\BaseWindow.h"
+#include "Library\RecentlyUsed.h"
 #include "DarkMode.h"
 #include "CustomMenu.h"
 #include "UpdateTitle.h"
+#include "..\..\..\platform\QuadooForm\Packages\Packages.h"
 
 class CSplitter;
 class CQuadooProject;
@@ -15,11 +17,15 @@ class CQuadooStudio :
 	public CBaseUnknown,
 	public CBaseWindow,
 	public IUpdateTitle,
-	public IOleCommandTarget
+	public IOleCommandTarget,
+	public IOpenRecentlyUsed,
+	public QFP::IHost
 {
 protected:
 	HINSTANCE m_hInstance;
-	HACCEL m_hAccel;
+	HACCEL m_hAccel, m_hDesignerAccel;
+	INT m_treeHeight;
+	BOOL m_dragTreeSplit;
 
 	Gdiplus::GdiplusStartupInput* m_pGdiPlusStartupInput;
 	ULONG_PTR m_gdiplusToken;
@@ -32,6 +38,11 @@ protected:
 	CCustomMenu* m_pCustomMenu;
 	CSplitter* m_pSplitter;
 	CQuadooProject* m_pProject;
+	TStackRef<QFP::CCatalog> m_packages;
+	BOOL m_packagesBusy;
+	CRecentlyUsed m_recentProjects;
+	TStackRef<CRecentlyUsedMenu> m_recentMenu;
+	HMENU m_hRecentProjects;
 
 public:
 	IMP_BASE_UNKNOWN
@@ -50,8 +61,14 @@ public:
 	static HRESULT Register (HINSTANCE hInstance);
 	static HRESULT Unregister (HINSTANCE hInstance);
 
-	HRESULT Initialize (PCWSTR pcwzCmdLine, INT nWidth, INT nHeight, INT nCmdShow);
+	HRESULT Initialize (PCWSTR pcwzCmdLine, INT nWidth, INT nHeight, INT nCmdShow, PCWSTR packageDirectory = NULL);
 	BOOL PreTranslate (__inout MSG* pmsg);
+	HRESULT OpenProject(PCWSTR path);
+	CQuadooProject* Project() const { return m_pProject; }
+	QFP::CCatalog* Packages() const { return m_packages; }
+	HRESULT VisitDefinitions(QFP::IDefinitionVisitor* visitor);
+	HRESULT GetEditors(TArray<QFD::CDesignerEditor*>& editors);
+	HRESULT RefreshPackages();
 
 	// IUpdateTitle
 	virtual HRESULT UpdateTitle (PCWSTR pcwzProject, __in_opt PCWSTR pcwzStatus);
@@ -72,7 +89,8 @@ public:
 private:
 	HRESULT CreateNewProject (VOID);
 	HRESULT OpenProjectPrompt (VOID);
-	HRESULT OpenProject (PCWSTR pcwzProject);
+	HRESULT OpenAndRecordProject (PCWSTR pcwzPath);
+	virtual HRESULT OpenRecentlyUsed (PCWSTR pcwzPath);
 	VOID UpdateColorScheme (VOID);
 
 	// CBaseWindow

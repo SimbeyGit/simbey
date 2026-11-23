@@ -1,0 +1,80 @@
+{
+	"schemaVersion": 1,
+	"type": "Form",
+	"name": "StatusBars",
+	"properties": {
+		"Caption": "Status bar example",
+		"Width": 560,
+		"Height": 300
+	},
+	"children": [
+		{
+			"type": "Label",
+			"name": "Instructions",
+			"properties": {
+				"Left": 16,
+				"Top": 16,
+				"Width": 520,
+				"Height": 28,
+				"Caption": "Edit the status panels in the Objects tree."
+			}
+		},
+		{
+			"type": "StatusBar",
+			"name": "StatusBar1",
+			"id": "{DB900000-0000-0000-0000-000000000001}",
+			"properties": {
+				"Height": 22,
+				"SizeGrip": true,
+				"Images": "{DB900000-0000-0000-0000-000000000010}",
+				"Panels": [
+					{
+						"id": "{DB900000-0000-0000-0000-000000000002}",
+						"Text": "Ready",
+						"Width": 140,
+						"Icon": 0
+					},
+					{
+						"id": "{DB900000-0000-0000-0000-000000000003}",
+						"Text": "Line 1, Column 1",
+						"Width": 180,
+						"Icon": 1
+					},
+					{
+						"id": "{DB900000-0000-0000-0000-000000000004}",
+						"Text": "Application",
+						"Width": 120,
+						"Icon": -1
+					}
+				]
+			}
+		}
+	],
+	"components": [
+		{
+			"type": "ImageList",
+			"name": "StatusImages",
+			"id": "{DB900000-0000-0000-0000-000000000010}",
+			"properties": {
+				"Width": 16,
+				"Height": 16,
+				"ColorDepth": "Color32",
+				"Masked": true,
+				"Images": [
+					{
+						"format": "png",
+						"encoding": "base64",
+						"data": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAACP0lEQVR4nK1SS2tTQRg939xJ7k1umqciaaFKRERooT5x4dKdS8lG9/kLLl25cSEouBAFf0DduBBB1I2b4gN0oVURWrAPq21s3smdl8ykQaIL05pzucyL78w53xxCHwQY/D9oHCTDIPufL1fSn9dXGWrYI2qYnp5FZ0o16dyFS7kwm3s1EU7kjVF7ZUQkJHpR9yJf3tqkM8XJwrWrV7LJhA+lNIis8NGgjUHC93D95j08evI0zu0mEYkwmTBh0jdSaiJiuyDUSCWZIQIppYwjhHELklLDjkR6VwqFcAKcrT5hXyWsMku2G8vkan+vR/c2Iti4Cfmw5cG4d8t8MBFCIPIYhJRDhGS/QZUxfz0IEUFye9Q/4+l0BkIKLLx8jUTgIxHzhm7sCgUhtSvwvEGHCFpr+PE42p0OtFZoNBrIpDPgaZsaAxhtcLhUwofVOsROuG3IZw7moXotrKxvYObYURsrRxYEARqNJm7cvotTx2cBm10lB5YNGGNgPIbni5to9iQ4I6fu0GQBhcB3F1gS25p4PObIbt25j9Mn5nCkNI03797D833wOoD9LslGr618NZfnQvs07hLX2+oalqIIWkksfvzk9qRSePDwMaaKB/BlaRlGKxP4AUVRZHgxGZCUcuLZiwXm7PzRePcojMB2WsCs8l6EVqsN5nn4tvEDnW4XW9t15HNZTicrldi+Gjv7s92MQTEDo/+ZGS/gSPkp1GrbKGSy+F6tmnw+TRQm3o6ct1Hh1JTLZW8cZPPz8/oXQe78LiuQq+AAAAAASUVORK5CYII=",
+						"sizing": "Contain"
+					},
+					{
+						"format": "png",
+						"encoding": "base64",
+						"data": "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAB5UlEQVR4nOWSv2sUQRzF3/c7s5ucJpe7aO4CdwkJihH/AkFLsYidcgi2im0gVTqDjZU/mtgoaH+kEE2lvYKVnQhihIgpLnp3u97u3s4PmfU8PUmi4HV5w858mn3MvPcFDpzoj/N/ZTFskfvO1a7n3739xC0OLYz+59tO/DRhYWeqpyiq6JDOXrhSPFwovs6PjU+y82fAaA0msScTA1rr3vtstiepQpLEl+TmhwadPlM5snZrpQC20MbgkD+CRKUw1iDn7cLGIOePQjDDGAtmws17D7H+9IUv22hDCpEKj+zKxn273dyhG4tX8ejlM3z8uo3VxWsD/PjVBt43tnDn4hJOluf7ZTARaa2t7F2alNL0JWxhJ2hR1O2i2QkcYzduBC3EaQprLZTW8GRmk2XP/XaI4AsPI9KDIIa3H3uOKfuHaLDDvqHL5VsSIYg7SHW6L7cjxzrLzxgDY34ZyjzysMaayfyEuXt52cbdhI6Xqpg5Oo1YJTg2NcizU9PodBMslGbhpsJnL0uNmH9kuHCiTGHUGV+9/YBdi+4FrklfSDAxYtXdk91EoDc2m1ufMT9XlbJZyrWLgT6//uS5FyYhFIBRIaG0+iu7BdeHUqjMVVEujL3BsEVuq9VqYhhm9Xr9t3oOjL4D7osTYQ+VOVIAAAAASUVORK5CYII=",
+						"sizing": "Contain"
+					}
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,44 @@
+{
+	"target": "application",
+	"args": "",
+	"startDir": ".\\",
+	"files": [
+		{
+			"path": ".\\CanvasForm.quadoo",
+			"default": true,
+			"designer": {
+				"unitId": "{6E9D6BA1-E08F-4BFC-A5DB-C899015C8331}",
+				"kind": "form",
+				"definition": ".\\CanvasForm.qform.json",
+				"class": "CanvasForm",
+				"eventsInterface": "ICanvasForm",
+				"sourceSync": {
+					"version": 1,
+					"membersText": "\t// <QuadooStudio:members {6E9D6BA1-E08F-4BFC-A5DB-C899015C8331}>\r\n\tproperty __QuadooUnitId { get { return \"{6E9D6BA1-E08F-4BFC-A5DB-C899015C8331}\"; } }\r\n\tproperty __QuadooRoot\r\n\t{\r\n\t\tget\r\n\t\t{\r\n\t\t\treturn Form;\r\n\t\t}\r\n\t\tset (value)\r\n\t\t{\r\n\t\t\tForm = value;\r\n\t\t}\r\n\t}\r\n\tproperty var Drawing; // {03B35642-E6D6-5883-AAE8-CFE4EE5E39EE}\r\n\tproperty var ResultLabel; // {FC6166E7-B7D7-5875-A043-1104D2EC953E}\r\n\tproperty var ExportButton; // {AE554607-4F61-57C4-8BD0-679EDCAB668A}\r\n\tproperty var Images; // {B3DDE9AF-41AA-5C7E-B770-099F9DC233CF}\r\n\t// </QuadooStudio:members>\r\n",
+					"eventsText": "\t// <QuadooStudio:events {6E9D6BA1-E08F-4BFC-A5DB-C899015C8331}>\r\n\tvirtual function CanvasCreated (oArgs) = 0;\r\n\tvirtual function CanvasPaint (oArgs) = 0;\r\n\tvirtual function ExportClicked (oArgs) = 0;\r\n\t// </QuadooStudio:events>\r\n",
+					"members": [
+						{
+							"id": "{03B35642-E6D6-5883-AAE8-CFE4EE5E39EE}",
+							"member": "Drawing"
+						},
+						{
+							"id": "{FC6166E7-B7D7-5875-A043-1104D2EC953E}",
+							"member": "ResultLabel"
+						},
+						{
+							"id": "{AE554607-4F61-57C4-8BD0-679EDCAB668A}",
+							"member": "ExportButton"
+						},
+						{
+							"id": "{B3DDE9AF-41AA-5C7E-B770-099F9DC233CF}",
+							"member": "Images"
+						}
+					]
+				}
+			}
+		}
+	],
+	"application": {
+		"schemaVersion": 1
+	}
+}

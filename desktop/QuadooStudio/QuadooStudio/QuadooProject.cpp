@@ -3,6 +3,7 @@
 #include <commctrl.h>
 #include "resource.h"
 #include "Library\Core\CoreDefs.h"
+#include "Library\DPI.h"
 #include "Library\Core\MemoryStream.h"
 #include "Library\Util\Formatting.h"
 #include "Library\Util\TextHelpers.h"
@@ -27,6 +28,7 @@
 #include "DebugSession.h"
 #include "QuadooCallStackDisplay.h"
 #include "QuadooProject.h"
+#include "ApplicationProject.h"
 
 const WCHAR c_wzQuadooProjectClass[] = L"QuadooProjectCls";
 const WCHAR c_wzFontKey[] = L"Software\\Simbey\\QuadooStudio";
@@ -96,9 +98,16 @@ public:
 // CProjectFile
 ///////////////////////////////////////////////////////////////////////////////
 
+CProjectFile::~CProjectFile()
+{
+	SafeRelease(m_form);
+	SafeRelease(m_metadata);
+	SafeRelease(m_pTabDocument);
+}
+
 bool CProjectFile::IsModified (VOID)
 {
-	return m_pTabDocument->IsModified();
+	return (m_pTabDocument && m_pTabDocument->IsModified()) || (m_form && m_form->Dirty());
 }
 
 HRESULT CProjectFile::SaveFromEditor (ICodeEditor* pEditor)
@@ -136,6 +145,12 @@ HRESULT CProjectFile::SaveToStorage (ICodeEditor* pEditor, bool fActiveTab)
 		pDocument = pEditor->GetTextDocument();
 	}
 
+	if(m_form)
+	{
+		Check(m_form->Save(pDocument,m_pwzAbsolutePath));
+		goto Cleanup;
+	}
+	CheckIf(!pDocument,E_UNEXPECTED);
 	Check(pDocument->StreamOut(&stmText));
 	Check(Text::SaveToFile(stmText.TGetReadPtr<WCHAR>(), stmText.TDataRemaining<WCHAR>(), m_pwzAbsolutePath));
 	pDocument->ResetModifiedSnapshot();
@@ -335,6 +350,7 @@ CQuadooProject::CQuadooProject (HINSTANCE hInstance, IUpdateTitle* pTitle, CDark
 	m_hProjectRoot(NULL),
 	m_pEditor(NULL),
 	m_pDebugger(NULL),
+	m_applicationDebugReadOnly(FALSE),
 	m_pCallStack(NULL),
 	m_pDebugTree(NULL),
 	m_hwndDebugTip(NULL),
@@ -343,6 +359,12 @@ CQuadooProject::CQuadooProject (HINSTANCE hInstance, IUpdateTitle* pTitle, CDark
 	m_rstrHoverName(NULL),
 	m_rstrTooltipText(NULL)
 {
+	m_pCodeFile = NULL;
+	m_hwndStatus = NULL;
+	m_formRegistry = NULL;
+	m_treeDepth = 0;
+	m_sourceDepth = 0;
+	m_savingUnit = NULL;
 	m_pTitle->AddRef();
 }
 
@@ -353,6 +375,9 @@ CQuadooProject::~CQuadooProject()
 
 	SafeDelete(m_pDebugger);
 	SafeRelease(m_pDebugTree);
+	ClearTreeNodes();
+	m_mapFiles.DeleteAll();
+	SafeRelease(m_formRegistry);
 	SafeDelete(m_pTabs);
 	if(m_hwndDebugTip)
 		DestroyWindow(m_hwndDebugTip);
@@ -403,6 +428,8 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	PWSTR pwzJSON = NULL;
 	INT cchJSON;
 
+	CheckIf(!pcwzProject,E_INVALIDARG);
+	Check(RStrCreateW(TStrLenAssert(pcwzProject),pcwzProject,&m_rstrProject));
 	Check(UpdateColors());
 
 	m_hCloseIcon = (HICON)LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_CLOSE), IMAGE_ICON, 0, 0, LR_DEFAULTCOLOR);
@@ -435,10 +462,23 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 	m_hProjectRoot = TreeView_InsertItem(m_hwndTree, &tvis);
 	CheckIfGetLastError(NULL == m_hProjectRoot);
 
+	Check(CStudioFormUnit::RecoverProject(pcwzProject));
 	Check(Text::LoadFromFile(pcwzProject, &pwzJSON, &cchJSON));
+	Check(RStrCreateW(cchJSON,pwzJSON,&m_savedProject));
 	Check(JSONParse(NULL, pwzJSON, cchJSON, &srv));
 	CheckIf(NULL == srv, HRESULT_FROM_WIN32(ERROR_BAD_FORMAT));
 	Check(srv->GetObject(&m_pProject));
+	if(IsApplication())
+	{
+		TStackRef<IJSONObject> application;
+		TStackRef<IJSONValue> value, version;
+		INT schema;
+		Check(m_pProject->FindNonNullValueW(L"application",&value));
+		Check(value->GetObject(&application));
+		Check(application->FindNonNullValueW(L"schemaVersion",&version));
+		Check(version->GetInteger(&schema));
+		CheckIf(schema != 1,HRESULT_FROM_WIN32(ERROR_REVISION_MISMATCH));
+	}
 
 	srv.Release();
 	Check(m_pProject->FindNonNullValueW(L"files", &srv));
@@ -455,6 +495,14 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 		Check(srFile->FindNonNullValueW(L"path", &srv));
 		Check(srv->GetString(&rstrPath));
 		Check(AddFile(rstrPath, &pFile));
+		SetInterface(static_cast<CProjectFile*>(pFile)->m_metadata,static_cast<IJSONObject*>(srFile));
+		srv.Release();
+		if(SUCCEEDED(srFile->FindNonNullValueW(L"designer",&srv)))
+		{
+			TStackRef<IJSONObject> unit;
+			Check(srv->GetObject(&unit));
+			Check(InitializeFormUnit(static_cast<CProjectFile*>(pFile),unit));
+		}
 
 		srv.Release();
 		if(SUCCEEDED(srFile->FindNonNullValueW(L"breakpoints", &srv)))
@@ -480,12 +528,25 @@ HRESULT CQuadooProject::Initialize (HWND hwndParent, const RECT& rcSite, PCWSTR 
 		RStrRelease(rstrPath); rstrPath = NULL;
 	}
 
-	Check(RStrCreateW(TStrLenAssert(pcwzProject), pcwzProject, &m_rstrProject));
 
 	if(IsWebProject() && 0 == srFiles->Count() && IDYES == MessageBox(m_hwnd, L"Would you like to add a default web service script to your project?", L"Add Web Service Script", MB_YESNO))
 	{
 		if(SUCCEEDED(NewFilePrompt()))
 			SetPageScript(IDR_WEBSERVICE);
+	}
+
+	if(IsApplication())
+	{
+		for(sysint n = 0; n < m_mapFiles.Length(); n++)
+		{
+			CProjectFile* file = static_cast<CProjectFile*>(*m_mapFiles.GetValuePtr(n));
+			if(file->m_form && file->m_form->form)
+			{
+				file->m_form->design = TRUE;
+				if(FAILED(SwitchToFile(file))) file->m_form->design = FALSE;
+				break;
+			}
+		}
 	}
 
 Cleanup:
@@ -495,15 +556,27 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CQuadooProject::Save (VOID)
+HRESULT CQuadooProject::Save(VOID)
 {
 	HRESULT hr;
-	CMemoryStream stmJSON, stmFormatted;
-
-	Check(JSONSerializeObject(m_pProject, &stmJSON));
-	Check(ReformatJSON(stmJSON.TGetReadPtr<WCHAR>(), stmJSON.TDataRemaining<WCHAR>(), &stmFormatted));
-	Check(Text::SaveToFile(stmFormatted.TGetReadPtr<WCHAR>(), stmFormatted.TDataRemaining<WCHAR>(), RStrToWide(m_rstrProject)));
-
+	CMemoryStream text;
+	CRString saved;
+	CheckIf(m_sourceDepth,HRESULT_FROM_WIN32(ERROR_BUSY));
+	// An ordinary project save must publish only mappings whose paired source
+	// has already been saved. PrepareUnitSave explicitly selects its own unit.
+	Check(UpdateFiles());
+	if(IsApplication())
+	{
+		TStackRef<IJSONValue> value;
+		TStackRef<IJSONObject> application;
+		Check(m_pProject->FindNonNullValueW(L"application", &value));
+		Check(value->GetObject(&application));
+		application->RemoveValueW(L"mainForm");
+	}
+	Check(SerializeStudioProject(m_pProject,text));
+	Check(RStrCreateW(static_cast<INT>(text.TDataRemaining<WCHAR>()),text.TGetReadPtr<WCHAR>(),&saved));
+	Check(SaveStudioProject(m_pProject,RStrToWide(m_rstrProject)));
+	m_savedProject = saved;
 Cleanup:
 	return hr;
 }
@@ -520,8 +593,20 @@ HRESULT CQuadooProject::UpdateFiles (VOID)
 		TStackRef<IJSONObject> srFile;
 		CProjectTab* pFile = *m_mapFiles.GetValuePtr(i);
 
-		Check(JSONCreateObject(&srFile));
-
+		CProjectFile* source = static_cast<CProjectFile*>(pFile);
+		if(source->m_metadata)
+			srFile = source->m_metadata;
+		else
+		{
+			Check(JSONCreateObject(&srFile));
+			SetInterface(source->m_metadata,static_cast<IJSONObject*>(srFile));
+		}
+		if(source->m_form)
+		{
+			Check(JSONWrapObject(source->m_form->metadataDirty && source != m_savingUnit ? source->m_form->savedMetadata : source->m_form->metadata,&srv));
+			Check(srFile->AddValueW(L"designer",srv));
+			srv.Release();
+		}
 		Check(JSONCreateString(pFile->m_rstrPath, &srv));
 		Check(srFile->AddValueW(L"path", srv));
 		srv.Release();
@@ -532,9 +617,23 @@ HRESULT CQuadooProject::UpdateFiles (VOID)
 			Check(srFile->AddValueW(L"default", srv));
 			srv.Release();
 		}
+		else
+			srFile->RemoveValueW(L"default");
 
 		CProjectFile* pProjectFile = static_cast<CProjectFile*>(pFile);
-		if(0 < pProjectFile->Breakpoints())
+		if(source->m_form && source->m_form->metadataDirty && source != m_savingUnit)
+		{
+			// Generated line changes belong to the same save as their source.
+			Check(SavedUnitBreakpoints(source,&srv));
+			if(srv)
+			{
+				Check(srFile->AddValueW(L"breakpoints",srv));
+				srv.Release();
+			}
+			else
+				srFile->RemoveValueW(L"breakpoints");
+		}
+		else if(0 < pProjectFile->Breakpoints())
 		{
 			TStackRef<IJSONArray> srBreakpoints;
 			Check(pProjectFile->SaveBreakpoints(&srBreakpoints));
@@ -542,7 +641,8 @@ HRESULT CQuadooProject::UpdateFiles (VOID)
 			Check(srFile->AddValueW(L"breakpoints", srv));
 			srv.Release();
 		}
-
+		else
+			srFile->RemoveValueW(L"breakpoints");
 		Check(JSONWrapObject(srFile, &srv));
 		Check(srFiles->Add(srv));
 		srv.Release();
@@ -557,20 +657,38 @@ Cleanup:
 
 HRESULT CQuadooProject::CloseProject (BOOL fPromptUserForSave)
 {
+	HRESULT hr;
+	CheckIf(m_sourceDepth,HRESULT_FROM_WIN32(ERROR_BUSY));
+
+	if(fPromptUserForSave && ActiveDesigner())
+	{
+		Check(ActiveDesigner()->CommitPropertyEdit());
+	}
+
 	if(fPromptUserForSave)
 	{
 		for(sysint i = m_pTabs->Tabs() - 1; i >= 0; i--)
 		{
-			if(!CloseTab(i))
-				return E_ABORT;
+			CheckIf(!CloseTab(i), E_ABORT);
 		}
 	}
 
 	StopDebugger();
+	HideDesigners();
+	m_pCodeFile = NULL;
+	if(m_pTabs)
+	{
+		while(m_pTabs->Tabs())
+			m_pTabs->RemoveTab(m_pTabs->Tabs() - 1);
+	}
+	ClearTreeNodes();
 	m_mapFiles.DeleteAll();
 
 	Destroy();
-	return S_OK;
+	hr = S_OK;
+
+Cleanup:
+	return hr;
 }
 
 HRESULT CQuadooProject::SetPageScript (INT idScript)
@@ -625,6 +743,33 @@ VOID CQuadooProject::UpdateColorScheme (VOID)
 
 VOID CQuadooProject::ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen)
 {
+	CProjectTreeNode* node = TreeNode(hItem);
+	if(node && !node->source)
+	{
+		QFD::CDesignerEditor* editor = ActiveDesigner();
+		HRESULT hr;
+		if(editor && node->file == ActiveFile() && editor->IsSelected(node->id))
+		{
+			hr = editor->CommitPropertyEdit();
+		}
+		else
+		{
+			hr = SelectTreeItem(hItem);
+		}
+		if(FAILED(hr))
+		{
+			return;
+		}
+		HMENU menu = QFD::CreateControlMenu();
+		if(menu)
+		{
+			MenuUtil::EnableMenuItems(NULL,menu,this);
+			UINT command = CustomTrackPopupMenu(menu,TPM_RETURNCMD | TPM_NONOTIFY,ptScreen);
+			if(command) DesignerCommand(command);
+			DestroyMenu(menu);
+		}
+		return;
+	}
 	if(hItem == m_hProjectRoot)
 	{
 		HMENU hPopup = MenuUtil::LoadSubPopupMenu(m_hInstance, IDR_MENU, L"&Project");
@@ -647,8 +792,13 @@ VOID CQuadooProject::ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen)
 			INT nCmd;
 			CProjectTab* pFile = GetProjectFromTreeItem(hItem);
 
-			if(pFile->m_fDefault)
+			if(pFile && pFile->m_fDefault)
 				CheckMenuItem(hPopup, ID_CONTEXT_SETDEFAULT, MF_BYCOMMAND | MF_CHECKED);
+			if(m_applicationDebugReadOnly)
+			{
+				EnableMenuItem(hPopup,ID_CONTEXT_SETDEFAULT,MF_BYCOMMAND | MF_GRAYED);
+				EnableMenuItem(hPopup,ID_CONTEXT_REMOVE,MF_BYCOMMAND | MF_GRAYED);
+			}
 
 			nCmd = CustomTrackPopupMenu(hPopup, TPM_LEFTALIGN | TPM_RETURNCMD | TPM_NONOTIFY, ptScreen);
 			if(0 != nCmd)
@@ -668,7 +818,14 @@ VOID CQuadooProject::ActivateItem (HTREEITEM hItem)
 {
 	CProjectTab* pFile = GetProjectFromTreeItem(hItem);
 	if(pFile)
+	{
+		CProjectFile* source = static_cast<CProjectFile*>(pFile);
+		if(ActiveDesigner() && FAILED(ActiveDesigner()->CommitPropertyEdit())) return;
+		if(source->m_form) source->m_form->design = FALSE;
 		SwitchToFile(pFile);
+	}
+	else
+		SelectTreeItem(hItem);
 }
 
 VOID CQuadooProject::Move (const RECT& rcSite)
@@ -689,12 +846,49 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 
 	for(ULONG i = 0; i < cCmds; i++)
 	{
+		UINT command = prgCmds[i].cmdID;
+		if(command >= QFD::NewForm && command <= QFD::LastCommand)
+		{
+			BOOL enabled = FALSE;
+			if(command == QFD::NewForm || command == QFD::NewFrame || command == QFD::Open)
+				enabled = IsApplication() && !m_applicationDebugReadOnly;
+			else if(command == QFD::Save || command == QFD::SaveAs) enabled = DesignerActive();
+			else enabled = ActiveDesigner() && ActiveDesigner()->CanExecute(command);
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED | (enabled ? OLECMDF_ENABLED : 0);
+			if(ActiveDesigner() && ActiveDesigner()->IsCommandChecked(command))
+				prgCmds[i].cmdf |= OLECMDF_LATCHED;
+			continue;
+		}
+		if(command == ID_FORM_SYNCSOURCE)
+		{
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED | (ActiveFile() && ActiveFile()->m_form && !m_sourceDepth &&
+				!m_applicationDebugReadOnly ? OLECMDF_ENABLED : 0);
+			continue;
+		}
+		if(command == ID_VIEW_CODE || command == ID_VIEW_DESIGN || command == ID_VIEW_TOGGLEDESIGN)
+		{
+			CProjectFile* file = ActiveFile();
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED | (file && file->m_form ? OLECMDF_ENABLED : 0);
+			if((command == ID_VIEW_DESIGN && DesignerActive()) || (command == ID_VIEW_CODE && file && file->m_form && !DesignerActive()))
+				prgCmds[i].cmdf |= OLECMDF_LATCHED;
+			continue;
+		}
 		switch(prgCmds[i].cmdID)
 		{
+		case ID_PROJECT_SETTINGS:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
+			if(IsApplication() && !m_applicationDebugReadOnly)
+			{
+				prgCmds[i].cmdf |= OLECMDF_ENABLED;
+			}
+			break;
 		case ID_PROJECT_RUNPARAMETERS:
 		case ID_PROJECT_ADDFILE:
 		case ID_PROJECT_NEWFILE:
 		case ID_CONTEXT_REMOVE:
+		case ID_CONTEXT_SETDEFAULT:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED | (!m_applicationDebugReadOnly ? OLECMDF_ENABLED : 0);
+			break;
 		case ID_VIEW_OPTIONS:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED | OLECMDF_ENABLED;
 			break;
@@ -705,17 +899,20 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 			break;
 		case ID_DEBUG_SCRIPT:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
-			if(fDebugPaused || (!fDebugging && NULL != FindDefaultScript() && !IsWebProject()))
+			if(fDebugPaused || (!fDebugging && !m_applicationDebugReadOnly && NULL != FindDefaultScript() && !IsWebProject()))
 				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 			break;
 		case ID_PROJECT_COMPILE:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
-			if(!fDebugging && NULL != FindDefaultScript() && !IsWebProject())
+			if(!IsApplication() && !fDebugging && NULL != FindDefaultScript() && !IsWebProject())
 				prgCmds[i].cmdf |= OLECMDF_ENABLED;
+			break;
+		case ID_FILE_SAVEALL:
+			prgCmds[i].cmdf = OLECMDF_SUPPORTED | OLECMDF_ENABLED;
 			break;
 		case ID_FILE_SAVEFILE:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
-			if(m_pTabs->GetActiveTabHighlight())
+			if(ActiveFile() && (ActiveFile()->IsModified() || (m_pCodeFile == ActiveFile() && m_pEditor->IsModified())))
 				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 			break;
 		case ID_STEP_INTO:
@@ -731,7 +928,7 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::QueryStatus (
 			break;
 		case ID_TOGGLE_BREAKPOINT:
 			prgCmds[i].cmdf = OLECMDF_SUPPORTED;
-			if(!IsWebProject())
+			if(m_pCodeFile && !IsWebProject())
 				prgCmds[i].cmdf |= OLECMDF_ENABLED;
 			break;
 		case ID_NEXT_TAB:
@@ -758,10 +955,66 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 {
 	HRESULT hr;
 
+	CheckIf(m_sourceDepth,HRESULT_FROM_WIN32(ERROR_BUSY));
+	if(m_applicationDebugReadOnly)
+	{
+		CheckIf(nCmdID == ID_FORM_SYNCSOURCE || nCmdID == ID_PROJECT_SETTINGS || nCmdID == ID_PROJECT_RUNPARAMETERS ||
+			nCmdID == ID_PROJECT_ADDFILE || nCmdID == ID_PROJECT_NEWFILE || nCmdID == ID_CONTEXT_REMOVE ||
+			nCmdID == ID_CONTEXT_SETDEFAULT || nCmdID == QFD::NewForm || nCmdID == QFD::NewFrame || nCmdID == QFD::Open,
+			OLECMDERR_E_DISABLED);
+	}
+	if(ActiveFile() && ActiveFile()->m_form)
+		ActiveFile()->m_form->sourceError = S_OK;
+	if(nCmdID == ID_FORM_SYNCSOURCE)
+	{
+		Check(SynchronizeFormSource(ActiveFile(),TRUE));
+		if(ActiveFile()->m_form)
+			DesignerChanged(ActiveFile()->m_form->session);
+		goto Cleanup;
+	}
+	CheckIf(IsApplication() && nCmdID == ID_PROJECT_COMPILE,E_NOTIMPL);
+	if(ActiveDesigner())
+	{
+		Check(ActiveDesigner()->CommitPropertyEdit());
+	}
+	if(nCmdID >= QFD::NewForm && nCmdID <= QFD::LastCommand)
+	{
+		switch(nCmdID)
+		{
+		case QFD::NewForm:
+		case QFD::NewFrame:
+			hr = NewFormUnit(nCmdID == QFD::NewForm);
+			break;
+		case QFD::Open:
+			hr = AddFormUnit(TRUE);
+			break;
+		case QFD::Save:
+			hr = SaveTab(m_pTabs->GetActiveTab());
+			break;
+		case QFD::SaveAs:
+			hr = ExportDefinition();
+			break;
+		default:
+			hr = DesignerCommand(nCmdID);
+			break;
+		}
+		goto Cleanup;
+	}
 	switch(nCmdID)
 	{
+	case ID_VIEW_CODE:
+	case ID_VIEW_DESIGN:
+	case ID_VIEW_TOGGLEDESIGN:
+		hr = SetDesignView(nCmdID == ID_VIEW_TOGGLEDESIGN ? !DesignerActive() : nCmdID == ID_VIEW_DESIGN);
+		break;
+	case ID_FILE_SAVEALL:
+		hr = SaveAll();
+		break;
 	case ID_PROJECT_RUNPARAMETERS:
 		hr = EditRunParams();
+		break;
+	case ID_PROJECT_SETTINGS:
+		hr = EditApplicationSettings();
 		break;
 
 	case ID_PROJECT_ADDFILE:
@@ -854,6 +1107,7 @@ HRESULT STDMETHODCALLTYPE CQuadooProject::Exec (
 
 	case ID_TOGGLE_BREAKPOINT:
 		{
+			CheckIf(!m_pCodeFile,OLECMDERR_E_DISABLED);
 			TEXT_EDIT_VIEW tev;
 
 			m_pEditor->GetTextEditView(&tev);
@@ -906,11 +1160,20 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 {
 	switch(message)
 	{
+	case QFD::ChangedMessage:
+		DesignerChanged(static_cast<UINT_PTR>(wParam));
+		lResult = 0; return TRUE;
+
 	case WM_QUADOO_DEBUG_SOCKET:
 		if(m_pDebugger)
 		{
 			if(FAILED(m_pDebugger->OnSocketEvent(wParam, lParam)))
+			{
+				CRString diagnostic(m_pDebugger->ApplicationError());
 				StopDebugger();
+				if(diagnostic.Length())
+					MessageBoxW(m_hwnd,diagnostic.c_wstr(),L"Application Debugger",MB_OK | MB_ICONERROR);
+			}
 			else
 			{
 				SideAssertHr(ShowDebuggerLocation());
@@ -1037,6 +1300,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 				HideDebuggerTooltip();
 				break;
 			case TVN_CURSOR_CHANGE:
+				if(!m_pCodeFile) break;
 				SendMessage(GetParent(m_hwnd), WM_NOTIFY, wParam, lParam);
 				break;
 			case TVN_MARGIN_CLICK:
@@ -1047,6 +1311,7 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 				}
 				break;
 			case TVN_LINES_CHANGED:
+				if(!m_pCodeFile) break;
 				SideAssertHr(AdjustBreakpoints(static_cast<TVNLINESCHANGED*>(pnmhdr)));
 				break;
 			case TVN_SYNTAX_HIGHLIGHT:
@@ -1146,64 +1411,90 @@ BOOL CQuadooProject::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, 
 		break;
 
 	case WM_SETFOCUS:
-		m_pEditor->SetFocus();
+		if(DesignerActive())
+			SetFocus(ActiveDesigner()->OverlayWindow());
+		else
+			m_pEditor->SetFocus();
 		break;
 	}
 
 	return __super::DefWindowProc(message, wParam, lParam, lResult);
 }
 
-HRESULT CQuadooProject::SwitchToFile (CProjectTab* pFile)
+HRESULT CQuadooProject::SwitchToFile(CProjectTab* pFile)
 {
 	HRESULT hr;
-	RSTRING rstrLabel = NULL;
 	HDC hdc = NULL;
-	RECT rc;
-	sysint idxTab = m_pTabs->GetActiveTab();
-	bool fResize = false;
-
-	if(-1 != idxTab)
+	CProjectFile* file = static_cast<CProjectFile*>(pFile);
+	CRString label;
+	RECT rect;
+	sysint index;
+	TStackRef<IBaseWindow> codeWindow;
+	CheckIf(m_sourceDepth,HRESULT_FROM_WIN32(ERROR_BUSY));
+	CheckIf(!file,E_INVALIDARG);
+	if(ActiveDesigner())
 	{
-		CProjectTab* pTab = m_pTabs->TGetTabData<CProjectTab>(idxTab);
-		fResize = S_OK == pTab->CloseCustomLayout();
-		SaveTabData(pTab);
+		Check(ActiveDesigner()->CommitPropertyEdit());
 	}
-
-	idxTab = m_pTabs->FindTab(pFile);
-	if(-1 == idxTab)
+	if(file->m_form && file->m_form->design)
 	{
-		PCWSTR pcwzLabel = TStrRChr(RStrToWide(pFile->m_rstrPath), L'\\');
-		if(pcwzLabel)
-			pcwzLabel++;
-		else
-			pcwzLabel = RStrToWide(pFile->m_rstrPath);
-
+		Check(file->m_form->EnsureEditor(m_hwnd,GetParent(m_hwnd),m_formRegistry,static_cast<UINT>(DPI::xDPI)));
+		file->m_form->editor->SetReadOnly(m_applicationDebugReadOnly);
+		// Source diagnostics do not prevent viewing, moving or resizing controls.
+		if(!m_applicationDebugReadOnly)
+			SynchronizeFormSource(file);
+	}
+	// Preserve the real source owner even when the tab's next view is Design.
+	if(m_pCodeFile)
+	{
+		Check(SaveTabData(m_pCodeFile));
+		m_pCodeFile = NULL;
+	}
+	HideDesigners();
+	index = m_pTabs->FindTab(file);
+	if(index < 0)
+	{
+		PCWSTR leaf = TStrRChr(RStrToWide(file->m_rstrPath),L'\\');
+		Check(RStrCreateW(TStrLenAssert(leaf ? leaf + 1 : RStrToWide(file->m_rstrPath)),leaf ? leaf + 1 : RStrToWide(file->m_rstrPath),&label));
 		hdc = GetDC(m_hwnd);
-		Check(RStrCreateW(TStrLenAssert(pcwzLabel), pcwzLabel, &rstrLabel));
-		Check(m_pTabs->AddTab(hdc, rstrLabel, pFile));
-		idxTab = 0;
+		Check(m_pTabs->AddTab(hdc,label,file));
+		index = 0;
 	}
-
-	Check(m_pTabs->SetActive(idxTab));
-	Check(LoadTabData(pFile));
-
-	if(S_OK == pFile->OpenCustomLayout(m_pEditor) || fResize)
+	Check(m_pTabs->SetActive(index));
+	if(file->m_form)
 	{
-		GetClientRect(m_hwnd, &rc);
-		ResizeEditor(rc.bottom);
+		PCWSTR leaf = TStrRChr(RStrToWide(file->m_rstrPath),L'\\');
+		label = static_cast<RSTRING>(NULL);
+		Check(RStrFormatW(&label,L"%ls [%ls]",leaf ? leaf + 1 : RStrToWide(file->m_rstrPath),file->m_form->design ? L"Design" : L"Code"));
+		if(!hdc) hdc = GetDC(m_hwnd);
+		Check(m_pTabs->SetLabel(hdc,m_pTabs->GetActiveTab(),label));
 	}
-
-	m_pTabs->GetTabsRect(0, 0, rc);
-	InvalidateRect(m_hwnd, &rc, FALSE);
-
-	PostMessage(m_hwnd, WM_SETFOCUS, 0, 0);
+	Check(m_pEditor->QueryInterface(&codeWindow));
+	if(file->m_form && file->m_form->design)
+	{
+		HWND window; codeWindow->GetWindow(&window); ::ShowWindow(window,SW_HIDE);
+		m_pEditor->EnableEditor(FALSE);
+		::ShowWindow(file->m_form->editor->Window(),SW_SHOWNOACTIVATE);
+		::ShowWindow(file->m_form->editor->PaletteWindow(),SW_SHOWNOACTIVATE);
+		Check(RefreshOutline(file));
+	}
+	else
+	{
+		Check(LoadTabData(file));
+		m_pCodeFile = file;
+		HWND window; codeWindow->GetWindow(&window); ::ShowWindow(window,SW_SHOW);
+		m_pEditor->EnableEditor(TRUE);
+		m_pEditor->SetReadOnly(m_pDebugger != NULL || m_applicationDebugReadOnly);
+	}
+	GetClientRect(m_hwnd,&rect); ResizeEditor(rect.bottom);
+	m_pTabs->GetTabsRect(0,0,rect); InvalidateRect(m_hwnd,&rect,FALSE);
+	m_pTabs->HighlightTab(m_pTabs->GetActiveTab(),file->IsModified() || (m_pCodeFile == file && m_pEditor->IsModified()));
+	UpdateDesignerStatus();
+	PostMessage(GetParent(m_hwnd),WM_STUDIO_DESIGNER,0,0);
+	PostMessage(m_hwnd,WM_SETFOCUS,0,0);
+	hr = S_OK;
 
 Cleanup:
-	m_pEditor->EnableEditor(SUCCEEDED(hr));
-	if(FAILED(hr) && -1 != idxTab)
-		CloseTab(idxTab);
-
-	RStrRelease(rstrLabel);
 	if(hdc)
 		ReleaseDC(m_hwnd, hdc);
 	return hr;
@@ -1321,45 +1612,39 @@ Cleanup:
 	return hr;
 }
 
-HRESULT CQuadooProject::AddFile (RSTRING rstrPath, __deref_out CProjectTab** ppFile)
+HRESULT CQuadooProject::AddFile (RSTRING rstrPath, CProjectTab** ppFile)
 {
 	HRESULT hr;
-	CProjectTab* pFile = NULL;
+	CProjectFile* pFile = NULL;
+	CProjectTreeNode* node = NULL;
+	PCWSTR label = TStrRChr(RStrToWide(rstrPath),L'\\');
+	CheckIf(!ppFile,E_POINTER);
+	*ppFile = NULL;
 
 	hr = m_mapFiles.Find(rstrPath, ppFile);
 	if(FAILED(hr))
 	{
-		TVINSERTSTRUCT tvis = {0};
-		PCWSTR pcwzLabel = TStrRChr(RStrToWide(rstrPath), L'\\');
-		if(pcwzLabel)
-			pcwzLabel++;
-
 		pFile = __new CProjectFile(rstrPath);
 		CheckAlloc(pFile);
+		Check(Formatting::TBuildDirectory(RStrToWide(m_rstrProjectDir),RStrLen(m_rstrProjectDir),RStrToWide(rstrPath),RStrLen(rstrPath),&pFile->m_pwzAbsolutePath,&pFile->m_cchAbsolutePath));
+		{
+			CRString text;
+			Check(RStrCreateW(TStrLenAssert(label ? label + 1 : RStrToWide(rstrPath)),label ? label + 1 : RStrToWide(rstrPath),&text));
+			Check(AddTreeNode(pFile,TRUE,GUID_NULL,m_hProjectRoot,text,2,&node));
+		}
+		pFile->m_hItem = node->item;
 		Check(m_mapFiles.Add(rstrPath, pFile));
-
-		Check(Formatting::TBuildDirectory(RStrToWide(m_rstrProjectDir), RStrLen(m_rstrProjectDir), RStrToWide(rstrPath), RStrLen(rstrPath), &pFile->m_pwzAbsolutePath, &pFile->m_cchAbsolutePath));
-
-		tvis.hParent        = m_hProjectRoot;
-		tvis.hInsertAfter   = TVI_LAST;
-		tvis.item.mask      = TVIF_TEXT | TVIF_PARAM | TVIF_IMAGE | TVIF_SELECTEDIMAGE;
-		tvis.item.pszText   = const_cast<PWSTR>(pcwzLabel);
-		tvis.item.iImage    = 2;
-		tvis.item.iSelectedImage = 2;
-		tvis.item.lParam    = (LPARAM)pFile;
-
-		pFile->m_hItem = TreeView_InsertItem(m_hwndTree, &tvis);
-		CheckIfGetLastError(NULL == pFile->m_hItem);
-
-		if(1 == m_mapFiles.Length())
-			TreeView_Expand(m_hwndTree, m_hProjectRoot, TVE_EXPAND);
-
+		TreeView_Expand(m_hwndTree,m_hProjectRoot,TVE_EXPAND);
 		*ppFile = pFile;
 		pFile = NULL;
 	}
 
 Cleanup:
-	SafeDelete(pFile);
+	if(pFile)
+	{
+		ClearTreeNodes(pFile);
+		SafeDelete(pFile);
+	}
 	return hr;
 }
 
@@ -1372,7 +1657,12 @@ VOID CQuadooProject::ResizeEditor (INT nWindowHeight)
 
 	SideAssertHr(m_pEditor->QueryInterface(&srEditorWin));
 
-	nEditorHeight = (nWindowHeight - pcszTabs->cy) - 1;
+	nEditorHeight = max(0,(nWindowHeight - pcszTabs->cy) - 1);
+	if(DesignerActive())
+	{
+		MoveWindow(ActiveDesigner()->Window(),1,pcszTabs->cy,max(1,pcszTabs->cx - 2),max(1,nEditorHeight),TRUE);
+		return;
+	}
 	if(-1 != idxTab)
 	{
 		CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
@@ -1627,7 +1917,7 @@ CProjectFile* CQuadooProject::GetActiveProjectFile (VOID)
 {
 	sysint idxTab = m_pTabs->GetActiveTab();
 	if(-1 != idxTab)
-		return static_cast<CProjectFile*>(m_pTabs->TGetTabData<CProjectTab>(idxTab));
+		return DesignerActive() ? NULL : m_pCodeFile;
 	return NULL;
 }
 
@@ -1762,17 +2052,11 @@ Cleanup:
 HRESULT CQuadooProject::SaveAll (VOID)
 {
 	HRESULT hr = S_FALSE;
-	sysint idxActive = m_pTabs->GetActiveTab();
 
 	for(sysint idxTab = 0; idxTab < m_pTabs->Tabs(); idxTab++)
 	{
 		CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
-		if(idxActive == idxTab)
-		{
-			if(m_pTabs->GetActiveTabHighlight())
-				Check(SaveTab(idxTab));
-		}
-		else if(pFile->IsModified())
+		if(pFile->IsModified() || (m_pCodeFile == pFile && m_pEditor->IsModified()))
 			Check(SaveTab(idxTab));
 	}
 
@@ -1791,6 +2075,11 @@ HRESULT CQuadooProject::RunScript (VOID)
 	INT cchStartDir = 0, nCompare;
 	LONG_PTR nResult;
 
+	if(IsApplication())
+	{
+		hr = RunApplication();
+		goto Cleanup;
+	}
 	Check(SaveAll());
 	CheckIf(NULL == pFile, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
 
@@ -1864,7 +2153,7 @@ HRESULT CQuadooProject::RunScript (VOID)
 	}
 
 Cleanup:
-	if(FAILED(hr) && E_ABORT != hr)
+	if(FAILED(hr) && E_ABORT != hr && !IsApplication())
 	{
 		RSTRING rstrError;
 		if(SUCCEEDED(RStrFormatW(&rstrError, L"Failed to run your project due to error %.8X!", hr)))
@@ -1897,23 +2186,38 @@ HRESULT CQuadooProject::DebugScript (VOID)
 	PWSTR pwzStartDir = NULL;
 	INT cchStartDir = 0, cchBaseEngine, nPort;
 	WCHAR wzDebugger[MAX_PATH];
+	BOOL application = IsApplication();
 
-	Check(SaveAll());
 	CheckIf(NULL == pFile, HRESULT_FROM_WIN32(ERROR_NOT_FOUND));
 	CheckIf(IsWebProject(), E_UNEXPECTED);
 
-	Check(FindInstalledEngine(&rstrEngine));
-
-	pcwzDotExe = TStrCchRChr(RStrToWide(rstrEngine), RStrLen(rstrEngine), L'.');
-	CheckIf(NULL == pcwzDotExe, E_UNEXPECTED);
-	Check(TStrCchCpyLen(wzDebugger, ARRAYSIZE(wzDebugger), RStrToWide(rstrEngine), static_cast<INT>(pcwzDotExe - RStrToWide(rstrEngine)), &cchBaseEngine));
-	Check(TStrCchCpy(wzDebugger + cchBaseEngine, ARRAYSIZE(wzDebugger) - cchBaseEngine, L"Dbg.exe"));
+	if(application)
+	{
+		Check(SaveApplicationInputs());
+		DWORD length = GetModuleFileNameW(m_hInstance,wzDebugger,ARRAYSIZE(wzDebugger));
+		CheckIf(!length || length >= ARRAYSIZE(wzDebugger),HrEnsureLastError());
+		PCWSTR leaf = TStrRChr(wzDebugger,L'\\');
+		CheckIf(!leaf,E_INVALIDARG);
+		cchBaseEngine = static_cast<INT>(leaf + 1 - wzDebugger);
+		Check(TStrCchCpyLen(wzDebugger + cchBaseEngine,ARRAYSIZE(wzDebugger) - cchBaseEngine,SLP(L"AQVMDbg.exe"),NULL));
+	}
+	else
+	{
+		Check(SaveAll());
+		Check(FindInstalledEngine(&rstrEngine));
+		pcwzDotExe = TStrCchRChr(RStrToWide(rstrEngine), RStrLen(rstrEngine), L'.');
+		CheckIf(NULL == pcwzDotExe, E_UNEXPECTED);
+		Check(TStrCchCpyLen(wzDebugger, ARRAYSIZE(wzDebugger), RStrToWide(rstrEngine), static_cast<INT>(pcwzDotExe - RStrToWide(rstrEngine)), &cchBaseEngine));
+		Check(TStrCchCpy(wzDebugger + cchBaseEngine, ARRAYSIZE(wzDebugger) - cchBaseEngine, L"Dbg.exe"));
+	}
 
 	Check(m_pProject->FindNonNullValueW(L"args", &srv));
 	Check(srv->GetString(&rstrArgs));
 	srv.Release();
 
-	if(0 < RStrLen(rstrArgs))
+	if(application)
+		RStrSet(rstrScriptArgs,rstrArgs);
+	else if(0 < RStrLen(rstrArgs))
 		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\" %r", pFile->m_pwzAbsolutePath, rstrArgs));
 	else
 		Check(RStrFormatW(&rstrScriptArgs, L"\"%ls\"", pFile->m_pwzAbsolutePath));
@@ -2095,8 +2399,28 @@ HRESULT CQuadooProject::ShowDebuggerLocation (VOID)
 			break;
 		}
 	}
+	if(!pFile && m_applicationDebugReadOnly)
+	{
+		UpdateDebuggerUI();
+		hr = S_FALSE;
+		goto Cleanup;
+	}
 	CheckIf(NULL == pFile, HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND));
-	Check(SwitchToFile(pFile));
+	{
+		CProjectFile* file = static_cast<CProjectFile*>(pFile);
+		if(file->m_form && file->m_form->design)
+		{
+			file->m_form->design = FALSE;
+			hr = SwitchToFile(file);
+			if(FAILED(hr))
+				file->m_form->design = TRUE;
+			Check(hr);
+		}
+		else
+		{
+			Check(SwitchToFile(file));
+		}
+	}
 	m_pEditor->ScrollView(0, nLine - 1);
 	m_pEditor->SetFocus();
 	UpdateDebuggerUI();
@@ -2320,6 +2644,7 @@ VOID CQuadooProject::StopDebugger (VOID)
 	}
 	SafeRelease(m_pDebugTree);
 	SafeDelete(m_pDebugger);
+	SetApplicationDebugReadOnly(FALSE);
 	UpdateDebuggerUI();
 
 	if(m_pCallStack)
@@ -2333,7 +2658,8 @@ VOID CQuadooProject::StopDebugger (VOID)
 		ResizeEditor(rc.bottom);
 	}
 
-	m_pEditor->SetReadOnly(FALSE);
+	if(m_pEditor)
+		m_pEditor->SetReadOnly(FALSE);
 }
 
 BOOL CQuadooProject::IsDebugging (VOID)
@@ -2469,12 +2795,8 @@ Cleanup:
 
 CProjectTab* CQuadooProject::GetProjectFromTreeItem (HTREEITEM hItem)
 {
-	TVITEM tvItem = {0};
-	tvItem.hItem = hItem;
-	tvItem.mask = TVIF_PARAM;
-	if(TreeView_GetItem(m_hwndTree, &tvItem) && tvItem.lParam)
-		return reinterpret_cast<CProjectTab*>(tvItem.lParam);
-	return NULL;
+	CProjectTreeNode* node = TreeNode(hItem);
+	return node && node->source ? node->file : NULL;
 }
 
 CProjectTab* CQuadooProject::FindDefaultScript (VOID)
@@ -2602,7 +2924,8 @@ HRESULT CQuadooProject::SaveTab (sysint idxTab)
 	CProjectTab* pFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
 	RECT rc;
 
-	Check(pFile->SaveToStorage(m_pEditor, m_pTabs->GetActiveTab() == idxTab));
+	CheckIf(!pFile,OLECMDERR_E_DISABLED);
+	Check(pFile->SaveToStorage(m_pEditor, m_pCodeFile == pFile));
 	Check(m_pTabs->HighlightTab(idxTab, false));
 	m_pTabs->GetTabsRect(0, 0, rc);
 	InvalidateRect(m_hwnd, &rc, FALSE);
@@ -2643,12 +2966,14 @@ BOOL CQuadooProject::PromptToSaveTab (sysint idxTab)
 
 BOOL CQuadooProject::CloseTab (sysint idxTab)
 {
+	if(!m_pTabs->TGetTabData<CProjectTab>(idxTab)) return FALSE;
+	if(ActiveDesigner() && FAILED(ActiveDesigner()->CommitPropertyEdit())) return FALSE;
 	CProjectTab* pActiveFile = NULL;
 	sysint idxActive = m_pTabs->GetActiveTab();
 	if(idxActive == idxTab)
 	{
 		pActiveFile = m_pTabs->TGetTabData<CProjectTab>(idxTab);
-		if(m_pTabs->GetActiveTabHighlight() && !PromptToSaveTab(idxTab))
+		if((pActiveFile->IsModified() || (m_pCodeFile == pActiveFile && m_pEditor->IsModified())) && !PromptToSaveTab(idxTab))
 			return FALSE;
 	}
 	else
@@ -2658,6 +2983,9 @@ BOOL CQuadooProject::CloseTab (sysint idxTab)
 			return FALSE;
 	}
 
+	CProjectFile* closing = static_cast<CProjectFile*>(m_pTabs->TGetTabData<CProjectTab>(idxTab));
+	if(m_pCodeFile == closing) { SaveTabData(closing); m_pCodeFile = NULL; }
+	if(closing->m_form) { closing->m_form->Hide(); closing->m_form->Close(); closing->DiscardStoredDocument(); ReloadSavedOutline(closing); }
 	SideAssertHr(m_pTabs->RemoveTab(idxTab));
 
 	RECT rc;
@@ -2681,6 +3009,8 @@ BOOL CQuadooProject::CloseTab (sysint idxTab)
 		m_pEditor->EnableEditor(FALSE);
 	}
 
+	UpdateDesignerStatus();
+	PostMessage(GetParent(m_hwnd),WM_STUDIO_DESIGNER,0,0);
 	return TRUE;
 }
 
@@ -2689,7 +3019,7 @@ VOID CQuadooProject::RemoveFilePrompt (CProjectTab* pFile)
 	sysint idxTab = m_pTabs->FindTab(pFile);
 	if(-1 == idxTab || CloseTab(idxTab))
 	{
-		TreeView_DeleteItem(m_hwndTree, pFile->m_hItem);
+		ClearTreeNodes(pFile);
 		m_mapFiles.Remove(pFile->m_rstrPath, NULL);
 		__delete pFile;
 
@@ -2706,6 +3036,7 @@ HRESULT CQuadooProject::ShowProjectCompiler (VOID)
 	CDialogHost dlgHost(m_hInstance);
 
 	CheckIf(NULL == pDefault, E_UNEXPECTED);
+	CheckIf(IsApplication(),E_NOTIMPL);			// TODO
 	Check(GetProjectTarget(&rstrTarget));
 	Check(FindInstalledEngine(&rstrEngine));
 

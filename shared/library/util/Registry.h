@@ -5,7 +5,9 @@ namespace Registry
 	HRESULT WINAPI CreateKey (HKEY hOpenKey, LPCTSTR pctzSubKey, REGSAM samDesired, __out HKEY* phKey);
 	HRESULT WINAPI WriteRegistryString (HKEY hKey, LPCTSTR pctzValueName, LPCTSTR pctzStringData, INT cchStringData);
 	HRESULT WINAPI RegisterServer (HINSTANCE hServer, LPCTSTR pctzGuid, LPCTSTR pctzDescription, LPCTSTR pctzProgId);
+	HRESULT WINAPI AddImplementedCategories (LPCTSTR pctzGuid, __in_ecount(cCategories) const GUID* pcrgCategories, INT cCategories);
 	HRESULT WINAPI ApproveShellExt (LPCTSTR pctzGuid, LPCTSTR pctzDescription, BOOL fApprove);
+	LONG WINAPI RegDeleteTreeRecursive (HKEY hKey);
 	LONG WINAPI RegDeleteKeyRecursive (HKEY hKeyBase, LPCTSTR pctzKey);
 
 	HRESULT WINAPI LoadCustomColors (__in_opt HKEY hKey, COLORREF* pcr, __inout INT* pcColors);

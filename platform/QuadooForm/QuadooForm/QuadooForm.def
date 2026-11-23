@@ -1,0 +1,15 @@
+LIBRARY	"QuadooForm"
+
+EXPORTS
+	QuadooCreateForm				@5
+	QuadooCreateFrame			@6
+	QuadooGetControlRegistry		@7
+	QuadooCreateConstructionContext	@8
+	QuadooCreateControl			@9
+	QuadooGetFormSerializer		@10
+	QuadooValidateControlName		@11
+	QuadooCreateIconValue		@12
+	QuadooLoadIconValue		@13
+	QuadooCreateComponent		@14
+	ResolveQuadooColor			@15
+	ShowQuadooColorPicker		@16

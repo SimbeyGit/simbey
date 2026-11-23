@@ -4,6 +4,7 @@
 #include "Library\Window\BaseDialog.h"
 #include "Published\QuadooParser.h"
 #include "DebugSession.h"
+#include "ApplicationTarget.h"
 
 class CQuadooProject;
 
@@ -24,11 +25,14 @@ private:
 	CMemoryStream m_stmDebug;
 	CMemoryStream m_stmBreakpoints;
 	IQuadooDebugTree* m_pDebugTree;
+	StudioApplication::CApplicationDebugData m_application;
+	CRString m_diagnostic;
+	BOOL m_applicationMode;
 
 	HWND m_hwndStatus;
 	HICON m_hDebuggerIcon;
 	HANDLE m_hStartThread;
-	BOOL m_fAbort;
+	LONG m_fAbort;
 	CQuadooDebugSession* m_pDebugger;
 	RSTRING m_rstrRemoteHost;
 

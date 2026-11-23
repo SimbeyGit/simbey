@@ -1,0 +1,32 @@
+#pragma once
+
+// Quadoo Studio Frame unit.
+
+interface IDetailsFrame
+{
+	// <QuadooStudio:events {B6A5CF6F-B558-4398-A4A7-95AAF17694FB}>
+	// </QuadooStudio:events>
+};
+
+class DetailsFrame : extern(Frame), IDetailsFrame
+{
+	// <QuadooStudio:members {B6A5CF6F-B558-4398-A4A7-95AAF17694FB}>
+	property __QuadooUnitId { get { return "{B6A5CF6F-B558-4398-A4A7-95AAF17694FB}"; } }
+	property __QuadooRoot
+	{
+		get
+		{
+			return Frame;
+		}
+		set (value)
+		{
+			Frame = value;
+		}
+	}
+	// </QuadooStudio:members>
+
+	DetailsFrame (Owner)
+	{
+		Frame = Frame.Create(this, Owner);
+	}
+};

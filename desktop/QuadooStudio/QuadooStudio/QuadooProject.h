@@ -7,11 +7,14 @@
 #include "Library\Window\BaseWindow.h"
 #include "Published\CodeEdit.h"
 #include "UpdateTitle.h"
+#include "FormProjectFile.h"
 
 interface IJSONObject;
 interface IJSONArray;
 interface IQuadooDebugTree;
 
+namespace QFP { struct IDefinitionVisitor; }
+namespace StudioApplication { class CApplicationDebugData; }
 class CDarkMode;
 class CTabs;
 class CMemoryStream;
@@ -83,17 +86,20 @@ private:
 	TArray<ULONG> m_aBreakpoints;
 
 public:
+	CStudioFormUnit* m_form;
+	IJSONObject* m_metadata;
 	CProjectFile (RSTRING rstrPath) :
 		CProjectTab(rstrPath),
-		m_pTabDocument(NULL)
+		m_pTabDocument(NULL), m_form(NULL), m_metadata(NULL)
 	{
 		ZeroMemory(&m_tev, sizeof(m_tev));
 	}
 
-	virtual ~CProjectFile ()
-	{
-		SafeRelease(m_pTabDocument);
-	}
+	virtual ~CProjectFile ();
+	ITextDocument* StoredDocument() const { return m_pTabDocument; }
+	VOID DiscardStoredDocument() { SafeRelease(m_pTabDocument); }
+	VOID StoreDocument(ITextDocument* document) { ReplaceInterface(m_pTabDocument,document); }
+	TEXT_EDIT_VIEW& StoredView() { return m_tev; }
 
 	virtual bool IsModified (VOID);
 	virtual HRESULT SaveFromEditor (ICodeEditor* pEditor);
@@ -125,12 +131,22 @@ private:
 	IUpdateTitle* m_pTitle;
 	CDarkMode* m_pdm;
 	HWND m_hwndTree;
+	HWND m_hwndStatus;
+	CProjectFile* m_pCodeFile;
+	IQuadooControlRegistry* m_formRegistry;
+	TArray<CProjectTreeNode*> m_treeNodes;
+	TRStrMap<INT> m_treeIcons;
+	UINT m_treeDepth;
+	UINT m_sourceDepth;
+	CProjectFile* m_savingUnit;
+	friend class CStudioSourceEdit;
 
 	HICON m_hCloseIcon, m_hDropDown;
 	CTabs* m_pTabs;
 
 	RSTRING m_rstrProject;
 	RSTRING m_rstrProjectDir;
+	CRString m_savedProject;
 	HTREEITEM m_hProjectRoot;
 
 	IJSONObject* m_pProject;
@@ -139,6 +155,7 @@ private:
 	TNamedMapW<COLORREF> m_mapKeywords;
 	ICodeEditor* m_pEditor;
 	CQuadooDebugSession* m_pDebugger;
+	BOOL m_applicationDebugReadOnly;
 	CQuadooCallStackDisplay* m_pCallStack;
 	IQuadooDebugTree* m_pDebugTree;
 	HWND m_hwndDebugTip;
@@ -178,6 +195,35 @@ public:
 	VOID ShowTreeContext (HTREEITEM hItem, const POINT& ptScreen);
 	VOID ActivateItem (HTREEITEM hItem);
 	VOID Move (const RECT& rcSite);
+	BOOL IsApplication(VOID);
+	BOOL IsTreeUpdating() const { return m_treeDepth != 0; }
+	HRESULT ReloadSavedOutline(CProjectFile* file);
+	BOOL DesignerActive(VOID);
+	QFD::CDesignerEditor* ActiveDesigner(VOID);
+	HWND ActivePalette(VOID);
+	VOID SetStatusWindow(HWND status) { m_hwndStatus = status; }
+	VOID UpdateDesignerStatus(VOID);
+	BOOL TranslateProjectMessage(MSG* message);
+	HRESULT SelectTreeItem(HTREEITEM item);
+	HRESULT ExpandTreeItem(HTREEITEM item);
+	HRESULT NewFormUnit(BOOL form, PCWSTR sourcePath = NULL);
+	HRESULT AddFormUnit(BOOL form);
+	HRESULT SetDesignView(BOOL design);
+	HRESULT FindSource(RSTRING path, CProjectFile** file);
+	ICodeEditor* ActiveSourceEditor() const { return m_pCodeFile ? m_pEditor : NULL; }
+	IQuadooControlRegistry* FormRegistry() const { return m_formRegistry; }
+	VOID SetFormRegistry(IQuadooControlRegistry* registry) { ReplaceInterface(m_formRegistry,registry); }
+	HRESULT VisitPackageDefinitions(QFP::IDefinitionVisitor* visitor);
+	HRESULT GetPackageEditors(TArray<QFD::CDesignerEditor*>& editors);
+	HRESULT PrepareFormSource(CProjectFile* file, IJSONObject* proposed, RSTRING handler, QFD::ISourceEdit** edit, INT* position = NULL, BOOL repair = FALSE);
+	HRESULT OpenFormHandler(CProjectFile* file, REFGUID component, RSTRING eventName);
+	HRESULT SynchronizeFormSource(CProjectFile* file, BOOL repair = FALSE);
+	HRESULT SourceDocument(CProjectFile* file, ITextDocument** document);
+	RSTRING SourceDiagnostic() { CProjectFile* file = ActiveFile(); return file && file->m_form ? static_cast<RSTRING>(file->m_form->sourceDiagnostic) : NULL; }
+	HRESULT SourceError() { CProjectFile* file = ActiveFile(); return file && file->m_form ? file->m_form->sourceError : S_OK; }
+	HRESULT PrepareUnitSave(CProjectFile* file, CMemoryStream* project, RSTRING* path);
+	HRESULT SavedUnitBreakpoints(CProjectFile* file, IJSONValue** points);
+	VOID UnitProjectSaved(RSTRING text) { m_savedProject = text; }
 
 	// IOleCommandTarget
 	virtual HRESULT STDMETHODCALLTYPE QueryStatus (
@@ -202,13 +248,29 @@ public:
 	HRESULT SwitchToFile (CProjectTab* pFile);
 
 	HRESULT EditRunParams (VOID);
+	HRESULT EditApplicationSettings(VOID);
 	HRESULT AddFilePrompt (VOID);
 	HRESULT NewFilePrompt (VOID);
 	HRESULT AddFile (RSTRING rstrPath, __deref_out CProjectTab** ppFile);
 	HRESULT CreateDebugger (__deref_out CQuadooDebugSession** ppDebugger, __out CMemoryStream* pstmBreakpoints, __deref_out RSTRING* prstrRemoteHost);
 	HRESULT AttachDebugger (CQuadooDebugSession* pDebugger, IQuadooDebugTree* pDebugTree);
+	HRESULT CompileApplicationDebug(StudioApplication::CApplicationDebugData& data, CMemoryStream& byteCode,
+		CMemoryStream& debug, IQuadooDebugTree** tree, CRString& diagnostic);
+	VOID SetApplicationDebugReadOnly(BOOL readOnly);
 
 private:
+	CProjectFile* ActiveFile(VOID);
+	CProjectTreeNode* TreeNode(HTREEITEM item);
+	HRESULT AddTreeNode(CProjectTab* file, BOOL source, REFGUID id, HTREEITEM parent, RSTRING label, INT image, CProjectTreeNode** node);
+	VOID ClearTreeNodes(CProjectTab* file = NULL);
+	HRESULT RefreshOutline(CProjectFile* file);
+	HRESULT SavedOutline(CProjectFile* file, IJSONObject* definition, HTREEITEM parent, UINT depth);
+	HRESULT InitializeFormUnit(CProjectFile* file, IJSONObject* metadata);
+	VOID DesignerChanged(UINT_PTR session);
+	INT TreeIcon(RSTRING type);
+	VOID HideDesigners(VOID);
+	HRESULT DesignerCommand(UINT command);
+	HRESULT ExportDefinition();
 	VOID ResizeEditor (INT nWindowHeight);
 	HRESULT UpdateColors (VOID);
 	INT CustomTrackPopupMenu (HMENU hPopup, UINT uFlags, const POINT& ptScreen);
@@ -225,6 +287,8 @@ private:
 
 	HRESULT SaveAll (VOID);
 	HRESULT RunScript (VOID);
+	HRESULT RunApplication(VOID);
+	HRESULT SaveApplicationInputs(VOID);
 	HRESULT DebugScript (VOID);
 	HRESULT BuildBreakpointData (__out CMemoryStream* pstmBreakpoints);
 	HRESULT SendDebuggerCommand (DWORD nMessage);

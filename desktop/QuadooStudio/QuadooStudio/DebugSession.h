@@ -31,6 +31,11 @@ private:
 	BOOL m_fLocationChanged;
 	BOOL m_fException;
 	BOOL m_fAutoStartDebugger;
+	BOOL m_started;
+	BOOL m_application;
+	IStartDebuggerStatus* m_startupStatus;
+	DWORD m_startupTick;
+	CRString m_applicationError;
 	RSTRING m_rstrCurrentFile;
 	DWORD m_nCurrentLine;
 	CMemoryStream m_stmIncoming;
@@ -48,10 +53,18 @@ public:
 	HRESULT Start (PCWSTR pcwzDebugger, PCWSTR pcwzStartDir, __in_opt RSTRING rstrHost, INT nPort,
 		PCWSTR pcwzScriptPath, RSTRING rstrScriptArgs,
 		CMemoryStream* pstmQBC, CMemoryStream* pstmDebug, CMemoryStream* pstmBreakpoints,
-		IStartDebuggerStatus* pDebuggerStatus);
+		IStartDebuggerStatus* pDebuggerStatus, CMemoryStream* application = NULL, RSTRING* diagnostic = NULL);
 	HRESULT AssociateSocket (HWND hwndNotify);
 
 	BOOL IsActive (VOID) const;
+	BOOL AutoStarts (VOID) const
+	{
+		return m_fAutoStartDebugger;
+	}
+	RSTRING ApplicationError (VOID) const
+	{
+		return m_applicationError;
+	}
 	BOOL IsPaused (VOID) const { return m_fPaused; }
 	BOOL IsCurrentLocation (PCWSTR pcwzFile, DWORD nLine) const;
 	DWORD GetStackFrameCount (VOID) const { return static_cast<DWORD>(m_aStackFrames.Length()); }
@@ -70,7 +83,10 @@ private:
 	HRESULT StartProcess (PCWSTR pcwzDebugger, PCWSTR pcwzStartDir, INT nPort, IStartDebuggerStatus* pDebuggerStatus);
 	HRESULT Connect (__in_opt RSTRING rstrHost, INT nPort, IStartDebuggerStatus* pDebuggerStatus);
 	HRESULT SendStartupData (PCWSTR pcwzScriptPath, RSTRING rstrScriptArgs,
-		CMemoryStream* pstmQBC, CMemoryStream* pstmDebug, CMemoryStream* pstmBreakpoints);
+		CMemoryStream* pstmQBC, CMemoryStream* pstmDebug, CMemoryStream* pstmBreakpoints, CMemoryStream* application);
+	HRESULT ReceiveStartupMessage(DWORD message, PVOID payload, DWORD bytes);
+	HRESULT ReceiveStartupBytes(PVOID payload, DWORD bytes);
+	HRESULT WaitForStartupSocket(BOOL write, DWORD timeout);
 	HRESULT SendDbgMsg (DWORD nMessage, __in_bcount_opt(cbPayload) const VOID* pvPayload, DWORD cbPayload);
 	HRESULT SendAll (__in_bcount(cbData) const BYTE* pbData, DWORD cbData);
 	HRESULT ReceiveIncoming (VOID);

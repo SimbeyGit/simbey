@@ -40,7 +40,7 @@ END
 
 3 TEXTINCLUDE 
 BEGIN
-    "\r\n"
+    "#include ""../../../platform/QuadooForm/Packages/PackagesDialog.rc""\r\n"
     "\0"
 END
 
@@ -71,15 +71,25 @@ BEGIN
     POPUP "&File"
     BEGIN
         MENUITEM "&New Project...",             ID_FILE_NEW_PROJECT
+        MENUITEM "New For&m...",                ID_FORM_NEWFORM
+        MENUITEM "New F&rame...",               ID_FORM_NEWFRAME
+        MENUITEM "Add Existing Form/Frame &Unit...", ID_FORM_OPEN
         MENUITEM "&Open Project...",            ID_FILE_OPENPROJECT
+        POPUP "Recent &Projects"
+        BEGIN
+            MENUITEM "(No recent projects)",   ID_FILE_RECENT_FIRST, GRAYED
+        END
         MENUITEM "&Close Project",              ID_FILE_CLOSEPROJECT
         MENUITEM SEPARATOR
         MENUITEM "&Save File\tCtrl+S",          ID_FILE_SAVEFILE
+        MENUITEM "Save &All",                   ID_FILE_SAVEALL
+        MENUITEM "&Export Definition Copy...",  ID_FORM_EXPORT
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_FILE_EXIT
     END
     POPUP "&Project"
     BEGIN
+        MENUITEM "&Settings...",                ID_PROJECT_SETTINGS
         MENUITEM "Edit Run &Parameters...",     ID_PROJECT_RUNPARAMETERS
         MENUITEM SEPARATOR
         MENUITEM "&Start Debugging\tF5",        ID_DEBUG_SCRIPT
@@ -95,9 +105,56 @@ BEGIN
         MENUITEM "&Add File...",                ID_PROJECT_ADDFILE
         MENUITEM "&New File...",                ID_PROJECT_NEWFILE
     END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "Cu&t\tCtrl+X",                ID_FORM_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_FORM_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_FORM_PASTE
+        MENUITEM SEPARATOR
+        MENUITEM "&Delete Component\tDelete",   ID_FORM_DELETE
+        MENUITEM "Select &Parent",              ID_FORM_PARENT
+        MENUITEM "Select &Root",                ID_FORM_ROOT
+    END
+    POPUP "For&m"
+    BEGIN
+        MENUITEM "View &Code",                  ID_VIEW_CODE
+        MENUITEM "View &Designer",              ID_VIEW_DESIGN
+        MENUITEM "Toggle Code/Design\tF12",     ID_VIEW_TOGGLEDESIGN
+        MENUITEM "Synchronize Script &Declarations", ID_FORM_SYNCSOURCE
+        MENUITEM SEPARATOR
+        MENUITEM "&Preview\tCtrl+F9",           ID_FORM_PREVIEW
+        MENUITEM "Tab &Order...",               ID_FORM_TABORDER
+        MENUITEM "&Menu Editor...",             ID_FORM_MENUEDITOR
+        MENUITEM "&Image List Editor...",       ID_FORM_IMAGELISTEDITOR
+        MENUITEM "Tree &Nodes Editor...",       ID_FORM_TREENODESEDITOR
+        MENUITEM "ListView &Columns Editor...", ID_FORM_LISTCOLUMNSEDITOR
+        MENUITEM "Add Status &Panel",           ID_FORM_ADDSTATUSPANEL
+        MENUITEM "Move Panel &Left",            ID_FORM_MOVESTATUSPANELLEFT
+        MENUITEM "Move Panel &Right",           ID_FORM_MOVESTATUSPANELRIGHT
+        MENUITEM "Create/Open Event &Handler",  ID_FORM_HANDLER
+        MENUITEM "Send to &Back",               ID_FORM_BACK
+        MENUITEM "Send to &Front",              ID_FORM_FRONT
+        MENUITEM "&Enabled",                    ID_FORM_ENABLED
+        MENUITEM SEPARATOR
+        MENUITEM "50%",                         ID_FORM_ZOOM50
+        MENUITEM "75%",                         ID_FORM_ZOOM75
+        MENUITEM "100%",                        ID_FORM_ZOOM100
+        MENUITEM "150%",                        ID_FORM_ZOOM150
+        MENUITEM "200%",                        ID_FORM_ZOOM200
+        MENUITEM SEPARATOR
+        MENUITEM "Workspace &Grid",             ID_FORM_GRID
+        MENUITEM "&Snap to 8 logical units",    ID_FORM_SNAP
+        MENUITEM "&Reset pane layout",          ID_FORM_RESET
+        MENUITEM SEPARATOR
+        MENUITEM "&Packages...",                ID_FORM_PACKAGES
+    END
     POPUP "&View"
     BEGIN
         MENUITEM "&Options",                    ID_VIEW_OPTIONS
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "About QuadooForm &Designer...", ID_FORM_ABOUT
     END
 END
 
@@ -124,20 +181,41 @@ IDB_SPLITTER            BITMAP                  "Splitter.bmp"
 // Dialog
 //
 
-IDD_NEW_PROJECT DIALOGEX 0, 0, 180, 140
+IDD_NEW_PROJECT DIALOGEX 0, 0, 180, 154
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Create New Project"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Project Type",IDC_STATIC,6,6,168,48,WS_TABSTOP
+    GROUPBOX        "Project Type",IDC_STATIC,6,6,168,60,WS_TABSTOP
     CONTROL         "Console (QVM.exe)",IDC_QVM,"Button",BS_AUTORADIOBUTTON,12,18,78,10
     CONTROL         "Windowed (WQVM.exe)",IDC_WQVM,"Button",BS_AUTORADIOBUTTON,12,30,93,10
     CONTROL         "Web Service (Requires IIS)",IDC_WEBSERVICE,"Button",BS_AUTORADIOBUTTON,12,42,103,10
-    LTEXT           "Project Path:",IDC_STATIC,6,60,43,8
-    EDITTEXT        IDC_PROJECT_PATH,6,72,168,14,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "Browse",IDC_BROWSE,6,90,50,14
-    DEFPUSHBUTTON   "OK",IDOK,6,120,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,60,120,50,14
+    CONTROL         "Application (QuadooForm)",IDC_APPLICATION,"Button",BS_AUTORADIOBUTTON,12,54,144,10
+    LTEXT           "Project Path:",IDC_STATIC,6,74,43,8
+    EDITTEXT        IDC_PROJECT_PATH,6,86,168,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Browse",IDC_BROWSE,6,104,50,14
+    DEFPUSHBUTTON   "OK",IDOK,6,134,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,60,134,50,14
+END
+
+IDD_APPLICATION_SETTINGS DIALOGEX 0, 0, 340, 254
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Application Settings"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Application icon",IDC_STATIC,6,6,328,66
+    ICON            "",IDC_EMBED_ICON,18,24,20,20,SS_CENTERIMAGE
+    PUSHBUTTON      "Load Icon...",IDC_SELECT_ICON,76,26,70,14
+    PUSHBUTTON      "Clear Icon",IDC_CLEAR_ICON,76,48,70,14
+    LTEXT           "The icon is stored in the project and embedded into the generated executable.",IDC_STATIC,160,26,160,32
+    GROUPBOX        "Module dependencies",IDC_STATIC,6,78,328,150
+    CONTROL         "x86 (32-bit)",IDC_MODULES_X86,"Button",BS_AUTORADIOBUTTON,18,90,54,10
+    CONTROL         "x64 (64-bit)",IDC_MODULES_X64,"Button",BS_AUTORADIOBUTTON,84,90,54,10
+    CONTROL         "",IDC_APPLICATION_MODULES,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,12,102,316,95
+    PUSHBUTTON      "Add...",IDC_ADD_MODULE,12,204,60,14
+    PUSHBUTTON      "Remove",IDC_REMOVE_MODULE,78,204,60,14
+    DEFPUSHBUTTON   "OK",IDOK,114,234,52,14
+    PUSHBUTTON      "Cancel",IDCANCEL,174,234,52,14
 END
 
 IDD_RUN_PARAMS DIALOGEX 0, 0, 196, 200
@@ -333,6 +411,13 @@ BEGIN
     VK_F9,          ID_TOGGLE_BREAKPOINT,   VIRTKEY, NOINVERT
     VK_TAB,         ID_NEXT_TAB,            VIRTKEY, CONTROL, NOINVERT
     VK_F4,          ID_CLOSE_TAB,           VIRTKEY, CONTROL, NOINVERT
+    VK_F12,         ID_VIEW_TOGGLEDESIGN,   VIRTKEY, NOINVERT
+END
+
+IDR_DESIGNER_ACCELERATOR ACCELERATORS
+BEGIN
+    VK_DELETE,      ID_FORM_DELETE,         VIRTKEY, NOINVERT
+    VK_F9,          ID_FORM_PREVIEW,        VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -352,7 +437,7 @@ IDR_WEBSERVICE          TEXT                    "webservice.txt"
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-
+#include "../../../platform/QuadooForm/Packages/PackagesDialog.rc"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

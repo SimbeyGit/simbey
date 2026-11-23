@@ -1,8 +1,8 @@
 #pragma once
 
-#include "..\..\..\Shared\Library\Util\RString.h"
-#include "..\..\..\Shared\Library\Util\StreamCopy.h"
-#include "..\..\..\Shared\Library\Sorting.h"
+#include "Library\Util\RString.h"
+#include "Library\Util\StreamCopy.h"
+#include "Library\Sorting.h"
 
 #define	SEARCH_TYPE_PATH			0
 #define	SEARCH_TYPE_CURRENT_DIR		1

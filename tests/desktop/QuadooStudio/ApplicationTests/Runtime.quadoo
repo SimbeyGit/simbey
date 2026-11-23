@@ -1,0 +1,385 @@
+#include "TreeRuntime.quadoo"
+#include "ListRuntime.quadoo"
+#include "VirtualListRuntime.quadoo"
+#include "ImageButtonRuntime.quadoo"
+#include "ProgressBarRuntime.quadoo"
+#include "StatusBarRuntime.quadoo"
+#include "CanvasRuntime.quadoo"
+#include "SpriteRuntime.quadoo"
+
+var created = 0;
+var clicked = 0;
+var ticks = 0;
+var cancelClose = true;
+var retainedArgs;
+var pulses = 0;
+var destroyed = 0;
+var throwTimer = false;
+var pluginsCreated = 0;
+var pluginsDestroyed = 0;
+
+function PluginCounts()
+{
+	return pluginsCreated * 10 + pluginsDestroyed;
+}
+
+interface IStartupForm
+{
+	virtual function Created(args) = 0;
+	virtual function Clicked(args) = 0;
+	virtual function Tick(args) = 0;
+	virtual function Closing(args) = 0;
+	virtual function Pulse(args) = 0;
+	virtual function Destroyed(args) = 0;
+	virtual function PluginCreated(args) = 0;
+	virtual function PluginDestroyed(args) = 0;
+};
+
+class StartupForm : extern(Form), IStartupForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set (value)
+		{
+			Form = value;
+		}
+	}
+	property var Button1;
+	property var Panel1;
+	property var List1;
+	property var Timer1;
+	property var Meter1;
+	property var DirectPlugin;
+	property var FallbackPlugin;
+	StartupForm()
+	{
+		Form = Form.Create(this);
+	}
+	virtual function Created(args)
+	{
+		created++;
+		if(DirectPlugin.Ping() != 73 || FallbackPlugin.Ping() != 73)
+		{
+			throw "Plugin references were not installed before OnCreate";
+		}
+		Button1.Caption = "Bound before OnCreate";
+		Form.ModalResult = 4;
+		return false;
+	}
+	virtual function PluginCreated(args)
+	{
+		if(DirectPlugin.Ping() != 73 || FallbackPlugin.Ping() != 73)
+		{
+			throw "Plugin references were not installed before component OnCreate";
+		}
+		pluginsCreated++;
+		return true;
+	}
+	virtual function PluginDestroyed(args)
+	{
+		pluginsDestroyed++;
+		return true;
+	}
+	virtual function Clicked(args)
+	{
+		clicked++;
+		retainedArgs = args;
+		return true;
+	}
+	virtual function Tick(args)
+	{
+		if(throwTimer)
+		{
+			throw "Deliberate callback failure";
+		}
+		ticks++;
+		if(ticks >= 2)
+		{
+			cancelClose = false;
+			Form.Close();
+		}
+		return true;
+	}
+	virtual function Closing(args)
+	{
+		args.Cancel = cancelClose;
+		retainedArgs = args;
+		return true;
+	}
+	virtual function Pulse(args)
+	{
+		pulses++;
+		args.Value = args.Value + 7;
+		return true;
+	}
+	virtual function Destroyed(args)
+	{
+		destroyed++;
+		return true;
+	}
+};
+
+interface IDetailsFrame
+{
+};
+class DetailsFrame : extern(Frame), IDetailsFrame
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Frame;
+		}
+		set (value)
+		{
+			Frame = value;
+		}
+	}
+	property var Label1;
+	DetailsFrame(Owner)
+	{
+		Frame = Frame.Create(this, Owner);
+	}
+};
+
+interface IDeferredForm
+{
+};
+class DeferredForm : extern(Form), IDeferredForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set (value)
+		{
+			Form = value;
+		}
+	}
+	function Start()
+	{
+		Form = Form.Create(this);
+	}
+};
+
+function Make()
+{
+	return new StartupForm();
+}
+function Deferred()
+{
+	return new DeferredForm();
+}
+function Counts()
+{
+	return created + clicked * 10 + ticks * 100;
+}
+function SavedEventName()
+{
+	return retainedArgs.EventName;
+}
+function SavedArguments()
+{
+	return retainedArgs;
+}
+function ArmTimerThrow()
+{
+	throwTimer = true;
+}
+function DestroyedCount()
+{
+	return destroyed;
+}
+function MakeFrames(Owner)
+{
+	var first = new DetailsFrame(Owner);
+	var second = new DetailsFrame(Owner);
+	first.Label1.Caption = "First frame";
+	second.Label1.Caption = "Second frame";
+	return first;
+}
+function NoOwner()
+{
+	try
+	{
+		var invalid = new DetailsFrame(null);
+	}
+	catch (error)
+	{
+		return true;
+	}
+	return false;
+}
+function Pulses()
+{
+	return pulses;
+}
+
+interface IThrowForm
+{
+	virtual function ThrowOnCreate(args) = 0;
+};
+class ThrowForm : extern(Form), IThrowForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set (value)
+		{
+			Form = value;
+		}
+	}
+	ThrowForm()
+	{
+		Form = Form.Create(this);
+	}
+	virtual function ThrowOnCreate(args)
+	{
+		throw "Deliberate initialization failure";
+	}
+};
+function MakeThrow()
+{
+	return new ThrowForm();
+}
+
+interface IMissingPluginForm
+{
+};
+class MissingPluginForm : extern(Form), IMissingPluginForm
+{
+	property var Missing;
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set (value)
+		{
+			Form = value;
+		}
+	}
+	MissingPluginForm()
+	{
+		Form = Form.Create(this);
+	}
+};
+
+function MissingPlugin()
+{
+	try
+	{
+		var failed = new MissingPluginForm();
+	}
+	catch (error)
+	{
+		return true;
+	}
+	return false;
+}
+
+
+var menuClicks = 0;
+interface IMenuForm
+{
+	virtual function MenuClick(args) = 0;
+};
+class MenuForm : extern(Form), IMenuForm
+{
+	property var ChildButton;
+	property var MainMenu1;
+	property var FileMenu;
+	property var OpenItem;
+	property var RecentMenu;
+	property var RecentItem;
+	property var Separator1;
+	property var DisabledItem;
+	property var EditMenu;
+	property var LongMenu;
+	property var PopupMenu1;
+	property var PopupItem;
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set (value)
+		{
+			Form = value;
+		}
+	}
+	MenuForm()
+	{
+		Form = Form.Create(this);
+	}
+	virtual function MenuClick(args)
+	{
+		if(args.Sender.Name == "OpenItem" || args.Sender.Name == "RecentItem" || args.Sender.Name == "PopupItem")
+		{
+			menuClicks++;
+		}
+		return true;
+	}
+};
+function Menus()
+{
+	menuClicks = 0;
+	var form = new MenuForm();
+	var root = form.__QuadooRoot;
+	if(root.MainMenu != form.MainMenu1 || root.PopupMenu != form.PopupMenu1)
+	{
+		throw "Menu references did not resolve to their component wrappers";
+	}
+	form.OpenItem.SetEnabled(false);
+	form.OpenItem.Click();
+	if(form.OpenItem.GetEnabled() || form.OpenItem.Enabled || menuClicks != 0)
+	{
+		throw "Disabled menu item accepted a click";
+	}
+	form.OpenItem.SetEnabled(true);
+	form.OpenItem.Click();
+	if(!form.OpenItem.GetChecked() || !form.OpenItem.Checked || menuClicks != 1)
+	{
+		throw "Menu AutoCheck or OnClick binding failed";
+	}
+	form.OpenItem.SetChecked(true);
+	form.OpenItem.Toggle();
+	if(form.OpenItem.GetChecked())
+	{
+		throw "MenuItem.Toggle failed";
+	}
+	form.OpenItem.Checked = true;
+	form.RecentItem.Click();
+	form.PopupItem.Click();
+	if(menuClicks != 3)
+	{
+		throw "Nested or popup menu event binding failed";
+	}
+	root.MainMenu = null;
+	if(root.MainMenu != null)
+	{
+		throw "Main menu was not detached";
+	}
+	root.MainMenu = form.MainMenu1;
+	form.ChildButton.PopupMenu = form.PopupMenu1;
+	if(form.ChildButton.PopupMenu != form.PopupMenu1)
+	{
+		throw "PopupMenu assignment did not round trip";
+	}
+	form.ChildButton.PopupMenu = null;
+	root.PopupMenu = null;
+	root.PopupMenu = form.PopupMenu1;
+	root.Close();
+	return 42;
+}

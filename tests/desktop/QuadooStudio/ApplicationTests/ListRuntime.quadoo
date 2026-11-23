@@ -1,0 +1,292 @@
+var listChanges = 0;
+var listInserts = 0;
+var listDeletes = 0;
+var listChecks = 0;
+var listCancel = false;
+var listCompared = 0;
+var listRetained;
+var listColumn;
+var listProgress = 0;
+function ListDiagnostics()
+{
+	return "List stage " + listProgress + ", inserts " + listInserts + ", changes " + listChanges;
+}
+
+interface IListForm
+{
+	virtual function Change(args) = 0;
+	virtual function Changing(args) = 0;
+	virtual function Inserted(args) = 0;
+	virtual function Deleted(args) = 0;
+	virtual function Checked(args) = 0;
+	virtual function Compare(args) = 0;
+	virtual function ColumnClick(args) = 0;
+};
+class ListForm : extern(Form), IListForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	property var List1;
+	ListForm()
+	{
+		Form = Form.Create(this);
+	}
+	function Close()
+	{
+		Form.Close();
+	}
+	virtual function Change(args)
+	{
+		listChanges++;
+		listRetained = args.Item;
+		return true;
+	}
+	virtual function Changing(args)
+	{
+		args.Cancel = listCancel;
+		return true;
+	}
+	virtual function Inserted(args)
+	{
+		listInserts++;
+		if(args.Item != List1.Items.GetAt(args.Item.ItemIndex))
+		{
+			throw "Insert event lost item identity";
+		}
+		return true;
+	}
+	virtual function Deleted(args)
+	{
+		listDeletes++;
+		if(!args.Item.Attached)
+		{
+			throw "Item detached before deletion callback";
+		}
+		return true;
+	}
+	virtual function Checked(args)
+	{
+		listChecks++;
+		return true;
+	}
+	virtual function Compare(args)
+	{
+		listCompared++;
+		if(args.Item1.Caption < args.Item2.Caption)
+		{
+			args.Result = -1;
+		}
+		else if(args.Item1.Caption > args.Item2.Caption)
+		{
+			args.Result = 1;
+		}
+		return true;
+	}
+	virtual function ColumnClick(args)
+	{
+		listColumn = args.Column;
+		if(args.Column != List1.Columns.GetAt(args.ColumnIndex))
+		{
+			throw "Column event lost wrapper identity";
+		}
+		return true;
+	}
+};
+class ListPayload
+{
+	property var Value;
+	ListPayload(value)
+	{
+		Value = value;
+	}
+};
+function Lists()
+{
+	var form = new ListForm;
+	listProgress = 1;
+	var view = form.List1;
+	var columns = view.Columns;
+	var firstColumn = columns.Add("Caption");
+	var secondColumn = columns.Add("Detail");
+	secondColumn.Width = 144;
+	secondColumn.Alignment = 2;
+	secondColumn.DisplayIndex = 0;
+	if(firstColumn.Index != 0 || secondColumn.Index != 1 || secondColumn.DisplayIndex != 0 || secondColumn.Width != 144 ||
+		columns.Find(firstColumn.ID) != firstColumn || columns[1] != secondColumn)
+	{
+		throw "List column properties or identity failed";
+	}
+	secondColumn.Alignment = 0;
+	var items = view.Items;
+	listProgress = 2;
+	view.BeginUpdate();
+	var first = items.Add("Bravo");
+	var second = items.Insert(0,"Alpha");
+	var third = items.Add("Bravo");
+	view.EndUpdate();
+	var id = first.ID;
+	if(items.Count != 3 || first.ItemIndex != 1 || items.Find(id) != first || items[1] != first || listInserts != 3)
+	{
+		throw "List item insertion or identity failed";
+	}
+	if(view.Items[1] != first || view.Columns[0] != firstColumn)
+	{
+		throw "Direct indexed component collection access failed";
+	}
+	first.SubItems.Add("one");
+	listProgress = 3;
+	first.SubItems.Add("two");
+	var strings = first.SubItems;
+	strings[0] = "updated";
+	first.SubItems[1] = "direct";
+	strings.Insert(1,"inserted");
+	strings.Replace(0,"replacement");
+	if(strings.Count != 3 || first.SubItems[0] != "replacement" || first.SubItems[2] != "direct")
+	{
+		throw "Live SubItems facade failed";
+	}
+	strings.Delete(1);
+	var replacement = new array;
+	replacement.Append("snapshot");
+	replacement.Append("copied");
+	first.SubItems = replacement;
+	if(first.SubItems[0] != "snapshot" || strings[1] != "copied")
+	{
+		throw "SubItems array replacement failed";
+	}
+	first.Data = 73;
+	listProgress = 4;
+	if(first.Data != 73)
+	{
+		throw "Scalar Data failed";
+	}
+	first.Data = "text";
+	if(first.Data != "text")
+	{
+		throw "String Data failed";
+	}
+	var data = new ListPayload(91);
+	first.Data = data;
+	if(first.Data != data || first.Data.Value != 91)
+	{
+		throw "Object Data failed";
+	}
+	var values = new array;
+	values.Append(1);
+	values.Append(2);
+	values.Append(3);
+	first.Data = values;
+	if(first.Data != values || first.Data[2] != 3)
+	{
+		throw "Array Data failed";
+	}
+	first.Data[2] = 11;
+	if(values[2] != 11)
+	{
+		throw "Indexed Data assignment lost array identity";
+	}
+	first.Data = form;
+	if(first.Data != form)
+	{
+		throw "Form Data identity failed";
+	}
+	first.ImageIndex = 0;
+	listProgress = 5;
+	first.Checked = true;
+	if(!first.Checked || first.StateIndex != 1 || listChecks != 1)
+	{
+		throw "Checkbox alias or event failed";
+	}
+	listCancel = true;
+	first.Checked = false;
+	view.Selected = first;
+	if(!first.Checked || view.Selected != null)
+	{
+		throw "List cancellation failed";
+	}
+	listCancel = false;
+	view.Selected = first;
+	third.Selected = true;
+	view.Focused = third;
+	if(view.Selected != third || view.SelectedCount != 2 || view.ItemIndex != 2 || view.NextSelected(-1) != first)
+	{
+		throw "List selection enumeration failed";
+	}
+	var before = listChanges;
+	third.Selected = true;
+	if(listChanges != before)
+	{
+		throw "Duplicate logical selection event";
+	}
+	items.Move(first,0);
+	listProgress = 6;
+	view.Sort(0,true);
+	if(first.ItemIndex != 1 || third.ItemIndex != 2 || listCompared == 0 || items.Find(id) != first)
+	{
+		throw "Stable sorting failed";
+	}
+	var inserted = columns.Insert(1,"New");
+	listProgress = 7;
+	if(first.SubItems[0] != "" || first.SubItems[1] != "snapshot")
+	{
+		throw "Column insert did not migrate cells";
+	}
+	columns.Move(inserted,0);
+	if(first.Caption != "")
+	{
+		throw "Caption promotion failed";
+	}
+	inserted.Delete();
+	if(first.Caption != "Bravo" || inserted.Attached)
+	{
+		throw "Column deletion did not restore cell association";
+	}
+	first.Delete();
+	listProgress = 8;
+	if(first.Attached || items.Count != 2 || listDeletes != 1)
+	{
+		throw "List delete did not detach item";
+	}
+	first = items.Add("retained");
+	first.Data = form;
+	listRetained = first;
+	items.Clear();
+	if(items.Count != 0 || first.Attached || listRetained.Attached)
+	{
+		throw "Clear did not detach cached objects";
+	}
+	view.BeginUpdate();
+	for(var n = 0; n < 1000; n++)
+	{
+		items.Add("row");
+	}
+	view.EndUpdate();
+	listProgress = 9;
+	if(items.Count != 1000)
+	{
+		throw "Bulk insertion failed";
+	}
+	form.Close();
+	if(firstColumn.Attached)
+	{
+		throw "Destroyed form retained attached columns";
+	}
+	return 83;
+}
+function ListEventForm()
+{
+	return new ListForm;
+}
+function ListClickedColumn()
+{
+	return listColumn;
+}

@@ -1221,3 +1221,73 @@ const T* TFindEnd (const T* pctzText, const T* pctzList)
 	}
 	return pctzFind;
 }
+
+template <typename T>
+HRESULT TStrCchFindAndReplace (const T* pctzText, INT cchText, const T* pctzFind, INT cchFind, const T* pctzReplace, INT cchReplace, __deref_out T** pptzNew)
+{
+    HRESULT hr;
+
+	CheckIf(NULL == pptzNew, E_INVALIDARG);
+    *pptzNew = NULL;
+
+    CheckIf(NULL == pctzText || NULL == pctzFind ||
+        (NULL == pctzReplace && 0 != cchReplace) ||
+        cchFind <= 0 || cchReplace < 0, E_INVALIDARG);
+
+    INT cchNew = cchText;
+    INT cMatches = 0;
+
+    // First pass: count the occurrences to determine the
+    // required size of the resulting string.
+    for(INT i = 0; i <= cchText - cchFind;)
+    {
+        if(0 == TStrCmpNAssert(pctzText + i, pctzFind, cchFind))
+        {
+            cMatches++;
+            i += cchFind;
+        }
+        else
+            i++;
+    }
+
+	CheckIfIgnore(0 == cMatches, S_FALSE);
+
+	// Calculate the new length using 64-bit arithmetic
+	// to prevent integer overflow.
+	LONGLONG cchRequired = static_cast<LONGLONG>(cchText) +
+		static_cast<LONGLONG>(cMatches) * (cchReplace - cchFind);
+
+	CheckIf(cchRequired >= STRSAFE_MAX_CCH, STRSAFE_E_INSUFFICIENT_BUFFER);
+	cchNew = static_cast<INT>(cchRequired);
+
+	T* ptzNew = __new T[cchNew + 1];
+	CheckAlloc(ptzNew);
+
+	// Second pass: copy text and substitute each occurrence.
+	T* ptzDest = ptzNew;
+	INT i = 0;
+
+	while(i < cchText)
+	{
+		if(i <= cchText - cchFind &&
+			0 == TStrCmpNAssert(pctzText + i, pctzFind, cchFind))
+		{
+			if(cchReplace > 0)
+			{
+				CopyMemory(ptzDest, pctzReplace, cchReplace * sizeof(T));
+				ptzDest += cchReplace;
+			}
+
+			i += cchFind;
+		}
+		else
+			*ptzDest++ = pctzText[i++];
+	}
+
+	*ptzDest = '\0';
+	*pptzNew = ptzNew;
+	hr = S_OK;
+
+Cleanup:
+    return hr;
+}

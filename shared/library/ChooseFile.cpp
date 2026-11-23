@@ -58,6 +58,27 @@ HRESULT CChooseFile::SetInitialDirectory (LPCTSTR pctzInitialDir)
 	return hr;
 }
 
+LPCTSTR CChooseFile::GetInitialDirectory (VOID)
+{
+	return m_ofnOpen.lpstrInitialDir;
+}
+
+HRESULT CChooseFile::Choose (HWND hwnd, BOOL fOpen, LPCTSTR pctzTitle, LPCTSTR pctzName,
+	LPCTSTR pctzFilter, LPCTSTR pctzDefaultExt, UINT nFilterIndex, DWORD dwFlags, UINT* pnSelectedFilter)
+{
+	HRESULT hr;
+	LPCTSTR previousExt = m_ofnOpen.lpstrDefExt;
+	DWORD previousIndex = m_ofnOpen.nFilterIndex;
+	CheckIf(!pnSelectedFilter,E_POINTER); *pnSelectedFilter = nFilterIndex;
+	CheckIf(!m_lpszName || !m_lpszTitle || !pctzFilter || !nFilterIndex,E_INVALIDARG);
+	m_ofnOpen.lpstrDefExt = pctzDefaultExt; m_ofnOpen.nFilterIndex = nFilterIndex;
+	hr = Display(hwnd,fOpen,pctzTitle,pctzName,pctzFilter,dwFlags | OFN_EXPLORER);
+	if(hr == S_OK) *pnSelectedFilter = m_ofnOpen.nFilterIndex;
+Cleanup:
+	m_ofnOpen.lpstrDefExt = previousExt; m_ofnOpen.nFilterIndex = previousIndex;
+	return hr;
+}
+
 BOOL CChooseFile::OpenSingleFile (HWND hwnd)
 {
 	return OpenSingleFile(hwnd,TEXT("All Files\0*.*\0\0"));
@@ -75,13 +96,18 @@ BOOL CChooseFile::OpenSingleFile (HWND hwnd, LPCTSTR lpctzDialogTitle, LPCTSTR l
 
 INT CChooseFile::OpenMultipleFiles (HWND hwnd)
 {
-	return OpenMultipleFiles(hwnd,TEXT("All Files\0*.*\0\0"));
+	return OpenMultipleFiles(hwnd, TEXT("All Files\0*.*\0\0"));
 }
 
 INT CChooseFile::OpenMultipleFiles (HWND hwnd, LPCTSTR lpctzFilter)
 {
+	return OpenMultipleFiles(hwnd, NULL, lpctzFilter);
+}
+
+INT CChooseFile::OpenMultipleFiles (HWND hwnd, LPCTSTR lpctzDialogTitle, LPCTSTR lpctzFilter)
+{
 	INT cFiles = 0;
-	if(SUCCEEDED(Display(hwnd,TRUE,NULL,NULL,lpctzFilter,OFN_ALLOWMULTISELECT | OFN_HIDEREADONLY | OFN_CREATEPROMPT | OFN_EXPLORER)))
+	if(SUCCEEDED(Display(hwnd,TRUE,lpctzDialogTitle,NULL,lpctzFilter,OFN_ALLOWMULTISELECT | OFN_HIDEREADONLY | OFN_CREATEPROMPT | OFN_EXPLORER)))
 	{
 		cFiles = static_cast<INT>(m_aFiles.Length());
 	}
@@ -146,8 +172,9 @@ HRESULT CChooseFile::Display (HWND hwnd, BOOL bOpen, LPCTSTR pctzDialogTitle, LP
 
 	Assert(m_lpszName && m_lpszTitle);
 
-	ZeroMemory(m_lpszName, m_ofnOpen.nMaxFile + 1);
-	ZeroMemory(m_lpszTitle, m_ofnOpen.nMaxFileTitle + 1);
+	CheckIf(!m_lpszName || !m_lpszTitle,E_UNEXPECTED);
+	ZeroMemory(m_lpszName, (m_ofnOpen.nMaxFile + 1) * sizeof(TCHAR));
+	ZeroMemory(m_lpszTitle, (m_ofnOpen.nMaxFileTitle + 1) * sizeof(TCHAR));
 
 	if(pctzFileName)
 	{
@@ -166,11 +193,19 @@ HRESULT CChooseFile::Display (HWND hwnd, BOOL bOpen, LPCTSTR pctzDialogTitle, LP
 
 	if(bOpen)
 	{
-		CheckIfGetLastError(!GetOpenFileName(&m_ofnOpen));
+		if(!GetOpenFileName(&m_ofnOpen))
+		{
+			DWORD error = CommDlgExtendedError();
+			hr = error ? HRESULT_FROM_WIN32(error) : S_FALSE; goto Cleanup;
+		}
 	}
 	else
 	{
-		CheckIfGetLastError(!GetSaveFileName(&m_ofnOpen));
+		if(!GetSaveFileName(&m_ofnOpen))
+		{
+			DWORD error = CommDlgExtendedError();
+			hr = error ? HRESULT_FROM_WIN32(error) : S_FALSE; goto Cleanup;
+		}
 	}
 
 	cchName = TStrLenAssert(m_lpszName);

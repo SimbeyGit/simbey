@@ -1,0 +1,22 @@
+{
+	"type": "Form",
+	"name": "VirtualListForm",
+	"properties": {"Visible": false},
+	"children": [
+		{
+			"type": "ListView",
+			"name": "List1",
+			"properties": {
+				"OwnerData": true,
+				"CheckBoxes": true,
+				"MultiSelect": true,
+				"Columns": [{"Caption": "Name"}, {"Caption": "Detail"}]
+			},
+			"events": {
+				"OnData": "Data",
+				"OnDataUpdate": "Update",
+				"OnItemChecking": "Checking"
+			}
+		}
+	]
+}

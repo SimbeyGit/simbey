@@ -1,0 +1,96 @@
+#pragma once
+
+interface ICanvasForm
+{
+	// <QuadooStudio:events {6E9D6BA1-E08F-4BFC-A5DB-C899015C8331}>
+	virtual function CanvasCreated (oArgs) = 0;
+	virtual function CanvasPaint (oArgs) = 0;
+	virtual function ExportClicked (oArgs) = 0;
+	// </QuadooStudio:events>
+};
+
+class CanvasForm : extern(Form), ICanvasForm
+{
+	// <QuadooStudio:members {6E9D6BA1-E08F-4BFC-A5DB-C899015C8331}>
+	property __QuadooUnitId { get { return "{6E9D6BA1-E08F-4BFC-A5DB-C899015C8331}"; } }
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set (value)
+		{
+			Form = value;
+		}
+	}
+	property var Drawing; // {03B35642-E6D6-5883-AAE8-CFE4EE5E39EE}
+	property var ResultLabel; // {FC6166E7-B7D7-5875-A043-1104D2EC953E}
+	property var ExportButton; // {AE554607-4F61-57C4-8BD0-679EDCAB668A}
+	property var Images; // {B3DDE9AF-41AA-5C7E-B770-099F9DC233CF}
+	// </QuadooStudio:members>
+
+	property var LastPng;
+	property var FileSprite;
+	property var MemorySprite;
+	property var RawSprite;
+	CanvasForm()
+	{
+		Form = Form.Create(this);
+	}
+	function CreateSprites()
+	{
+		FileSprite = Drawing.CreateSprite();
+		FileSprite.LoadFile("Sprite.png");
+		MemorySprite = Drawing.CreateSprite();
+		MemorySprite.LoadPng(Host.FileFromBase64(null, "iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAD0UlEQVR4nK2Ub2wTZRzHP8/12uu1W9utG91ksjqWBd2GJCRuLEwXMkSd24upL9hiSJRAJomJJr7BmKgv0GiIRFKNBCP+eUPieCExoCy8EDMzAiqYDcbIwDnG5mCsZVvb9e4ec9du0hcLMfGX3F3u7vd8nt+/7wP/swn7an1hV2DkypSA2fsumJ3N+oRCobzv0WgUNkTnRFtbV5FZVHwu4PeHpZTSQgoFsMjd7Jfcw7IkLk1HmiaWtYiCWHKRqUVDpFKZTvXCtVui4YHVxbH39wZ1zYOUEuk4CdyqgmFJTFOiCIni1lgYH0T1F+EORpBGBguBogjePXCY3uN9btXZXYhMoU+Xmsctc2VwLL6QIejzLKeVnhzm5ucvoq+uZe3Ln4G/YOmXVIQQpmlKByhBGKYpNNxOXfuHp/jkx0vMLBh4XYLOx9bQ3VyN9BTgKX+YmcHT8MUeItv3Y2gFhDSvw7AXO0AHascG/DI8xatHztLeUk91RZg7iSSxk79yN5mhZ9sjVL10iNEvXyEx2Mftwzv5OLCO5vWP4xbZxHIlx6mDaeFEZsOa6itRXS4qy0Ps7mzk2LlxJu/Mo+qFVO2IEazbSnhyiKeunqJIsfB4dNJmOgu022A3YCFtOGnakc0k5p0kUmmIFIXQfT6GJ+JOKqoe4O62N/jdW0Jjeponr/9E0jLRXK4sUCAwTInmVtBcgtvxeQp9PizL4u/4NcamR8lk4qwpCTkTYIfwzcUzxILrmKxswLup25kOzHtqaJoWuqbwXMODHOobYke7i/4rR/nr1iUsqRAMhgkHtyCE4MKNEQZGzlMaKqOm6yBe3Y/MnAGXml9De0i7m2vYut7Dkb79DE+cRZilFGtlTMxf583jMWaTc3z722ni6STPP/oEq3S/owB7o7wuL3Xo/Nhlrs6dxFCmaFm7id1NXc4svvV9jP7RP3i99yOmEjNUl1TQVrfZSVU42vqXgbQkmurm1OUBXus9wNDEBNs3Ps2+jh4qS4KEfDrvdeyhqaqewZuj3IhP07mhhYDXj2mZeZpWxxPjtHob+WrgBAd/PkpA8/N2206eqW3CknYR7FQkBVoW+mHf10QKwzxbv9mZDnFPdA4wEAiQNBbZUrORkZkxOmqbaayqwzBNW5JZL2HPqOVA32nblVNC9rCQVu4gWQYSsDtsVZaWWfvae5a1bA91ni3Bl9+dMwC7mTZeKEpWy+U1EZFMpQJ7P/g0G7vMdnwlyzs9cpIVQvLn+CQPRStU1VqlJxbn0q3HvvvBnTKMFUErmT0m9qpotIJIqODifwbcz/4B2dp3ElzU1pgAAAAASUVORK5CYII="));
+		var rgb = Host.CreateBinary(12 * 12 * 3);
+		for(var n = 0; n < 12 * 12; n++)
+		{
+			rgb.Data[n * 3] = 40;
+			rgb.Data[n * 3 + 1] = 120;
+			rgb.Data[n * 3 + 2] = 220;
+		}
+		RawSprite = Drawing.CreateSprite();
+		RawSprite.LoadPixels(12, 12, rgb);
+	}
+	function PaintScene()
+	{
+		Drawing.Clear(Drawing.ResolveColor(Drawing.BackColor));
+		Drawing.SetFont("Arial", 11, false, false);
+		var title = "Measured Canvas text";
+		var size = Drawing.MeasureText(title);
+		size.Left = 10;
+		size.Top = 10;
+		Drawing.DrawRectangle(size, 0xA07040, 0xF0F0F0);
+		Drawing.DrawText(title, size.Left, size.Top, Drawing.ResolveColor(Drawing.ForeColor));
+		Drawing.DrawLine(10, 20 + size.Height, Drawing.PixelWidth - 10, 20 + size.Height, 0xC08040);
+		Drawing.DrawImageList(Images, 0, 12, 40 + size.Height);
+		Drawing.DrawText("PNG export includes text, images and sprites.", 12, 100, 0x705030);
+		if(FileSprite != null)
+		{
+			var sprite = FileSprite;
+			sprite.Draw(72, 40 + size.Height);
+			sprite(-8, 146);
+			MemorySprite.Draw(108, 40 + size.Height);
+			RawSprite.Draw(144, 40 + size.Height);
+		}
+	}
+	virtual function CanvasCreated(args)
+	{
+		CreateSprites();
+		PaintScene();
+		return true;
+	}
+	virtual function CanvasPaint(args)
+	{
+		PaintScene();
+		return true;
+	}
+	virtual function ExportClicked(args)
+	{
+		LastPng = Drawing.ExportPng();
+		ResultLabel.Caption = "PNG snapshot: " + LastPng.Size + " bytes";
+		return true;
+	}
+};

@@ -1,0 +1,11 @@
+{
+	"type": "Form",
+	"name": "ProgressBarForm",
+	"children": [
+		{
+			"type": "ProgressBar",
+			"name": "ProgressBar1",
+			"properties": {"Left": 8, "Top": 8, "Position": 25}
+		}
+	]
+}

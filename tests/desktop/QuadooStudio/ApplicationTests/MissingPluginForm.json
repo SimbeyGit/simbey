@@ -1,0 +1,7 @@
+{
+  "type": "Form",
+  "name": "MissingPluginForm",
+  "components": [
+    {"type": "QuadooPlugin", "name": "Missing", "properties": {"Module": "Missing-QuadooPlugin-Test.qbc"}}
+  ]
+}

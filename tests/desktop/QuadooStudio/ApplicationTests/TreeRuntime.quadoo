@@ -1,0 +1,165 @@
+var treeChanges = 0;
+var treeCancels = false;
+var treeExpanded = 0;
+var treeCollapsed = 0;
+var treeChecks = 0;
+var retainedTreeNode;
+
+interface ITreeForm
+{
+	virtual function OnChanging(args) = 0;
+	virtual function OnChange(args) = 0;
+	virtual function OnExpanding(args) = 0;
+	virtual function OnExpanded(args) = 0;
+	virtual function OnCollapsing(args) = 0;
+	virtual function OnCollapsed(args) = 0;
+	virtual function OnEditing(args) = 0;
+	virtual function OnEdited(args) = 0;
+	virtual function OnCheck(args) = 0;
+};
+class TreeForm : extern(Form), ITreeForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	property var Tree1;
+	property var ImageList1;
+	TreeForm()
+	{
+		Form = Form.Create(this);
+	}
+	virtual function OnChanging(args)
+	{
+		args.Cancel = treeCancels;
+		return true;
+	}
+	virtual function OnChange(args)
+	{
+		treeChanges++;
+		retainedTreeNode = args.Node;
+		if(args.Node != null && args.Node.Text == "")
+		{
+			throw "Tree node argument has no text";
+		}
+		return true;
+	}
+	virtual function OnExpanding(args)
+	{
+		args.Cancel = treeCancels;
+		return true;
+	}
+	virtual function OnExpanded(args)
+	{
+		treeExpanded++;
+		return true;
+	}
+	virtual function OnCollapsing(args)
+	{
+		args.Cancel = treeCancels;
+		return true;
+	}
+	virtual function OnCollapsed(args)
+	{
+		treeCollapsed++;
+		return true;
+	}
+	virtual function OnEditing(args)
+	{
+		args.Cancel = true;
+		return true;
+	}
+	virtual function OnEdited(args)
+	{
+		args.Text = "Edited by script";
+		return true;
+	}
+	virtual function OnCheck(args)
+	{
+		treeChecks++;
+		return true;
+	}
+	function Close()
+	{
+		Form.Close();
+	}
+};
+function Trees()
+{
+	var form = new TreeForm;
+	var items = form.Tree1.Items;
+	var first = items.GetAt(0);
+	var child = first.Children.GetAt(0);
+	var originalID = first.ID;
+	var added = items.Insert(0,"Inserted");
+	if(items.Count != 3 || first.Index != 1 || first.ID != originalID || child.Parent.ID != originalID || child.Parent != first)
+	{
+		throw "Stable tree nodes or hierarchy failed";
+	}
+	first.MoveTo(null,2);
+	if(first.Index != 2 || items.Find(originalID).Text != "Root" || items.Find(originalID) != first)
+	{
+		throw "Tree reorder or GUID lookup failed";
+	}
+	items.Move(added,first,1);
+	if(first.Children.Count != 2)
+	{
+		throw "Collection reparenting failed";
+	}
+	items.Move(added,null,0);
+	treeCancels = true;
+	form.Tree1.Selected = first;
+	if(form.Tree1.Selected != null || treeChanges != 0)
+	{
+		throw "Selection cancellation failed";
+	}
+	treeCancels = false;
+	form.Tree1.Selected = first;
+	form.Tree1.Selected = first;
+	if(treeChanges != 1 || retainedTreeNode.ID != first.ID || form.Tree1.Selected.ID != first.ID || form.Tree1.Selected != first || retainedTreeNode != first)
+	{
+		throw "Tree node event arguments or duplicate selection failed";
+	}
+	first.Expanded = true;
+	first.Collapse();
+	child.Checked = true;
+	child.ImageIndex = 0;
+	child.SelectedImageIndex = 1;
+	if(treeExpanded != 1 || treeCollapsed != 1 || treeChecks != 1 || !child.Checked)
+	{
+		throw "Tree expansion or checkbox events failed";
+	}
+	var newChild = first.Children.Add("New child");
+	newChild.Text = "Renamed";
+	if(first.Children.Count != 2 || newChild.Text != "Renamed")
+	{
+		throw "Tree child collection failed";
+	}
+	newChild.Delete();
+	if(newChild.Attached || first.Children.Count != 1)
+	{
+		throw "Tree deletion did not detach retained node";
+	}
+	if(form.Tree1.Images != form.ImageList1)
+	{
+		throw "Tree ImageList namespace reference failed";
+	}
+	form.Tree1.Images = null;
+	form.Tree1.Images = form.ImageList1;
+	first.Children.Clear();
+	var retainedSelection = retainedTreeNode;
+	items.Clear();
+	if(items.Count != 0 || first.Attached || retainedSelection.Attached)
+	{
+		throw "Tree clear did not detach retained nodes";
+	}
+	form.Close();
+	return 73;
+}

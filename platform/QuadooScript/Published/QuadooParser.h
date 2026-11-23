@@ -56,5 +56,6 @@ HRESULT WINAPI QuadooAllocStream (__deref_out ISequentialStream** ppStream);
 DWORD WINAPI QuadooStreamDataSize (ISequentialStream* pStream);
 
 HRESULT WINAPI QuadooFindDefinitions (PCWSTR pcwzFile, PCWSTR pcwzDef, __deref_out IQuadooDefinitions** ppDefs);
+HRESULT WINAPI QuadooIsValidIdentifier (PCWSTR pcwzIdentifier, INT cchIdentifier, __out BOOL* pfValid);
 
 HRESULT WINAPI QuadooCreateCompiler (DWORD dwFlags, IQuadooCompilerStatus* pStatus, __deref_out IQuadooCompiler** ppCompiler);

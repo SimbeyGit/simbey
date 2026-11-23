@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "type": "Frame",
+  "name": "DetailsFrame",
+  "id": "{E6BF4AEC-5904-42E1-AAA7-000000000010}",
+  "children": [
+    {"type": "Label", "name": "Label1", "id": "{E6BF4AEC-5904-42E1-AAA7-000000000011}"}
+  ]
+}

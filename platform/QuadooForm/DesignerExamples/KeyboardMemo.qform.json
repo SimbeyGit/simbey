@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "type": "Form",
+  "name": "KeyboardMemoForm",
+  "properties": { "Caption": "Memo and dialog keys", "Width": 500, "Height": 360, "KeyPreview": true },
+  "children": [
+    { "type": "Label", "name": "Instructions", "properties": { "Left": 20, "Top": 12, "Width": 460, "Height": 28, "Caption": "Enter edits the Memo; Enter in the single-line edit selects OK." } },
+    { "type": "Memo", "name": "Notes", "properties": { "Left": 20, "Top": 48, "Width": 460, "Height": 200, "Text": "First line\r\nSecond line", "WordWrap": true, "ScrollBars": "Vertical", "TabOrder": 0 } },
+    { "type": "TextBox", "name": "SingleLine", "properties": { "Left": 20, "Top": 260, "Width": 460, "Text": "Press Enter for OK", "TabOrder": 1 } },
+    { "type": "Button", "name": "OKButton", "properties": { "Left": 300, "Top": 308, "Width": 80, "Height": 28, "Caption": "OK", "Default": true, "ModalResult": "mrOk", "TabOrder": 2 } },
+    { "type": "Button", "name": "CancelButton", "properties": { "Left": 390, "Top": 308, "Width": 90, "Height": 28, "Caption": "Cancel", "Cancel": true, "ModalResult": "mrCancel", "TabOrder": 3 } }
+  ]
+}

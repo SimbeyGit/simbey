@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "type": "Form",
+  "name": "DialogExample",
+  "properties": { "Caption": "Nonvisual components", "Width": 520, "Height": 300 },
+  "children": [
+    { "type": "Button", "name": "OpenButton", "properties": { "Caption": "Open...", "Left": 24, "Top": 24 }, "events": { "OnClick": "OpenButton_Click" } },
+    { "type": "Button", "name": "SaveButton", "properties": { "Caption": "Save...", "Left": 140, "Top": 24 }, "events": { "OnClick": "SaveButton_Click" } }
+  ],
+  "components": [
+    {
+      "type": "OpenFile",
+      "name": "OpenFile1",
+      "properties": { "Title": "Select a text file", "Filter": "Text files (*.txt)|*.txt|All files (*.*)|*.*", "FilterIndex": 1, "DefaultExt": "txt", "Options": 11 },
+      "events": { "OnAccept": "OpenFile1_Accept" }
+    },
+    {
+      "type": "SaveFile",
+      "name": "SaveFile1",
+      "properties": { "Title": "Save a text file", "Filter": "Text files (*.txt)|*.txt|All files (*.*)|*.*", "FilterIndex": 1, "DefaultExt": "txt", "FileName": "Untitled.txt", "Options": 14 },
+      "events": { "OnAccept": "SaveFile1_Accept" }
+    },
+    {
+      "type": "Timer",
+      "name": "Timer1",
+      "properties": { "Enabled": true, "Interval": 1000 },
+      "events": { "OnTimer": "Timer1_Timer" }
+    }
+  ]
+}

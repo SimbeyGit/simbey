@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\..\..\Shared\Library\Util\RString.h"
+#include "Library\Util\RString.h"
 
 interface IQuadooVM;
 interface IQuadooArray;

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "type": "Form",
+  "name": "StartupForm",
+  "id": "{E6BF4AEC-5904-42E1-AAA7-000000000001}",
+  "properties": {"Width": 320, "Height": 240},
+  "events": {"OnCreate": "Created", "OnCloseQuery": "Closing"},
+  "children": [
+    {"type": "Button", "name": "Button1", "id": "{E6BF4AEC-5904-42E1-AAA7-000000000002}", "properties": {"Default": true}, "events": {"OnClick": "Clicked"}},
+    {"type": "Panel", "name": "Panel1", "id": "{E6BF4AEC-5904-42E1-AAA7-000000000003}", "properties": {"Top": 40, "Width": 200, "Height": 150},
+      "children": [{"type": "ExternalMeter", "name": "Meter1", "id": "{E6BF4AEC-5904-42E1-AAA7-000000000006}", "properties": {"Level": 23}, "events": {"OnPulse": "Pulse"}}]},
+    {"type": "ListBox", "name": "List1", "id": "{E6BF4AEC-5904-42E1-AAA7-000000000004}", "properties": {"Items": ["First", "Second"], "ItemIndex": 1}}
+  ],
+  "components": [
+    {"type": "Timer", "name": "Timer1", "id": "{E6BF4AEC-5904-42E1-AAA7-000000000005}", "properties": {"Interval": 20}, "events": {"OnTimer": "Tick"}},
+    {"type": "QuadooPlugin", "name": "DirectPlugin", "properties": {"Module": "DirectPlugin.qbc"}, "events": {"OnCreate": "PluginCreated", "OnDestroy": "PluginDestroyed"}},
+    {"type": "QuadooPlugin", "name": "FallbackPlugin", "properties": {"Module": "FallbackPlugin.qbc"}}
+  ]
+}

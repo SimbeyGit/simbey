@@ -1,0 +1,188 @@
+﻿{
+  "schemaVersion": 1,
+  "type": "Form",
+  "name": "MainForm",
+  "id": "{D2F4C081-7E4D-4C15-86FB-AB4188928854}",
+  "properties": {
+    "Width": 640,
+    "Height": 400,
+    "Caption": "MainForm",
+    "Left": 0,
+    "Top": 0,
+    "Visible": false,
+    "Enabled": true,
+    "Align": 0,
+    "Anchors": 3,
+    "Padding": {
+      "Left": 0,
+      "Top": 0,
+      "Right": 0,
+      "Bottom": 0
+    },
+    "Margins": {
+      "Left": 0,
+      "Top": 0,
+      "Right": 0,
+      "Bottom": 0
+    },
+    "MinWidth": 0,
+    "MinHeight": 0,
+    "MaxWidth": 0,
+    "MaxHeight": 0,
+    "TabOrder": 0,
+    "Font": {
+      "Name": "Segoe UI",
+      "Size": 9,
+      "Bold": false,
+      "Italic": false
+    },
+    "ForeColor": 0,
+    "BackColor": 15790320,
+    "BorderStyle": 2,
+    "BorderIcons": 15,
+    "WindowState": 0,
+    "FormStyle": 0,
+    "AutoScroll": false,
+    "Icon": null,
+    "KeyPreview": false
+  },
+  "events": {
+    "OnDestroy": "",
+    "OnCloseQuery": "",
+    "OnClose": "",
+    "OnShow": "",
+    "OnHide": "",
+    "OnFocus": "",
+    "OnBlur": "",
+    "OnKeyDown": "",
+    "OnKeyUp": "",
+    "OnKeyPress": ""
+  },
+  "children": [
+    {
+      "type": "Panel",
+      "name": "Panel1",
+      "properties": {
+        "Left": 20,
+        "Top": 25,
+        "Caption": "Panel1",
+        "TabOrder": 0,
+        "Width": 280,
+        "Height": 150,
+        "Visible": true,
+        "Enabled": true,
+        "Align": 0,
+        "Anchors": 3,
+        "Padding": {
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0
+        },
+        "Margins": {
+          "Left": 0,
+          "Top": 0,
+          "Right": 0,
+          "Bottom": 0
+        },
+        "AutoSize": false,
+        "MinWidth": 0,
+        "MinHeight": 0,
+        "MaxWidth": 0,
+        "MaxHeight": 0,
+        "Font": {
+          "Name": "Segoe UI",
+          "Size": 9,
+          "Bold": false,
+          "Italic": false
+        },
+        "ForeColor": 0,
+        "BackColor": 15790320
+      },
+      "schemaVersion": 1,
+      "id": "{BE8BA62D-A4E6-4CDC-837C-1CF7C453C2D0}",
+      "events": {
+        "OnCreate": "",
+        "OnDestroy": "",
+        "OnShow": "",
+        "OnHide": "",
+        "OnFocus": "",
+        "OnBlur": "",
+        "OnKeyDown": "",
+        "OnKeyUp": "",
+        "OnKeyPress": ""
+      },
+      "children": [
+        {
+          "type": "Button",
+          "name": "RenamedButton",
+          "properties": {
+            "Left": 12,
+            "Top": 18,
+            "Caption": "Button1",
+            "TabOrder": 0,
+            "Width": 123,
+            "Height": 26,
+            "Visible": true,
+            "Enabled": true,
+            "Align": 0,
+            "Anchors": 3,
+            "Margins": {
+              "Left": 0,
+              "Top": 0,
+              "Right": 0,
+              "Bottom": 0
+            },
+            "MinWidth": 0,
+            "MinHeight": 0,
+            "MaxWidth": 0,
+            "MaxHeight": 0,
+            "Font": {
+              "Name": "Segoe UI",
+              "Size": 9,
+              "Bold": false,
+              "Italic": false
+            },
+            "ForeColor": 0,
+            "BackColor": 15790320,
+            "ModalResult": 0,
+            "Default": false,
+            "Cancel": false
+          },
+          "schemaVersion": 1,
+          "id": "{C1EA19D3-EC3D-4558-BD0C-56E903CE33CA}",
+          "events": {
+            "OnCreate": "",
+            "OnDestroy": "",
+            "OnClick": "",
+            "OnShow": "",
+            "OnHide": "",
+            "OnFocus": "",
+            "OnBlur": "",
+            "OnKeyDown": "",
+            "OnKeyUp": "",
+            "OnKeyPress": ""
+          },
+          "children": []
+        }
+      ]
+    }
+  ],
+  "components": [
+    {
+      "type": "Timer",
+      "name": "Timer1",
+      "id": "{AE148703-AAAB-4342-A62C-C10C93E2EB98}",
+      "schemaVersion": 1,
+      "properties": {
+        "Enabled": true,
+        "Interval": 1000
+      },
+      "events": {
+        "OnCreate": "",
+        "OnDestroy": "",
+        "OnTimer": ""
+      }
+    }
+  ]
+}

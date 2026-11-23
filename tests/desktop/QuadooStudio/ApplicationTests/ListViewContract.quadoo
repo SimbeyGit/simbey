@@ -1,0 +1,62 @@
+// Stage-one adapter experiment. Item is an independent test object, not an
+// implemented ListView control. No parser or VM changes are needed.
+class ListProbePayload
+{
+	property var Value;
+	ListProbePayload(value)
+	{
+		Value = value;
+	}
+};
+
+function Probe(Item)
+{
+	Item.SubItems.Add("one");
+	Item.SubItems.Add("two");
+	if(Item.SubItems[0] != "one")
+	{
+		return -1;
+	}
+	var strings = Item.SubItems;
+	strings[0] = "edited";
+	strings.Replace(1, "last");
+	var snapshot = Item.Snapshot();
+	snapshot.Strings[0] = "independent";
+	if(strings[0] != "edited")
+	{
+		return -2;
+	}
+	Item.Apply(snapshot);
+	if(strings[0] != "independent" || strings.Count != 2)
+	{
+		return -3;
+	}
+	Item.Apply(snapshot);
+	if(Item.Updates != 5 || Item.ItemIndex != 7)
+	{
+		return -4;
+	}
+	Item.Data = 123;
+	if(Item.Data != 123)
+	{
+		return -5;
+	}
+	Item.Data = "payload";
+	if(Item.Data != "payload")
+	{
+		return -6;
+	}
+	Item.Data = null;
+	if(Item.Data != null)
+	{
+		return -7;
+	}
+	var payload = new ListProbePayload(73);
+	Item.Data = payload;
+	Item.Data.Value = 91;
+	if(payload.Value != 91)
+	{
+		return -8;
+	}
+	return 73;
+}

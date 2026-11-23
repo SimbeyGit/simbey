@@ -1,0 +1,22 @@
+{
+	"type": "Form",
+	"name": "SpriteForm",
+	"properties": {
+		"Width": 80,
+		"Height": 60
+	},
+	"children": [
+		{
+			"type": "Canvas",
+			"name": "Drawing",
+			"properties": {
+				"Width": 40,
+				"Height": 30
+			},
+			"events": {
+				"OnPaint": "SpritePaint",
+				"OnCreate": "SpriteCreated"
+			}
+		}
+	]
+}

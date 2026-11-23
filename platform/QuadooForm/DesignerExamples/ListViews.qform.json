@@ -1,0 +1,55 @@
+{
+	"type": "Form",
+	"name": "ListViews",
+	"properties": {"Caption": "ListView columns", "Width": 640, "Height": 340},
+	"components": [
+		{
+			"type": "ImageList",
+			"name": "Images",
+			"id": "{B5000000-0000-0000-0000-000000000002}",
+			"properties": {
+				"Width": 16,
+				"Height": 16,
+				"ColorDepth": "Color32",
+				"Masked": true,
+				"Images": [{"format": "png", "encoding": "base64", "data": "iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAEUlEQVR4nGP4z8DQwPCf4T8ADn0Dfur2k8AAAAAASUVORK5CYII=", "sizing": "Contain"}]
+			}
+		},
+		{"type": "PopupMenu", "name": "RowMenu", "id": "{B5000000-0000-0000-0000-000000000003}"},
+		{
+			"type": "MenuItem",
+			"name": "OpenRow",
+			"menuParent": "{B5000000-0000-0000-0000-000000000003}",
+			"properties": {"Caption": "&Open"}
+		}
+	],
+	"children": [
+		{
+			"type": "ListView",
+			"name": "Results",
+			"properties": {
+				"Left": 12,
+				"Top": 12,
+				"Width": 616,
+				"Height": 270,
+				"ViewStyle": "Report",
+				"FullRowSelect": true,
+				"GridLines": true,
+				"ColumnReorder": true,
+				"CheckBoxes": true,
+				"SmallImages": "{B5000000-0000-0000-0000-000000000002}",
+				"PopupMenu": "{B5000000-0000-0000-0000-000000000003}",
+				"Columns": [
+					{"Caption": "Name", "Width": 260, "Alignment": "Left"},
+					{"Caption": "Size", "Width": 110, "Alignment": "Right"},
+					{"Caption": "Modified", "Width": 170, "Alignment": "Left"}
+				]
+			}
+		},
+		{
+			"type": "Label",
+			"name": "Hint",
+			"properties": {"Left": 12, "Top": 294, "Width": 616, "Height": 22, "Caption": "Columns are designed here. Applications populate rows at runtime."}
+		}
+	]
+}

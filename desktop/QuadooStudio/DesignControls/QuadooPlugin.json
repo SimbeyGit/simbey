@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "packageId": "{A14F5FB9-D835-4812-ABEF-8A265E49B247}",
+  "name": "QuadooPlugin",
+  "description": "Design-time placeholder for an application-provided plugin component.",
+  "control": {
+    "type": "QuadooPlugin",
+    "kind": "nonvisual",
+    "container": false,
+    "properties": [
+      {
+        "name": "Module",
+        "type": "String",
+        "default": ""
+      }
+    ]
+  }
+}

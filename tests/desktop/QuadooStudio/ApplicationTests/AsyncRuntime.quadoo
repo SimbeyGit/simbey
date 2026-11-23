@@ -1,0 +1,211 @@
+var asyncCalls = 0;
+var asyncDestructed = 0;
+var asyncForm;
+var asyncFrame;
+var asyncFailConstructor = false;
+
+interface IAsyncForm
+{
+	virtual function Created(args) = 0;
+};
+interface IAsyncFrame
+{
+};
+
+class AsyncForm : extern(Form), IAsyncForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	property var Panel1;
+	property var GroupBox1;
+	property var ScrollingPanel1;
+	property var Tabs;
+	property var Page1;
+	AsyncForm()
+	{
+		Form = Form.Create(this);
+	}
+	virtual function Created(args)
+	{
+		if(asyncFailConstructor)
+		{
+			Form.Async(AsyncGlobal);
+			throw "Deliberate Async constructor rollback";
+		}
+		return true;
+	}
+	function Bound()
+	{
+		asyncCalls++;
+		return this;
+	}
+	function QueueBound()
+	{
+		Panel1.Async(Bound);
+	}
+};
+
+class AsyncFrame : extern(Frame), IAsyncFrame
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Frame;
+		}
+		set(value)
+		{
+			Frame = value;
+		}
+	}
+	property var FramePanel;
+	AsyncFrame(owner)
+	{
+		Frame = Frame.Create(this,owner);
+	}
+};
+
+class AsyncCallable
+{
+	var action;
+	default function action;
+	AsyncCallable()
+	{
+		action = AsyncGlobal;
+	}
+	~AsyncCallable()
+	{
+		asyncDestructed++;
+	}
+	function Run()
+	{
+		asyncCalls++;
+		return "ignored";
+	}
+	function Callback()
+	{
+		return Run;
+	}
+};
+
+function AsyncGlobal()
+{
+	asyncCalls++;
+	return "ignored return value";
+}
+
+function AsyncGetDefault()
+{
+	return new AsyncCallable;
+}
+
+function AsyncMake()
+{
+	asyncForm = new AsyncForm;
+	asyncFrame = new AsyncFrame(asyncForm.Panel1);
+	return asyncForm;
+}
+
+function AsyncQueueScript()
+{
+	asyncForm.__QuadooRoot.Async(AsyncGlobal);
+	asyncForm.QueueBound();
+	asyncForm.GroupBox1.Async(new function()
+	{
+		asyncCalls++;
+	});
+	asyncForm.ScrollingPanel1.Async(() =>
+	{
+		asyncCalls++;
+	});
+	var callable = new AsyncCallable;
+	asyncForm.Page1.Async(callable.Callback());
+	asyncForm.Tabs.Async(AsyncGlobal);
+	asyncFrame.__QuadooRoot.Async(AsyncGlobal);
+	asyncFrame.FramePanel.Async(new function()
+	{
+		asyncCalls++;
+	});
+	gc();
+	return asyncCalls;
+}
+
+function AsyncQueueThrow()
+{
+	asyncForm.__QuadooRoot.Async(new function()
+	{
+		throw "Deliberate deferred Async failure";
+	});
+	asyncForm.__QuadooRoot.Async(AsyncGlobal);
+}
+
+function AsyncWrongArity()
+{
+	asyncForm.__QuadooRoot.Async(new function(value)
+	{
+		asyncCalls += value;
+	});
+	asyncForm.__QuadooRoot.Async(AsyncGlobal);
+}
+
+function AsyncQueueGlobal()
+{
+	asyncForm.__QuadooRoot.Async(AsyncGlobal);
+}
+
+function AsyncQueueDefaultWrapped()
+{
+	var callable = new AsyncCallable;
+	asyncForm.Page1.Async(new function()
+	{
+		callable();
+	});
+}
+
+function AsyncCounts()
+{
+	return asyncCalls;
+}
+
+function AsyncDestructed()
+{
+	gc();
+	return asyncDestructed;
+}
+
+function AsyncRollback()
+{
+	asyncFailConstructor = true;
+	try
+	{
+		var rejected = new AsyncForm;
+	}
+	catch(error)
+	{
+		asyncFailConstructor = false;
+		return true;
+	}
+	return false;
+}
+
+function AsyncQueueClose()
+{
+	asyncForm.__QuadooRoot.Async(new function()
+	{
+		asyncForm.__QuadooRoot.Close();
+		asyncForm = new AsyncForm;
+		asyncForm.__QuadooRoot.Async(new function()
+		{
+			asyncForm.__QuadooRoot.Close();
+		});
+	});
+}

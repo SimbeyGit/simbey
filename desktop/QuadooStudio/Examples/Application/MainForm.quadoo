@@ -1,0 +1,35 @@
+#pragma once
+
+// Quadoo Studio Form unit.
+
+interface IMainForm
+{
+	// <QuadooStudio:events {7D38ED6F-BA5B-41D7-9269-B3027B5E22A7}>
+	// </QuadooStudio:events>
+};
+
+class MainForm : extern(Form), IMainForm
+{
+	// <QuadooStudio:members {7D38ED6F-BA5B-41D7-9269-B3027B5E22A7}>
+	property __QuadooUnitId { get { return "{7D38ED6F-BA5B-41D7-9269-B3027B5E22A7}"; } }
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set (value)
+		{
+			Form = value;
+		}
+	}
+	property var Panel1; // {BE8BA62D-A4E6-4CDC-837C-1CF7C453C2D0}
+	property var RenamedButton; // {C1EA19D3-EC3D-4558-BD0C-56E903CE33CA}
+	property var Timer1; // {AE148703-AAAB-4342-A62C-C10C93E2EB98}
+	// </QuadooStudio:members>
+
+	MainForm ()
+	{
+		Form = Form.Create(this);
+	}
+};

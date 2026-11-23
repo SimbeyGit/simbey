@@ -1,0 +1,57 @@
+{
+  "target": "application",
+  "args": "",
+  "startDir": ".\\",
+  "files": [
+    {
+      "designer": {
+        "unitId": "{B6A5CF6F-B558-4398-A4A7-95AAF17694FB}",
+        "kind": "frame",
+        "definition": ".\\DetailsFrame.qframe.json",
+        "class": "DetailsFrame",
+        "eventsInterface": "IDetailsFrame",
+        "sourceSync": {
+          "version": 1,
+          "membersText": "\t// <QuadooStudio:members {B6A5CF6F-B558-4398-A4A7-95AAF17694FB}>\r\n\tproperty __QuadooUnitId { get { return \"{B6A5CF6F-B558-4398-A4A7-95AAF17694FB}\"; } }\r\n\tproperty __QuadooRoot\r\n\t{\r\n\t\tget\r\n\t\t{\r\n\t\t\treturn Frame;\r\n\t\t}\r\n\t\tset (value)\r\n\t\t{\r\n\t\t\tFrame = value;\r\n\t\t}\r\n\t}\r\n\t// </QuadooStudio:members>\r\n",
+          "eventsText": "\t// <QuadooStudio:events {B6A5CF6F-B558-4398-A4A7-95AAF17694FB}>\r\n\t// </QuadooStudio:events>\r\n",
+          "members": []
+        }
+      },
+      "path": ".\\DetailsFrame.quadoo"
+    },
+    {
+      "path": ".\\MainForm.quadoo",
+      "designer": {
+        "unitId": "{7D38ED6F-BA5B-41D7-9269-B3027B5E22A7}",
+        "kind": "form",
+        "definition": ".\\MainForm.qform.json",
+        "class": "MainForm",
+        "eventsInterface": "IMainForm",
+        "sourceSync": {
+          "version": 1,
+          "membersText": "\t// <QuadooStudio:members {7D38ED6F-BA5B-41D7-9269-B3027B5E22A7}>\r\n\tproperty __QuadooUnitId { get { return \"{7D38ED6F-BA5B-41D7-9269-B3027B5E22A7}\"; } }\r\n\tproperty __QuadooRoot\r\n\t{\r\n\t\tget\r\n\t\t{\r\n\t\t\treturn Form;\r\n\t\t}\r\n\t\tset (value)\r\n\t\t{\r\n\t\t\tForm = value;\r\n\t\t}\r\n\t}\r\n\tproperty var Panel1; // {BE8BA62D-A4E6-4CDC-837C-1CF7C453C2D0}\r\n\tproperty var RenamedButton; // {C1EA19D3-EC3D-4558-BD0C-56E903CE33CA}\r\n\tproperty var Timer1; // {AE148703-AAAB-4342-A62C-C10C93E2EB98}\r\n\t// </QuadooStudio:members>\r\n",
+          "eventsText": "\t// <QuadooStudio:events {7D38ED6F-BA5B-41D7-9269-B3027B5E22A7}>\r\n\t// </QuadooStudio:events>\r\n",
+          "members": [
+            {
+              "id": "{BE8BA62D-A4E6-4CDC-837C-1CF7C453C2D0}",
+              "member": "Panel1"
+            },
+            {
+              "id": "{C1EA19D3-EC3D-4558-BD0C-56E903CE33CA}",
+              "member": "RenamedButton"
+            },
+            {
+              "id": "{AE148703-AAAB-4342-A62C-C10C93E2EB98}",
+              "member": "Timer1"
+            }
+          ]
+        }
+      },
+      "default": true
+    }
+  ],
+  "application": {
+    "schemaVersion": 1,
+    "mainForm": "{7D38ED6F-BA5B-41D7-9269-B3027B5E22A7}"
+  }
+}

@@ -124,6 +124,7 @@ public:
 	sysint FindTab (PVOID pvData);
 	HRESULT AddTab (HDC hdc, RSTRING rstrLabel, PVOID pvData);
 	HRESULT SetActive (sysint idxTab);
+	HRESULT SetLabel(HDC dc, sysint index, RSTRING label);
 	sysint GetActiveTab (VOID);
 	HRESULT RemoveTab (sysint idxTab);
 	PVOID GetTabData (sysint idxTab);

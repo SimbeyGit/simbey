@@ -330,7 +330,10 @@ static void lodepng_set32bitInt(unsigned char* buffer, unsigned value)
 #ifdef LODEPNG_COMPILE_ENCODER
 static void lodepng_add32bitInt(ucvector* buffer, unsigned value)
 {
-  ucvector_resize(buffer, buffer->size + 4); /*todo: give error if resize failed*/
+	if(!ucvector_resize(buffer, buffer->size + 4))
+	{
+		return;
+	}
   lodepng_set32bitInt(&buffer->data[buffer->size - 4], value);
 }
 #endif /*LODEPNG_COMPILE_ENCODER*/
@@ -347,7 +350,10 @@ static void lodepng_add32bitInt(ucvector* buffer, unsigned value)
 static void addBitToStream(lodepng_size_t* bitpointer, ucvector* bitstream, unsigned char bit)
 {
   /*add a new byte at the end*/
-  if((*bitpointer) % 8 == 0) ucvector_push_back(bitstream, (unsigned char)0);
+	if((*bitpointer) % 8 == 0 && !ucvector_push_back(bitstream, (unsigned char)0))
+	{
+		return;
+	}
   /*earlier bit of huffman code is in a lesser significant bit of an earlier byte*/
   (bitstream->data[bitstream->size - 1]) |= (bit << ((*bitpointer) & 0x7));
   (*bitpointer)++;
@@ -725,7 +731,12 @@ unsigned lodepng_huffman_code_lengths(unsigned* lengths, const unsigned* frequen
     coinmem = numpresent * 2; /*max amount of coins needed with the current algo*/
     coins = (Coin*)malloc(sizeof(Coin) * coinmem);
     prev_row = (Coin*)malloc(sizeof(Coin) * coinmem);
-    if(!coins || !prev_row) return 83; /*alloc fail*/
+	if(!coins || !prev_row)
+	{
+		free(coins);
+		free(prev_row);
+		return 83;
+	}
     init_coins(coins, coinmem);
     init_coins(prev_row, coinmem);
 
@@ -882,11 +893,14 @@ static unsigned huffmanDecodeSymbol(const unsigned char* in, lodepng_size_t* bp,
 /* ////////////////////////////////////////////////////////////////////////// */
 
 /*get the tree of a deflated block with fixed tree, as specified in the deflate specification*/
-static void getTreeInflateFixed(HuffmanTree* tree_ll, HuffmanTree* tree_d)
+static unsigned getTreeInflateFixed(HuffmanTree* tree_ll, HuffmanTree* tree_d)
 {
-  /*TODO: check for out of memory errors*/
-  generateFixedLitLenTree(tree_ll);
-  generateFixedDistanceTree(tree_d);
+	unsigned error = generateFixedLitLenTree(tree_ll);
+	if(!error)
+	{
+		error = generateFixedDistanceTree(tree_d);
+	}
+	return error;
 }
 
 /*get the tree of a deflated block with dynamic tree, the tree itself is also Huffman compressed with a known tree*/
@@ -1049,7 +1063,10 @@ static unsigned inflateHuffmanBlock(ucvector* out, const unsigned char* in, lode
   HuffmanTree_init(&tree_ll);
   HuffmanTree_init(&tree_d);
 
-  if(btype == 1) getTreeInflateFixed(&tree_ll, &tree_d);
+	if(btype == 1)
+	{
+		error = getTreeInflateFixed(&tree_ll, &tree_d);
+	}
   else if(btype == 2)
   {
     error = getTreeInflateDynamic(&tree_ll, &tree_d, in, bp, inlength);
@@ -1941,8 +1958,12 @@ static unsigned lodepng_deflatev(ucvector* out, const unsigned char* in, lodepng
     numdeflateblocks = (insize + blocksize - 1) / blocksize;
     if(numdeflateblocks == 0) numdeflateblocks = 1;
 
-    error = hash_init(&hash, settings->windowsize);
-    if(error) return error;
+	error = hash_init(&hash, settings->windowsize);
+	if(error)
+	{
+		hash_cleanup(&hash);
+		return error;
+	}
 
     for(i = 0; i < numdeflateblocks && !error; i++)
     {
@@ -2116,9 +2137,9 @@ unsigned lodepng_zlib_compress(unsigned char** out, lodepng_size_t* outsize, con
     {
       ADLER32 = adler32(in, (unsigned)insize);
       for(i = 0; i < deflatedata.size; i++) ucvector_push_back(&outv, deflatedata.data[i]);
-      ucvector_cleanup(&deflatedata);
       lodepng_add32bitInt(&outv, ADLER32);
     }
+	ucvector_cleanup(&deflatedata);
 
     *out = outv.data;
     *outsize = outv.size;
@@ -3198,7 +3219,7 @@ unsigned lodepng_convert(unsigned char* out, const unsigned char* in,
     for(i = 0; i < palsize; i++)
     {
       unsigned char* p = &mode_out->palette[i * 4];
-      color_tree_add(&tree, p[0], p[1], p[2], p[3], i);
+      color_tree_add(&tree, p[0], p[1], p[2], p[3], (int)i); /* palette index is at most 255 */
     }
   }
 
@@ -5288,10 +5309,16 @@ unsigned lodepng_encode(unsigned char** out, lodepng_size_t* outsize,
     {
       state->error = lodepng_convert(converted, image, &info.color, &state->info_raw, w, h);
     }
-    if(!state->error) preProcessScanlines(&data, &datasize, converted, w, h, &info, &state->encoder);
+	if(!state->error)
+	{
+		state->error = preProcessScanlines(&data, &datasize, converted, w, h, &info, &state->encoder);
+	}
     free(converted);
   }
-  else preProcessScanlines(&data, &datasize, image, w, h, &info, &state->encoder);
+	else
+	{
+		state->error = preProcessScanlines(&data, &datasize, image, w, h, &info, &state->encoder);
+	}
 
   ucvector_init(&outv);
   while(!state->error) /*while only executed once, to break on error*/

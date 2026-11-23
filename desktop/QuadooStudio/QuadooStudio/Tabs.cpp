@@ -217,6 +217,22 @@ Cleanup:
 	return hr;
 }
 
+HRESULT CTabs::SetLabel(HDC dc, sysint index, RSTRING label)
+{
+	HRESULT hr = S_OK;
+	Gdiplus::Graphics graphics(dc);
+	Gdiplus::RectF bounds;
+	CheckIf(index < 0 || index >= m_aTabs.Length(),E_INVALIDARG);
+	CTab* tab = m_aTabs[index];
+	RStrReplace(&tab->m_rstrLabel,label);
+	graphics.MeasureString(RStrToWide(label),RStrLen(label),m_pNormal,Gdiplus::PointF(0,0),&bounds);
+	tab->m_pt[2].X = m_yTextOffset + bounds.Width + m_yTextOffset;
+	tab->m_pt[3].X = tab->m_pt[2].X + m_yTextOffset;
+	tab->m_pt[4].X = tab->m_pt[3].X;
+	CalculateVisibleTabs();
+Cleanup:
+	return hr;
+}
 HRESULT CTabs::SetActive (sysint idxTab)
 {
 	HRESULT hr;
@@ -267,7 +283,7 @@ Cleanup:
 
 PVOID CTabs::GetTabData (sysint idxTab)
 {
-	if(idxTab < m_aTabs.Length())
+	if(idxTab >= 0 && idxTab < m_aTabs.Length())
 		return m_aTabs[idxTab]->m_pvData;
 	return NULL;
 }

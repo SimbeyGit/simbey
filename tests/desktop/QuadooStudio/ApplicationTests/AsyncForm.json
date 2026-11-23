@@ -1,0 +1,14 @@
+{
+	"type": "Form",
+	"name": "AsyncForm",
+	"properties": {"Visible": false},
+	"events": {"OnCreate": "Created"},
+	"children": [
+		{"type": "Panel", "name": "Panel1", "properties": {"Width": 300, "Height": 100}},
+		{"type": "GroupBox", "name": "GroupBox1", "properties": {"Top": 110}},
+		{"type": "ScrollingPanel", "name": "ScrollingPanel1", "properties": {"Left": 310}},
+		{"type": "TabControl", "name": "Tabs", "properties": {"Top": 220}, "children": [
+			{"type": "TabPage", "name": "Page1"}
+		]}
+	]
+}

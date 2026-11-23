@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "type": "Form",
+  "name": "SettingsForm",
+  "id": "{836934A1-4A55-496F-89F1-000000000001}",
+  "properties": {
+    "Caption": "Application settings",
+    "Width": 540,
+    "Height": 360,
+    "BorderStyle": "Dialog",
+    "BorderIcons": 9,
+    "WindowState": "Normal",
+    "FormStyle": "Normal",
+    "AutoScroll": false,
+    "Icon": null
+  },
+  "events": { "OnCreate": "Settings_Create" },
+  "children": [
+    {
+      "type": "TabControl", "name": "settingsTabs",
+      "id": "{836934A1-4A55-496F-89F1-000000000002}",
+      "properties": { "Align": "Top", "Height": 290, "ActivePageIndex": 0 },
+      "children": [
+        {
+          "type": "TabPage", "name": "generalPage",
+          "id": "{836934A1-4A55-496F-89F1-000000000003}",
+          "properties": { "Caption": "General" },
+          "children": [
+            { "type": "Label", "name": "nameLabel", "properties": { "Caption": "Display name", "Left": 12, "Top": 14, "AutoSize": true } },
+            { "type": "TextBox", "name": "nameEdit", "properties": { "Left": 12, "Top": 38, "Width": 260, "Text": "Léa" }, "events": { "OnChange": "Name_Changed" } },
+            { "type": "CheckBox", "name": "notifications", "properties": { "Caption": "Enable notifications", "Left": 12, "Top": 80, "Width": 260, "CheckState": "Checked" } },
+            {
+              "type": "GroupBox", "name": "connectionGroup",
+              "properties": { "Caption": "Connection", "Left": 12, "Top": 120, "Width": 320, "Height": 110 },
+              "children": [
+                { "type": "RadioButton", "name": "automatic", "properties": { "Caption": "Automatic", "Left": 12, "Top": 25, "Width": 220, "Checked": true } },
+                { "type": "RadioButton", "name": "manual", "properties": { "Caption": "Manual", "Left": 12, "Top": 58, "Width": 220 } }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "TabPage", "name": "advancedPage",
+          "id": "{836934A1-4A55-496F-89F1-000000000004}",
+          "properties": { "Caption": "Advanced" },
+          "children": [
+            {
+              "type": "ScrollingPanel", "name": "advancedOptions",
+              "properties": { "Align": "Client", "AutoScroll": true },
+              "children": [
+                { "type": "ComboBox", "name": "theme", "properties": { "Left": 12, "Top": 20, "Width": 220, "Items": ["System", "Light", "Dark"], "ItemIndex": 0, "Style": "DropDownList" } },
+                { "type": "ListBox", "name": "folders", "properties": { "Left": 12, "Top": 70, "Width": 220, "Height": 110, "Items": ["Documents", "Images", "Archive"], "ItemIndex": 0 } },
+                { "type": "TextBox", "name": "moreOptions", "properties": { "Left": 12, "Top": 320, "Width": 340, "Text": "This page scrolls independently of the workspace." } }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    { "type": "Button", "name": "okButton", "properties": { "Caption": "OK", "Left": 350, "Top": 316, "Width": 80, "Anchors": 12, "ModalResult": "mrOk" }, "events": { "OnClick": "Settings_OK" } },
+    { "type": "Button", "name": "cancelButton", "properties": { "Caption": "Cancel", "Left": 440, "Top": 316, "Width": 80, "Anchors": 12, "ModalResult": "mrCancel", "TabOrder": 1 } }
+  ]
+}

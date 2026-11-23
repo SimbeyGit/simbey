@@ -1,0 +1,226 @@
+var spriteStage = 0;
+function SpriteWhere()
+{
+	return spriteStage;
+}
+var spriteForm;
+var spritePainter;
+var spriteBench;
+var spriteBenchCanvas;
+
+interface ISpriteForm
+{
+	virtual function SpriteCreated(args) = 0;
+	virtual function SpritePaint(args) = 0;
+};
+class SpriteForm : extern(Form), ISpriteForm
+{
+	property var Drawing;
+	property var Bootstrap;
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	SpriteForm()
+	{
+		Form = Form.Create(this);
+	}
+	virtual function SpriteCreated(args)
+	{
+		Bootstrap = args.Sender.CreateSprite();
+		Bootstrap.LoadPixels(2, 1, Host.FileFromHex(null, "ff0000ff00ff007f"), "RGBA32");
+		Bootstrap.Draw(1, 1);
+		return true;
+	}
+	virtual function SpritePaint(args)
+	{
+		if(spritePainter != null)
+		{
+			Drawing.SetPixel(0, 0, 0x563412);
+			var brush = spritePainter;
+			brush(4, 4);
+		}
+		return true;
+	}
+	function Close()
+	{
+		Form.Close();
+	}
+};
+function SpriteChecks()
+{
+	spriteStage = 1;
+	spriteForm = new SpriteForm();
+	var c = spriteForm.Drawing;
+	if(spriteForm.Bootstrap.Width != 2 || c.GetPixel(1, 1) != 0x0000FF)
+	{
+		throw "Sprite creation/drawing during OnCreate failed";
+	}
+	var a = c.CreateSprite();
+	var b = c.CreateSprite();
+	if(a.Width != 0 || a.Height != 0 || a.IsLoaded)
+	{
+		throw "A new Sprite was not empty";
+	}
+	spriteStage = 2;
+	var raw = Host.FileFromHex(null, "ff0000ff00ff007f");
+	spriteStage = 3;
+	a.LoadPixels(2, 1, raw, "RGBA32");
+	raw.Data[0] = 0;
+	c.Clear(0xFFFFFF);
+	a.Draw(2, 3);
+	if(c.GetPixel(2, 3) != 0x0000FF || c.GetPixel(3, 3) != 0x80FF80)
+	{
+		throw "Sprite raw channel order, owned pixels or alpha blending failed";
+	}
+	spriteStage = 4;
+	var explicit = c.ExportPng().ToHex();
+	c.Clear(0xFFFFFF);
+	a(2, 3);
+	if(c.ExportPng().ToHex() != explicit)
+	{
+		throw "Sprite default and explicit invocation differed";
+	}
+	spriteStage = 5;
+	var memory = Host.FileFromBase64(null, "iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAAGklEQVR4nGP4z8DwHwwZ/jdAKDAXAhgYGBgAIhkRcATYihIAAAAASUVORK5CYII=");
+	a.LoadPng(memory);
+	spriteStage = 6;
+	b.LoadFile(SpriteInputs.Png);
+	c.Clear(0xFFFFFF);
+	a.Draw(-1, -1);
+	explicit = c.ExportPng().ToHex();
+	c.Clear(0xFFFFFF);
+	b(-1, -1);
+	if(c.ExportPng().ToHex() != explicit)
+	{
+		throw "PNG file and memory loading differed";
+	}
+	spriteStage = 7;
+	b.LoadFile(SpriteInputs.Bmp);
+	if(b.Width != 3 || b.Height != 2)
+	{
+		throw "BMP loading failed";
+	}
+	spriteStage = 8;
+	b.LoadFile(SpriteInputs.Icon);
+	if(b.Width != 2 || b.Height != 2)
+	{
+		throw "ICO loading failed";
+	}
+	var rejected = 0;
+	try
+	{
+		b.LoadPng(raw);
+	}
+	catch(error)
+	{
+		rejected++;
+	}
+	try
+	{
+		b.Width = 42;
+	}
+	catch(error)
+	{
+		rejected++;
+	}
+	try
+	{
+		b.LoadPixels(2, 1, raw, "RGBA32", -8);
+	}
+	catch(error)
+	{
+		rejected++;
+	}
+	if(rejected != 3 || b.Width != 2 || b.Height != 2)
+	{
+		throw "Sprite validation or atomic replacement failed";
+	}
+	b.Clear();
+	if(b.IsLoaded || b.Width != 0 || b.Height != 0)
+	{
+		throw "Sprite Clear failed";
+	}
+	raw.Data[0] = 255;
+	a.LoadPixels(2, 1, raw, "RGBA32");
+	spritePainter = a;
+	spriteBenchCanvas = c;
+	spriteBench = c.CreateSprite();
+	spriteStage = 9;
+	var tile = Host.CreateBinary(16 * 16 * 4);
+	for(var n = 0; n < 16 * 16; n++)
+	{
+		tile.Data[n * 4] = 203;
+		tile.Data[n * 4 + 1] = 87;
+		tile.Data[n * 4 + 2] = 29;
+		tile.Data[n * 4 + 3] = 127;
+	}
+	spriteStage = 10;
+	spriteBench.LoadPixels(16, 16, tile, "RGBA32");
+	return c.Handle;
+}
+function SpriteBenchExplicit()
+{
+	spriteBenchCanvas.Clear(0xFFFFFF);
+	var brush = spriteBench;
+	for(var n = 0; n < 10000; n++)
+	{
+		brush.Draw(n * 7 % 40 - 8, n * 11 % 30 - 8);
+	}
+	return spriteBenchCanvas.GetPixel(10, 10);
+}
+function SpriteBenchDefault()
+{
+	spriteBenchCanvas.Clear(0xFFFFFF);
+	var brush = spriteBench;
+	for(var n = 0; n < 10000; n++)
+	{
+		brush(n * 7 % 40 - 8, n * 11 % 30 - 8);
+	}
+	return spriteBenchCanvas.GetPixel(10, 10);
+}
+function SpriteTransient()
+{
+	spriteForm.Drawing.AutoRedraw = false;
+	spriteForm.Drawing.DoubleBuffered = true;
+}
+function SpriteUnbuffered()
+{
+	spriteForm.Drawing.DoubleBuffered = false;
+}
+function SpriteFinish()
+{
+	var c = spriteForm.Drawing;
+	c.AutoRedraw = true;
+	c.Clear(0xFFFFFF);
+	var brush = spritePainter;
+	brush(2, 3);
+	var snapshot = c.ExportPng();
+	spriteForm.Close();
+	spriteForm = null;
+	var failed = false;
+	try
+	{
+		brush(0, 0);
+	}
+	catch(error)
+	{
+		failed = true;
+	}
+	if(!failed)
+	{
+		throw "Sprite retained a destroyed surface";
+	}
+	spritePainter.Clear();
+	spritePainter = null;
+	spriteBench = null;
+	spriteBenchCanvas = null;
+	return snapshot;
+}

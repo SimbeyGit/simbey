@@ -35,7 +35,7 @@ INT WINAPI wWinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	CheckIfGetLastError(!DPI::Initialize());
 
 	Check(OleInitialize(NULL));
-	Check(StartCommonControls(ICC_TAB_CLASSES | ICC_TREEVIEW_CLASSES));
+	Check(StartCommonControls(ICC_TAB_CLASSES | ICC_TREEVIEW_CLASSES | ICC_LISTVIEW_CLASSES | ICC_BAR_CLASSES));
 
 	Check(CSplitter::Register(hInstance));
 	Check(CodeEditRegister());

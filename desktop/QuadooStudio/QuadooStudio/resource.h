@@ -20,6 +20,8 @@
 #define IDD_WEB_PARAMS                  116
 #define IDD_RUN_WEBSERVICE              117
 #define IDD_START_DEBUGGER              118
+#define IDR_DESIGNER_ACCELERATOR        119
+#define IDD_APPLICATION_SETTINGS        120
 #define ID_STATUS_BAR                   1001
 #define IDC_PROJECT_FILES               1002
 #define IDC_QVM                         1003
@@ -57,6 +59,12 @@
 #define IDC_DEBUG_HOST                  1035
 #define IDC_ABORT                       1036
 #define IDC_DEBUGGER_ICON               1037
+#define IDC_APPLICATION                 1038
+#define IDC_APPLICATION_MODULES         1039
+#define IDC_ADD_MODULE                  1040
+#define IDC_REMOVE_MODULE               1041
+#define IDC_MODULES_X86                 1042
+#define IDC_MODULES_X64                 1043
 #define ID_FILE_EXIT                    40001
 #define ID_FILE_NEW_PROJECT             40003
 #define ID_PROJECT_ADDFILE              40004
@@ -78,14 +86,55 @@
 #define ID_TOGGLE_BREAKPOINT            40020
 #define ID_NEXT_TAB                     40021
 #define ID_CLOSE_TAB                    40022
+#define ID_VIEW_CODE                    40023
+#define ID_VIEW_DESIGN                  40024
+#define ID_VIEW_TOGGLEDESIGN            40025
+#define ID_FILE_SAVEALL                 40026
+#define ID_FORM_SYNCSOURCE              40027
+#define ID_PROJECT_SETTINGS             40028
+#define ID_FILE_RECENT_FIRST            40050
+#define ID_FILE_RECENT_LAST             40059
+#define ID_FORM_NEWFORM                 41001
+#define ID_FORM_NEWFRAME                41002
+#define ID_FORM_OPEN                    41003
+#define ID_FORM_EXPORT                  41005
+#define ID_FORM_DELETE                  41007
+#define ID_FORM_ROOT                    41008
+#define ID_FORM_PARENT                  41009
+#define ID_FORM_PREVIEW                 41010
+#define ID_FORM_ZOOM50                  41011
+#define ID_FORM_ZOOM75                  41012
+#define ID_FORM_ZOOM100                 41013
+#define ID_FORM_ZOOM150                 41014
+#define ID_FORM_ZOOM200                 41015
+#define ID_FORM_GRID                    41016
+#define ID_FORM_SNAP                    41017
+#define ID_FORM_RESET                   41018
+#define ID_FORM_ABOUT                   41019
+#define ID_FORM_TABORDER                41020
+#define ID_FORM_BACK                    41021
+#define ID_FORM_FRONT                   41022
+#define ID_FORM_CUT                     41023
+#define ID_FORM_COPY                    41024
+#define ID_FORM_PASTE                   41025
+#define ID_FORM_ENABLED                 41026
+#define ID_FORM_HANDLER                 41027
+#define ID_FORM_MENUEDITOR              41028
+#define ID_FORM_IMAGELISTEDITOR         41029
+#define ID_FORM_TREENODESEDITOR         41030
+#define ID_FORM_LISTCOLUMNSEDITOR       41031
+#define ID_FORM_ADDSTATUSPANEL          41032
+#define ID_FORM_MOVESTATUSPANELLEFT     41033
+#define ID_FORM_MOVESTATUSPANELRIGHT    41034
+#define ID_FORM_PACKAGES                41900
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        119
-#define _APS_NEXT_COMMAND_VALUE         40023
-#define _APS_NEXT_CONTROL_VALUE         1038
+#define _APS_NEXT_RESOURCE_VALUE        121
+#define _APS_NEXT_COMMAND_VALUE         40029
+#define _APS_NEXT_CONTROL_VALUE         1044
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

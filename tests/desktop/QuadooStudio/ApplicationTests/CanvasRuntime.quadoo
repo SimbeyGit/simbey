@@ -1,0 +1,139 @@
+var canvasForm;
+var canvasPaints = 0;
+var canvasCreates = 0;
+interface ICanvasForm
+{
+	virtual function CanvasCreate(args) = 0;
+	virtual function CanvasPaint(args) = 0;
+};
+class CanvasForm : extern(Form), ICanvasForm
+{
+	property var Drawing;
+	property var Images;
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	CanvasForm()
+	{
+		Form = Form.Create(this);
+	}
+	virtual function CanvasCreate(args)
+	{
+		args.Sender.Clear(0xFFFFFF);
+		canvasCreates++;
+		return true;
+	}
+	virtual function CanvasPaint(args)
+	{
+		canvasPaints++;
+		Drawing.DrawText("Paint callback", 1, 60, 0);
+		return true;
+	}
+	function Close()
+	{
+		Form.Close();
+	}
+};
+function CanvasChecks()
+{
+	canvasForm = new CanvasForm();
+	var c = canvasForm.Drawing;
+	if(canvasCreates != 1)
+	{
+		throw "Canvas OnCreate was not bound";
+	}
+	c.SetFont("Arial", 10, false, false);
+	var one = c.MeasureText("A&V ");
+	var block = c.MeasureText("A&V \r\n");
+	if(one.Width <= 0 || one.Height <= 0 || block.Width != one.Width || block.Height != 2 * one.Height)
+	{
+		throw "Canvas text measurement differs from its layout contract";
+	}
+	var oldWidth = one.Width;
+	one.Width = 1;
+	if(c.MeasureText("A&V ").Width != oldWidth)
+	{
+		throw "Canvas measurement result was not an independent value";
+	}
+	var pixels = c.GetPixelSize();
+	if(pixels.Width != c.PixelWidth || pixels.Height != c.PixelHeight)
+	{
+		throw "Canvas physical pixel properties disagree";
+	}
+	c.Clear(c.ResolveColor(0xFFFFFF));
+	c.SetPixel(2, 3, 0x563412);
+	if(c.GetPixel(2, 3) != 0x563412 || c.GetPixel(3, 2) != 0xFFFFFF)
+	{
+		throw "Canvas argument order or COLORREF encoding failed";
+	}
+	var box = c.MeasureText("Sized");
+	box.Left = 10;
+	box.Top = 10;
+	c.DrawRectangle(box, 0, 0x00FF00);
+	box.Left = 60;
+	c.DrawEllipse(box, 0, 0xFF0000);
+	c.DrawLine(0, 45, 70, 45, 0xFF);
+	c.DrawText("Unicode \u03a9", 2, 28, 0);
+	c.DrawImageList(canvasForm.Images, 0, 90, 5);
+	var rejected = 0;
+	try
+	{
+		c.MeasureText(7);
+	}
+	catch(error)
+	{
+		rejected++;
+	}
+	try
+	{
+		c.SetPixel(0, 0, 0x80000005);
+	}
+	catch(error)
+	{
+		rejected++;
+	}
+	if(rejected != 2)
+	{
+		throw "Canvas failed to reject an invalid script argument";
+	}
+	c.ResetFont();
+	c.Invalidate();
+	return c.Handle;
+}
+function CanvasFinish()
+{
+	if(canvasPaints != 1)
+	{
+		throw "Canvas paint callback was missing or recursive";
+	}
+	var c = canvasForm.Drawing;
+	var binary = c.ExportPng();
+	if(binary.ContentType != "image/png" || binary.Size < 32 || binary.Data[0] != 137 || binary.Data[1] != 80)
+	{
+		throw "Canvas export did not return a PNG binary object";
+	}
+	canvasForm.Close();
+	canvasForm = null;
+	var rejected = false;
+	try
+	{
+		c.MeasureText("Destroyed");
+	}
+	catch(error)
+	{
+		rejected = true;
+	}
+	if(!rejected || binary.Data[0] != 137)
+	{
+		throw "Canvas/binary lifetime was incorrect";
+	}
+	return binary;
+}

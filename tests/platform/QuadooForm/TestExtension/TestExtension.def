@@ -1,0 +1,8 @@
+LIBRARY QuadooFormTestExtension
+EXPORTS
+	CreateExternalFactory
+	GetExternalCounts
+	DllCanUnloadNow PRIVATE
+	CreateExternalComponentFactory
+	ConfigureExternalKeyClaims
+	CreateExternalScriptFactory

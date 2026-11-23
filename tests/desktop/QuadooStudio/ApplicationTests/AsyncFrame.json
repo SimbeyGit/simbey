@@ -1,0 +1,5 @@
+{
+	"type": "Frame",
+	"name": "AsyncFrame",
+	"children": [{"type": "Panel", "name": "FramePanel"}]
+}

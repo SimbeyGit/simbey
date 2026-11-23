@@ -21,13 +21,40 @@ enum QUADOO_DEBUG_MESSAGE
 	QDM_EXCEPTION,
 	QDM_STACK_FRAMES,
 	QDM_VARIABLE_QUERY,
-	QDM_VARIABLE_VALUE
+	QDM_VARIABLE_VALUE,
+	QDM_APP_CATALOG,
+	QDM_APP_DEFINITION,
+	QDM_APP_STATUS
 };
 
 // Current protocol version: 2
 // Version 1: Run, code stepping, and call stacks
 // Version 2: Variable inspection
 #define QUADOO_DEBUG_PROTOCOL_VERSION 2
+
+// Only Application sessions use the extended hello and wait for its reply.
+const DWORD QUADOO_APP_DEBUG_REVISION = 1;
+const DWORD QUADOO_DEBUG_MAX_MESSAGE = 64 * 1024 * 1024;
+const DWORD QUADOO_APP_DEBUG_MAX_JSON = 32 * 1024 * 1024;
+const DWORD QUADOO_APP_DEBUG_MAX_BUNDLE = 128 * 1024 * 1024;
+const DWORD QUADOO_APP_DEBUG_MAX_UNITS = 4096;
+const DWORD QUADOO_DEBUG_STARTUP_TIMEOUT = 60000;
+
+struct QUADOO_APP_DEBUG_HELLO
+{
+	DWORD nProtocol;
+	DWORD nApplication;
+	DWORD nBits;
+};
+
+// The catalog starts with a DWORD definition count, followed by UTF-8 JSON.
+// Each definition starts with a DWORD byte count and its UTF-8 class key,
+// followed by UTF-8 JSON. Application status carries a terminated diagnostic.
+struct QUADOO_APP_DEBUG_STATUS
+{
+	HRESULT hr;
+	WCHAR wzDetail[256];
+};
 
 enum QUADOO_DEBUG_VARIABLE_CLASS
 {

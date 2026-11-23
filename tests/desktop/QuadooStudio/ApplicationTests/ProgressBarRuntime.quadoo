@@ -1,0 +1,58 @@
+interface IProgressBarForm
+{
+};
+
+class ProgressBarForm : extern(Form), IProgressBarForm
+{
+	property __QuadooRoot
+	{
+		get
+		{
+			return Form;
+		}
+		set(value)
+		{
+			Form = value;
+		}
+	}
+	property var ProgressBar1;
+	ProgressBarForm()
+	{
+		Form = Form.Create(this);
+	}
+	function Close()
+	{
+		Form.Close();
+	}
+};
+
+function ProgressBars()
+{
+	var form = new ProgressBarForm;
+	var progress = form.ProgressBar1;
+	if(progress.Min != 0 || progress.Max != 100 || progress.Step != 10 || progress.Position != 25)
+	{
+		throw "ProgressBar defaults failed";
+	}
+	progress.StepIt();
+	if(progress.Position != 35)
+	{
+		throw "ProgressBar StepIt failed";
+	}
+	progress.Max = 200000;
+	progress.Min = 100000;
+	progress.Step = 25;
+	progress.Position = 125000;
+	progress.StepIt();
+	if(progress.Position != 125025 || progress.Min != 100000 || progress.Max != 200000)
+	{
+		throw "ProgressBar descriptor synchronization failed";
+	}
+	progress.Position = 0;
+	if(progress.Position != 100000)
+	{
+		throw "ProgressBar position clamping failed";
+	}
+	form.Close();
+	return true;
+}

@@ -145,24 +145,31 @@ namespace Registry
 		return hr;
 	}
 
+	LONG WINAPI RegDeleteTreeRecursive (HKEY hKey)
+	{
+		LONG lResult = ERROR_SUCCESS;
+		TCHAR tzBuffer[MAX_PATH];
+		DWORD dwSize = ARRAYSIZE(tzBuffer);
+		while(RegEnumKeyEx(hKey, 0, tzBuffer, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
+		{
+			lResult = RegDeleteKeyRecursive(hKey, tzBuffer);
+			if(lResult != ERROR_SUCCESS)
+				break;
+			dwSize = ARRAYSIZE(tzBuffer);
+		}
+		return lResult;
+	}
+
 	LONG WINAPI RegDeleteKeyRecursive (HKEY hKeyBase, LPCTSTR pctzKey)
 	{
 		HKEY hKey;
 		LONG lResult = RegOpenKeyEx(hKeyBase, pctzKey, 0, KEY_ALL_ACCESS, &hKey);
 		if(ERROR_SUCCESS == lResult)
 		{
-			FILETIME ft;
-			TCHAR tzBuffer[MAX_PATH];
-			DWORD dwSize = ARRAYSIZE(tzBuffer);
-			while(RegEnumKeyEx(hKey, 0, tzBuffer, &dwSize, NULL, NULL, NULL, &ft) == ERROR_SUCCESS)
-			{
-				lResult = RegDeleteKeyRecursive(hKey, tzBuffer);
-				if(lResult != ERROR_SUCCESS)
-					break;
-				dwSize = ARRAYSIZE(tzBuffer);
-			}
+			lResult = RegDeleteTreeRecursive(hKey);
 			RegCloseKey(hKey);
-			lResult = RegDeleteKey(hKeyBase, pctzKey);
+			if(ERROR_SUCCESS == lResult)
+				lResult = RegDeleteKey(hKeyBase, pctzKey);
 		}
 		return lResult;
 	}
@@ -308,10 +315,16 @@ namespace Registry
 		{
 			*phKey = HKEY_CLASSES_ROOT;
 		}
-		else if(0 == TStrCmpIAssert(pctzHive, TEXT("HKEY_USERS")))
+		else if(0 == TStrCmpIAssert(pctzHive, TEXT("HKEY_USERS")) || 0 == TStrCmpIAssert(pctzHive, TEXT("HKU")))
 		{
 			*phKey = HKEY_USERS;
 		}
+#if(WINVER >= 0x0400)
+		else if(0 == TStrCmpIAssert(pctzHive, TEXT("HKEY_CURRENT_CONFIG")) || 0 == TStrCmpIAssert(pctzHive, TEXT("HKCC")))
+		{
+			*phKey = HKEY_CURRENT_CONFIG;
+		}
+#endif
 		else
 		{
 			hr = HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
@@ -375,7 +388,7 @@ namespace Registry
 		*pcch = GetModuleFileName(hModule, lpFileName, nSize);
 		if(pctzPeerFile)
 		{
-			PCTSTR pctzSlash = TStrCchRChr(lpFileName, *pcch, L'\\');
+			PCTSTR pctzSlash = TStrCchRChr(lpFileName, *pcch, (TCHAR)'\\');
 			if(pctzSlash)
 			{
 				INT cchPath = static_cast<INT>(pctzSlash - lpFileName) + 1;

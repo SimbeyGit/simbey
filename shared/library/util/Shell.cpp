@@ -38,7 +38,7 @@ HRESULT HrShellExecuteEx (LPSHELLEXECUTEINFOW psei)
 	return ShellExecuteExW(psei) ? S_OK : HrEnsureLastError();
 }
 
-HRESULT HrCreateLink (PCWSTR pcwzPathObj, PCWSTR pcwzPathLink, PCWSTR pcwzDesc)
+HRESULT HrCreateLink (PCWSTR pcwzPathObj, __in_opt PCWSTR pcwzWorkingDir, __in_opt PCWSTR pcwzArgs, PCWSTR pcwzPathLink, __in_opt PCWSTR pcwzIconFile, INT idxIcon, INT nCmdShow, __in_opt PCWSTR pcwzDesc)
 {
 	HRESULT hr;
 	IShellLink* psl = NULL;
@@ -50,6 +50,18 @@ HRESULT HrCreateLink (PCWSTR pcwzPathObj, PCWSTR pcwzPathLink, PCWSTR pcwzDesc)
 
 	// Set the path to the shortcut target and add the description.
 	Check(psl->SetPath(pcwzPathObj));
+
+	if(pcwzWorkingDir)
+		Check(psl->SetWorkingDirectory(pcwzWorkingDir));
+
+	if(pcwzArgs)
+		Check(psl->SetWorkingDirectory(pcwzArgs));
+
+	if(pcwzIconFile)
+		Check(psl->SetIconLocation(pcwzIconFile, idxIcon));
+
+	if(0 < nCmdShow)
+		Check(psl->SetShowCmd(nCmdShow));
 
 	if(pcwzDesc)
 		Check(psl->SetDescription(pcwzDesc));

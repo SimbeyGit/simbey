@@ -1,0 +1,38 @@
+#pragma once
+
+#define IDI_PALETTE_FORM             101
+#define IDI_PALETTE_FRAME            102
+#define IDI_PALETTE_BUTTON           103
+#define IDI_PALETTE_CHECKBOX         104
+#define IDI_PALETTE_COMBOBOX         105
+#define IDI_PALETTE_GROUPBOX         106
+#define IDI_PALETTE_LABEL            107
+#define IDI_PALETTE_LISTBOX          108
+#define IDI_PALETTE_MEMO             109
+#define IDI_PALETTE_PANEL            110
+#define IDI_PALETTE_RADIOBUTTON      111
+#define IDI_PALETTE_SCROLLINGPANEL   112
+#define IDI_PALETTE_TABCONTROL       113
+#define IDI_PALETTE_TABPAGE          114
+#define IDI_PALETTE_TEXTBOX          115
+#define IDI_PALETTE_OPENFILE         116
+#define IDI_PALETTE_SAVEFILE         117
+#define IDI_PALETTE_TIMER            118
+#define IDI_PALETTE_IMAGE            119
+#define IDI_PALETTE_COLORSWATCH      120
+
+#define IDI_PALETTE_COLORDIALOG      121
+#define IDI_PALETTE_MAINMENU        122
+#define IDI_PALETTE_POPUPMENU       123
+#define IDI_PALETTE_MENUITEM        124
+#define IDI_PALETTE_IMAGELIST        125
+#define IDI_PALETTE_TREEVIEW         126
+#define IDI_PALETTE_LISTVIEW         127
+#define IDI_PALETTE_IMAGEBUTTON      128
+#define IDI_PALETTE_PROGRESSBAR      129
+#define IDI_PALETTE_STATUSBAR        130
+#define IDI_PALETTE_CANVAS           131
+#define IDI_PALETTE_DATETIMEPICKER   132
+#define IDI_PALETTE_CALENDAR         133
+#define IDR_COLOR_PICKER             201
+#define IDI_COLOR_PICKER             202

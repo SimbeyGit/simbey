@@ -273,4 +273,18 @@ public:
 	{
 		return RStrToWide(m_rstrValue);
 	}
+
+	VOID Clear (VOID)
+	{
+		if(m_rstrValue)
+		{
+			RStrRelease(m_rstrValue);
+			m_rstrValue = NULL;
+		}
+	}
+
+	VOID Replace (RSTRING rstrValue)
+	{
+		RStrReplace(&m_rstrValue, rstrValue);
+	}
 };

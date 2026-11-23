@@ -1,0 +1,3930 @@
+{
+  "schemaVersion": 1,
+  "type": "Form",
+  "name": "ColorPicker",
+  "properties": {
+    "Caption": "Choose Color",
+    "Width": 920,
+    "Height": 612,
+    "BorderStyle": "Single",
+    "BorderIcons": 9,
+    "Font": {
+      "Name": "Tahoma",
+      "Size": 8,
+      "Bold": false,
+      "Italic": false
+    },
+    "Icon": {
+      "format": "ico",
+      "encoding": "base64",
+      "data": "AAABAAIAEBAAAAEAIABoBAAAJgAAACAgAAABACAAqBAAAI4EAAAoAAAAEAAAACAAAAABACAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAADMRgAKTAYACowGAAqMBgAKjAYACowGAAqMBgAKjAYACowGAAqMB4AKgAAAAoAAAAAAAAAAQAAAABKNyUppZmKzcjAtfjDurD5w7ux+sO7sfrDurD6w7qw+sS7sfrDurH6w7qx+cnAt/isoJTZW0s2PQAAAAAAAAADm46Ax//////////+//////////////////////////////7///////////////3//////6ebjuETEwANAAAAErmvpO3////97unb/u7o1P718Oj+9fDr/u7h1P7w5dv+9/Tv/vDl5/7s3eL+8eno/v///f3HvrT8LxcAKwAAABK3rqTp///3/8u9Z/7Dskj/4dql/+TKtP++hET/xpRb/+/j2v/Ci7f/s22j/9Ksxv7/////w7mw+TAYACoAAAASuK6l6v//9P/Ju2L+xLNL/9/Xnf/hxKv/v4ZG/8WSWP/r3NP/wIi1/7RwpP/PpsL+/////8O5sPowGAAqAAAAEriuper///X/xbdY/r6sPP/d1Zr/4MOp/7h7OP/Bik3/7N3U/7yAsP+tZJz/zaK//v/////DubD6MBgAKgAAABK3raLq///9/+bdsf7k2Zz/8ezS//Ll2v/ivpv/5siq//fx6//ixtn/2rPP/+nW3/7///7/w7qx+jAYACoAAAASt62i6v/////p5/f+4+L9//Tw9v/3+PX/4/X+/+n2/P/69/P/8fbo/+v04f/09Ov+///+/8S7sfowGAAqAAAAErmuour9+///cnjq/lJe7P+vqu7/u+ny/0u+8v9jx/T/3+zr/529gP+ArmX/uM2m/v/////CurD6MBgAKgAAABK6r6Lq/Pr//2507P5XYu//p6Pv/7Pn8/9OwfX/Ycj3/9jp6P+cvXz/g7Fp/7PLn/7/////wrqw+jAYACoAAAASuq+h6fz6/v9lbOz+SFXv/6Sg7/+x5/P/QLz1/1bF9//Z6un/lbp1/3irXf+wyZz+/////8K6sPkwGAAqAAAAEbmuo+3////8uLjq/aKm7f7Y0+3+3+7v/qDY8P6w3fD+8PDu/szZu/66z6j+2+HO/f////zEvLL9KhgAKgAAAAGShne4///+////////////////////////////////////////////////////////////n5KF1AAAAAj/AAABMR0JGpeJebS6sKfntaui6LWsouq1raLqs6yi6rSsouq3raLqtayg6rSrn+m7s6fon5KEwU42JCoAAAAAAAAAAAAAAAAAAAAAAAAAEQAAABIAAAASAAAAEgAAABIAAAASAAAAEgAAABIAAAASAAAAEwAAAAAAAAAAAAAAAUACAACAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAOAGAAAoAAAAIAAAAEAAAAABACAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH8/PwQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVVVVA/8AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAFVVPwxPOiU9TzsjQE87I0BPOyNATzsjQE87I0BPOyNATzsjQE87I0BPOyNATzsjQE87I0BPOyNATzsjQE87I0BPOyNATzsjQE87I0BPOyNATzsjQFVCJRsAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAQABAQBbRzN9cWBM5ZSGdv+Wh3f/lYd3/5aHd/+Wh3f/lod3/5aHd/+Wh3f/lod3/5aHd/+Wh3f/lod3/5aHd/+Wh3f/lod3/5aHd/+Wh3f/lod3/5WHdv+Yinr/emtY811LNJ9jVUYSAAAAAAAAAAEAAAAAAAAAAH9/fwL///8CY1E9mqOVhf/m4dv///z6/f/8+P3//Pn9//z5/f/8+f3//Pn9//z5/f/8+f3//Pn9//z5/f/8+f3//Pn9//z5/f/8+f3//Pn9//z5/f/8+f3//Pn9//z4/f/9+v3x7ef/ua2f/2tZRspmWT8Uf38AAv8AAAF/Pz8EAAAAAFdFL2CYiHf/////+f/7+P338+//+PTv//j07//49O//+PTv//j07//49O//+PTv//j07//49O//+PTv//j07//49O//+PTv//j07//49O//+PTv//j07//49O//9/Pv//r28v7////4ua2f/1pHMqEAAAAAPz8/BFVVVQM/Pz8EZ1VCzNzUy/3//fr89vHt//n18P/49O//+PTv//j07//59PD/+fXx//n18f/59PD/+PTv//j07//49O//+fTw//n18f/59fH/+fTx//jz8P/48/D/+PPw//j08P/59fH/9/Pv//r28v7z7un8emlY9lVCJRsAAAAAAAAAAEstHhF3ZlXy9O/q//v28/749O//+vb0//z4+v/8+Pn//Pj6//v39v/59fD/+fXw//r39P/8+/r//Pr5//z7+v/7+Pb/+fXw//n18f/69/L//fz1//z89f/9/PX/+/nz//n08f/59fH/+PPu///9+v2Yinr/UTkiQgAAAAAAAAAATy8fEHVlVO/x7Ob/+/fz/vn18//18OT/7OXI/+3my//s5cf/8uzb//r29P/69/T/9ezk/+rZxv/r28r/6tjG//Hm2v/69/X/+vfy//Tr6//o097/6dbf/+fT3v/w4+f/+/jz//n08f/49O////z4/ZWGdv9QPCQ/AAAAAAAAAABPLx8QdWRT8PHs5//7+PT++PTv/9HEdP/EtEv/xrdT/8W2T//Julr/8uzb//r39f/Nn27/v4RG/8GKTv/Ah0r/w49V//Hm2v/7+Pb/xI+2/7RvpP+3daf/tnKm/7p7q//w4+b/+/nz//fz7////Pn9lod3/087I0AAAAAAAAAAAE8vHxB1ZFPw8ezn//z49v717+X/yrxf/8i5V//IuVr/ybtb/8W1Tv/s5sr/+PHu/8WRWP/DjFL/w49V/8WPVv+/h0r/69rH//jy9f+7fav/uXmq/7l7q/+7fKz/tXKm/+jT3v/8/PX/9/Lv///8+f2Wh3f/TzsjQAAAAAAAAAAATy8fEHVkU/Dx7Of//Pj2/vXw5v/LvWP/x7hV/8i5Wf/Iuln/xrZR/+3nzf/48u//xpRc/8KLUP/DjlT/xI5U/8CITf/s3Mv/+PP1/7yBrf+4d6n/uXqq/7p6q/+2dKf/6dXf//z89f/38u////z5/ZaHd/9POyNAAAAAAAAAAABPLx8QdWRT8PHs5//8+Pb+9fDm/8u9Yv/HuFX/yLlZ/8i6Wf/GtlD/7efM//jy7//Gk1v/wotQ/8OOVP/EjlT/wIhM/+zcyv/48/X/vICt/7h3qf+5eqr/unqr/7Zzp//p1d///Pz1//fy7////Pn9lod3/087I0AAAAAAAAAAAE8vHxB1ZFPw8ezn//z49v718Ob/y75j/8e4Vv/IuVr/yLpa/8a3Uf/t58z/+PLv/8aUXP/Ci1H/w45V/8SOVf/AiU3/7NzK//jz9f+9ga7/uHip/7l7qv+6eqv/t3So/+nV3//8/PX/9/Lv///8+f2Wh3f/TzsjQAAAAAAAAAAATy8fEHVkU/Dx7Of//Pj2/vXw5f/Ju1z/xrdS/8e4Vv/HuVf/xLRK/+zmyv/48u//xI9V/8GJTf/CjFH/w41S/76ERv/r28j/+PP1/7l7qv+3daj/uHip/7l4qv+0bqT/6NPe//z89f/38u////z5/ZaHd/9POyNAAAAAAAAAAABPLx8QdWRT8PLt5//79/P++fXz/9nOjf/Ju1z/zL5k/8q8X//RxHP/9fDk//v49//WsYn/xI9X/8eWYP/FkVr/zKBv//Ts5P/7+fX/z6TC/7t8rP++g6//vH+t/8SPt//06+v/+vfy//fz7////Pn9lod3/087I0AAAAAAAAAAAE8vHxB1ZFPw8u3n//v39P759fL/+fXz//Tv5v/08Of/8+/m//j08P/69vT/+fby//n29P/z7eb/9O7n//Pt5f/39PD/+vf0//n28f/69/L/8+zq//Tt6//z6+r/+PTw//r48//59PH/+PTv///8+f2Wh3f/TzsjQAAAAAAAAAAATy8fEHVkU/Dy7ef/+/f0/vfz8P/89/H///70///99P///vT//vry//j08P/49fH//Pbx///69P//+fP///r0//738f/49PD/+fXw//v28///+/r///r5///7+v/99/X/+PTw//n18f/49O////z5/ZaHd/9POyNAAAAAAAAAAABPLx8QdWRT8PLt5//69vT++/fw/+3q8f/Q0PD/09Pw/9DP8P/j4fD/+/jx//v18f/s8fH/zujx/9Hp8f/N6PH/4u7x//z28P/69vT/8PDm/9vjzv/e5dH/2+PO/+nr3v/79/T/+PXw//j07////Pn9lod3/087I0AAAAAAAAAAAE8vHxB1ZFPw8u3n//v49P738/D/foXv/1Zh7/9eaO//WmTv/2Vu7//j4fH/+/nx/3bN9P9OwvX/VsT1/1LD9f9dx/X/4e7y//z28P+ewYn/g7Fo/4m0bv+Gs2v/jrd0/+ns3v/99/X/9/Pv///8+f2Wh3f/TzsjQAAAAAAAAAAATy8fEHVkU/Dx7Of//fr0/u7q8P9qcu//Ymzv/2Vu7/9mb+//WmTv/9PR8P/2+fH/YMb1/1rG9f9dxvX/Xsf1/1HD9f/Q6fT/+vPo/4+5d/+LtnL/jrZ0/464df+Gsmv/2+TO///4+P/28+7///z5/ZaHd/9POyNAAAAAAAAAAABPLx8QdWRT8PHs5//9+vT+7+vw/2527/9gau//ZG3v/2Rt7/9dZ+//1dTw//f58f9kx/X/WMX1/1zG9f9cxvX/VMT1/9Pq9P/68+n/krp7/4q1cP+NtnP/jbdz/4ezbf/d5dH///j4//bz7v///Pn9lod3/087I0AAAAAAAAAAAE8vHxB1ZFPw8ezn//369P7v6/D/bXXv/2Bq7/9kbe//ZG3v/1xm7//V0/D/9/nx/2PH9f9YxfX/XMb1/1zG9f9TxPX/0ur0//rz6f+Runr/irVw/422c/+Nt3P/h7Ns/93l0P//+Pj/9vPu///8+f2Wh3f/TzsjQAAAAAAAAAAATy8fEHVkU/Dx7Of//fr0/u/r8P9udu//YWvv/2Vu7/9lbu//XWfv/9XT8P/3+fH/ZMf1/1nF9f9dxvX/Xcb1/1TE9f/S6vT/+vPp/5K7e/+KtXH/jbZ0/423c/+ItG3/3eXQ///4+P/28+7///z5/ZaHd/9POyNAAAAAAAAAAABPLx8QdWRT8PHs5//9+vT+7urw/2dw7/9eaO//YWvv/2Jr7/9WYe//09Hw//f58f9dxfX/VcT1/1nF9f9axfX/TcL1/9Dp9P/68+j/jbh1/4i0bv+LtXH/i7Zx/4OxZ//b5M7///j4//bz7v///Pn9lod3/087I0AAAAAAAAAAAE8vHxB1ZFPw8ezn//v39P769vD/l5zw/2dw7/9vd+//aXLv/36F7//s6vH//fjx/5HV9P9fx/X/aMr1/2LI9f93z/T/6/Hx//338/+xzJ7/j7h1/5W7fP+RuXj/oMGJ//Dw5//79vP/9/Pv///8+f2Wh3f/TjojQQAAAAAAAAAAVTMiD3VkU+/z7uj/+vbz/vn28P/79/H/7+zx//Dt8f/u6/H/+PTx//z48f/69fH//Pbx/+7y8f/v8vH/7fLx//j18f/89vH/+fXy//v28//x8ej/8vHp//Hw6P/49fD/+/b0//n18f/48+7///36/ZWGdv9OOSU+AAAAAD8/PwQAAAABYU86t83Duf7////79PDs//j08P/79/D/+/fw//v38P/59fD/+PTw//j08P/49PD/+/Xw//v18P/79fD/+fTw//j08P/49PD/+PTw//r18//69fL/+vbz//n08f/49PD/9vHt///7+P3p49z9bl1K61VEMw8AAAABVVVVAwAAAABWQi9Bg3Jg//Tw6/z////7+vbz/vr38/769/T++vf0/vv39P779/T++/f0/vv39P769/T++vf0/vr39P779/T++/f0/vv39P779/P++vfz/vr38/769/P++/fz/vr28/7///r8////+aSVhf9ZRjF7AAAAAH8/PwQAAAAAf39/AgAAAABfSzdlg3Ng/8zDuf/x7ej/8ezn//Ls5//y7ef/8u3n//Lt5//y7ef/8u3n//Lt5//y7ef/8u3n//Lt5//y7ef/8u3n//Lt5//y7ef/8u3n//Lt5//x7Ob/8+/q/9rTyv+YiHf/Y1E9mv///wJVVVUDAAAAAAAAAAAAAAAAf39/AgAAAABbSDFDZFE8snZmU+t2ZlTvdmVU73VkU/B1ZFPwdWRT8HVkU/B1ZFPwdWRT8HVkU/B1ZFPwdWRT8HVkU/B1ZFPwdWRT8HVkU/B1ZFPwdWRT8HVlU+95Z1XualhDx1hGMWIAAQEAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAf38AAgAAAAAAAAAARDMiD08vHxBPLx8QTy8fEE8vHxBPLx8QTy8fEE8vHxBPLx8QTy8fEE8vHxBPLx8QTy8fEE8vHxBPLx8QTy8fEE8vHxBPLx8QPy8fEE8vHxAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVVVVA1VVVQMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///wF/Pz8EAAAAAAAAAAAAAAAAAAAAAPf//+foAAAbkAAABYAAAABAAAACAAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABAAAAAEAAAAKgAAAB0AAACewAADfz///P"
+    }
+  },
+  "events": {
+    "OnCloseQuery": "CloseQuery",
+    "OnFocus": "FocusHex"
+  },
+  "children": [
+    {
+      "type": "Panel",
+      "name": "Footer",
+      "properties": {
+        "Left": 0,
+        "Top": 564,
+        "Width": 920,
+        "Height": 48,
+        "Font": {
+          "Name": "Tahoma",
+          "Size": 8,
+          "Bold": false,
+          "Italic": false
+        },
+        "Align": "Bottom"
+      },
+      "children": [
+        {
+          "type": "Button",
+          "name": "AcceptColor",
+          "properties": {
+            "Left": 374,
+            "Top": 10,
+            "Width": 80,
+            "Height": 26,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            },
+            "Caption": "OK",
+            "Default": true,
+            "ModalResult": 1,
+            "TabOrder": 0,
+            "Anchors": 2
+          }
+        },
+        {
+          "type": "Button",
+          "name": "CancelColor",
+          "properties": {
+            "Left": 466,
+            "Top": 10,
+            "Width": 80,
+            "Height": 26,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            },
+            "Caption": "Cancel",
+            "Cancel": true,
+            "ModalResult": 2,
+            "TabOrder": 1,
+            "Anchors": 2
+          }
+        }
+      ]
+    },
+    {
+      "type": "ScrollingPanel",
+      "name": "ColorChoices",
+      "properties": {
+        "Left": 0,
+        "Top": 0,
+        "Width": 920,
+        "Height": 564,
+        "Font": {
+          "Name": "Tahoma",
+          "Size": 8,
+          "Bold": false,
+          "Italic": false
+        },
+        "Align": "Client",
+        "AutoScroll": true
+      },
+      "children": [
+        {
+          "type": "Panel",
+          "name": "VistaPalette",
+          "properties": {
+            "Left": 16,
+            "Top": 38,
+            "Width": 458,
+            "Height": 150,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            }
+          },
+          "children": [
+            {
+              "type": "ColorSwatch",
+              "name": "Vista0",
+              "properties": {
+                "Left": 0,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16775408
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista1",
+              "properties": {
+                "Left": 22,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16777200
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista2",
+              "properties": {
+                "Left": 44,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15792895
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista3",
+              "properties": {
+                "Left": 66,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16775416
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista4",
+              "properties": {
+                "Left": 88,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15794160
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista5",
+              "properties": {
+                "Left": 110,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15794175
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista6",
+              "properties": {
+                "Left": 132,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16118015
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista7",
+              "properties": {
+                "Left": 154,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16449525
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista8",
+              "properties": {
+                "Left": 176,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15660543
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista9",
+              "properties": {
+                "Left": 198,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16448255
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista10",
+              "properties": {
+                "Left": 220,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16777215
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista11",
+              "properties": {
+                "Left": 242,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16443110
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista12",
+              "properties": {
+                "Left": 264,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15134970
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista13",
+              "properties": {
+                "Left": 286,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16119285
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista14",
+              "properties": {
+                "Left": 308,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14474460
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista15",
+              "properties": {
+                "Left": 330,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13882323
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista16",
+              "properties": {
+                "Left": 352,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  12632256
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista17",
+              "properties": {
+                "Left": 374,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11119017
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista18",
+              "properties": {
+                "Left": 396,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8421504
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista19",
+              "properties": {
+                "Left": 418,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  6908265
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista20",
+              "properties": {
+                "Left": 440,
+                "Top": 0,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  3289650
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista21",
+              "properties": {
+                "Left": 0,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  0
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista22",
+              "properties": {
+                "Left": 22,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  255
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista23",
+              "properties": {
+                "Left": 44,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8421616
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista24",
+              "properties": {
+                "Left": 66,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  6053069
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista25",
+              "properties": {
+                "Left": 88,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9408444
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista26",
+              "properties": {
+                "Left": 110,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  2237106
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista27",
+              "properties": {
+                "Left": 132,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  2763429
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista28",
+              "properties": {
+                "Left": 154,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  139
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista29",
+              "properties": {
+                "Left": 176,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  128
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista30",
+              "properties": {
+                "Left": 198,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14804223
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista31",
+              "properties": {
+                "Left": 220,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  7504122
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista32",
+              "properties": {
+                "Left": 242,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  4678655
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista33",
+              "properties": {
+                "Left": 264,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8034025
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista34",
+              "properties": {
+                "Left": 286,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  5275647
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista35",
+              "properties": {
+                "Left": 308,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  17919
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista36",
+              "properties": {
+                "Left": 330,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8036607
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista37",
+              "properties": {
+                "Left": 352,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  2970272
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista38",
+              "properties": {
+                "Left": 374,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  1993170
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista39",
+              "properties": {
+                "Left": 396,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  1262987
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista40",
+              "properties": {
+                "Left": 418,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  6333684
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista41",
+              "properties": {
+                "Left": 440,
+                "Top": 22,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  12180223
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista42",
+              "properties": {
+                "Left": 0,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  4163021
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista43",
+              "properties": {
+                "Left": 22,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  12903679
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista44",
+              "properties": {
+                "Left": 44,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  36095
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista45",
+              "properties": {
+                "Left": 66,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8894686
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista46",
+              "properties": {
+                "Left": 88,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14150650
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista47",
+              "properties": {
+                "Left": 110,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9221330
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista48",
+              "properties": {
+                "Left": 132,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11394815
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista49",
+              "properties": {
+                "Left": 154,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13495295
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista50",
+              "properties": {
+                "Left": 176,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14020607
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista51",
+              "properties": {
+                "Left": 198,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11920639
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista52",
+              "properties": {
+                "Left": 220,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  42495
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista53",
+              "properties": {
+                "Left": 242,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11788021
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista54",
+              "properties": {
+                "Left": 264,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15136253
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista55",
+              "properties": {
+                "Left": 286,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  755384
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista56",
+              "properties": {
+                "Left": 308,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  2139610
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista57",
+              "properties": {
+                "Left": 330,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14481663
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista58",
+              "properties": {
+                "Left": 352,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  55295
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista59",
+              "properties": {
+                "Left": 374,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13499135
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista60",
+              "properties": {
+                "Left": 396,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9234160
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista61",
+              "properties": {
+                "Left": 418,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11200750
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista62",
+              "properties": {
+                "Left": 440,
+                "Top": 44,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  7059389
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista63",
+              "properties": {
+                "Left": 0,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14745599
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista64",
+              "properties": {
+                "Left": 22,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  65535
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista65",
+              "properties": {
+                "Left": 44,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13826810
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista66",
+              "properties": {
+                "Left": 66,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14480885
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista67",
+              "properties": {
+                "Left": 88,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  32896
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista68",
+              "properties": {
+                "Left": 110,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  2330219
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista69",
+              "properties": {
+                "Left": 132,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  3329434
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista70",
+              "properties": {
+                "Left": 154,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  3107669
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista71",
+              "properties": {
+                "Left": 176,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  3145645
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista72",
+              "properties": {
+                "Left": 198,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  65407
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista73",
+              "properties": {
+                "Left": 220,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  64636
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista74",
+              "properties": {
+                "Left": 242,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9157775
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista75",
+              "properties": {
+                "Left": 264,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  65280
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista76",
+              "properties": {
+                "Left": 286,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  10025880
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista77",
+              "properties": {
+                "Left": 308,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9498256
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista78",
+              "properties": {
+                "Left": 330,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  3329330
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista79",
+              "properties": {
+                "Left": 352,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  2263842
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista80",
+              "properties": {
+                "Left": 374,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  32768
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista81",
+              "properties": {
+                "Left": 396,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  25600
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista82",
+              "properties": {
+                "Left": 418,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  5737262
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista83",
+              "properties": {
+                "Left": 440,
+                "Top": 66,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  7451452
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista84",
+              "properties": {
+                "Left": 0,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8388352
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista85",
+              "properties": {
+                "Left": 22,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  10156544
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista86",
+              "properties": {
+                "Left": 44,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11193702
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista87",
+              "properties": {
+                "Left": 66,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13959039
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista88",
+              "properties": {
+                "Left": 88,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13688896
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista89",
+              "properties": {
+                "Left": 110,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11186720
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista90",
+              "properties": {
+                "Left": 132,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13422920
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista91",
+              "properties": {
+                "Left": 154,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16777184
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista92",
+              "properties": {
+                "Left": 176,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16776960
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista93",
+              "properties": {
+                "Left": 198,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16776960
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista94",
+              "properties": {
+                "Left": 220,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15658671
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista95",
+              "properties": {
+                "Left": 242,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9145088
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista96",
+              "properties": {
+                "Left": 264,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8421376
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista97",
+              "properties": {
+                "Left": 286,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  5197615
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista98",
+              "properties": {
+                "Left": 308,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13749760
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista99",
+              "properties": {
+                "Left": 330,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  10526303
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista100",
+              "properties": {
+                "Left": 352,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15130800
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista101",
+              "properties": {
+                "Left": 374,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15128749
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista102",
+              "properties": {
+                "Left": 396,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16760576
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista103",
+              "properties": {
+                "Left": 418,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15453831
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista104",
+              "properties": {
+                "Left": 440,
+                "Top": 88,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16436871
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista105",
+              "properties": {
+                "Left": 0,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11829830
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista106",
+              "properties": {
+                "Left": 22,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16748574
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista107",
+              "properties": {
+                "Left": 44,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  10061943
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista108",
+              "properties": {
+                "Left": 66,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9470064
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista109",
+              "properties": {
+                "Left": 88,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14599344
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista110",
+              "properties": {
+                "Left": 110,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15570276
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista111",
+              "properties": {
+                "Left": 132,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14772545
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista112",
+              "properties": {
+                "Left": 154,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16711680
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista113",
+              "properties": {
+                "Left": 176,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13434880
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista114",
+              "properties": {
+                "Left": 198,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9109504
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista115",
+              "properties": {
+                "Left": 220,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8388608
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista116",
+              "properties": {
+                "Left": 242,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  7346457
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista117",
+              "properties": {
+                "Left": 264,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13458026
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista118",
+              "properties": {
+                "Left": 286,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9125192
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista119",
+              "properties": {
+                "Left": 308,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15624315
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista120",
+              "properties": {
+                "Left": 330,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14381203
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista121",
+              "properties": {
+                "Left": 352,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14822282
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista122",
+              "properties": {
+                "Left": 374,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8519755
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista123",
+              "properties": {
+                "Left": 396,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13382297
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista124",
+              "properties": {
+                "Left": 418,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13828244
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista125",
+              "properties": {
+                "Left": 440,
+                "Top": 110,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13850042
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista126",
+              "properties": {
+                "Left": 0,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16711935
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista127",
+              "properties": {
+                "Left": 22,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  16711935
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista128",
+              "properties": {
+                "Left": 44,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  15631086
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista129",
+              "properties": {
+                "Left": 66,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14524637
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista130",
+              "properties": {
+                "Left": 88,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14204888
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista131",
+              "properties": {
+                "Left": 110,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9109643
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista132",
+              "properties": {
+                "Left": 132,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8388736
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista133",
+              "properties": {
+                "Left": 154,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  14053594
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista134",
+              "properties": {
+                "Left": 176,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  8721863
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista135",
+              "properties": {
+                "Left": 198,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9639167
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista136",
+              "properties": {
+                "Left": 220,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  11823615
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista137",
+              "properties": {
+                "Left": 242,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  9662683
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista138",
+              "properties": {
+                "Left": 264,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  3937500
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista139",
+              "properties": {
+                "Left": 286,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  13353215
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            },
+            {
+              "type": "ColorSwatch",
+              "name": "Vista140",
+              "properties": {
+                "Left": 308,
+                "Top": 132,
+                "Width": 18,
+                "Height": 18,
+                "Font": {
+                  "Name": "Tahoma",
+                  "Size": 8,
+                  "Bold": false,
+                  "Italic": false
+                },
+                "Mode": "Fixed",
+                "Selected": 0,
+                "Colors": [
+                  12695295
+                ]
+              },
+              "events": {
+                "OnClick": "ChooseSwatch"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Label",
+          "name": "VistaHeading",
+          "properties": {
+            "Left": 16,
+            "Top": 12,
+            "Width": 458,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            },
+            "Caption": "Vista Colors"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "CurrentHeading",
+          "properties": {
+            "Left": 510,
+            "Top": 12,
+            "Width": 378,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            },
+            "Caption": "Current color (click to customize)"
+          }
+        },
+        {
+          "type": "ColorSwatch",
+          "name": "CurrentColor",
+          "properties": {
+            "Left": 510,
+            "Top": 34,
+            "Width": 378,
+            "Height": 80,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            },
+            "Mode": "Editable",
+            "Colors": [
+              0
+            ]
+          },
+          "events": {
+            "OnClick": "ChooseSwatch"
+          }
+        },
+        {
+          "type": "TextBox",
+          "name": "HexColor",
+          "properties": {
+            "Left": 510,
+            "Top": 124,
+            "Width": 210,
+            "Height": 24,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            },
+            "TabOrder": 0,
+            "Text": "#000000"
+          },
+          "events": {
+            "OnChange": "EditHex"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "ColorName",
+          "properties": {
+            "Left": 510,
+            "Top": 154,
+            "Width": 378,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            },
+            "Caption": "RGB: 0, 0, 0"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "HexHint",
+          "properties": {
+            "Left": 510,
+            "Top": 180,
+            "Width": 378,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 8,
+              "Bold": false,
+              "Italic": false
+            },
+            "Caption": "#RRGGBB or 0x800000nn (system color)"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "DesktopWorkspaceHeading",
+          "properties": {
+            "Left": 16,
+            "Top": 202,
+            "Width": 888,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 9,
+              "Bold": true,
+              "Italic": false
+            },
+            "Caption": "Desktop & Workspace"
+          }
+        },
+        {
+          "type": "ColorSwatch",
+          "name": "DesktopWorkspace",
+          "properties": {
+            "Left": 16,
+            "Top": 222,
+            "Width": 888,
+            "Height": 32,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 7,
+              "Bold": false,
+              "Italic": false
+            },
+            "Mode": "Fixed",
+            "Colors": [
+              -2147483647,
+              -2147483636,
+              -2147483648
+            ],
+            "Labels": [
+              "DESKTOP",
+              "APPWORKSPACE",
+              "SCROLLBAR"
+            ]
+          },
+          "events": {
+            "OnClick": "ChooseSwatch"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "WindowsTextHeading",
+          "properties": {
+            "Left": 16,
+            "Top": 262,
+            "Width": 888,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 9,
+              "Bold": true,
+              "Italic": false
+            },
+            "Caption": "Windows & Text"
+          }
+        },
+        {
+          "type": "ColorSwatch",
+          "name": "WindowsText",
+          "properties": {
+            "Left": 16,
+            "Top": 282,
+            "Width": 888,
+            "Height": 32,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 7,
+              "Bold": false,
+              "Italic": false
+            },
+            "Mode": "Fixed",
+            "Colors": [
+              -2147483643,
+              -2147483640,
+              -2147483631,
+              -2147483622
+            ],
+            "Labels": [
+              "WINDOW",
+              "WINDOWTEXT",
+              "GRAYTEXT",
+              "HOTLIGHT"
+            ]
+          },
+          "events": {
+            "OnClick": "ChooseSwatch"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "Buttons3DHeading",
+          "properties": {
+            "Left": 16,
+            "Top": 322,
+            "Width": 888,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 9,
+              "Bold": true,
+              "Italic": false
+            },
+            "Caption": "Buttons & 3D"
+          }
+        },
+        {
+          "type": "ColorSwatch",
+          "name": "Buttons3D",
+          "properties": {
+            "Left": 16,
+            "Top": 342,
+            "Width": 888,
+            "Height": 32,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 7,
+              "Bold": false,
+              "Italic": false
+            },
+            "Mode": "Fixed",
+            "Colors": [
+              -2147483633,
+              -2147483630,
+              -2147483626,
+              -2147483628,
+              -2147483632,
+              -2147483627
+            ],
+            "Labels": [
+              "BTNFACE",
+              "BTNTEXT",
+              "3DLIGHT",
+              "BTNHIGHLIGHT",
+              "BTNSHADOW",
+              "3DDKSHADOW"
+            ]
+          },
+          "events": {
+            "OnClick": "ChooseSwatch"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "MenusHeading",
+          "properties": {
+            "Left": 16,
+            "Top": 382,
+            "Width": 888,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 9,
+              "Bold": true,
+              "Italic": false
+            },
+            "Caption": "Menus"
+          }
+        },
+        {
+          "type": "ColorSwatch",
+          "name": "Menus",
+          "properties": {
+            "Left": 16,
+            "Top": 402,
+            "Width": 888,
+            "Height": 32,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 7,
+              "Bold": false,
+              "Italic": false
+            },
+            "Mode": "Fixed",
+            "Colors": [
+              -2147483644,
+              -2147483641,
+              -2147483618,
+              -2147483619
+            ],
+            "Labels": [
+              "MENU",
+              "MENUTEXT",
+              "MENUBAR",
+              "MENUHILIGHT"
+            ]
+          },
+          "events": {
+            "OnClick": "ChooseSwatch"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "CaptionsBordersHeading",
+          "properties": {
+            "Left": 16,
+            "Top": 442,
+            "Width": 888,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 9,
+              "Bold": true,
+              "Italic": false
+            },
+            "Caption": "Captions & Borders"
+          }
+        },
+        {
+          "type": "ColorSwatch",
+          "name": "CaptionsBorders",
+          "properties": {
+            "Left": 16,
+            "Top": 462,
+            "Width": 888,
+            "Height": 32,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 7,
+              "Bold": false,
+              "Italic": false
+            },
+            "Mode": "Fixed",
+            "Colors": [
+              -2147483646,
+              -2147483639,
+              -2147483621,
+              -2147483645,
+              -2147483629,
+              -2147483620,
+              -2147483638,
+              -2147483637,
+              -2147483642
+            ],
+            "Labels": [
+              "ACTIVECAPTION",
+              "CAPTIONTEXT",
+              "GRADIENTACTIVECAPTION",
+              "INACTIVECAPTION",
+              "INACTIVECAPTIONTEXT",
+              "GRADIENTINACTIVECAPTION",
+              "ACTIVEBORDER",
+              "INACTIVEBORDER",
+              "WINDOWFRAME"
+            ]
+          },
+          "events": {
+            "OnClick": "ChooseSwatch"
+          }
+        },
+        {
+          "type": "Label",
+          "name": "SelectionInfoHeading",
+          "properties": {
+            "Left": 16,
+            "Top": 502,
+            "Width": 888,
+            "Height": 20,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 9,
+              "Bold": true,
+              "Italic": false
+            },
+            "Caption": "Selection & Info"
+          }
+        },
+        {
+          "type": "ColorSwatch",
+          "name": "SelectionInfo",
+          "properties": {
+            "Left": 16,
+            "Top": 522,
+            "Width": 888,
+            "Height": 32,
+            "Font": {
+              "Name": "Tahoma",
+              "Size": 7,
+              "Bold": false,
+              "Italic": false
+            },
+            "Mode": "Fixed",
+            "Colors": [
+              -2147483635,
+              -2147483634,
+              -2147483624,
+              -2147483625
+            ],
+            "Labels": [
+              "HIGHLIGHT",
+              "HIGHLIGHTTEXT",
+              "INFOBK",
+              "INFOTEXT"
+            ]
+          },
+          "events": {
+            "OnClick": "ChooseSwatch"
+          }
+        }
+      ]
+    }
+  ]
+}

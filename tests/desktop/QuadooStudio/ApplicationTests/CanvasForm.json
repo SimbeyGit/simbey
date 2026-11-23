@@ -1,0 +1,43 @@
+{
+	"schemaVersion": 1,
+	"type": "Form",
+	"name": "CanvasForm",
+	"properties": {
+		"Width": 260,
+		"Height": 160
+	},
+	"children": [
+		{
+			"type": "Canvas",
+			"name": "Drawing",
+			"properties": {
+				"Width": 160,
+				"Height": 96
+			},
+			"events": {
+				"OnCreate": "CanvasCreate",
+				"OnPaint": "CanvasPaint"
+			}
+		}
+	],
+	"components": [
+		{
+			"type": "ImageList",
+			"name": "Images",
+			"properties": {
+				"Width": 3,
+				"Height": 1,
+				"ColorDepth": "Color32",
+				"Masked": true,
+				"Images": [
+					{
+						"format": "png",
+						"encoding": "base64",
+						"data": "iVBORw0KGgoAAAANSUhEUgAAAAMAAAABCAYAAAAb4BS0AAAAE0lEQVR4nGP4z8DwnwEE/jM0AAAYdQN+O93EpAAAAABJRU5ErkJggg==",
+						"sizing": "Contain"
+					}
+				]
+			}
+		}
+	]
+}

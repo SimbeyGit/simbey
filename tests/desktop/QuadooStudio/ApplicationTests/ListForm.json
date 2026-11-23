@@ -1,0 +1,21 @@
+{
+	"type": "Form",
+	"name": "ListForm",
+	"properties": {"Visible": false},
+	"children": [
+		{
+			"type": "ListView",
+			"name": "List1",
+			"properties": {"CheckBoxes": true, "MultiSelect": true},
+			"events": {
+				"OnChanging": "Changing",
+				"OnChange": "Change",
+				"OnInsert": "Inserted",
+				"OnDeletion": "Deleted",
+				"OnItemChecked": "Checked",
+				"OnCompare": "Compare",
+				"OnColumnClick": "ColumnClick"
+			}
+		}
+	]
+}

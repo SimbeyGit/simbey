@@ -1,0 +1,78 @@
+#include "AsyncRuntime.quadoo"
+
+var waitEvent;
+var waitCalls = 0;
+var waitDestructed = 0;
+
+class WaitCapture
+{
+	~WaitCapture()
+	{
+		waitDestructed++;
+	}
+	function Callback()
+	{
+		return Completed;
+	}
+	function Completed()
+	{
+		waitCalls++;
+		return this;
+	}
+};
+
+function WaitGlobal()
+{
+	waitCalls++;
+	return "ignored";
+}
+
+function WaitQueue()
+{
+	waitEvent = event(null,true);
+	var capture = new WaitCapture;
+	asyncForm.__QuadooRoot.AsyncWait(waitEvent,capture.Callback());
+	asyncForm.Panel1.AsyncWait(waitEvent,WaitGlobal);
+	asyncFrame.FramePanel.AsyncWait(waitEvent,new function()
+	{
+		waitCalls++;
+	});
+	capture = null;
+	gc();
+	return waitCalls;
+}
+
+function WaitSignal()
+{
+	waitEvent.Set();
+	waitEvent = null;
+	gc();
+}
+
+function WaitCounts()
+{
+	gc();
+	return waitCalls * 100 + waitDestructed;
+}
+
+function WaitThrow()
+{
+	var ready = event(null,true);
+	ready.Set();
+	asyncForm.__QuadooRoot.AsyncWait(ready,new function()
+	{
+		throw "Deliberate AsyncWait callback failure";
+	});
+	asyncForm.__QuadooRoot.AsyncWait(ready,WaitGlobal);
+}
+
+function WaitCancel()
+{
+	var never = event(null,false);
+	var capture = new WaitCapture;
+	asyncForm.__QuadooRoot.AsyncWait(never,capture.Callback());
+	asyncForm.__QuadooRoot.Destroy();
+	asyncForm = null;
+	asyncFrame = null;
+	gc();
+}

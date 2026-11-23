@@ -18,6 +18,12 @@ public:
 
 	HRESULT Initialize (VOID);
 	HRESULT SetInitialDirectory (LPCTSTR pctzInitialDir);
+	// S_OK = accepted, S_FALSE = cancelled, failure = common-dialog/system error.
+	// Filter is the usual double-NUL Win32 list. No file contents are written.
+	HRESULT Choose (HWND hwnd, BOOL fOpen, LPCTSTR pctzTitle, LPCTSTR pctzName,
+		LPCTSTR pctzFilter, LPCTSTR pctzDefaultExt, UINT nFilterIndex, DWORD dwFlags,
+		__out UINT* pnSelectedFilter);
+	LPCTSTR GetInitialDirectory (VOID);
 
 	BOOL OpenSingleFile (HWND hwnd);
 	BOOL OpenSingleFile (HWND hwnd, LPCTSTR lpctzFilter);
@@ -25,6 +31,7 @@ public:
 
 	INT OpenMultipleFiles (HWND hwnd);
 	INT OpenMultipleFiles (HWND hwnd, LPCTSTR lpctzFilter);
+	INT OpenMultipleFiles (HWND hwnd, LPCTSTR lpctzDialogTitle, LPCTSTR lpctzFilter);
 
 	BOOL SaveFile (HWND hwnd);
 	BOOL SaveFile (HWND hwnd, LPCTSTR pctzFilter);

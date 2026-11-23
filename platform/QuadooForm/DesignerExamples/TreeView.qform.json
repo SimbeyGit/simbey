@@ -1,0 +1,88 @@
+{
+  "type": "Form",
+  "name": "TreeExample",
+  "properties": {
+    "Caption": "TreeView and shared ImageList",
+    "Width": 500,
+    "Height": 330
+  },
+  "components": [
+    {
+      "type": "ImageList",
+      "name": "ImageList1",
+      "id": "{A9000000-0000-0000-0000-000000000001}",
+      "properties": {
+        "Width": 16,
+        "Height": 16,
+        "ColorDepth": "Color32",
+        "Masked": true,
+        "Images": [
+          {
+            "format": "png",
+            "encoding": "base64",
+            "data": "iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAEUlEQVR4nGP4z8DQwPCf4T8ADn0Dfur2k8AAAAAASUVORK5CYII=",
+            "sizing": "Contain"
+          },
+          {
+            "format": "png",
+            "encoding": "base64",
+            "data": "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA2ElEQVR4nGNgGOmAEZeEqUfEf2padHrHCqx2MdHDcnxmMuJSKOFURFUHvNjXhzUkmOhhObKZ6CHBRA/L8TmCiWGAAQu5Gjdlc2OI+U39SnsHbMJiMbocKQ5hopbl5KgjyQGkGEqKeiZaWE6KPiaGAQZMtPI9sfqZGAYYMI06gGGwR4EfGcUrKfqZGAYYMBGjiNxQIEYfEzUNI0c9Ey0MJcWxLKQ4ANnwAWsPUCt3YETBaWhrFdZ6pQXA1jJmQlZAS0fgapYz0qtjgs1yEGAipRtFbctHASgEAMm8WRYS7EW8AAAAAElFTkSuQmCC",
+            "sizing": "Contain"
+          }
+        ]
+      }
+    }
+  ],
+  "id": "{F3000000-0000-0000-0000-000000000001}",
+  "children": [
+    {
+      "type": "TreeView",
+      "name": "TreeView1",
+      "properties": {
+        "Width": 476,
+        "Height": 306,
+        "CheckBoxes": true,
+        "ReadOnly": false,
+        "Images": "{A9000000-0000-0000-0000-000000000001}",
+        "Items": [
+          {
+            "id": "{F3100000-0000-0000-0000-000000000001}",
+            "Text": "Project",
+            "ImageIndex": 0,
+            "SelectedImageIndex": 1,
+            "Expanded": true,
+            "Items": [
+              {
+                "id": "{F3100000-0000-0000-0000-000000000002}",
+                "Text": "Forms",
+                "ImageIndex": 0,
+                "Expanded": true,
+                "Items": [
+                  {
+                    "id": "{F3100000-0000-0000-0000-000000000003}",
+                    "Text": "MainForm",
+                    "ImageIndex": 1,
+                    "Checked": true
+                  }
+                ]
+              },
+              {
+                "id": "{F3100000-0000-0000-0000-000000000004}",
+                "Text": "Modules",
+                "ImageIndex": 0
+              }
+            ]
+          },
+          {
+            "id": "{F3100000-0000-0000-0000-000000000005}",
+            "Text": "Resources",
+            "ImageIndex": 1
+          }
+        ],
+        "Left": 12,
+        "Top": 12,
+        "Anchors": 15
+      }
+    }
+  ]
+}

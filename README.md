@@ -17,5 +17,15 @@
 ![Infinite Wolfenstein](screenshots/InfiniteWolfenstein.png)
 ### Quadoo Studio ###
 ![Quadoo Studio](screenshots/QuadooStudio.png)
+### Quadoo Studio with Forms Integration ###
+![Quadoo Studio with Forms Integration](screenshots/QuadooForm.png)
 ### Block Map Editor ###
 ![Block Map Editor](screenshots/BlockMapEditor.png)
+
+## Building Quadoo Studio
+
+Open `desktop/QuadooStudio/QuadooStudio.sln` in Visual Studio 2008 and select Debug or Release with Win32 or x64. Build the solution, then launch `target/<configuration>/QuadooStudio.exe` (or `target/<configuration>/x64/QuadooStudio.exe`). The solution builds CodeEdit, QuadooForm, and the shared and standalone form designers against the published SimbeyCore, JSON, and QuadooScript libraries included in this mirror.
+
+The standalone designer solution is `platform/QuadooForm/QuadooForm.sln`. Test solutions, fixtures, and command-line runners are documented in [tests/README.md](tests/README.md).
+
+Build outputs for projects whose sources are included here are ignored, including copies placed in `bin`. Build those projects locally. Published binaries and libraries are retained for components whose implementation projects are absent from this mirror, along with required third-party dependencies and tools.

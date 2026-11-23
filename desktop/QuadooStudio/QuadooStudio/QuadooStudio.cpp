@@ -15,6 +15,7 @@
 #include "NewProjectDlg.h"
 #include "QuadooProject.h"
 #include "QuadooStudio.h"
+#include "ApplicationProject.h"
 
 const WCHAR c_wzQuadooStudioClass[] = L"QuadooStudioCls";
 #ifdef	_WIN64
@@ -27,6 +28,9 @@ const WCHAR c_wzRegistryKey[] = L"Software\\Simbey\\QuadooStudio";
 CQuadooStudio::CQuadooStudio (HINSTANCE hInstance) :
 	m_hInstance(hInstance),
 	m_hAccel(NULL),
+	m_hDesignerAccel(NULL),
+	m_treeHeight(0),
+	m_dragTreeSplit(FALSE),
 	m_pGdiPlusStartupInput(NULL),
 	m_gdiplusToken(NULL),
 	m_hwndStatus(NULL),
@@ -34,7 +38,9 @@ CQuadooStudio::CQuadooStudio (HINSTANCE hInstance) :
 	m_hImageList(NULL),
 	m_pCustomMenu(NULL),
 	m_pSplitter(NULL),
-	m_pProject(NULL)
+	m_pProject(NULL),
+	m_packagesBusy(FALSE),
+	m_hRecentProjects(NULL)
 {
 }
 
@@ -79,10 +85,20 @@ HRESULT CQuadooStudio::Unregister (HINSTANCE hInstance)
 	return UnregisterClass(c_wzQuadooStudioClass, hInstance);
 }
 
-HRESULT CQuadooStudio::Initialize (PCWSTR pcwzCmdLine, INT nWidth, INT nHeight, INT nCmdShow)
+HRESULT CQuadooStudio::Initialize (PCWSTR pcwzCmdLine, INT nWidth, INT nHeight, INT nCmdShow, PCWSTR packageDirectory)
 {
 	HRESULT hr;
 
+	m_packages.Attach(__new QFP::CCatalog);
+	CheckAlloc(m_packages);
+	Check(m_packages->Initialize(packageDirectory));
+
+	C_ASSERT(ID_FILE_RECENT_LAST - ID_FILE_RECENT_FIRST + 1 == CRecentlyUsed::MaxItems);
+	m_recentMenu.Attach(__new CRecentlyUsedMenu(m_recentProjects, ID_FILE_RECENT_FIRST));
+	CheckAlloc(m_recentMenu);
+	m_recentProjects.Initialize(c_wzRegistryKey, this);
+
+	m_hDesignerAccel = LoadAccelerators(m_hInstance,MAKEINTRESOURCE(IDR_DESIGNER_ACCELERATOR));
 	m_hAccel = LoadAccelerators(m_hInstance, MAKEINTRESOURCE(IDR_ACCELERATOR));
 	CheckIfGetLastError(NULL == m_hAccel);
 
@@ -98,7 +114,15 @@ Cleanup:
 
 BOOL CQuadooStudio::PreTranslate (__inout MSG* pmsg)
 {
-	return TranslateAccelerator(m_hwnd, m_hAccel, pmsg);
+	if(m_pProject)
+	{
+		if(m_pProject->TranslateProjectMessage(pmsg))
+			return TRUE;
+		if(m_pProject->DesignerActive() && TranslateAccelerator(m_hwnd,m_hDesignerAccel,pmsg))
+			return TRUE;
+	}
+
+	return TranslateAccelerator(m_hwnd,m_hAccel,pmsg);
 }
 
 // IUpdateTitle
@@ -144,8 +168,14 @@ HRESULT STDMETHODCALLTYPE CQuadooStudio::QueryStatus (
 {
 	for(ULONG i = 0; i < cCmds; i++)
 	{
+		if(!pguidCmdGroup && m_recentMenu && m_recentMenu->Handles(prgCmds[i].cmdID))
+		{
+			m_recentMenu->QueryStatus(NULL, 1, prgCmds + i, pCmdText);
+			continue;
+		}
 		switch(prgCmds[i].cmdID)
 		{
+		case QFP::PackagesCommand:
 		case ID_FILE_NEW_PROJECT:
 		case ID_FILE_OPENPROJECT:
 		case ID_FILE_EXIT:
@@ -178,8 +208,21 @@ HRESULT STDMETHODCALLTYPE CQuadooStudio::Exec (
 {
 	HRESULT hr;
 
+	if(!pguidCmdGroup && m_recentMenu && m_recentMenu->Handles(nCmdID))
+	{
+		hr = m_recentMenu->Exec(NULL, nCmdID, nCmdexecopt, pvaIn, pvaOut);
+		goto Cleanup;
+	}
+
 	switch(nCmdID)
 	{
+	case QFP::PackagesCommand:
+		CheckIf(m_packagesBusy,HRESULT_FROM_WIN32(ERROR_BUSY));
+		m_packagesBusy = TRUE;
+		hr = QFP::ShowPackages(m_hwnd,m_hInstance,m_packages,this);
+		m_packagesBusy = FALSE;
+		break;
+
 	case ID_FILE_NEW_PROJECT:
 		hr = CreateNewProject();
 		break;
@@ -192,7 +235,10 @@ HRESULT STDMETHODCALLTYPE CQuadooStudio::Exec (
 		CheckIfIgnore(NULL == m_pProject, S_FALSE);
 		Check(m_pProject->CloseProject(TRUE));
 		SafeRelease(m_pProject);
+		if(m_packages) m_packages->UpdateUsage(this);
 		TreeView_DeleteAllItems(m_hwndTree);
+		ImageList_SetImageCount(m_hImageList,3);
+		PostMessage(m_hwnd,WM_STUDIO_DESIGNER,0,0);
 		SetWindowText(m_hwnd, c_wzQuadooStudioTitle);
 		break;
 
@@ -283,10 +329,26 @@ HRESULT CQuadooStudio::CreateNewProject (VOID)
 	Check(JSONWrapArray(srFiles, &srv));
 	Check(srProject->AddValueW(L"files", srv));
 
-	Check(JSONSerializeObject(srProject, &stmJSON));
-	Check(Text::SaveToFile(stmJSON.TGetReadPtr<WCHAR>(), stmJSON.TDataRemaining<WCHAR>(), dlgNewProject.GetProjectFile()));
+	if(!lstrcmpW(dlgNewProject.GetProjectType(),L"application"))
+	{
+		Check(CreateApplicationProject(srProject,dlgNewProject.GetProjectFile()));
+	}
+	else
+	{
+		Check(JSONSerializeObject(srProject, &stmJSON));
+		Check(Text::SaveToFile(stmJSON.TGetReadPtr<WCHAR>(), stmJSON.TDataRemaining<WCHAR>(), dlgNewProject.GetProjectFile()));
+	}
 
-	Check(OpenProject(dlgNewProject.GetProjectFile()));
+	Check(OpenAndRecordProject(dlgNewProject.GetProjectFile()));
+	if(m_pProject->IsApplication())
+	{
+		hr = m_pProject->NewFormUnit(TRUE);
+		if(hr == OLECMDERR_E_CANCELED)
+		{
+			hr = S_OK;
+		}
+		Check(hr);
+	}
 
 Cleanup:
 	RStrRelease(rstrField);
@@ -302,10 +364,23 @@ HRESULT CQuadooStudio::OpenProjectPrompt (VOID)
 
 	Check(pick.Initialize());
 	CheckIfIgnore(!pick.OpenSingleFile(m_hwnd, L"Open Project File", L"Project (*.qsproj)\0*.qsproj\0"), E_ABORT);
-	Check(OpenProject(pick.GetFile(0)));
+	Check(OpenAndRecordProject(pick.GetFile(0)));
 
 Cleanup:
 	return hr;
+}
+
+HRESULT CQuadooStudio::OpenAndRecordProject (PCWSTR pcwzPath)
+{
+	HRESULT hr = OpenProject(pcwzPath);
+	if(SUCCEEDED(hr))
+		m_recentProjects.RecordOpen(pcwzPath);
+	return hr;
+}
+
+HRESULT CQuadooStudio::OpenRecentlyUsed (PCWSTR pcwzPath)
+{
+	return OpenProject(pcwzPath);
 }
 
 HRESULT CQuadooStudio::OpenProject (PCWSTR pcwzProject)
@@ -324,12 +399,17 @@ HRESULT CQuadooStudio::OpenProject (PCWSTR pcwzProject)
 
 	pProject = __new CQuadooProject(m_hInstance, this, &m_dm, m_hwndTree);
 	CheckAlloc(pProject);
+	Check(m_packages->ProtectUnknown());
+	m_packagesBusy = TRUE;
+	pProject->SetFormRegistry(m_packages->Registry());
+	pProject->SetStatusWindow(m_hwndStatus);
 	Check(pProject->Initialize(m_hwnd, rcSite, pcwzProject));
 
 	UpdateTitle(pcwzProject, NULL);
 
 	m_pProject = pProject;
 	pProject = NULL;
+	PostMessage(m_hwnd,WM_STUDIO_DESIGNER,0,0);
 
 Cleanup:
 	if(pProject)
@@ -340,6 +420,8 @@ Cleanup:
 		TreeView_DeleteAllItems(m_hwndTree);
 		SetWindowText(m_hwnd, c_wzQuadooStudioTitle);
 	}
+	m_packagesBusy = FALSE;
+	if(m_packages) m_packages->UpdateUsage(this);
 	return hr;
 }
 
@@ -408,6 +490,11 @@ HRESULT CQuadooStudio::FinalizeAndShow (DWORD dwStyle, INT nCmdShow)
 
 BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
+	if(message == QFP::CatalogChangedMessage() || (message == WM_ACTIVATE && LOWORD(wParam) != WA_INACTIVE))
+	{
+		RefreshPackages();
+		if(message == QFP::CatalogChangedMessage()) { lResult = 0; return TRUE; }
+	}
 	switch(message)
 	{
 	case WM_CREATE:
@@ -418,6 +505,14 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 		}
 		break;
 
+	case QFP::RefreshPackagesMessage:
+		if(m_packages && !m_packagesBusy) m_packages->UpdateUsage(this);
+		lResult = 0; return TRUE;
+	case WM_STUDIO_DESIGNER:
+		{ RECT client; GetClientRect(m_hwnd,&client); SendMessage(m_hwnd,WM_SIZE,0,MAKELPARAM(client.right,client.bottom)); }
+		if(m_pProject) m_pProject->UpdateDesignerStatus();
+		else for(UINT n = 0; n < 4; n++) SendMessage(m_hwndStatus,SB_SETTEXTW,n,reinterpret_cast<LPARAM>(n ? L"" : L"Ready"));
+		lResult = 0; return TRUE;
 	case WM_SIZE:
 		if(SIZE_MINIMIZED != wParam && SIZE_MAXHIDE != wParam)
 		{
@@ -431,15 +526,19 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 			GetClientRect(m_hwndStatus, &rcStatus);
 			MoveWindow(m_hwndStatus, 0, rc.bottom - (rcStatus.bottom - rcStatus.top), rc.right - rc.left, rcStatus.bottom - rcStatus.top, TRUE);
 
-			nParts[0] = (rc.right - rc.left) / 2;
-			nParts[1] = nParts[0] + 80;
-			nParts[2] = nParts[1] + 80;
+			nParts[0] = max(0,rc.right - static_cast<INT>(DPI::Scale(330)));
+			nParts[1] = nParts[0] + static_cast<INT>(DPI::Scale(110));
+			nParts[2] = nParts[1] + static_cast<INT>(DPI::Scale(110));
 			nParts[3] = -1;
 			SendMessage(m_hwndStatus, SB_SETPARTS, ARRAYSIZE(nParts), (LPARAM)nParts);
 
 			rc.bottom -= (rcStatus.bottom - rc.top);
 
-			MoveWindow(m_hwndTree, rc.left, rc.top, cxTree, rc.bottom - rc.top, TRUE);
+			HWND palette = m_pProject ? m_pProject->ActivePalette() : NULL;
+			INT height = rc.bottom - rc.top;
+			INT treeHeight = palette ? max(80,min(height - 140,m_treeHeight ? m_treeHeight : height * 2 / 5)) : height;
+			MoveWindow(m_hwndTree,rc.left,rc.top,cxTree,treeHeight,TRUE);
+			if(palette) MoveWindow(palette,rc.left,treeHeight + 5,cxTree,max(1,height - treeHeight - 5),TRUE);
 			m_pSplitter->Move(cxTree, 0, cxSplitter, rc.bottom - rc.top, TRUE);
 
 			if(m_pProject)
@@ -450,9 +549,39 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 		}
 		break;
 
+	case WM_LBUTTONDOWN:
+		if(m_pProject && m_pProject->ActivePalette())
+		{
+			RECT tree; GetWindowRect(m_hwndTree,&tree); MapWindowPoints(NULL,m_hwnd,reinterpret_cast<POINT*>(&tree),2);
+			if(GET_X_LPARAM(lParam) < tree.right && abs(GET_Y_LPARAM(lParam) - tree.bottom - 2) <= 3) { m_dragTreeSplit = TRUE; SetCapture(m_hwnd); lResult = 0; return TRUE; }
+		}
+		break;
+	case WM_MOUSEMOVE:
+		if(m_dragTreeSplit)
+		{
+			m_treeHeight = GET_Y_LPARAM(lParam);
+			PostMessage(m_hwnd,WM_STUDIO_DESIGNER,0,0);
+			lResult = 0;
+			return TRUE;
+		}
+		break;
+	case WM_LBUTTONUP:
+		if(m_dragTreeSplit)
+		{
+			m_dragTreeSplit = FALSE;
+			ReleaseCapture();
+			lResult = 0;
+			return TRUE;
+		}
+		break;
+	case WM_CAPTURECHANGED:
+		m_dragTreeSplit = FALSE;
+		break;
 	case WM_INITMENUPOPUP:
 		if(!HIWORD(lParam))
 		{
+			if(m_hRecentProjects && (HMENU)wParam == GetSubMenu(::GetMenu(m_hwnd), 0))
+				m_recentMenu->Populate(m_hRecentProjects, NULL != m_pCustomMenu);
 			if(SUCCEEDED(MenuUtil::EnableMenuItems(NULL, (HMENU)wParam, this)))
 			{
 				if(m_pCustomMenu)
@@ -466,8 +595,32 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 	case WM_COMMAND:
 		{
 			HRESULT hr = Exec(NULL,LOWORD(wParam),0,NULL,NULL);
+			if(m_recentMenu && m_recentMenu->Handles(LOWORD(wParam)))
+			{
+				if(FAILED(hr) && E_ABORT != hr && OLECMDERR_E_CANCELED != hr && OLECMDERR_E_DISABLED != hr)
+				{
+					CRString text;
+					if(SUCCEEDED(RStrFormatW(&text, L"The recent project could not be opened (0x%.8x).", hr)))
+						MessageBoxW(m_hwnd, text.c_wstr(), c_wzQuadooStudioTitle, MB_OK | MB_ICONERROR);
+				}
+				lResult = 0;
+				return TRUE;
+			}
 			if(hr == S_OK || hr == OLECMDERR_E_CANCELED)
 			{
+				lResult = 0;
+				return TRUE;
+			}
+			if(FAILED(hr) && (LOWORD(wParam) == ID_FILE_SAVEFILE || LOWORD(wParam) == ID_FILE_SAVEALL ||
+				(LOWORD(wParam) >= ID_FORM_NEWFORM && LOWORD(wParam) <= ID_FORM_MOVESTATUSPANELRIGHT) || LOWORD(wParam) == ID_FORM_SYNCSOURCE))
+			{
+				CRString text;
+				if(m_pProject && FAILED(m_pProject->SourceError()) && RStrLen(m_pProject->SourceDiagnostic()))
+					MessageBoxW(m_hwnd,RStrToWide(m_pProject->SourceDiagnostic()),L"Source synchronization",MB_OK | MB_ICONERROR);
+				else if(hr == HRESULT_FROM_WIN32(ERROR_REVISION_MISMATCH))
+					MessageBoxW(m_hwnd,L"The source or definition changed on disk. Save your in-memory edits to a separate file, then close and reopen the project before saving.",L"File changed",MB_OK | MB_ICONERROR);
+				else if(SUCCEEDED(RStrFormatW(&text,L"The command could not be completed (0x%.8x).",hr)))
+					MessageBoxW(m_hwnd,text.c_wstr(),L"Quadoo Studio",MB_OK | MB_ICONERROR);
 				lResult = 0;
 				return TRUE;
 			}
@@ -477,7 +630,7 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 	case WM_NOTIFY:
 		{
 			LPNMHDR pnmh = (LPNMHDR)lParam;
-			if(TVN_CURSOR_CHANGE == pnmh->code)
+			if(TVN_CURSOR_CHANGE == pnmh->code && m_pProject && !m_pProject->DesignerActive())
 			{
 				WCHAR wzStatus[64];
 				TVNCURSORINFO* pci = static_cast<TVNCURSORINFO*>(pnmh);
@@ -519,6 +672,15 @@ BOOL CQuadooStudio::DefWindowProc (UINT message, WPARAM wParam, LPARAM lParam, L
 								lResult = 0;
 								return TRUE;
 							}
+						}
+						break;
+					case TVN_SELCHANGINGW:
+						if(!m_pProject->IsTreeUpdating() && m_pProject->ActiveDesigner() && FAILED(m_pProject->ActiveDesigner()->CommitPropertyEdit())) { lResult = TRUE; return TRUE; }
+						break;
+					case TVN_SELCHANGEDW:
+						{
+							HRESULT hr = m_pProject->SelectTreeItem(reinterpret_cast<NMTREEVIEWW*>(lParam)->itemNew.hItem);
+							if(FAILED(hr)) { CRString text; if(SUCCEEDED(RStrFormatW(&text,L"Unable to open the designer (0x%.8x). Check the associated definition and project metadata.",hr))) MessageBoxW(m_hwnd,text.c_wstr(),L"Designer",MB_OK | MB_ICONERROR); }
 						}
 						break;
 					case NM_DBLCLK:
@@ -623,6 +785,17 @@ HRESULT CQuadooStudio::OnCreate (VOID)
 	HRESULT hr;
 	INT cxTree = -1;
 	HICON hClosedFolder = NULL, hOpenFolder = NULL, hQuadooFile = NULL;
+	HMENU hFile = GetSubMenu(::GetMenu(m_hwnd), 0);
+
+	for(INT i = 0, count = GetMenuItemCount(hFile); i < count; i++)
+	{
+		HMENU hSubMenu = GetSubMenu(hFile, i);
+		if(hSubMenu && 0 <= MenuUtil::FindMenuItemPos(hSubMenu, ID_FILE_RECENT_FIRST))
+		{
+			m_hRecentProjects = hSubMenu;
+			break;
+		}
+	}
 
 	HKEY hKey;
 	if(ERROR_SUCCESS == RegOpenKey(HKEY_CURRENT_USER, c_wzRegistryKey, &hKey))

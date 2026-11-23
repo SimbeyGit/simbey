@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "type": "Form",
+  "name": "ColorSwatches",
+  "properties": {
+    "Caption": "Color swatches",
+    "Width": 430,
+    "Height": 245,
+    "BackColor": 3683376
+  },
+  "children": [
+    {
+      "type": "ColorSwatch",
+      "name": "Palette",
+      "properties": {
+        "Left": 32,
+        "Top": 24,
+        "Width": 350,
+        "Height": 64,
+        "Colors": [
+          11844752,
+          13812616,
+          11836288,
+          11371870
+        ],
+        "Selected": 1
+      }
+    },
+    {
+      "type": "ColorSwatch",
+      "name": "LabeledPalette",
+      "properties": {
+        "Left": 32,
+        "Top": 104,
+        "Width": 350,
+        "Height": 68,
+        "Colors": [
+          11844752,
+          13812616,
+          11836288,
+          11371870
+        ],
+        "Labels": [
+          "Teal",
+          "Cyan",
+          "Slate",
+          "Blue"
+        ],
+        "Selected": 2,
+        "ForeColor": 15790320
+      }
+    },
+    {
+      "type": "ColorSwatch",
+      "name": "EditableColor",
+      "properties": {
+        "Left": 32,
+        "Top": 192,
+        "Width": 100,
+        "Height": 36,
+        "Colors": [
+          13812616
+        ],
+        "Mode": "Editable"
+      }
+    },
+    {
+      "type": "Label",
+      "name": "EditableLabel",
+      "properties": {
+        "Left": 146,
+        "Top": 200,
+        "Width": 230,
+        "Height": 24,
+        "Caption": "Click the swatch to choose a color",
+        "ForeColor": 15790320
+      }
+    }
+  ]
+}

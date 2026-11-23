@@ -1,0 +1,12 @@
+class LoadedPlugin
+{
+	function Ping()
+	{
+		return 73;
+	}
+};
+
+function CreateObject(options)
+{
+	return new LoadedPlugin();
+}
